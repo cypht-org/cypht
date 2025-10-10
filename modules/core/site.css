@@ -967,6 +967,7 @@ div.unseen,
 }
 .mobile .mailbox_list_title {
   font-size: 95%;
+  padding-right: 25px;
 }
 .mobile .folder_cell {
   display: block;
@@ -1642,7 +1643,7 @@ pre.msg_source {
 }
 
 /* Mobile responsive overrides for Bootstrap classes */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .small_header {
     display: flex;
     flex-direction: row;
@@ -1660,26 +1661,27 @@ pre.msg_source {
     font-weight: bold;
   }
 
-  .msg_actions a {
-    font-size: 0.85rem;
-  }
-
+  .mobile .msg_actions a { font-size: 0.85rem; }
   .mobile nav.folder_cell { width: 50%; }
   .mobile .news_cell .subject div { padding-bottom: 0px !important; }
+  .mobile .message_list { position: relative; }
+  .mobile .small_header .col-md-2 {
+    font-weight: bold; white-space: nowrap; width: fit-content;
+  }
+  .mobile .message_list .list_controls.on_mobile {
+    position: absolute; top: 11px; right: 15px;
+  }
+  .mobile .content_title > .flex-wrap {
+    flex-wrap: nowrap !important; margin-bottom: 0px !important;
+  }
+  .mobile .content_title .list_meta { margin-bottom: 0px !important; }
 }
 
-@media (max-width: 575px) {
+@media (max-width: 575.98px) {
   .mobile nav.folder_cell { width: 100%; }
   .mobile #list_controls_menu.show { left: auto; right: -15px; }
   .mobile .calendar .month_label { padding: 1rem !important; }
   .mobile .calendar .border.m-4 { margin: 1rem !important; }
   .mobile .content_title { gap: 0.25rem; padding-bottom: 10px !important; }
-  .mobile .message_list { position: relative; }
-  .mobile .message_list .list_controls.on_mobile {
-    position: absolute; top: 12px; right: 15px;
-  }
-  .mobile .small_header .col-md-2 {
-    font-weight: bold; white-space: nowrap; width: fit-content !important;
-  }
   .mobile .small_header:nth-child(-n+3) { padding-bottom: 6px !important; }
 }
