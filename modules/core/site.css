@@ -1261,7 +1261,6 @@ div.unseen,
 }
 [data-title] {
   position: relative;
-  z-index: 10 !important;
 }
 
 #list_controls_menu {

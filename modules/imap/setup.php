@@ -430,5 +430,6 @@ return array(
         'list_page' => FILTER_UNSAFE_RAW,
         'sort' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'count_children' => FILTER_VALIDATE_BOOL,
+        'reset_cache' => FILTER_VALIDATE_BOOL,
     )
 );
