@@ -881,7 +881,12 @@ class Hm_Handler_load_imap_folders extends Hm_Handler_Module {
         $servers = Hm_IMAP_List::dump();
         $folders = array();
         if (!empty($servers)) {
+            list($success, $form) = $this->process_form(array('reset_cache'));
+            $reset_cache = !empty($form['reset_cache']) ? $form['reset_cache'] : false;
             foreach ($servers as $id => $server) {
+                if ($this->config->get('allow_session_cache', false) && $reset_cache) {
+                    $this->cache->del('imap_folders_imap_'.$id.'_');
+                }
                 $folders[$id] = $server['name'];
             }
         }
