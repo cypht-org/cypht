@@ -559,7 +559,7 @@ class Hm_Mailbox {
         }
     }
 
-    public function search($folder, $target='ALL', $terms=array(), $sort=null, $reverse=null, $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
+    public function search($folder, $target='ALL', $terms=array(), $sort=null, $reverse=null, $exclude_deleted=true, $only_auto_bcc=false) {
         if (! $this->select_folder($folder)) {
             return [];
         }
@@ -567,17 +567,17 @@ class Hm_Mailbox {
             if ($sort) {
                 if ($this->connection->is_supported('SORT')) {
                     // use fast sort extension and search simultanously
-                    $uids = $this->connection->get_message_sort_order($sort, $reverse, $target, $terms, $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
+                    $uids = $this->connection->get_message_sort_order($sort, $reverse, $target, $terms, $exclude_deleted, $only_auto_bcc);
                 } else {
                     // search first and then sort only the found ones by fetch
-                    $uids = $this->connection->search($target, false, $terms, [], $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
+                    $uids = $this->connection->search($target, false, $terms, [], $exclude_deleted, $only_auto_bcc);
                     if ($uids) {
                         $uids = $this->connection->sort_by_fetch($sort, $reverse, $target, implode(',', $uids));
                     }
                 }
             } else {
                 // just search with default sort order
-                $uids = $this->connection->search($target, false, $terms, [], $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
+                $uids = $this->connection->search($target, false, $terms, [], $exclude_deleted, $only_auto_bcc);
             }
             return $uids;
         } else {
@@ -587,12 +587,12 @@ class Hm_Mailbox {
         }
     }
 
-    public function get_message_list($folder, $msg_ids) {
+    public function get_message_list($folder, $msg_ids, $exclude_auto_bcc = true) {
         if (! $this->select_folder($folder)) {
             return [];
         }
         if ($this->is_imap()) {
-            return $this->connection->get_message_list($msg_ids);
+            return $this->connection->get_message_list($msg_ids, exclude_auto_bcc: $exclude_auto_bcc);
         } else {
             return $this->connection->get_message_list($msg_ids);
         }
