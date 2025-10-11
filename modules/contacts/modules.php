@@ -294,6 +294,10 @@ class Hm_Handler_check_imported_contacts extends Hm_Handler_Module
         $imported_contact = $this->session->get('imported_contact', array());
         $this->session->del('imported_contact');
         $this->out('imported_contact', $imported_contact);
+        $is_ldap_contacts_module_enabled = $this->module_is_supported('ldap_contacts');
+        $this->out('is_ldap_contacts_module_enabled', $is_ldap_contacts_module_enabled);
+        $is_local_contacts_module_enabled = $this->module_is_supported('local_contacts');
+        $this->out('is_local_contacts_module_enabled', $is_local_contacts_module_enabled);
     }
 }
 
@@ -438,13 +442,17 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
 
         $res .= '<div class="action-buttons">';
 
-        $res .= '<button class="btn btn-primary action-btn-add" data-bs-toggle="modal" data-bs-target="#ldapContactModal"><i class="bi bi-person-plus-fill"></i>';
-        $res .= 'Add LDAP';
-        $res .= '</button>';
+        if ($this->get('is_ldap_contacts_module_enabled', false)) {
+            $res .= '<button class="btn btn-primary action-btn-add" data-bs-toggle="modal" data-bs-target="#ldapContactModal"><i class="bi bi-person-plus-fill"></i>';
+            $res .= 'Add LDAP';
+            $res .= '</button>';
+        }
 
-        $res .= '<button class="btn btn-success action-btn-add" data-bs-toggle="modal" data-bs-target="#localContactModal"><i class="bi bi-person-plus"></i>';
-        $res .= 'Add Local';
-        $res .= '</button>';
+        if( $this->get('is_local_contacts_module_enabled', false)) {
+            $res .= '<button class="btn btn-success action-btn-add" data-bs-toggle="modal" data-bs-target="#localContactModal"><i class="bi bi-person-plus"></i>';
+            $res .= 'Add Local';
+            $res .= '</button>';
+        }
 
         $res .= '</div>';
 
@@ -653,8 +661,6 @@ class Hm_Output_contact_forms extends Hm_Output_Module {
         $res = '';
         // TODO: Move local modal form to /modules/local_contacts/
         $res .= $this->buildLocalContactModal();
-        // TODO: Move ldap modal form to /modules/ldap_contacts/
-        $res .= $this->buildLdapContactModal();
         
         return $res;
     }
@@ -782,7 +788,12 @@ class Hm_Output_contact_forms extends Hm_Output_Module {
         
         return $res;
     }
-    
+
+    /**
+     * TODO: remove this function, it's just a copy to build the LDAP modal form, we do need it here anymore
+     * Build the LDAP contact modal
+     * @return string
+     */
     private function buildLdapContactModal() {
         $res = '<div class="modal fade" id="ldapContactModal" tabindex="-1" aria-labelledby="ldapContactModalLabel" aria-hidden="true">';
         $res .= '<div class="modal-dialog modal-dialog-centered modal-xl">';
@@ -988,9 +999,11 @@ class Hm_Output_contact_forms extends Hm_Output_Module {
         $res .= '<input placeholder="' . $this->trans('Username') . '" id="ldap_uid" type="text" name="ldap_uid" value="" class="form-control custom-input" autocomplete="username">';
         $res .= '</div>';
         
+
         $res .= '</div>';
         $res .= '</div>';
         
+        //to put to end form
         $res .= '</form>';
         $res .= '</div>';
 
