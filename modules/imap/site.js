@@ -962,18 +962,17 @@ var imap_move_copy = function(e, action, context) {
 };
 
 
-
 $(function () {
     $(document).on("submit", "#create-filter-form", function (e) {
         e.preventDefault();
         const current_account = $(this).attr("account");
-        // const edit_filter_modal = new Hm_Modal({
-        // //   title: "Create Email Filter",
-        // //   modalId: "editFilterModal",
-        //     size: "xl",
-        //     modalId: "myEditFilterModal",
-        // });
-        const edit_filter_modal = new Hm_Filter_Modal(current_account);
+        console.log("Current account mailbox:", current_account);
+        
+        
+        const edit_filter_modal = new Hm_Filter_Modal();
+        hm_sieve_button_events(edit_filter_modal);
+        edit_filter_modal.setTitle("Add Filter for message like this");
+
         const $form = $(this);
         const $btn = $form.find("#create_filter").prop("disabled", true);
         const data = {};
@@ -1000,9 +999,9 @@ $(function () {
             .join("&");
         }
 
-
         const params = encodeParams(data);
         edit_filter_modal.open();
+        
 
     });
 });

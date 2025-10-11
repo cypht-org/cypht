@@ -192,6 +192,12 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
  */
 class Hm_Output_filter_message_headers extends Hm_Output_Module {
       protected function output() {
+        $mailbox_list_title = $this->get('mailbox_list_title', array());
+
+
+        $account_name = $mailbox_list_title[1] ?? '';
+        $mailbox = $this->get('mailbox');
+
         if ($this->get('msg_headers')) {
             $txt = '';
             $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'reply-to', 'cc', 'x-original-bcc', 'flags');
@@ -440,7 +446,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 . $this->trans('Filter similar messages')
                 . '</a>'
                 . '<div class="dropdown-menu move_to_location p-3">'
-                . '<form id="create-filter-form" style="min-width:260px;">'
+                . '<form id="create-filter-form" style="min-width:260px;" account="' . $mailbox_list_title['name'] . '">'
 
                 // From (enabled, checked by default)
                 . '<div class="form-check mb-1">'
@@ -478,7 +484,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 . '</label>'
                 . '</div>'
 
-                . '<button type="submit" id="create_filter" class="btn btn-primary btn-sm">'
+                . '<button type="submit" id="create_filter" class="btn btn-primary btn-sm" >'
                 . $this->trans('Create filter')
                 . '</button>'
                 . '</form>'
