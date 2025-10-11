@@ -18,6 +18,7 @@ add_handler('ajax_imap_status', 'sieve_status', true, 'sievefilters', 'imap_stat
 add_handler('ajax_imap_debug', 'sieve_connect', true, 'imap', 'imap_connect', 'after');
 
 // sieve filter
+add_output('sieve_filters', 'sievefilters_title_start', true, 'sievefilters', 'content_section_start', 'after');
 add_output('sieve_filters', 'sievefilters_settings_start', true, 'sievefilters', 'version_upgrade_checker', 'after');
 add_output('message', 'sievefilters_settings_start', true, 'sievefilters', 'content_section_start', 'after');
 add_output('ajax_hm_folders', 'sievefilters_settings_link', true, 'sievefilters', 'settings_menu_end', 'before');
@@ -147,6 +148,7 @@ return array(
         'ajax_sieve_toggle_script_state',
         'ajax_list_block_sieve',
         'message_list',
+        'message',
         'ajax_account_sieve_filters',
         'ajax_block_account_sieve_filters',
     ),

@@ -1162,13 +1162,25 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
 /**
  * @subpackage sievefilters/output
  */
-class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
+class Hm_Output_sievefilters_title_start extends Hm_Output_Module {
     protected function output() {
         $socked_connected = $this->get('socket_connected', false);
         $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters').'</div>';
         $res .= '<div class="p-3">';
         $res .= '<div id="sieve_accounts"></div>';
-        $res .= get_classic_filter_modal_content();
+        return $res;
+    }
+}
+
+/**
+ * @subpackage sievefilters/output
+ */
+class Hm_Output_sievefilters_settings_start extends Hm_Output_Module
+{
+    protected function output()
+    {
+
+        $res = get_classic_filter_modal_content();
         $res .= get_script_modal_content();
         return $res;
     }
