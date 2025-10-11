@@ -27,7 +27,7 @@ class WebTest:
         self.driver = get_driver(cap)
         # Change the window size to make sure all elements are visible
         current_size = self.driver.get_window_size()
-        new_height = 5000
+        new_height = 10000
         self.driver.set_window_size(current_size['width'], new_height)
         self.browser = False
         if 'browserName' in self.driver.capabilities:
@@ -170,50 +170,43 @@ class WebTest:
         
     def wait_for_navigation_to_complete(self, timeout=30):
         print(" - waiting for the navigation to complete...")
-        # Wait for the main content to be updated and any loading indicators to disappear
-        try:
-            # Wait for any loading indicators to disappear
-            WebDriverWait(self.driver, 5).until_not(
-                lambda driver: len(driver.find_elements(By.ID, "loading_indicator")) > 0
-            )
-        except:
-            # Loading icon might not be present, continue
-            pass
+        import time
         
-        # Wait for the main content area to be stable
         try:
-            WebDriverWait(self.driver, timeout).until(
-                lambda driver: driver.execute_script("""
-                    return new Promise((resolve) => {
-                        let lastContent = '';
-                        let stableCount = 0;
-                        const checkStability = () => {
-                            const mainContent = document.querySelector('main')?.innerHTML || '';
-                            if (mainContent === lastContent) {
-                                stableCount++;
-                                if (stableCount >= 3) {
-                                    resolve(true);
-                                    return;
-                                }
-                            } else {
-                                stableCount = 0;
-                                lastContent = mainContent;
-                            }
-                            setTimeout(checkStability, 100);
-                        };
-                        checkStability();
-                    });
-                """)
+            get_current_navigations_request_entries_length = lambda: self.driver.execute_script(
+                'return window.performance.getEntriesByType("resource").filter((r) => r.initiatorType === "fetch").length'
             )
-        except:
-            # Fallback: just wait for the main element to be present
-            print(" - fallback: waiting for main element")
-            WebDriverWait(self.driver, timeout).until(
-                exp_cond.presence_of_element_located((By.TAG_NAME, "main"))
+            navigation_length = get_current_navigations_request_entries_length()
+            
+            WebDriverWait(self.driver, min(timeout, 10)).until(
+                lambda driver: get_current_navigations_request_entries_length() > navigation_length
             )
-            # Additional wait for any dynamic content
-            import time
-            time.sleep(1)
+            print(" - navigation detected via fetch requests")
+            
+            time.sleep(0.5)
+            
+        except Exception as e1:
+            print(f" - fetch monitoring failed: {e1}, trying fallback methods")
+            
+            try:
+                WebDriverWait(self.driver, 5).until_not(
+                    lambda driver: len(driver.find_elements(By.ID, "loading_indicator")) > 0
+                )
+                print(" - loading indicator disappeared")
+            except:
+                pass
+            
+            try:
+                WebDriverWait(self.driver, min(timeout, 15)).until(
+                    exp_cond.presence_of_element_located((By.TAG_NAME, "main"))
+                )
+                print(" - main element present")
+                
+                time.sleep(1)
+                
+            except Exception as e2:
+                print(f" - all navigation waiting methods failed: {e1}, {e2}")
+                time.sleep(2)
 
     def wait_for_settings_to_expand(self):
         print(" - waiting for the settings section to expand...")
