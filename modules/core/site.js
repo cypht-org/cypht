@@ -2586,6 +2586,9 @@ function setupActionSnooze(callback) {
 
 const Hm_Filters = (function (my) {
   my.save_filter = function (imap_account, gen_script = false) {
+
+        let is_editing_filter = false;
+        let current_editing_filter_name = "";
     function ordinal_number(n) {
       let ord = "th";
 
@@ -2596,7 +2599,7 @@ const Hm_Filters = (function (my) {
       } else if (n % 10 == 3 && n % 100 != 13) {
         ord = "rd";
       }
-
+  
       return n + ord;
     }
     let validation_failed = false;
@@ -2749,7 +2752,8 @@ const Hm_Filters = (function (my) {
       ],
       function (res) {
         if (Object.keys(res.script_details).length === 0) {
-          window.location = window.location;
+            console.log("res", res);
+        //   window.location = window.location;
         } else {
           edit_script_modal.open();
           $(".modal_sieve_script_textarea").val(res.script_details.gen_script);
@@ -2761,14 +2765,124 @@ const Hm_Filters = (function (my) {
       }
     );
 
-    return true;
-  };
+        return true;
+    };
+
+    my.save_script = function (imap_account) {
+        if ($('.modal_sieve_script_name').val() === "") {
+            Hm_Notices.show('You must provide a name for your script', 'warning');
+            return false;
+        }
+        if ($('.modal_sieve_script_textarea').val() === "") {
+            Hm_Notices.show('Empty script', 'warning');
+            return false;
+        }
+        Hm_Ajax.request(
+            [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_save_script'},
+                {'name': 'imap_account', 'value': imap_account},
+                {'name': 'sieve_script_name', 'value': $('.modal_sieve_script_name').val()},
+                {'name': 'sieve_script_priority', 'value': $('.modal_sieve_script_priority').val()},
+                {'name': 'is_editing_script', 'value': is_editing_script},
+                {'name': 'current_editing_script', 'value': current_editing_script_name},
+                {'name': 'script', 'value': $('.modal_sieve_script_textarea').val()}],
+            function(res) {
+                // window.location = window.location;
+            }
+        );
+    }
+
+    my.add_filter_condition = function() {
+      let header_fields = "";
+      let message_fields = "";
+
+      hm_sieve_condition_fields().Message.forEach(function (value) {
+        if (value.selected === true) {
+          message_fields +=
+            '<option selected value="' +
+            value.name +
+            '">' +
+            value.description +
+            "</option>";
+        } else {
+          message_fields +=
+            '<option value="' +
+            value.name +
+            '">' +
+            value.description +
+            "</option>";
+        }
+      });
+
+      hm_sieve_condition_fields().Header.forEach(function (value) {
+        if (value.selected === true) {
+          header_fields +=
+            '<option selected value="' +
+            value.name +
+            '">' +
+            value.description +
+            "</option>";
+        } else {
+          header_fields +=
+            '<option value="' +
+            value.name +
+            '">' +
+            value.description +
+            "</option>";
+        }
+      });
+
+      let extra_options =
+        '<td class="col-sm-3"><input type="hidden" class="condition_extra_value form-control form-control-sm" name="sieve_selected_extra_option_value[]" /></td>';
+      $(".sieve_list_conditions_modal").append(
+        "                            <tr>" +
+          '                                <td class="col-sm-2">' +
+          '                                    <select class="add_condition_sieve_filters form-control form-control-sm" name="sieve_selected_conditions_field[]">' +
+          '                                        <optgroup label="Message">' +
+          message_fields +
+          "                                        </optgroup>" +
+          '                                        <optgroup label="Header">' +
+          header_fields +
+          "                                        </optgroup>" +
+          "                                    </select>" +
+          "                                </td>" +
+          extra_options +
+          '                                <td class="col-sm-3">' +
+          '                                    <select class="condition_options form-control form-control-sm" name="sieve_selected_conditions_options[]">' +
+          '                                        <option value="Contains">' +
+          "                                            Contains" +
+          "                                        </option>" +
+          '                                        <option value="!Contains">' +
+          "                                            Not Contains" +
+          "                                        </option>" +
+          '                                        <option value="Matches">' +
+          "                                            Matches" +
+          "                                        </option>" +
+          '                                        <option value="!Matches">' +
+          "                                            Not Matches" +
+          "                                        </option>" +
+          '                                        <option value="Regex">' +
+          "                                            Regex" +
+          "                                        </option>" +
+          '                                        <option value="!Regex">' +
+          "                                            Not Regex" +
+          "                                        </option>" +
+          "                                    </select>" +
+          "                                </td>" +
+          '                                <td class="col-sm-3">' +
+          '                                    <input type="text" name="sieve_selected_option_value[]" class="form-control form-control-sm" />' +
+          "                                </td>" +
+          '                                <td class="col-sm-1 text-end align-middle">' +
+          '                                    <a href="#" class="delete_condition_modal_button btn btn-sm btn-secondary">Delete</a>' +
+          "                                </td>" +
+          "                            </tr>"
+      );
+    };
 
   return my;
 })({});
 
 class Hm_Filter_Modal extends Hm_Modal {
-  constructor(current_account) {
+  constructor() {
     super({
       size: "xl",
       modalId: "myEditFilterModal",
@@ -2782,16 +2896,17 @@ class Hm_Filter_Modal extends Hm_Modal {
       this.setContent("<p>Could not load filter editor</p>");
     }
     // add a button
+    console.log("hm_sieve_current_account ===> ", hm_sieve_current_account);
     this.addFooterBtn("Save", "btn-primary ms-auto", async function () {
-      let result = save_filter(current_account);
+    console.log("current_account save===> ", hm_sieve_current_account);
+      let result = save_filter(hm_sieve_current_account);
       if (result) {
         this.hide();
       }
     });
-
     // add another button
     this.addFooterBtn("Convert to code", "btn-warning", async function () {
-      let result = save_filter(current_account, true);
+      let result = save_filter(hm_sieve_current_account, true);
       if (result) {
         this.hide();
       }
