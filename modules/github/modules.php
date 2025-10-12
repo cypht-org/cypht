@@ -439,7 +439,7 @@ class Hm_Output_github_folders extends Hm_Output_Module {
                     $res .= '<i class="bi bi-code-slash account_icon"></i> ';
                 }
                 $repo_parts = explode('/', urldecode($repo));
-                $repo_display_name = isset($repo_parts[1]) ? $repo_parts[1] : $repo;
+                $repo_display_name = count($repo_parts) > 1 ? $repo_parts[1] : urldecode($repo);
                 $res .= $this->html_safe($repo_display_name).'</a></li>';
             }
             $this->append('folder_sources', array('github_folders', $res));
@@ -464,11 +464,8 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
         }
         $repo_id = $this->get('github_data_source_id');
         $repo = $this->get('github_data_source', 'Github');
-        if (empty($this->get('github_data')) || $repo === 'Github') {
-            return;
-        }
         $repo_parts = explode('/', $repo);
-        $repo_name = isset($repo_parts[1]) ? $repo_parts[1] : 'Github';
+        $repo_name = count($repo_parts) > 1 ? $repo_parts[1] : $repo;
         $cutoff = $this->get('github_list_since', '');
         if ($cutoff) {
             $cutoff = strtotime($cutoff);
