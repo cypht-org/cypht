@@ -2725,8 +2725,7 @@ const Hm_Filters = (function (my) {
       ],
       function (res) {
         if (Object.keys(res.script_details).length === 0) {
-            console.log("res", res);
-        //   window.location = window.location;
+          window.location = window.location;
         } else {
           edit_script_modal.open();
           $(".modal_sieve_script_textarea").val(res.script_details.gen_script);
@@ -2759,7 +2758,7 @@ const Hm_Filters = (function (my) {
                 {'name': 'current_editing_script', 'value': current_editing_script_name},
                 {'name': 'script', 'value': $('.modal_sieve_script_textarea').val()}],
             function(res) {
-                // window.location = window.location;
+                window.location = window.location;
             }
         );
     }
@@ -2851,11 +2850,54 @@ const Hm_Filters = (function (my) {
       );
     };
 
+    my.add_filter_action = function (default_value = "") {
+      let possible_actions_html = "";
+
+      hm_sieve_possible_actions().forEach(function (value) {
+        if (value.selected === true) {
+          possible_actions_html +=
+            '<option selected value="' +
+            value.name +
+            '">' +
+            value.description +
+            "</option>";
+          return;
+        }
+        possible_actions_html +=
+          '<option value="' +
+          value.name +
+          '">' +
+          value.description +
+          "</option>";
+      });
+      let extra_options =
+        '<td class="col-sm-3"><input type="hidden" class="condition_extra_action_value form-control form-control-sm" name="sieve_selected_extra_action_value[]" /></td>';
+      $(".filter_actions_modal_table").append(
+        '<tr class="border" default_value="' +
+          default_value +
+          '">' +
+          '   <td class="col-sm-3">' +
+          '       <select class="sieve_actions_select form-control form-control-sm" name="sieve_selected_actions[]">' +
+          "          " +
+          possible_actions_html +
+          "       </select>" +
+          "    </td>" +
+          extra_options +
+          '    <td class="col-sm-5">' +
+          '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
+          "    </input>" +
+          '    <td class="col-sm-1 text-end align-middle">' +
+          '           <a href="#" class="delete_action_modal_button btn btn-sm btn-secondary">Delete</a>' +
+          "    </td>" +
+          "</tr>"
+      );
+    };
+
   return my;
 })({});
 
 class Hm_Filter_Modal extends Hm_Modal {
-  constructor() {
+  constructor(current_account) {
     super({
       size: "xl",
       modalId: "myEditFilterModal",
@@ -2868,18 +2910,16 @@ class Hm_Filter_Modal extends Hm_Modal {
     } else {
       this.setContent("<p>Could not load filter editor</p>");
     }
-    // add a button
-    console.log("hm_sieve_current_account ===> ", hm_sieve_current_account);
-    this.addFooterBtn("Save", "btn-primary ms-auto", async function () {
-    console.log("current_account save===> ", hm_sieve_current_account);
-      let result = save_filter(hm_sieve_current_account);
+
+    this.addFooterBtn("Save", "btn-primary ms-auto", async () => {
+      let result = save_filter(current_account);
       if (result) {
         this.hide();
       }
     });
-    // add another button
-    this.addFooterBtn("Convert to code", "btn-warning", async function () {
-      let result = save_filter(hm_sieve_current_account, true);
+
+    this.addFooterBtn("Convert to code", "btn-warning", async () => {
+      let result = save_filter(current_account, true);
       if (result) {
         this.hide();
       }

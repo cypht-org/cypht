@@ -141,7 +141,6 @@ add_handler('ajax_reset_search', 'reset_search', true, 'core', 'load_user_data',
 setup_base_page('message');
 add_output('message', 'message_start', true, 'core', 'version_upgrade_checker', 'after');
 add_output('message', 'message_end', true, 'core', 'message_start', 'after');
-add_output('ajax_imap_message_content', 'filter_message_headers', true, 'core');
 
 /* not-found page data and output */
 setup_base_page('notfound');
