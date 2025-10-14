@@ -2752,7 +2752,8 @@ const Hm_Filters = (function (my) {
       ],
       function (res) {
         if (Object.keys(res.script_details).length === 0) {
-          window.location = window.location;
+           window.location.href = "?page=sieve_filters";
+          
         } else {
           edit_script_modal.open();
           $(".modal_sieve_script_textarea").val(res.script_details.gen_script);
@@ -2941,6 +2942,7 @@ class Hm_Filter_Modal extends Hm_Modal {
     this.addFooterBtn("Save", "btn-primary ms-auto", async () => {
       let result = save_filter(current_account);
       if (result) {
+        Hm_Notices.show("Filter saved", "success");
         this.hide();
       }
     });
@@ -2948,6 +2950,7 @@ class Hm_Filter_Modal extends Hm_Modal {
     this.addFooterBtn("Convert to code", "btn-warning", async () => {
       let result = save_filter(current_account, true);
       if (result) {
+        Hm_Notices.show("Filter saved", "success");
         this.hide();
       }
     });
