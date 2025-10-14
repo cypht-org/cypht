@@ -192,11 +192,8 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
  */
 class Hm_Output_filter_message_headers extends Hm_Output_Module {
       protected function output() {
-        $mailbox_list_title = $this->get('mailbox_list_title', array());
 
-
-        $account_name = $mailbox_list_title[1] ?? '';
-        $mailbox = $this->get('mailbox');
+        $mailbox_name = $this->get('mailbox_name');
 
         if ($this->get('msg_headers')) {
             $txt = '';
@@ -446,8 +443,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 . $this->trans('Filter similar messages')
                 . '</a>'
                 . '<div class="dropdown-menu move_to_location p-3">'
-                . '<form id="create-filter-form" style="min-width:260px;" account="' . $mailbox_list_title['name'] . '">'
-
+                . '<form id="create-filter-form" style="min-width:260px;" account="' . $mailbox_name . '">'
                 // From (enabled, checked by default)
                 . '<div class="form-check mb-1">'
                 . '<input class="form-check-input" type="checkbox" id="use_from" checked>'
