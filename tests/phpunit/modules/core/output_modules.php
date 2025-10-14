@@ -7,7 +7,6 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function setUp(): void {
         require __DIR__.'/../../bootstrap.php';
         require __DIR__.'/../../helpers.php';
-        require APP_PATH.'modules/core/modules.php';
     }
     /**
      * @preserveGlobalState disabled
