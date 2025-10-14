@@ -243,7 +243,7 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
                 '<input class="btn btn-primary edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
         }
-        return '<div class="add_contact_responsive"><form class="add_contact_form" method="POST">'.
+        $form_html = '<div class="add_contact_responsive"><form class="add_contact_form search_terms" method="POST">'.
             '<button class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
             '<div class="'.$form_class.'">'.
             '<input type="hidden" name="contact_source" value="local" />'.
@@ -257,7 +257,7 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             '<label class="form-label" for="contact_phone">'.$this->trans('Telephone Number').'</label>'.
             '<input class="form-control" placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="text" name="contact_phone" '.
             'value="'.$this->html_safe($phone).'" /><br />'.
-            '<label class="screen_reader" for="contact_group">'.$this->trans('Contact Group').'</label>'.
+            '<label class="form-label" for="contact_group">'.$this->trans('Contact Group').'</label>'.
             '<select class="form-select" id="contact_group" name="contact_group">'.
             '<option value="'.$this->trans('Personal Addresses').'"'.(isset($group) && $this->html_safe($group) == $this->trans('Personal Addresses') ? ' selected' : '').'>'.$this->trans('Personal Addresses').'</option>'.
             '<option value="'.$this->trans('Trusted Senders').'"'.(isset($group) && $this->html_safe($group) == $this->trans('Trusted Senders') ? ' selected' : '').'>'.$this->trans('Trusted Senders').'</option>'.
@@ -265,6 +265,7 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             '</select><br />'.
             $button.' <input type="button" class="btn btn-secondary reset_contact" value="'.
             $this->trans('Cancel').'" /></div></form></div>';
+        return $form_html;
     }
 }
 

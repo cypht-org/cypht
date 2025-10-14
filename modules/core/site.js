@@ -120,14 +120,14 @@ var Hm_Ajax = {
         Hm_Ajax.icon_loading_id = false;
     },
 
-    process_callback_hooks: function(name, res) {
+    process_callback_hooks: function(name, res, xhr) {
         var hook;
         var func;
         for (var i in Hm_Ajax.callback_hooks) {
             hook = Hm_Ajax.callback_hooks[i];
             if (hook[0] == name || hook[0] == '*') {
                 func = hook[1];
-                func(res);
+                func(res, xhr);
                 if (hook[0] == '*') {
                     if ($.inArray(hook, Hm_Ajax.p_callbacks) === -1) {
                         Hm_Ajax.p_callbacks.push(hook);
@@ -172,7 +172,7 @@ var Hm_Ajax_Request = function() { return {
                 url.searchParams.set(configItem.name, configItem.value);
             }
         }
-        
+
         xhr.open('POST', url.toString())
         if (config.signal) {
             config.signal.addEventListener('abort', function() {
@@ -266,7 +266,7 @@ var Hm_Ajax_Request = function() { return {
             if (this.callback) {
                 this.callback(res);
             }
-            Hm_Ajax.process_callback_hooks(this.name, res);
+            Hm_Ajax.process_callback_hooks(this.name, res, xhr);
         }
     },
 
@@ -368,7 +368,7 @@ Hm_Modal.prototype = {
         `;
 
         $('body').append(modal);
-        
+
         this.modal = $(`#${this.opts.modalId}`);
         this.modalContent = this.modal.find('.modal-body');
         this.modalTitle = this.modal.find('.modal-title');
@@ -383,7 +383,7 @@ Hm_Modal.prototype = {
             this.customButtons.forEach(btn => {
                 btn.element.off('click', btn.handler);
             });
-            
+
             if (this.bsModal) {
                 this.bsModal.dispose();
             }
@@ -394,7 +394,7 @@ Hm_Modal.prototype = {
 
     recreateButtons: function() {
         this.modalFooter.children().not('.btn-secondary').remove();
-        
+
         this.customButtons.forEach(btn => {
             this.createButton(btn.label, btn.classes, btn.handler);
         });
@@ -483,7 +483,7 @@ class Hm_Alert {
             closeButton.setAttribute('aria-label', 'Close');
             alert.appendChild(closeButton);
         }
-        
+
         this.container.appendChild(alert);
 
         if (dismissible) {
@@ -972,7 +972,7 @@ function Message_List() {
     this.prev_next_links = function(msgUid, listPath = getListPathParam(), cb = null) {
         let prevUrl;
         let nextUrl;
-                
+
         const target = $('.msg_text .small_header').last();
         let filter = `${getParam('keyword')}_${getParam('filter')}`;
         if (getParam('search_terms')) {
@@ -1323,9 +1323,12 @@ var Hm_Folders = {
         hl_save_link();
     },
 
-    update_folder_list: function() {
+    update_folder_list: function(reset_cache = false) {
         Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'}],
+            [
+                {'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'},
+                {'name': 'reset_cache', 'value': reset_cache}
+            ],
             Hm_Folders.update_folder_list_display,
             [],
             true
@@ -1340,17 +1343,17 @@ var Hm_Folders = {
             let transformValue = '';
             if ($(this).attr('aria-expanded') == 'true') {
                 transformValue = 'rotate(180deg)';
-                
+
             } else {
                 transformValue = 'rotate(0deg)';
             }
-            
+
             $(this).find('i').css('transform', transformValue);
         });
         $('.update_message_list').on("click", function(e) {
             var text = e.target.innerHTML;
             e.target.innerHTML = '<div class="spinner-border spinner-border-sm text-dark role="status"><span class="visually-hidden">Loading...</span></div>';
-            Hm_Folders.update_folder_list();
+            Hm_Folders.update_folder_list(true);
             Hm_Ajax.add_callback_hook('hm_reload_folders', function() {
                 e.target.innerHTML = text;
             });
@@ -1369,7 +1372,7 @@ var Hm_Folders = {
     hl_selected_menu: function() {
         const page = getPageNameParam();
         const path = getListPathParam();
-        
+
         $('.folder_list').find('*').removeClass('selected_menu');
         if (path) {
             if (page == 'message_list' || page == 'message') {
@@ -1554,7 +1557,7 @@ var Hm_Utils = {
             if (force_on) {
                 $(class_name).css('display', 'none');
             }
-            $(`[data-bs-target="${class_name}"]`).trigger('click');            
+            $(`[data-bs-target="${class_name}"]`).trigger('click');
             Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         }
         return false;
@@ -2177,7 +2180,7 @@ function handleSmtpImapCheckboxChange(checkbox) {
     if ($('#srv_setup_stepper_is_sender').prop('checked') && $('#srv_setup_stepper_is_receiver').prop('checked')) {
         $('#srv_setup_stepper_profile_bloc').show();
         $('#srv_setup_stepper_profile_checkbox_bloc').show();
-        
+
     } else if(! $('#srv_setup_stepper_is_sender').prop('checked') || ! $('#srv_setup_stepper_is_receiver').prop('checked')) {
         $('#srv_setup_stepper_profile_bloc').hide();
         $('#srv_setup_stepper_profile_checkbox_bloc').hide();
@@ -2229,7 +2232,7 @@ function display_config_step(stepNumber) {
                     $(`#${item.key}-error`).text('Required');
                     isValid = false;
                 }
-                
+
             } else {
                 $(`#${item.key}-error`).text('');
             }
@@ -2513,14 +2516,14 @@ const handleExternalResources = (inline) => {
 };
 
 const observeMessageTextMutationAndHandleExternalResources = (inline) => {
-    const message = document.querySelector('.msg_text');    
+    const message = document.querySelector('.msg_text');
     if (message) {
         new MutationObserver(function (mutations) {
             mutations.forEach(function (mutation) {
                 if (mutation.addedNodes.length > 0) {
                     mutation.addedNodes.forEach(function (node) {
                         if (node.classList.contains('msg_text_inner')) {
-                            handleExternalResources(inline);                    
+                            handleExternalResources(inline);
                         }
                     });
                 }

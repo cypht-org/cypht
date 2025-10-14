@@ -127,7 +127,8 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
 
     foreach ($folders as $folder_name => $folder) {
         $folder_name = bin2hex($folder_name);
-        $results .= '<li class="'. ($folder['children'] ? 'm-has-children ' : '') .'imap_'.$id.'_'.$output_mod->html_safe($folder_name).'" data-number-children="'.$output_mod->html_safe($folder['number_of_children']).'">';
+        $childrenCount = isset($folder['number_of_children']) ? $folder['number_of_children'] : 0;
+        $results .= '<li class="'. ($folder['children'] ? 'm-has-children ' : '') .'imap_'.$id.'_'.$output_mod->html_safe($folder_name).'" data-number-children="'.$output_mod->html_safe($childrenCount).'">';
 
         if ($folder['children']) {
             $results .= '<div class="m-has-children-wrapper"><a href="#" class="imap_folder_link expand_link d-inline-flex" data-target="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"><i class="bi bi-plus-circle-fill"></i></a>';
@@ -250,7 +251,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         else {
             $from = $msg['from'];
         }
-        $from = format_imap_from_fld($from);
+        $from = format_imap_from_fld(is_array($from) ? implode(', ', $from) : $from);
         $nofrom = '';
         if (!trim($from)) {
             $from = '[No From]';
@@ -800,7 +801,7 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                     }
                 }
                 if ($sent) {
-                    $msgs = $mailbox->search($folder, $search_type, $terms, null, null, true, false, true);
+                    $msgs = $mailbox->search($folder, $search_type, $terms, null, null, true, true);
                 }
                 else {
                     $msgs = $mailbox->search($folder, $search_type, $terms);
@@ -814,7 +815,7 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                     rsort($msgs);
                     $msgs = array_slice($msgs, 0, $limit);
                 }
-                foreach ($mailbox->get_message_list($folder, $msgs) as $msg) {
+                foreach ($mailbox->get_message_list($folder, $msgs, !$sent) as $msg) {
                     if (array_key_exists('content-type', $msg) && mb_stristr($msg['content-type'], 'multipart/mixed')) {
                         $msg['flags'] .= ' \Attachment';
                     }
@@ -1492,7 +1493,7 @@ function snooze_dropdown($output, $unsnooze = false) {
     $values = nexter_formats();
 
     $txt = '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-bs-auto-close="outside">'.$output->trans('Snooze').'</a>
+                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-bs-auto-close="outside">'.$output->trans('Snooze').'</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
     foreach ($values as $format) {
         $labels = get_scheduled_date($format, true);
@@ -1514,7 +1515,7 @@ if (!hm_exists('tags_dropdown')) {
 function tags_dropdown($context, $headers) {
     $folders = $context->get('tags', array());
     $txt = '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Tags').'</a>
+                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Tags').'</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuTag">';
 
     $tags =  !empty($headers['X-Cypht-Tags']) ? explode(',', $headers['X-Cypht-Tags']) : array();
@@ -1650,4 +1651,18 @@ function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_i
         }
     }
     return [$uid, $sent_folder];
+}}
+
+if (!hm_exists('is_imap_archive_folder')) {
+function is_imap_archive_folder($server_id, $user_config, $current_folder) {
+    $special_folders = $user_config->get('special_imap_folders', array());
+    
+    if (isset($special_folders[$server_id]['archive'])) {
+        $archive_folder = $special_folders[$server_id]['archive'];
+        if (bin2hex($archive_folder) == $current_folder) {
+            return true;
+        }
+    }
+    
+    return false;
 }}

@@ -385,7 +385,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<a class="delete_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
             $txt .= '<div class="position-relative"><a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="copy_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Copy').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
             $txt .= '<div class="position-relative"><a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="move_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Move').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
-            $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+            if (!$this->get('is_archive_folder')) {
+                $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+            }
             
             if($this->get('tags')){
                 $txt .= tags_dropdown($this, $headers);
@@ -415,7 +417,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                         $txt .= block_filter_dropdown($this);
                     }
                 } else {
-                    $txt .= '<span class="btn btn-sm" data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
+                    $txt .= '<span class="text-decoration-none btn btn-sm btn-outline-danger" data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
             }
             $txt .= '<a class="hlink text-decoration-none btn btn-sm btn-outline-secondary" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
@@ -1260,7 +1262,7 @@ class Hm_Output_setting_enable_snooze extends Hm_Output_Module {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="enable_snooze">'.
-            $this->trans('Enable Snooze functionality').'</label></td>'.
+            $this->trans('Enable Snooze functionality').' <span class="badge bg-warning text-dark ms-2">'.$this->trans('Experimental').'</span></label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.' id="enable_snooze" name="enable_snooze" data-default-value="'.(DEFAULT_ENABLE_SNOOZE ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
     }
 }
