@@ -2587,3 +2587,21 @@ function setupActionSnooze(callback) {
     });
     $(document).on('change', '.nexter_input_snooze', callback);
 }
+
+document.addEventListener("show.bs.dropdown", function (event) {
+    const currentToggle = event.target;
+
+    // If it's nested inside a dropdown menu, skip
+    if (currentToggle.closest(".dropdown-menu")) {
+        return;
+    }
+
+    // Close other top-level dropdowns
+    document.querySelectorAll(".dropdown-toggle.show").forEach((openBtn) => {
+        if (openBtn !== currentToggle && !openBtn.closest(".dropdown-menu")) {
+            const dropdownInstance = bootstrap.Dropdown.getInstance(openBtn);
+            if (dropdownInstance) dropdownInstance.hide();
+        }
+    });
+});
+
