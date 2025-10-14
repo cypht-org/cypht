@@ -245,6 +245,16 @@ class Hm_Handler_process_auto_bcc extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_process_enable_exclude_auto_bcc extends Hm_Handler_Module {
+    public function process() {
+        function enable_exclude_auto_bcc_callback($val) { return $val; }
+        process_site_setting('enable_exclude_auto_bcc', $this, 'enable_exclude_auto_bcc_callback', DEFAULT_SETTING_ENABLE_EXCLUDE_AUTO_BCC, true);
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_get_test_chunk extends Hm_Handler_Module {
     public function process() {
         $filepath = $this->config->get('attachment_dir');
@@ -1389,6 +1399,27 @@ class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
             $auto = $settings['smtp_auto_bcc'];
         }
         $res = '<tr class="general_setting"><td><label class="form-check-label" for="smtp_auto_bcc">'.$this->trans('Always BCC sending address').'</label></td><td><input class="form-check-input" value="1" type="checkbox" name="smtp_auto_bcc" id="smtp_auto_bcc"  data-default-value="false"';
+        $reset = '';
+        if ($auto) {
+            $res .= ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
+        }
+        $res .= '>'.$reset.'</td></tr>';
+        return $res;
+    }
+}
+
+/**
+ * @subpackage smtp/output
+ */
+class Hm_Output_exclude_auto_bcc_setting extends Hm_Output_Module {
+    protected function output() {
+        $auto = DEFAULT_SETTING_ENABLE_EXCLUDE_AUTO_BCC;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('enable_exclude_auto_bcc', $settings)) {
+            $auto = $settings['enable_exclude_auto_bcc'];
+        }
+        $res = '<tr class="general_setting"><td><label class="form-check-label" for="enable_exclude_auto_bcc">'.$this->trans('Enable exclude auto BCC').'</label></td><td><input class="form-check-input" value="0" type="checkbox" name="enable_exclude_auto_bcc" id="enable_exclude_auto_bcc"  data-default-value="true"';
         $reset = '';
         if ($auto) {
             $res .= ' checked="checked"';
