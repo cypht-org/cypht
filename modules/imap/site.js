@@ -970,23 +970,21 @@ var imap_move_copy = function(e, action, context) {
     return false;
 };
 
-
 $(function () {
     $(document).on("submit", "#create-filter-form", function (e) {
         e.preventDefault();
         const current_account = $(this).attr("account");
-        console.log("Current account mailbox:", current_account);
-        
-        
-        const edit_filter_modal = new Hm_Filter_Modal();
+
+        const edit_filter_modal = new Hm_Filter_Modal(current_account);
         hm_sieve_button_events(edit_filter_modal);
         edit_filter_modal.setTitle("Add Filter for message like this");
+        const add_filter_condition = Hm_Filters.add_filter_condition;
+        const add_filter_action = Hm_Filters.add_filter_action;
 
         const $form = $(this);
         const $btn = $form.find("#create_filter").prop("disabled", true);
         const data = {};
 
-        // collect checked conditions
         if ($form.find("#use_from").is(":checked"))
             data["from"] = $form.find('input[name="from"]').val();
         if ($form.find("#use_to").is(":checked"))
@@ -997,21 +995,58 @@ $(function () {
             data["reply-to"] = $form.find('input[name="reply-to"]').val();
 
         if ($.isEmptyObject(data)) {
-            Hm_Notices.show("Please check at least one condition to create a filter.", "danger");
-            $btn.prop("disabled", false);
-            return;
-        }
+            Hm_Notices.show(
+            "Please check at least one condition to create a filter.",
+            "danger"
+        );
+        $btn.prop("disabled", false);
+        return;
+    }
 
-        function encodeParams(obj) {
-            return Object.entries(obj)
-            .map(([k, v]) => encodeURIComponent(k) + "=" + encodeURIComponent(v))
-            .join("&");
-        }
+    edit_filter_modal.open();
 
-        const params = encodeParams(data);
-        edit_filter_modal.open();
-        
+    // After modal content is ready, auto-fill conditions
+    setTimeout(() => {
+        const allFields = hm_sieve_condition_fields();
+        const availableFields = [
+          ...allFields.Message.map((f) => f.name),
+          ...allFields.Header.map((f) => f.name),
+        ];
 
+        for (const [key, value] of Object.entries(data)) {
+          // If key is not in available fields, skip it
+          if (!availableFields.includes(key)) {
+            console.warn("Skipping unrecognized field:", key);
+            continue;
+          }
+
+          add_filter_condition();
+
+          const $lastRow = $(".sieve_list_conditions_modal tr").last();
+          const $selectField = $lastRow.find(".add_condition_sieve_filters");
+          const $selectOp = $lastRow.find(".condition_options");
+          const $inputVal = $lastRow.find('input[name="sieve_selected_option_value[]"]');
+          $selectField.val(key);
+          $selectOp.val("Contains");
+          $inputVal.val(value);
+
+            }
+
+            if (data["reply-to"]) {
+
+                add_filter_action("autoreply");
+
+                const $lastRow = $(".filter_actions_modal_table tr").last();
+                const $select = $lastRow.find(".sieve_actions_select");
+                $select.val("autoreply").trigger("change");
+
+                // Focus the input field for the message
+                const $input = $lastRow.find('input[name="sieve_selected_action_value[]"]');
+                if ($input.length) {
+                    $input.focus();
+                }
+            }
+        }, 250);
     });
 });
 
