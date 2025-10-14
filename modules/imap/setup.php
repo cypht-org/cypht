@@ -337,6 +337,7 @@ return array(
         'do_not_flag_as_read_on_open' => array(FILTER_VALIDATE_BOOLEAN, false),
         'ajax_imap_folders_permissions' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'move_responses' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+        'mailbox_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     ),
 
     'allowed_get' => array(

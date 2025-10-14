@@ -1925,6 +1925,12 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $this->out('imap_accounts', $this->user_config->get('imap_servers'), array());
             $this->out('show_pagination_links', $this->user_config->get('pagination_links_setting', true));
             $this->out('auto_advance_email_enabled', $this->user_config->get('auto_advance_email_setting', true));
+
+            $parts = explode('_', 'imap_' . $form['imap_server_id'] . '_' . $form['folder'], 3);
+            $details = Hm_IMAP_List::dump($parts[1]);
+            $mailbox_name = $details['name'];
+
+
             $part = false;
             $prefetch = false;
             if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {
@@ -1988,6 +1994,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $this->session->set(sprintf('reply_details_imap_%s_%s_%s', $form['imap_server_id'], $form['folder'], $form['imap_msg_uid']),
                         array('ts' => time(), 'msg_struct' => $msg_struct_current, 'msg_text' => ($save_reply_text ? $msg_text : ''), 'msg_headers' => $msg_headers));
                 }
+                $this->out('mailbox_name', $mailbox_name);
             }
         }
     }
