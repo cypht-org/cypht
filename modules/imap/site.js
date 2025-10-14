@@ -1553,3 +1553,13 @@ $(document).on('submit', '#shareForm', function(e) {
         }
     );
 });
+
+document.addEventListener("show.bs.dropdown", function (event) {
+  // When one dropdown opens, close all others
+  document.querySelectorAll(".dropdown-toggle.show").forEach((openBtn) => {
+    if (openBtn !== event.target) {
+      const dropdownInstance = bootstrap.Dropdown.getInstance(openBtn);
+      if (dropdownInstance) dropdownInstance.hide();
+    }
+  });
+});
