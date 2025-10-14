@@ -190,139 +190,14 @@ var hm_sieve_possible_actions = function() {
     ];
 };
 
-    function add_filter_condition() {
-      let header_fields = "";
-      let message_fields = "";
-
-      hm_sieve_condition_fields().Message.forEach(function (value) {
-        if (value.selected === true) {
-          message_fields +=
-            '<option selected value="' +
-            value.name +
-            '">' +
-            value.description +
-            "</option>";
-        } else {
-          message_fields +=
-            '<option value="' +
-            value.name +
-            '">' +
-            value.description +
-            "</option>";
-        }
-      });
-      hm_sieve_condition_fields().Header.forEach(function (value) {
-        if (value.selected === true) {
-          header_fields +=
-            '<option selected value="' +
-            value.name +
-            '">' +
-            value.description +
-            "</option>";
-        } else {
-          header_fields +=
-            '<option value="' +
-            value.name +
-            '">' +
-            value.description +
-            "</option>";
-        }
-      });
-      let extra_options =
-        '<td class="col-sm-3"><input type="hidden" class="condition_extra_value form-control form-control-sm" name="sieve_selected_extra_option_value[]" /></td>';
-      $(".sieve_list_conditions_modal").append(
-        "                            <tr>" +
-          '                                <td class="col-sm-2">' +
-          '                                    <select class="add_condition_sieve_filters form-control form-control-sm" name="sieve_selected_conditions_field[]">' +
-          '                                        <optgroup label="Message">' +
-          message_fields +
-          "                                        </optgroup>" +
-          '                                        <optgroup label="Header">' +
-          header_fields +
-          "                                        </optgroup>" +
-          "                                    </select>" +
-          "                                </td>" +
-          extra_options +
-          '                                <td class="col-sm-3">' +
-          '                                    <select class="condition_options form-control form-control-sm" name="sieve_selected_conditions_options[]">' +
-          '                                        <option value="Contains">' +
-          "                                            Contains" +
-          "                                        </option>" +
-          '                                        <option value="!Contains">' +
-          "                                            Not Contains" +
-          "                                        </option>" +
-          '                                        <option value="Matches">' +
-          "                                            Matches" +
-          "                                        </option>" +
-          '                                        <option value="!Matches">' +
-          "                                            Not Matches" +
-          "                                        </option>" +
-          '                                        <option value="Regex">' +
-          "                                            Regex" +
-          "                                        </option>" +
-          '                                        <option value="!Regex">' +
-          "                                            Not Regex" +
-          "                                        </option>" +
-          "                                    </select>" +
-          "                                </td>" +
-          '                                <td class="col-sm-3">' +
-          '                                    <input type="text" name="sieve_selected_option_value[]" class="form-control form-control-sm" />' +
-          "                                </td>" +
-          '                                <td class="col-sm-1 text-end align-middle">' +
-          '                                    <a href="#" class="delete_condition_modal_button btn btn-sm btn-secondary">Delete</a>' +
-          "                                </td>" +
-          "                            </tr>"
-      );
-    }
-
-        function add_filter_action(default_value = "") {
-          let possible_actions_html = "";
-
-          hm_sieve_possible_actions().forEach(function (value) {
-            if (value.selected === true) {
-              possible_actions_html +=
-                '<option selected value="' +
-                value.name +
-                '">' +
-                value.description +
-                "</option>";
-              return;
-            }
-            possible_actions_html +=
-              '<option value="' +
-              value.name +
-              '">' +
-              value.description +
-              "</option>";
-          });
-          let extra_options =
-            '<td class="col-sm-3"><input type="hidden" class="condition_extra_action_value form-control form-control-sm" name="sieve_selected_extra_action_value[]" /></td>';
-          $(".filter_actions_modal_table").append(
-            '<tr class="border" default_value="' +
-              default_value +
-              '">' +
-              '   <td class="col-sm-3">' +
-              '       <select class="sieve_actions_select form-control form-control-sm" name="sieve_selected_actions[]">' +
-              "          " +
-              possible_actions_html +
-              "       </select>" +
-              "    </td>" +
-              extra_options +
-              '    <td class="col-sm-5">' +
-              '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
-              "    </input>" +
-              '    <td class="col-sm-1 text-end align-middle">' +
-              '           <a href="#" class="delete_action_modal_button btn btn-sm btn-secondary">Delete</a>' +
-              "    </td>" +
-              "</tr>"
-          );
-        }
+    const add_filter_condition = Hm_Filters.add_filter_condition;
+    const add_filter_action = Hm_Filters.add_filter_action;
 
 
+/**************************************************************************************
+*                                      MODAL EVENTS
+**************************************************************************************/
 var hm_sieve_button_events = function (edit_filter_modal, edit_script_modal) {
-  /**************************************************************************************
-   *                                      MODAL EVENTS
-   **************************************************************************************/
 
   $(document)
     .off("click")
