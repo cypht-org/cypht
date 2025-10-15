@@ -500,18 +500,8 @@ $(document).on('submit', '#imap_filter_form', async function(event) {
     event.preventDefault();
     const url = new URL(location.href);
     url.search = $(this).serialize();
-    history.pushState(history.state, "", url.toString());
-    location.next = url.search;
-    try {
-        const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
-        await messages.load(!messages.hasLocalData(), false, false, () => {
-            display_imap_mailbox(messages.rows, messages.list, messages);
-            showPagination(messages.pages);
-        });
-    } catch (error) {
-        console.log(error);
-        // Show error message. TODO: No message utility yet, implement it later.
-    }
+    url.searchParams.set('list_page', '1');
+    navigate(url.toString());
 });
 
 var display_imap_mailbox = function(rows, id, store, checkEmptyState = true) {
