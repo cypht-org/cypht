@@ -670,15 +670,16 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
                 $('.prev, .next').hide();
             }
             globals.auto_advance_email_enabled = Boolean(res.auto_advance_email_enabled);
+
+            if (callback) {
+                callback(res)
+            }
         };
 
         if (!msg_part) {
             var msgContent = get_local_message_content(uid, list_path);
             if (msgContent) {
                 onSuccess(msgContent);
-                if (callback) {
-                    callback(msgContent)
-                }
             }
         }
 
@@ -712,8 +713,7 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
                     }
                 },
                 [],
-                false,
-                callback
+                false
             );
         }
     }
