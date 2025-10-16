@@ -1153,7 +1153,20 @@ function imap_setup_tags() {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_tag'},
             {'name': 'tag_id', 'value': folder_id},
-            {'name': 'list_path', 'value': ids}]
+            {'name': 'list_path', 'value': ids},
+            {'name': 'untag', 'value': !$(this).is(':checked')},
+            {'name': 'tag', 'value': $(this).is(':checked')}],
+            function() {
+                if (getPageNameParam() == 'message_list') {
+                    // remove cached message content so that tag changes are reflected
+                    ids.forEach((id) => {
+                        const uid = id.split('_')[1];
+                        Hm_Utils.remove_from_local_storage(getMessageStorageKey(uid));
+                    });
+                } else if (getPageNameParam() == 'message') {
+                    set_message_content();
+                }
+            }
         );
     });
 }
