@@ -30,6 +30,9 @@ return array(
         'advanced_search',
         'ajax_adv_search'
     ),
+    'allowed_get' => array(
+        'search_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    ),
     'allowed_post' => array(
         'adv_source' => FILTER_UNSAFE_RAW,
         'adv_start' => FILTER_UNSAFE_RAW,
