@@ -102,6 +102,7 @@ class Hm_Handler_process_tag_update extends Hm_Handler_Module {
             Hm_Tags::add($tag);
             Hm_Msgs::add('Tag Created');
         }
+        $this->session->set('tags_updated', true);
     }
 }
 
@@ -117,6 +118,7 @@ class Hm_Handler_process_tag_delete extends Hm_Handler_Module {
         if (($tag = Hm_Tags::get($form['tag_id']))) {
             Hm_Tags::del($tag['id']);
             Hm_Msgs::add('Tag Deleted');
+            $this->session->set('tags_updated', true);
         } else {
             Hm_Msgs::add('Tag ID not found', 'warning');
             return;
@@ -189,6 +191,10 @@ class Hm_Handler_tag_data extends Hm_Handler_Module {
     public function process() {
         Hm_Tags::init($this);
         $this->out('tags', Hm_Tags::getAll());
+        if ($this->session->get('tags_updated')) {
+            $this->out('tags_updated', true);
+            $this->session->set('tags_updated', false);
+        }
     }
 }
 
