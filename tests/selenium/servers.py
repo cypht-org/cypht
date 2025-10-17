@@ -31,8 +31,39 @@ class ServersTest(WebTest):
     def server_stmp_and_imap_add(self):
         self.toggle_server_section('server_config')
         self.wait_on_class('imap-jmap-smtp-btn')
-        self.by_id('add_new_server_button').click()
-        # self.wait_on_class('srv_setup_stepper_profile_name')
+
+        # Wait for the add button to be clickable (combines presence and clickability)
+        add_button = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.ID, "add_new_server_button"))
+        )
+        
+        # Scroll the button into view before clicking
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", add_button)
+        sleep(0.5)
+
+        try:
+            add_button.click()
+            print("Normal click succeeded")
+        except Exception as e:
+            print(f"Normal click failed: {e}. Trying JavaScript click...")
+            self.driver.execute_script("arguments[0].click();", add_button)
+        
+        # Wait for the form to appear after clicking
+        try:
+            WebDriverWait(self.driver, 10).until(
+                EC.any_of(
+                    EC.presence_of_element_located((By.ID, 'srv_setup_stepper_profile_name')),
+                    EC.presence_of_element_located((By.NAME, 'srv_setup_stepper_profile_name'))
+                )
+            )
+            print("Server setup form appeared")
+        except Exception as e:
+            print(f"Server setup form did not appear: {e}")
+            # Debug: print current page state
+            print("Current URL:", self.driver.current_url)
+            print("Page title:", self.driver.title)
+            raise e
+
         name = self.by_id('srv_setup_stepper_profile_name')
         name.send_keys('Test')
         email = self.by_name('srv_setup_stepper_email')

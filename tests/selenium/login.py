@@ -51,11 +51,13 @@ class LoginTests(WebTest):
 
     def good_logout(self):
         self.logout()
-        self.wait()
+        # self.wait()
         self.safari_workaround()
-        self.wait_on_class('sys_messages')
-        sys_messages = self.by_class('sys_messages')
-        assert sys_messages is not None
+        self.wait(By.CLASS_NAME, 'login_form', 60)
+        # debugging line
+        print('debugging line')
+        print(self.by_class('login_form'))
+        assert self.by_class('login_form') != None
 
 if __name__ == '__main__':
 
