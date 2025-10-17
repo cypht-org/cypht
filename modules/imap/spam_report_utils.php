@@ -17,9 +17,10 @@ if (!defined('DEBUG_MODE')) { die(); }
  * @param string $imap_server_id IMAP server ID
  * @param array $message_data Message data containing sender information
  * @param string $spam_reason Reason for spam report
+ * @param string $junk_folder Junk folder name (dynamically detected)
  * @return array Result of auto-block operation
  */
-function auto_block_spam_sender($user_config, $site_config, $imap_server_id, $message_data, $spam_reason) {
+function auto_block_spam_sender($user_config, $site_config, $imap_server_id, $message_data, $spam_reason, $junk_folder = 'Junk') {
     try {
         // Check if auto-blocking is enabled
         if (!is_auto_block_spam_enabled($user_config)) {
@@ -139,6 +140,12 @@ function auto_block_spam_sender($user_config, $site_config, $imap_server_id, $me
         // Map action to Sieve action
         $sieve_action = map_auto_block_action_to_sieve($action, $user_config, $imap_server_id);
         
+        delayed_debug_log('Auto-block: Using junk folder', array(
+            'junk_folder' => $junk_folder,
+            'sieve_action' => $sieve_action,
+            'action' => $action
+        ));
+        
         if (!is_array($blocked_senders)) {
             $blocked_senders = array();
         }
@@ -151,7 +158,8 @@ function auto_block_spam_sender($user_config, $site_config, $imap_server_id, $me
                     $sieve_action,
                     $imap_server_id,
                     $blocked_sender,
-                    'Auto-blocked after spam report: ' . $spam_reason
+                    'Auto-blocked after spam report: ' . $spam_reason,
+                    $junk_folder
                 );
             } elseif (is_array($blocked_list_actions) && array_key_exists($blocked_sender, $blocked_list_actions)) {
                 $reject_message = '';
@@ -165,7 +173,8 @@ function auto_block_spam_sender($user_config, $site_config, $imap_server_id, $me
                     $action_type,
                     $imap_server_id,
                     $blocked_sender,
-                    $reject_message
+                    $reject_message,
+                    $junk_folder
                 );
             } else {
                 $actions = block_filter(
@@ -173,7 +182,9 @@ function auto_block_spam_sender($user_config, $site_config, $imap_server_id, $me
                     $user_config,
                     'default',
                     $imap_server_id,
-                    $blocked_sender
+                    $blocked_sender,
+                    '',
+                    $junk_folder
                 );
             }
             if (is_array($blocked_list_actions)) {

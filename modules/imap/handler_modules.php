@@ -2411,13 +2411,16 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
                         ));
                         
                         if ($imap_account && isset($imap_account['sieve_config_host'])) {
-                            delayed_debug_log('Auto-block: Starting auto-block process');
+                            delayed_debug_log('Auto-block: Starting auto-block process', array(
+                                'junk_folder' => $junk_folder
+                            ));
                             $auto_block_result = auto_block_spam_sender(
                                 $this->user_config,
                                 $this->config,
                                 $form['imap_server_id'],
                                 $message_data,
-                                $spam_reason
+                                $spam_reason,
+                                $junk_folder
                             );
                             if (!$auto_block_result['success']) {
                                 $result['error'] .= 'Auto-block failed: ' . $auto_block_result['error'] . '; ';

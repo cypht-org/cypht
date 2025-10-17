@@ -122,7 +122,11 @@ function is_spam_service_enabled($service_name) {
  * @return boolean True if auto-blocking is enabled
  */
 function is_auto_block_spam_enabled($user_config) {
-    return $user_config->get('auto_block_spam_sender', true);
+    // return $user_config->get('auto_block_spam_scope', 'sender');
+    //return $user_config->get('auto_block_spam_sender', true);
+    // HARDCODED FOR TESTING - TODO: Revert to user_config after testing
+    return true;
+    // Original: return $user_config->get('auto_block_spam_sender', true);
 }
 
 /**
@@ -131,7 +135,10 @@ function is_auto_block_spam_enabled($user_config) {
  * @return string Auto-block action
  */
 function get_auto_block_spam_action($user_config) {
-    return $user_config->get('auto_block_spam_action', 'move_to_junk');
+    //return $user_config->get('auto_block_spam_action', 'move_to_junk');
+    // HARDCODED FOR TESTING - TODO: Revert to user_config after testing
+    return 'move_to_junk';
+    // Original: return $user_config->get('auto_block_spam_action', 'move_to_junk');
 }
 
 /**
@@ -140,5 +147,7 @@ function get_auto_block_spam_action($user_config) {
  * @return string Auto-block scope
  */
 function get_auto_block_spam_scope($user_config) {
-    return $user_config->get('auto_block_spam_scope', 'sender');
+    // HARDCODED FOR TESTING - TODO: Revert to user_config after testing
+    return 'sender';
+    // Original: return $user_config->get('auto_block_spam_scope', 'sender');
 } 

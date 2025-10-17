@@ -348,7 +348,7 @@ if (!hm_exists('default_reject_message')) {
 }
 
 if (!hm_exists('block_filter')) {
-    function block_filter($filter, $user_config, $action, $imap_server_id, $sender, $custom_reject_message = '')
+    function block_filter($filter, $user_config, $action, $imap_server_id, $sender, $custom_reject_message = '', $junk_folder = 'Junk')
     {
         $ret = ['action' => $action];
 
@@ -400,8 +400,13 @@ if (!hm_exists('block_filter')) {
         }
         elseif ($default_behaviour == 'Move') {
             $filter->addRequirement('fileinto');
+            delayed_debug_log('Sieve filter: Moving to folder', array(
+                'folder' => $junk_folder,
+                'sender' => $sender,
+                'action' => $action
+            ));
             $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => 'Blocked'])
+                new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => $junk_folder])
             );
         }
 
