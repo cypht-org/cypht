@@ -390,7 +390,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
 
             if($this->get('tags')){
-                $txt .= tags_dropdown($this, $headers);
+                $txt .= tags_dropdown($this);
             }
             if (isset($lc_headers['x-schedule'])) {
                 $txt .= schedule_dropdown($this, true);

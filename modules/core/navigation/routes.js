@@ -81,6 +81,10 @@ const modulesRoutes = [
     {
         page: 'shortcuts',
         handler: 'applyShortcutsPageHandlers'
+    },
+    {
+        page: 'tags',
+        handler: 'applyTagsPageHandlers'
     }
 ]
 

@@ -117,7 +117,7 @@ class Hm_Output_tags_tree extends Hm_Output_Module {
             // Generate the tree view HTML
             $treeViewHtml = generate_tree_view($folderTree, $this->html_safe(Hm_Request_Key::generate()));
             $treeContent = count($folderTree) > 0 ? $treeViewHtml : '<p>'. $this->trans('No tags available yet.') .'</p>';
-            return '<div class="tags_tree mt-3 col-lg-8 col-md-8 col-sm-12">
+            $out = '<div class="tags_tree mt-3 col-lg-8 col-md-8 col-sm-12">
                     <div class="card m-3 mr-0">
                         <div class="card-body">
                             <div class="tree-view">
@@ -126,7 +126,11 @@ class Hm_Output_tags_tree extends Hm_Output_Module {
                         </div>
                     </div>
                 </div>';
-        
+
+            if ($this->get('tags_updated')) {
+                $out .= '<script>window.tagsUpdated = true;</script>';
+            }
+            return $out;
         }
     }
 }

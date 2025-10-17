@@ -1512,16 +1512,18 @@ function snooze_dropdown($output, $unsnooze = false) {
 }}
 
 if (!hm_exists('tags_dropdown')) {
-function tags_dropdown($context, $headers) {
+function tags_dropdown($context) {
+    $msgUid = $context->get('msg_text_uid');
+    $msgTags = Hm_Tags::getTagIdsWithMessage($msgUid);
+
     $folders = $context->get('tags', array());
     $txt = '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Tags').'</a>
+                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" href="#" aria-expanded="true">'.$context->trans('Tags').'</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuTag">';
 
-    $tags =  !empty($headers['X-Cypht-Tags']) ? explode(',', $headers['X-Cypht-Tags']) : array();
     foreach ($folders as $folder) {
         $tag = $folder['name'];
-        $is_checked = in_array($folder['id'], array_map('trim', $tags));
+        $is_checked = in_array($folder['id'], $msgTags);
         $txt .= '<li class="d-flex dropdown-item gap-2">';
         $txt .= '<input class="form-check-input me-1 label-checkbox" type="checkbox" value="" aria-label="..." data-id="'.$folder['id'].'" '.($is_checked ? 'checked' : '').'>';
         $txt .= '<span>'.$context->trans($tag).'</span>';

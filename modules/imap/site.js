@@ -500,18 +500,8 @@ $(document).on('submit', '#imap_filter_form', async function(event) {
     event.preventDefault();
     const url = new URL(location.href);
     url.search = $(this).serialize();
-    history.pushState(history.state, "", url.toString());
-    location.next = url.search;
-    try {
-        const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
-        await messages.load(!messages.hasLocalData(), false, false, () => {
-            display_imap_mailbox(messages.rows, messages.list, messages);
-            showPagination(messages.pages);
-        });
-    } catch (error) {
-        console.log(error);
-        // Show error message. TODO: No message utility yet, implement it later.
-    }
+    url.searchParams.set('list_page', '1');
+    navigate(url.toString());
 });
 
 var display_imap_mailbox = function(rows, id, store, checkEmptyState = true) {
@@ -670,15 +660,16 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
                 $('.prev, .next').hide();
             }
             globals.auto_advance_email_enabled = Boolean(res.auto_advance_email_enabled);
+
+            if (callback) {
+                callback(res)
+            }
         };
 
         if (!msg_part) {
             var msgContent = get_local_message_content(uid, list_path);
             if (msgContent) {
                 onSuccess(msgContent);
-                if (callback) {
-                    callback(msgContent)
-                }
             }
         }
 
@@ -712,8 +703,7 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
                     }
                 },
                 [],
-                false,
-                callback
+                false
             );
         }
     }
@@ -1153,7 +1143,20 @@ function imap_setup_tags() {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_tag'},
             {'name': 'tag_id', 'value': folder_id},
-            {'name': 'list_path', 'value': ids}]
+            {'name': 'list_path', 'value': ids},
+            {'name': 'untag', 'value': !$(this).is(':checked')},
+            {'name': 'tag', 'value': $(this).is(':checked')}],
+            function() {
+                if (getPageNameParam() == 'message_list') {
+                    // remove cached message content so that tag changes are reflected
+                    ids.forEach((id) => {
+                        const uid = id.split('_')[1];
+                        Hm_Utils.remove_from_local_storage(getMessageStorageKey(uid));
+                    });
+                } else if (getPageNameParam() == 'message') {
+                    set_message_content();
+                }
+            }
         );
     });
 }

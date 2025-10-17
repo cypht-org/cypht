@@ -131,7 +131,11 @@ function applySmtpComposePageHandlers() {
 
         async function handleSendAnyway() {
             if ($('.saving_draft').val() !== '0') {
-                Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+                if ($('.nexter_input').val()) {
+                    Hm_Notices.show([hm_trans('Please wait, message scheduling in progress...')]);
+                } else {
+                    Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+                }
                 await waitForValueChange('.saving_draft', '0');
             }
 
