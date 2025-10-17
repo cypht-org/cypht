@@ -30,6 +30,10 @@ window.addEventListener('popstate', function(event) {
 });
 
 window.addEventListener('load', function() {
+    if (!hm_is_logged()) {
+        return;
+    }
+
     const unMountCallback = renderPage(window.location.href);
     history.replaceState({ main: $('#cypht-main').prop('outerHTML'), scripts: extractCustomScripts($(document)) }, "");
 
