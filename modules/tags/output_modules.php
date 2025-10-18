@@ -213,13 +213,13 @@ class Hm_Output_tags extends hm_output_module {
                 if (!$this->get('hide_folder_icons')) {
                     $res .= $hasChild ? '<i class="bi bi-caret-down"></i>' : '<i class="bi bi-tags fs-5 me-2"></i>';
                 }
-                $res .= '<a data-id="tag_'.$this->html_safe($id).'" href="?page=message_list&list_path=tag&tag_id='.$this->html_safe($id).'">';
+                $res .= '<a data-id="tag_'.$this->html_safe($id).'" href="?page=message_list&list_path=tag&filter='.$this->html_safe($id).'">';
                 $res .= $this->html_safe($folder['name']).'</a>';
                 if($hasChild) {
                     $res .= '<ul>';
                     foreach ($folder['children'] as $key => $child) {
                         $res .= '<li class="tag_'.$this->html_safe($child['id']).'">';
-                        $res .= '<a data-id="tag_'.$this->html_safe($child['id']).'" href="?page=message_list&list_path=tag&tag_id='.$this->html_safe($child['id']).'">';
+                        $res .= '<a data-id="tag_'.$this->html_safe($child['id']).'" href="?page=message_list&list_path=tag&filter='.$this->html_safe($child['id']).'">';
                         $res .= $this->html_safe($folder['name']).'</a>';
                         $res .= '</li>';
                     }
