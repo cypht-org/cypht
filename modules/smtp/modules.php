@@ -564,6 +564,27 @@ class Hm_Handler_profile_status extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_smtp_supports_dsn extends Hm_Handler_Module {
+    public function process() {
+        if (! $this->user_config->get('enable_compose_delivery_receipt_setting')) {
+            return;
+        }
+
+        Hm_SMTP_List::init($this->user_config, $this->session);
+
+        $smtp_id = server_from_compose_smtp_id($this->request->post['compose_smtp_id']);
+        $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
+        $mailbox = Hm_SMTP_List::connect($smtp_id, false, $smtp_details['user'], $smtp_details['pass']);
+        if (! $mailbox || ! $mailbox->authed()) {
+            Hm_Msgs::add("Failed to determine Delivery Status Notification. The server refused connection. user is: ".$smtp_details['user'], "danger");
+            $this->out('dsn_supported', false);
+            return;
+        }
+
+        $this->out('dsn_supported', $mailbox->get_connection()->supports_dsn());
+    }
+}
+
 if (!hm_exists('get_mime_type')) {
     function get_mime_type($filename)
     {
@@ -1193,7 +1214,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                     (!$html ? '<label for="compose_body">'.$this->trans('Message').'</label>': '').
                 '</div>';
                 if($this->get('enable_compose_delivery_receipt_setting')) {
-                    $res .= '<div class="form-check mb-3"><input value="1" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" class="form-check-input" checked/><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
+                    $res .= '<div class="form-check mb-3"><input value="1" name="compose_delivery_receipt" disabled id="compose_delivery_receipt" type="checkbox" class="form-check-input" checked/><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
                 }
         if ($html == 2) {
             $res .= '<link href="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.

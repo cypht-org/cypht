@@ -96,6 +96,7 @@ add_handler('ajax_update_server_pw', 'load_smtp_servers_from_config', true, 'smt
 setup_base_ajax_page('ajax_profiles_status', 'core');
 add_handler('ajax_profiles_status', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_profiles_status', 'profile_status', true, 'smtp', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_profiles_status', 'smtp_supports_dsn', true, 'smtp', 'profile_status', 'after');
 
 /* resumable clear chunks */
 add_handler('ajax_clear_attachment_chunks', 'login', false, 'core');
@@ -164,6 +165,7 @@ return array(
         'sent_msg_id' => array(FILTER_VALIDATE_BOOLEAN, false),
         'enable_attachment_reminder' => array(FILTER_VALIDATE_BOOLEAN, false),
         'scheduled_msg_count' => array(FILTER_VALIDATE_INT, false),
+        'dsn_supported' => array(FILTER_VALIDATE_BOOLEAN, false),
     ),
     'allowed_post' => array(
         'post_archive' => FILTER_VALIDATE_INT,
