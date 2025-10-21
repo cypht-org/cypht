@@ -94,4 +94,8 @@ Now let's validate and use handlers that are given.
 ROUTES = modulesRoutes.filter(route => typeof(window[route.handler]) === 'function').map(route => ({
     ...route,
     handler: window[route.handler]
-}))
+}));
+
+
+/* Output routes */
+OUTPUT_BARE_ROUTES = ['logout'];
