@@ -146,6 +146,11 @@ add_output('message', 'message_end', true, 'core', 'message_start', 'after');
 setup_base_page('notfound');
 add_output('notfound', 'notfound_content', true, 'core', 'content_section_start', 'after');
 
+/* logout page */
+setup_base_page('logout', 'core', false);
+add_handler('logout', 'logout', true, 'core');
+add_output('logout', 'logout', true, 'core', 'content_section_start', 'after');
+
 /* message action ajax request */
 setup_base_ajax_page('ajax_message_action', 'core');
 
@@ -218,7 +223,8 @@ return array(
         'search',
         'ajax_quick_servers_setup',
         'ajax_privacy_settings',
-        'ajax_combined_message_list'
+        'ajax_combined_message_list',
+        'logout',
     ),
     'allowed_output' => array(
         'date' => array(FILTER_UNSAFE_RAW, false),
@@ -282,6 +288,8 @@ return array(
         'sort' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'screen_emails' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'prompt' => FILTER_VALIDATE_BOOLEAN,
+        'back_query' => FILTER_UNSAFE_RAW,
     ),
 
     'allowed_post' => array(
