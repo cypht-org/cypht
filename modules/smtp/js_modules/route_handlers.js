@@ -217,11 +217,25 @@ function applySmtpComposePageHandlers() {
             $('textarea[name="compose_body"]').focus();
         }
     }
+
+    const getSmtpProfileCallback = (res) => {
+        const deliveryReceiptCheckBox = $('#compose_delivery_receipt');
+        if (! res.dsn_supported) {
+            deliveryReceiptCheckBox.prop('checked', false);
+            deliveryReceiptCheckBox.prop('disabled', true);
+            deliveryReceiptCheckBox.next('label').after('<span class="badge bg-warning text-dark ms-2">Not supported by the selected SMTP server</span>');
+        } else {
+            deliveryReceiptCheckBox.prop('disabled', false);
+            deliveryReceiptCheckBox.prop('checked', true);
+            deliveryReceiptCheckBox.next('label').next('span.badge').remove();
+        }
+    };
+
     if ($('.sys_messages').text() != 'Message Sent') {
-        get_smtp_profile($('.compose_server').val());
+        get_smtp_profile($('.compose_server').val(), getSmtpProfileCallback);
     }
     $('.compose_server').on('change', function() {
-        get_smtp_profile($('.compose_server').val());
+        get_smtp_profile($('.compose_server').val(), getSmtpProfileCallback);
     });
     if($('.compose_attach_button').attr('disabled') == 'disabled'){
         check_attachment_dir_access();
