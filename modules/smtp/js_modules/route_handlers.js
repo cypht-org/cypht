@@ -131,7 +131,11 @@ function applySmtpComposePageHandlers() {
 
         async function handleSendAnyway() {
             if ($('.saving_draft').val() !== '0') {
-                Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+                if ($('.nexter_input').val()) {
+                    Hm_Notices.show([hm_trans('Please wait, message scheduling in progress...')]);
+                } else {
+                    Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+                }
                 await waitForValueChange('.saving_draft', '0');
             }
 
@@ -213,11 +217,25 @@ function applySmtpComposePageHandlers() {
             $('textarea[name="compose_body"]').focus();
         }
     }
+
+    const getSmtpProfileCallback = (res) => {
+        const deliveryReceiptCheckBox = $('#compose_delivery_receipt');
+        if (! res.dsn_supported) {
+            deliveryReceiptCheckBox.prop('checked', false);
+            deliveryReceiptCheckBox.prop('disabled', true);
+            deliveryReceiptCheckBox.next('label').after('<span class="badge bg-warning text-dark ms-2">Not supported by the selected SMTP server</span>');
+        } else {
+            deliveryReceiptCheckBox.prop('disabled', false);
+            deliveryReceiptCheckBox.prop('checked', true);
+            deliveryReceiptCheckBox.next('label').next('span.badge').remove();
+        }
+    };
+
     if ($('.sys_messages').text() != 'Message Sent') {
-        get_smtp_profile($('.compose_server').val());
+        get_smtp_profile($('.compose_server').val(), getSmtpProfileCallback);
     }
     $('.compose_server').on('change', function() {
-        get_smtp_profile($('.compose_server').val());
+        get_smtp_profile($('.compose_server').val(), getSmtpProfileCallback);
     });
     if($('.compose_attach_button').attr('disabled') == 'disabled'){
         check_attachment_dir_access();

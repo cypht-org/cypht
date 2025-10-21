@@ -59,5 +59,16 @@ if ($dbh) {
 }
 
 if ($user && $pass) {
-    $auth->create($user, $pass);
+    $res = $auth->create($user, $pass);
+    switch ($res) {
+        case 1:
+            fwrite(STDERR, "Error: Unable to create user account.\n");
+            exit(2);
+        case 2:
+            fwrite(STDOUT, "User account created successfully.\n");
+            exit(0);
+        default:
+            fwrite(STDERR, "Error: An unknown error occurred while trying to create user account.\n");
+            exit(2);
+    }
 }

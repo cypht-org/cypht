@@ -246,7 +246,7 @@ var Hm_Ajax_Request = function() { return {
                 res = Hm_Utils.json_decode(Hm_Crypt.decrypt(res.payload));
             }
             if ((res.status && res.status == 'not callable') || !res.router_login_state) {
-                this.fail(xhr, true, !res.router_login_state);
+                this.fail(xhr, true);
                 return;
             }
             if (Hm_Ajax.err_condition) {
@@ -2587,3 +2587,21 @@ function setupActionSnooze(callback) {
     });
     $(document).on('change', '.nexter_input_snooze', callback);
 }
+
+document.addEventListener("show.bs.dropdown", function (event) {
+    const currentToggle = event.target;
+
+    // If it's nested inside a dropdown menu, skip
+    if (currentToggle.closest(".dropdown-menu")) {
+        return;
+    }
+
+    // Close other top-level dropdowns
+    document.querySelectorAll(".dropdown-toggle.show").forEach((openBtn) => {
+        if (openBtn !== currentToggle && !openBtn.closest(".dropdown-menu")) {
+            const dropdownInstance = bootstrap.Dropdown.getInstance(openBtn);
+            if (dropdownInstance) dropdownInstance.hide();
+        }
+    });
+});
+
