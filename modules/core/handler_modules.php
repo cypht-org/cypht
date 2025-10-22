@@ -1179,7 +1179,11 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     $this->out('imap_service_name', $provider);
                 }
                 $this->out('just_saved_credentials', true);
-                Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                if (isPageConfigured('save')) {
+                    Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                } else {
+                    Hm_Msgs::add("Server saved.");
+                }
             }
 
             if ($createProfile && $this->smtp_server_id && ($this->imap_server_id || $this->jmap_server_id)) {

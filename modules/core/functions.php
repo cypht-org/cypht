@@ -780,3 +780,8 @@ function getSettingsSectionOutput($section, $sectionLabel, $sectionIcon, $settin
     return $res;
 }
 
+function isPageConfigured($page) {
+    $pages = array_keys(Hm_Handler_Modules::dump());
+    return in_array($page, $pages);
+}
+
