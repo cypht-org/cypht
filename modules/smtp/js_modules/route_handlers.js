@@ -1,5 +1,5 @@
 // TODO: This function is too large for a route handler, decouple it into multiple functions with action scope focused.
-function applySmtpComposePageHandlers() {
+function applySmtpComposePageHandlers(routeParams) {
     init_resumable_upload()
 
     setupActionSchedule(function () {
@@ -200,10 +200,10 @@ function applySmtpComposePageHandlers() {
         toggle_recip_flds();
     }
     // Handle focus management for different compose scenarios
-    if (window.location.href.search('&reply=1') !== -1 || window.location.href.search('&reply_all=1') !== -1) {
+    if (routeParams.reply == 1 || routeParams.reply_all == 1) {
         replace_cursor_positon ($('textarea[name="compose_body"]'));
     }
-    else if (window.location.href.search('&forward=1') !== -1) {
+    else if (routeParams.forward == 1) {
         replace_cursor_positon ($('textarea[name="compose_body"]'));
         setTimeout(function() {
             save_compose_state();
