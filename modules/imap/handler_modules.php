@@ -1456,8 +1456,12 @@ class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
                     'type' => 'jmap',
                     'port' => false,
                     'tls' => false));
-                Hm_Msgs::add("Added server!. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
-                $this->session->record_unsaved('JMAP server added');
+                if (isPageConfigured('save')) {
+                    Hm_Msgs::add("Added server!. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                    $this->session->record_unsaved('JMAP server added');
+                } else {
+                    Hm_Msgs::add('Added server!');
+                }
             }
             else {
                 Hm_Msgs::add('Could not access supplied URL', 'warning');
@@ -1613,8 +1617,12 @@ class Hm_Handler_save_ews_server extends Hm_Handler_Module {
                 ];
                 $this->user_config->set('special_imap_folders', $specials);
             }
-            Hm_Msgs::add("EWS server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
-            $this->session->record_unsaved('EWS server added');
+            if (isPageConfigured('save')) {
+                Hm_Msgs::add("EWS server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                $this->session->record_unsaved('EWS server added');
+            } else {
+                Hm_Msgs::add('EWS server saved.');
+            }
             $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
         }
     }

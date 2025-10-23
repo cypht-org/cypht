@@ -140,7 +140,11 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                         ));
                         $this->session->record_unsaved('SMTP server added');
                     }
-                    Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                    if (isPageConfigured('save')) {
+                        Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                    } else {
+                        Hm_Msgs::add("E-mail account successfully added.");
+                    }
                     Hm_IMAP_List::clean_up();
                     $this->session->del('nux_add_service_details');
                     $this->session->record_unsaved('IMAP server added');
@@ -214,7 +218,11 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     $this->session->record_unsaved('IMAP server added');
                     $this->session->record_unsaved('SMTP server added');
                     $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
-                    Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                    if (isPageConfigured('save')) {
+                        Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                    } else {
+                        Hm_Msgs::add("E-mail account successfully added.");
+                    }
                     $this->session->close_early();
                     $this->out('nux_account_added', true);
                     if ($this->module_is_supported('imap_folders')) {
