@@ -246,7 +246,7 @@ var Hm_Ajax_Request = function() { return {
                 res = Hm_Utils.json_decode(Hm_Crypt.decrypt(res.payload));
             }
             if ((res.status && res.status == 'not callable') || !res.router_login_state) {
-                this.fail(xhr, true);
+                this.fail(xhr, true, !res.router_login_state);
                 return;
             }
             if (Hm_Ajax.err_condition) {
