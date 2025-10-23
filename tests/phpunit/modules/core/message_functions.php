@@ -6,7 +6,6 @@ class Hm_Test_Core_Message_Functions extends TestCase {
 
     public function setUp(): void {
         require __DIR__.'/../../bootstrap.php';
-        require APP_PATH.'modules/core/modules.php';
     }
     /**
      * @preserveGlobalState disabled

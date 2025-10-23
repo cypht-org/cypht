@@ -13,6 +13,42 @@ function applyAdvancedSearchPageHandlers() {
     $('.adv_reset').on("click", function() { adv_reset_page(); });
     $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
 
+    $(document).off('click', '.show_save_advanced_search');
+    $(document).on('click', '.show_save_advanced_search', function(e) {
+        e.preventDefault();
+        $('.save_advanced_search_form').show();
+        $('.show_save_advanced_search').hide();
+        $('.advanced_search_name').focus();
+        return false;
+    });
+
+    $(document).off('click', '.cancel_save_advanced_search');
+    $(document).on('click', '.cancel_save_advanced_search', function(e) {
+        e.preventDefault();
+        $('.save_advanced_search_form').hide();
+        $('.show_save_advanced_search').show();
+        $('.advanced_search_name').val('');
+        return false;
+    });
+
+    $(document).off('click', '.save_advanced_search_btn');
+    $(document).on('click', '.save_advanced_search_btn', function(e) {
+        e.preventDefault();
+        return save_advanced_search();
+    });
+
+    $(document).off('click', '.update_advanced_search_btn');
+    $(document).on('click', '.update_advanced_search_btn', function(e) {
+        e.preventDefault();
+        return update_advanced_search();
+    });
+
+    $(document).off('click', '.delete_advanced_search_btn');
+    $(document).on('click', '.delete_advanced_search_btn', function(e) {
+        e.preventDefault();
+        return delete_advanced_search();
+    });
+
     apply_saved_search();
     var data = Hm_Utils.get_from_local_storage('formatted_advanced_search_data');
     if (data && data.length) {
