@@ -38,8 +38,10 @@ add_output('servers', 'display_configured_smtp_servers', true, 'smtp', 'server_c
 
 add_handler('settings', 'process_compose_type', true, 'smtp', 'save_user_settings', 'before');
 add_handler('settings', 'process_auto_bcc', true, 'smtp', 'save_user_settings', 'before');
+add_handler('settings', 'process_enable_exclude_auto_bcc', true, 'smtp', 'save_user_settings', 'before');
 add_output('settings', 'compose_type_setting', true, 'smtp', 'start_general_settings', 'after');
 add_output('settings', 'auto_bcc_setting', true, 'smtp', 'compose_type_setting', 'after');
+add_output('settings', 'exclude_auto_bcc_setting', true, 'smtp', 'auto_bcc_setting', 'after');
 add_handler('settings', 'attachment_dir', true, 'smtp', 'save_user_settings', 'after');
 add_output('settings', 'attachment_setting', true, 'smtp', 'compose_type_setting', 'after');
 
@@ -206,6 +208,7 @@ return array(
         'draft_in_reply_to' => FILTER_UNSAFE_RAW,
         'draft_notice' => FILTER_VALIDATE_BOOLEAN,
         'smtp_auto_bcc' => FILTER_VALIDATE_INT,
+        'enable_exclude_auto_bcc' => FILTER_VALIDATE_INT,
         'profile_value' => FILTER_UNSAFE_RAW,
         'uploaded_files' => FILTER_UNSAFE_RAW,
         'send_uploaded_files' => FILTER_UNSAFE_RAW,
