@@ -30,5 +30,10 @@ setup:  ## locally setup app and users. presumes env vars are set
 	echo "Creating directories and configs"
 	./scripts/setup_system.sh
 
+.PHONY: setup-mta-sts
+setup-mta-sts:  ## setup MTA-STS and TLS-RPT. usage: make setup-mta-sts DOMAIN=example.com MX=mail.example.com EMAIL=admin@example.com
+	@if [ -z "$(DOMAIN)" ]; then echo "Error: DOMAIN is required. Usage: make setup-mta-sts DOMAIN=example.com MX=mail.example.com EMAIL=admin@example.com"; exit 1; fi
+	@if [ -z "$(MX)" ]; then echo "Error: MX is required. Usage: make setup-mta-sts DOMAIN=example.com MX=mail.example.com EMAIL=admin@example.com"; exit 1; fi
+	./scripts/setup_mta_sts.sh -d $(DOMAIN) -m "$(MX)" $(if $(EMAIL),-e $(EMAIL),)
 help:  ## get help
 	@grep -E '^[a-zA-Z_-]+:.*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
