@@ -635,7 +635,7 @@ class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
             $folder_name = $this->get('special_folder_names')['junk'] ?? $junk_folder;
         }
 
-        $res = '<div class="row m-0 px-3 mt-3">';
+        $res = '<div class="row m-0 px-3 mt-3 pb-3">';
         $res .= '<div data-target=".junk_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
                     <a href="#" class="pe-auto"><i class="bi bi-envelope-x-fill fs-5 me-2"></i>'.$this->trans('Junk Folder').':<span id="junk_val">'.$folder_name.'</span></a>
                 </div>';

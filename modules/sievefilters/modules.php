@@ -1144,12 +1144,12 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
         }
         $res = '<li class="menu_sieve_filters"><a class="unread_link" href="?page=sieve_filters">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-journal-bookmark-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-journal-bookmark-fill me-2"></i>';
         }
         $res .= $this->trans('Filters').'</a></li>';
         $res .= '<li class="menu_block_list"><a class="unread_link" href="?page=block_list">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-x-circle-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-x-circle-fill me-2"></i>';
         }
         $res .= $this->trans('Block List').'</a></li>';
         if ($this->format == 'HTML5') {
