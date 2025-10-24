@@ -149,5 +149,3 @@ jobs:
           path: |
             tests/selenium/page_dump.html
             tests/selenium/page_screenshot.png
-            tests/selenium/console_logs.json
-            site.js

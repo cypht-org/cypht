@@ -155,14 +155,6 @@ class WebTest:
 
     def wait(self, el_type=By.TAG_NAME, el_value="body", timeout=60):
         print(" - waiting for page by {0}: {1} ...".format(el_type, el_value))
-        if el_value == "main":
-            time.sleep(10)
-            with open("page_dump.html", "w", encoding="utf-8") as f:
-                f.write(self.driver.page_source)
-            self.driver.save_screenshot("page_screenshot.png")
-            logs = self.driver.get_log("browser")
-            with open("console_logs.json", "w", encoding="utf-8") as f:
-                json.dump(logs, f, indent=2)
         element = WebDriverWait(self.driver, timeout).until(
             exp_cond.presence_of_element_located((el_type, el_value)))
 
@@ -186,6 +178,9 @@ class WebTest:
             )
         except:
             print(" - routing toast check failed, continuing...")
+            with open("page_dump.html", "w", encoding="utf-8") as f:
+                f.write(self.driver.page_source)
+            self.driver.save_screenshot("page_screenshot.png")
             pass
 
     def wait_for_settings_to_expand(self):
