@@ -176,8 +176,11 @@ class WebTest:
             WebDriverWait(self.driver, timeout).until(
                 lambda driver: driver.execute_script("return window.routingToast === null;")
             )
+            WebDriverWait(self.driver, timeout).until(
+                lambda driver: driver.execute_script("return document.getElementById('nprogress') === null;")
+            )
         except:
-            print(" - routing toast check failed, continuing...")
+            print(" - routing toast or nprogress check failed, continuing...")
             pass
 
     def wait_for_settings_to_expand(self):
