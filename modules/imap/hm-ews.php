@@ -268,7 +268,7 @@ class Hm_EWS {
             $msg->setFrom($from);
             $msg->setToRecipients($recipients);
 
-            $message = $this->convert_utf8_to_iso88591_if_safe($message);
+            $message = $this->use_iso_if_safe($message);
             $mimeContent = Type\MimeContentType::buildFromArray([
                 'CharacterSet' => 'UTF-8',
                 '_' => base64_encode($message)
@@ -294,7 +294,7 @@ class Hm_EWS {
      * @param string $message The MIME message from Hm_MIME_Msg
      * @return string Modified message with ISO-8859-1 where safe
      */
-    private function convert_utf8_to_iso88591_if_safe($message) {
+    private function use_iso_if_safe($message) {
         // Use regex to find and replace each text part's charset + body
         return preg_replace_callback(
             '/Content-Type:\s*text\/[^;]+;\s*charset="?UTF-8"?[^\r\n]*\r\n' .
@@ -1080,8 +1080,20 @@ class Hm_EWS {
             $struct[$part_num]['md5'] = '';
             $struct[$part_num]['disposition'] = $part->getContentDisposition();
 
-            if ($filename = $part->getFilename()) {
+            $filename = $part->getFilename();
+            if (! $filename) {
+                $filename = $part->getHeaderParameter('Content-Type', 'name');
+            }
+            if (! $filename) {
+                $filename = $part->getHeaderParameter('Content-Disposition', 'filename');
+            }
+            if ($filename) {
                 $struct[$part_num]['file_attributes'] = ['filename' => $filename];
+
+                if (! isset($struct[$part_num]['attributes']) || ! is_array($struct[$part_num]['attributes'])) {
+                    $struct[$part_num]['attributes'] = [];
+                }
+                $struct[$part_num]['attributes']['name'] = $filename;
 
                 if ($part->getContentDisposition() == 'attachment') {
                     $struct[$part_num]['file_attributes']['attachment'] = true;
