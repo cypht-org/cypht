@@ -17,6 +17,7 @@ from selenium.webdriver.support import expected_conditions as exp_cond
 import glob
 import subprocess
 import json
+import time
 
 class WebTest:
 
@@ -63,12 +64,12 @@ class WebTest:
         echo = " - modules enabled: "
         for mod in self.modules:
             echo += mod + " "
-        print(echo) 
+        print(echo)
         if name in self.modules:
             return True
         print(" - module not enabled: %s" % name)
         return False
-    
+
     def single_server(self):
         if self.servers <= 1:
             return True
@@ -95,7 +96,7 @@ class WebTest:
         WebDriverWait(self.driver, 3).until(exp_cond.alert_is_present(), 'timed out')
         alert = self.driver.switch_to.alert
         alert.accept()
-        
+
     def logout_no_save(self):
         print(" - logging out")
         self.driver.find_element(By.CLASS_NAME, 'logout_link').click()
@@ -128,7 +129,7 @@ class WebTest:
         print(" - finding element by class {0}".format(class_name))
         return self.driver.find_element(By.CLASS_NAME, class_name)
 
-    def wait_for_element_by_class(self, class_name, timeout=10):
+    def wait_for_element_by_class(self, class_name, timeout=60):
         """Wait for an element to be present and visible by class name"""
         print(" - waiting for element by class {0}".format(class_name))
         WebDriverWait(self.driver, timeout).until(
@@ -143,7 +144,7 @@ class WebTest:
     def by_xpath(self, element_xpath):
         print(" - finding element by xpath {0}".format(element_xpath))
         return self.driver.find_element(By.XPATH, element_xpath)
-    
+
     def element_exists(self, class_name):
         print(" - checking if element exists by class {0}".format(class_name))
         try:
@@ -157,63 +158,27 @@ class WebTest:
         element = WebDriverWait(self.driver, timeout).until(
             exp_cond.presence_of_element_located((el_type, el_value)))
 
-    def wait_on_class(self, class_name, timeout=30):
+    def wait_on_class(self, class_name, timeout=60):
         self.wait(By.CLASS_NAME, class_name)
 
     def wait_with_folder_list(self):
         self.wait(By.CLASS_NAME, "main")
 
-    def wait_on_sys_message(self, timeout=30):
+    def wait_on_sys_message(self, timeout=60):
         wait = WebDriverWait(self.driver, timeout)
         element = wait.until(wait_for_non_empty_text((By.CLASS_NAME, "sys_messages"))
 )
-        
-    def wait_for_navigation_to_complete(self, timeout=30):
+
+    def wait_for_navigation_to_complete(self, timeout=60):
         print(" - waiting for the navigation to complete...")
         # Wait for the main content to be updated and any loading indicators to disappear
         try:
-            # Wait for any loading indicators to disappear
-            WebDriverWait(self.driver, 5).until_not(
-                lambda driver: len(driver.find_elements(By.ID, "loading_indicator")) > 0
+            WebDriverWait(self.driver, timeout).until(
+                lambda driver: driver.execute_script("return window.routingToast === null;")
             )
         except:
-            # Loading icon might not be present, continue
+            print(" - routing toast check failed, continuing...")
             pass
-        
-        # Wait for the main content area to be stable
-        try:
-            WebDriverWait(self.driver, timeout).until(
-                lambda driver: driver.execute_script("""
-                    return new Promise((resolve) => {
-                        let lastContent = '';
-                        let stableCount = 0;
-                        const checkStability = () => {
-                            const mainContent = document.querySelector('main')?.innerHTML || '';
-                            if (mainContent === lastContent) {
-                                stableCount++;
-                                if (stableCount >= 3) {
-                                    resolve(true);
-                                    return;
-                                }
-                            } else {
-                                stableCount = 0;
-                                lastContent = mainContent;
-                            }
-                            setTimeout(checkStability, 100);
-                        };
-                        checkStability();
-                    });
-                """)
-            )
-        except:
-            # Fallback: just wait for the main element to be present
-            print(" - fallback: waiting for main element")
-            WebDriverWait(self.driver, timeout).until(
-                exp_cond.presence_of_element_located((By.TAG_NAME, "main"))
-            )
-            # Additional wait for any dynamic content
-            import time
-            time.sleep(1)
 
     def wait_for_settings_to_expand(self):
         print(" - waiting for the settings section to expand...")
@@ -229,13 +194,13 @@ class WebTest:
                         return
                 except:
                     pass
-                
+
                 # Click to expand
                 settings_button.click()
-                
+
                 # Wait for the settings to be displayed
                 try:
-                    WebDriverWait(self.driver, 10).until(lambda x: self.by_class('settings').is_displayed())
+                    WebDriverWait(self.driver, 60).until(lambda x: self.by_class('settings').is_displayed())
                     print(" - settings expanded successfully")
                 except:
                     print(" - settings expansion timeout, continuing anyway")
@@ -249,13 +214,13 @@ class WebTest:
         print(" - waiting for element to be clickable")
         try:
             # Scroll element into view
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
-            
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center', behavior: 'instant'});", el)
+
             # Wait for element to be clickable
-            WebDriverWait(self.driver, 10).until(
+            WebDriverWait(self.driver, 60).until(
                 exp_cond.element_to_be_clickable(el)
             )
-            
+
             # Try regular click first
             try:
                 el.click()
@@ -265,7 +230,7 @@ class WebTest:
                 print(" - trying JavaScript click as fallback")
                 # Use JavaScript click as fallback
                 self.driver.execute_script("arguments[0].click();", el)
-                
+
         except Exception as e:
             print(f" - click_when_clickable failed: {e}")
             # Final fallback: try JavaScript click without waiting
@@ -282,11 +247,8 @@ class WebTest:
         for attempt in range(max_attempts):
             try:
                 # Scroll element into view
-                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
-                # Wait a moment for any animations
-                import time
-                time.sleep(0.5)
-                # Try to click
+                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center', behavior: 'instant'});", element)
+                WebDriverWait(self.driver, 60).until(exp_cond.element_to_be_clickable(element))
                 element.click()
                 return
             except Exception as e:

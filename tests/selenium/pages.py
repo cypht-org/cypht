@@ -3,6 +3,7 @@
 from base import WebTest, USER, PASS
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from runner import test_runner
 
 class PageTests(WebTest):
@@ -158,15 +159,8 @@ class PageTests(WebTest):
             self.wait_for_settings_to_expand()
 
             # Add a small delay to ensure the menu is fully expanded
-            import time
-            time.sleep(0.5)
-
             list_item = self.by_class('menu_servers')
             link = list_item.find_element(By.TAG_NAME, 'a')
-
-            # Try to scroll the element into view and wait a bit more
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", link)
-            time.sleep(0.5)
 
             self.click_when_clickable(link)
             self.wait_with_folder_list()
@@ -188,16 +182,8 @@ class PageTests(WebTest):
             # Try to expand settings menu first
             self.wait_for_settings_to_expand()
 
-            # Add a small delay to ensure the menu is fully expanded
-            import time
-            time.sleep(0.5)
-
             list_item = self.by_class('menu_settings')
             link = list_item.find_element(By.TAG_NAME, 'a')
-
-            # Try to scroll the element into view and wait a bit more
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", link)
-            time.sleep(0.5)
 
             self.click_when_clickable(link)
             self.wait_with_folder_list()
@@ -229,13 +215,6 @@ class PageTests(WebTest):
                 print(" - menu_folders link is not enabled")
                 return
 
-            # Try to scroll the element into view first
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", link)
-
-            # Wait a moment for any animations
-            import time
-            time.sleep(0.5)
-
             # Try clicking with JavaScript as a fallback
             try:
                 self.click_when_clickable(link)
@@ -263,16 +242,8 @@ class PageTests(WebTest):
             # Try to expand settings menu first
             self.wait_for_settings_to_expand()
 
-            # Add a small delay to ensure the menu is fully expanded
-            import time
-            time.sleep(0.5)
-
             list_item = self.by_class('menu_save')
             link = list_item.find_element(By.TAG_NAME, 'a')
-
-            # Try to scroll the element into view and wait a bit more
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", link)
-            time.sleep(0.5)
 
             self.click_when_clickable(link)
             self.wait_with_folder_list()
@@ -294,16 +265,8 @@ class PageTests(WebTest):
             # Try to expand settings menu first
             self.wait_for_settings_to_expand()
 
-            # Add a small delay to ensure the menu is fully expanded
-            import time
-            time.sleep(0.5)
-
             list_item = self.by_class('menu_change_password')
             link = list_item.find_element(By.TAG_NAME, 'a')
-
-            # Try to scroll the element into view and wait a bit more
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", link)
-            time.sleep(0.5)
 
             self.click_when_clickable(link)
             self.wait_with_folder_list()
@@ -325,16 +288,8 @@ class PageTests(WebTest):
             # Try to expand settings menu first
             self.wait_for_settings_to_expand()
 
-            # Add a small delay to ensure the menu is fully expanded
-            import time
-            time.sleep(0.5)
-
             list_item = self.by_class('menu_profiles')
             link = list_item.find_element(By.TAG_NAME, 'a')
-
-            # Try to scroll the element into view and wait a bit more
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", link)
-            time.sleep(0.5)
 
             self.click_when_clickable(link)
             self.wait_with_folder_list()
