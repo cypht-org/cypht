@@ -267,6 +267,8 @@ class Hm_EWS {
             $msg = new Type\MessageType();
             $msg->setFrom($from);
             $msg->setToRecipients($recipients);
+
+            $message = $this->convert_utf8_to_iso88591_if_safe($message);
             $mimeContent = Type\MimeContentType::buildFromArray([
                 'CharacterSet' => 'UTF-8',
                 '_' => base64_encode($message)
@@ -283,6 +285,44 @@ class Hm_EWS {
         } catch (\Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    /**
+     * Convert UTF-8 to ISO-8859-1 if the content is safe to do so.
+     * This prevents Exchange from converting quoted-printable to base64 encoding.
+     * 
+     * @param string $message The MIME message from Hm_MIME_Msg
+     * @return string Modified message with ISO-8859-1 where safe
+     */
+    private function convert_utf8_to_iso88591_if_safe($message) {
+        // Use regex to find and replace each text part's charset + body
+        return preg_replace_callback(
+            '/Content-Type:\s*text\/[^;]+;\s*charset="?UTF-8"?[^\r\n]*\r\n' .
+            'Content-Transfer-Encoding:\s*quoted-printable\r\n\r\n' .
+            '(.*?)(?=\r\n--|\r\n\r\n--|\z)/s',
+            function($match) {
+                // Decode quoted-printable body
+                $decoded = quoted_printable_decode($match[1]);
+
+                // This will fail for characters not in ISO-8859-1 (e.g., €, emojis, Cyrillic).
+                $converted = @iconv('UTF-8', 'ISO-8859-1', $decoded);
+                if ($converted === false) {
+                    return $match[0]; // Keep UTF-8 (contains €, emojis, Cyrillic, etc.)
+                }
+
+                $backToUtf8 = @iconv('ISO-8859-1', 'UTF-8', $converted);
+                if ($backToUtf8 === false || $decoded !== $backToUtf8) {
+                    return $match[0]; // Not exact match, keep UTF-8
+                }
+
+                // Safe to convert: replace charset and re-encode
+                $newHeader = preg_replace('/charset="?UTF-8"?/i', 'charset="iso-8859-1"', $match[0]);
+                $newBody = quoted_printable_encode($converted);
+
+                return str_replace($match[1], $newBody, $newHeader);
+            },
+            $message
+        );
     }
 
     public function store_message($folder, $message, $seen = true, $draft = false) {
@@ -1040,8 +1080,20 @@ class Hm_EWS {
             $struct[$part_num]['md5'] = '';
             $struct[$part_num]['disposition'] = $part->getContentDisposition();
 
-            if ($filename = $part->getFilename()) {
+            $filename = $part->getFilename();
+            if (! $filename) {
+                $filename = $part->getHeaderParameter('Content-Type', 'name');
+            }
+            if (! $filename) {
+                $filename = $part->getHeaderParameter('Content-Disposition', 'filename');
+            }
+            if ($filename) {
                 $struct[$part_num]['file_attributes'] = ['filename' => $filename];
+
+                if (! isset($struct[$part_num]['attributes']) || ! is_array($struct[$part_num]['attributes'])) {
+                    $struct[$part_num]['attributes'] = [];
+                }
+                $struct[$part_num]['attributes']['name'] = $filename;
 
                 if ($part->getContentDisposition() == 'attachment') {
                     $struct[$part_num]['file_attributes']['attachment'] = true;
