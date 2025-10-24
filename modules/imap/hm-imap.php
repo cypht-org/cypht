@@ -966,7 +966,7 @@ if (!class_exists('Hm_IMAP')) {
          * @param bool $exclude_auto_bcc don't include auto-bcc'ed messages
          * @return array list of headers and values for the specified uids
          */
-        public function get_message_list($uids, $raw=false, $include_content_body = false, $exclude_auto_bcc = true) {
+        public function get_message_list($uids, $raw=false, $include_content_body = false, $exclude_auto_bcc = true, $active_body_structure = true) {
             if (is_array($uids)) {
                 sort($uids);
                 $sorted_string = implode(',', array_filter($uids));
@@ -981,7 +981,10 @@ if (!class_exists('Hm_IMAP')) {
             if ($this->is_supported( 'X-GM-EXT-1' )) {
                 $command .= 'X-GM-MSGID X-GM-THRID X-GM-LABELS ';
             }
-            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID IN-REPLY-TO X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY)]";
+            if ($active_body_structure) {
+                $command .= "BODYSTRUCTURE ";
+            }
+            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID IN-REPLY-TO X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY X-MS-EXCHANGE-CALENDAR-SERIES-INSTANCE-ID SENDER)]";
             if ($include_content_body) {
                 $command .= " BODY.PEEK[TEXT]<0.500>";
             }
@@ -995,8 +998,10 @@ if (!class_exists('Hm_IMAP')) {
             $res = $this->get_response(false, true);
             $status = $this->check_response($res, true);
             $tags = array('X-GM-MSGID' => 'google_msg_id', 'X-GM-THRID' => 'google_thread_id', 'X-GM-LABELS' => 'google_labels', 'UID' => 'uid', 'FLAGS' => 'flags', 'RFC822.SIZE' => 'size', 'INTERNALDATE' => 'internal_date');
-            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'IN-REPLY-TO', 'REFERENCES', 'X-SNOOZED', 'X-SCHEDULE', 'X-PROFILE-ID', 'X-DELIVERY', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
-            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'in-reply-to' => 'in_reply_to', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body');
+            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'IN-REPLY-TO', 'REFERENCES', 'X-SNOOZED', 'X-SCHEDULE', 'X-PROFILE-ID', 'X-DELIVERY', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE', 'X-MS-EXCHANGE-CALENDAR-SERIES-INSTANCE-ID', 'SENDER');
+            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'in-reply-to' => 'in_reply_to', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body', 'type_msg' => 'type_msg');
+            $flds['x-ms-exchange-calendar-series-instance-id'] = "x_ms_exchange_calendar_series_instance_id";
+            $flds['sender'] = "sender";
             $headers = array();
 
             foreach ($res as $n => $vals) {
@@ -1023,10 +1028,23 @@ if (!class_exists('Hm_IMAP')) {
                     $x_schedule = '';
                     $x_profile_id = '';
                     $x_delivery = '';
+                    $x_ms_exchange_calendar_series_instance_id = '';
+                    $sender = '';
                     $count = count($vals);
                     $header_founded = false;
                     $body_founded = false;
+                    $flds['type_msg'] = '';
+                    $bodystructure_found = false;
+                    $bodystructure_data = null;
                     for ($i=0;$i<$count;$i++) {
+                        if ($vals[$i] == 'BODYSTRUCTURE' && !$bodystructure_found) {
+                            $bodystructure_found = true;
+                            $bodystructure_data = $this->parseBodystructure($vals, $i + 1);
+
+                            if ($this->containsCalendarPart($bodystructure_data)) {
+                                $flds['type_msg'] = "calendar";
+                            }
+                        }
                         if ($vals[$i] == 'BODY[HEADER.FIELDS' && !$header_founded) {
                             $header_founded = true;
                             $i++;
@@ -1103,7 +1121,19 @@ if (!class_exists('Hm_IMAP')) {
                                          'timestamp' => time(), 'charset' => $cset, 'x-priority' => $x_priority, 'google_msg_id' => $google_msg_id,
                                          'google_thread_id' => $google_thread_id, 'google_labels' => $google_labels, 'list_archive' => $list_archive,
                                          'references' => $references, 'message_id' => $message_id, 'in_reply_to' => $in_reply_to, 'x_auto_bcc' => $x_auto_bcc,
-                                         'x_snoozed'  => $x_snoozed, 'x_schedule' => $x_schedule, 'x_profile_id' => $x_profile_id, 'x_delivery' => $x_delivery);
+                                         'x_snoozed'  => $x_snoozed, 'x_schedule' => $x_schedule, 'x_profile_id' => $x_profile_id, 'x_delivery' => $x_delivery, 'x_ms_exchange_calendar_series_instance_id' => $x_ms_exchange_calendar_series_instance_id, 'sender' => $sender);
+
+                        $headers[$uid]['type_msg'] = $flds['type_msg'] != "type_msg" ? $flds['type_msg'] :  "";
+                        if ($headers[$uid]['type_msg'] != "calendar") {
+                            if ($headers[$uid]['x_ms_exchange_calendar_series_instance_id'] || $headers[$uid]['sender']) {
+                                if (strpos($headers[$uid]['sender'], 'Google Calendar <calendar-')) {
+                                    $headers[$uid]['type_msg'] = "calendar";
+                                }
+                                if (! empty(trim($headers[$uid]['x_ms_exchange_calendar_series_instance_id']))) {
+                                    $headers[$uid]['type_msg'] = "calendar";
+                                }
+                            }
+                        }
                         $headers[$uid]['preview_msg'] = $flds['body'] != "content_body" ? $flds['body'] :  "";
 
                         if ($raw) {
@@ -2494,7 +2524,7 @@ if (!class_exists('Hm_IMAP')) {
          * @return array list of headers
          */
 
-        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=array(), $include_preview = false) {
+        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=array(), $include_preview = false, $active_body_structure = true) {
             $result = array();
 
             /* select the mailbox if need be */
@@ -2534,7 +2564,7 @@ if (!class_exists('Hm_IMAP')) {
 
             /* get the headers and build a result array by UID */
             if (!empty($uids)) {
-                $headers = $this->get_message_list($uids, false, $include_preview);
+                $headers = $this->get_message_list($uids, false, $include_preview, true, $active_body_structure);
                 foreach($uids as $uid) {
                     if (isset($headers[$uid])) {
                         $result[$uid] = $headers[$uid];
@@ -2619,6 +2649,76 @@ if (!class_exists('Hm_IMAP')) {
             }
 
             return false;
+        }
+
+        /**
+         * Parse the IMAP BODYSTRUCTURE to detect calendar parts
+         */
+        private function containsCalendarPart($bodystructure) {
+            if (!is_array($bodystructure)) {
+                return false;
+            }
+
+            if (isset($bodystructure[0]) && is_string($bodystructure[0]) && 
+                strpos(strtolower($bodystructure[0]), 'multipart') !== false) {
+                for ($i = 1; $i < count($bodystructure); $i++) {
+                    if (is_array($bodystructure[$i]) && $this->containsCalendarPart($bodystructure[$i])) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            if (isset($bodystructure[0]) && is_string($bodystructure[0])) {
+                $contentType = strtolower($bodystructure[0]);
+                if ($contentType === 'text/calendar' || $contentType === 'calendar') {
+                    return true;
+                }
+            }
+
+            if (isset($bodystructure[1]) && is_array($bodystructure[1])) {
+                foreach ($bodystructure[1] as $param) {
+                    if (is_array($param) && isset($param[0]) && strtolower($param[0]) === 'name') {
+                        $filename = strtolower($param[1]);
+                        if (strpos($filename, '.ics') !== false) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /**
+         * Parse the IMAP response BODYSTRUCTURE
+         */
+        private function parseBodystructure($response, $startIndex) {
+            $index = $startIndex;
+            $stack = array();
+            $current = array();
+            
+            while ($index < count($response)) {
+                $token = $response[$index];
+
+                if ($token == '(') {
+                    array_push($stack, $current);
+                    $current = array();
+                    $index++;
+                } elseif ($token == ')') {
+                    $parent = array_pop($stack);
+                    if ($parent === null) {
+                        return $current;
+                    }
+                    $parent[] = $current;
+                    $current = $parent;
+                    $index++;
+                } else {
+                    $current[] = $token;
+                    $index++;
+                }
+            }
+            return $current;
         }
 
     }

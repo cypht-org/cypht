@@ -240,8 +240,13 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
         $subject = $msg['subject'];
         $preview_msg = "";
+        $type_msg = "";
         if (isset($msg['preview_msg'])) {
             $preview_msg = $msg['preview_msg'];
+        }
+
+        if (isset($msg['type_msg'])) {
+            $type_msg = $msg['type_msg'];
         }
     
         if ($parent_list == 'sent') {
@@ -336,7 +341,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
                     array('icon_callback', $flags),
-                    array('subject_callback', $subject, $url, $flags, $icon, $preview_msg),
+                    array('subject_callback', $subject, $url, $flags, $icon, $preview_msg, $type_msg),
                     array('safe_output_callback', 'source', $source),
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
                     array('date_callback', $date, $timestamp, $is_snoozed || $is_scheduled),
@@ -355,7 +360,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('checkbox_callback', $id),
                     array('safe_output_callback', 'source', $source, $icon),
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
-                    array('subject_callback', $subject, $url, $flags, null, $preview_msg),
+                    array('subject_callback', $subject, $url, $flags, null, $preview_msg, $type_msg),
                     array('date_callback', $date, $timestamp, $is_snoozed || $is_scheduled),
                     array('icon_callback', $flags),
                     array('dates_holders_callback', $msg['internal_date'], $msg['date']),
