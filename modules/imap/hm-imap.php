@@ -1034,9 +1034,22 @@ if (!class_exists('Hm_IMAP')) {
                     $header_founded = false;
                     $body_founded = false;
                     $flds['type_msg'] = '';
+                    $bodystructure_found = false;
                     for ($i=0;$i<$count;$i++) {
-                        if ($i == 0 && (preg_grep('/^(calendar|text\/calendar)$/i', $vals) || preg_grep('/\.ics$/i', $vals))) {
-                            $flds['type_msg'] = "calendar";
+                        if ($vals[$i] == 'BODYSTRUCTURE' && !$bodystructure_found) {
+                            $bodystructure_found = true;
+                            
+                            $struct = new Hm_IMAP_Struct(array_slice($vals, $i + 1), $this);
+
+                            $calendar_parts = $struct->search(array('type' => 'text', 'subtype' => 'calendar'), true);
+
+                            if (empty($calendar_parts)) {
+                                $calendar_parts = $struct->search(array('type' => 'application', 'subtype' => 'ics'), true);
+                            }
+
+                            if (!empty($calendar_parts)) {
+                                $flds['type_msg'] = "calendar";
+                            }
                         }
                         if ($vals[$i] == 'BODY[HEADER.FIELDS' && !$header_founded) {
                             $header_founded = true;
@@ -2643,6 +2656,7 @@ if (!class_exists('Hm_IMAP')) {
 
             return false;
         }
+
 
     }
 }
