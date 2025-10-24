@@ -178,12 +178,6 @@ class WebTest:
             )
         except:
             print(" - routing toast check failed, continuing...")
-            with open("page_dump.html", "w", encoding="utf-8") as f:
-                f.write(self.driver.page_source)
-            self.driver.save_screenshot("page_screenshot.png")
-            logs = self.driver.get_log("browser")
-            with open("console_logs.json", "w", encoding="utf-8") as f:
-                json.dump(logs, f, indent=2)
             pass
 
     def wait_for_settings_to_expand(self):
