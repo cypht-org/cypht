@@ -146,11 +146,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: selenium-debug-html
-          path: page_dump.html
+          path: tests/selenium/page_dump.html
 
       - name: Upload screenshot artifact
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: selenium-screenshot
-          path: page_screenshot.png
+          path: tests/selenium/page_screenshot.png
