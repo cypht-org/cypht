@@ -18,6 +18,7 @@ import glob
 import subprocess
 import json
 import time
+import os
 
 class WebTest:
 
@@ -58,6 +59,17 @@ class WebTest:
                 self.driver.set_window_size(1920,1080)
             except Exception:
                 print(" - Could not maximize Safari")
+
+    def save_debug_artifacts(self, name):
+        if os.getenv("GITHUB_ACTIONS") != "true":
+            return
+        os.makedirs(f"artifacts/{name}", exist_ok=True)
+        with open(f"artifacts/{name}/page_dump.html", "w", encoding="utf-8") as f:
+            f.write(self.driver.page_source)
+        self.driver.save_screenshot(f"artifacts/{name}/page_screenshot.png")
+        logs = self.driver.get_log("browser")
+        with open(f"artifacts/{name}/console_logs.json", "w", encoding="utf-8") as f:
+            json.dump(logs, f, indent=2)
 
     def mod_active(self, name):
         # debug self.modules
