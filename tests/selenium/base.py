@@ -160,6 +160,9 @@ class WebTest:
             with open("page_dump.html", "w", encoding="utf-8") as f:
                 f.write(self.driver.page_source)
             self.driver.save_screenshot("page_screenshot.png")
+            logs = self.driver.get_log("browser")
+            with open("console_logs.json", "w", encoding="utf-8") as f:
+                json.dump(logs, f, indent=2)
         element = WebDriverWait(self.driver, timeout).until(
             exp_cond.presence_of_element_located((el_type, el_value)))
 

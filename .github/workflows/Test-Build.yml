@@ -141,16 +141,12 @@ jobs:
       - name: "Script: test.sh"
         run: bash .github/tests/test.sh
 
-      - name: Upload HTML debug artifact
+      - name: Upload Selenium debug artifacts
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: selenium-debug-html
-          path: tests/selenium/page_dump.html
-
-      - name: Upload screenshot artifact
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: selenium-screenshot
-          path: tests/selenium/page_screenshot.png
+          name: selenium-debug
+          path: |
+            tests/selenium/page_dump.html
+            tests/selenium/page_screenshot.png
+            tests/selenium/console_logs.json
