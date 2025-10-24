@@ -17,6 +17,10 @@ chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 chrome_options.add_experimental_option('useAutomationExtension', False)
 chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+chrome_options.add_argument("--window-size=1920,1080")
+
+# Enable browser console logs
+chrome_options.set_capability("goog:loggingPrefs", {"browser": "ALL"})
 
 RECIP='testuser@localhost.org'
 IMAP_ID='0'
