@@ -1034,9 +1034,16 @@ if (!class_exists('Hm_IMAP')) {
                     $header_founded = false;
                     $body_founded = false;
                     $flds['type_msg'] = '';
+                    $bodystructure_found = false;
+                    $bodystructure_data = null;
                     for ($i=0;$i<$count;$i++) {
-                        if ($i == 0 && (preg_grep('/^(calendar|text\/calendar)$/i', $vals) || preg_grep('/\.ics$/i', $vals))) {
-                            $flds['type_msg'] = "calendar";
+                        if ($vals[$i] == 'BODYSTRUCTURE' && !$bodystructure_found) {
+                            $bodystructure_found = true;
+                            $bodystructure_data = $this->parseBodystructure($vals, $i + 1);
+
+                            if ($this->containsCalendarPart($bodystructure_data)) {
+                                $flds['type_msg'] = "calendar";
+                            }
                         }
                         if ($vals[$i] == 'BODY[HEADER.FIELDS' && !$header_founded) {
                             $header_founded = true;
@@ -2642,6 +2649,76 @@ if (!class_exists('Hm_IMAP')) {
             }
 
             return false;
+        }
+
+        /**
+         * Parse the IMAP BODYSTRUCTURE to detect calendar parts
+         */
+        private function containsCalendarPart($bodystructure) {
+            if (!is_array($bodystructure)) {
+                return false;
+            }
+
+            if (isset($bodystructure[0]) && is_string($bodystructure[0]) && 
+                strpos(strtolower($bodystructure[0]), 'multipart') !== false) {
+                for ($i = 1; $i < count($bodystructure); $i++) {
+                    if (is_array($bodystructure[$i]) && $this->containsCalendarPart($bodystructure[$i])) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            if (isset($bodystructure[0]) && is_string($bodystructure[0])) {
+                $contentType = strtolower($bodystructure[0]);
+                if ($contentType === 'text/calendar' || $contentType === 'calendar') {
+                    return true;
+                }
+            }
+
+            if (isset($bodystructure[1]) && is_array($bodystructure[1])) {
+                foreach ($bodystructure[1] as $param) {
+                    if (is_array($param) && isset($param[0]) && strtolower($param[0]) === 'name') {
+                        $filename = strtolower($param[1]);
+                        if (strpos($filename, '.ics') !== false) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /**
+         * Parse the IMAP response BODYSTRUCTURE
+         */
+        private function parseBodystructure($response, $startIndex) {
+            $index = $startIndex;
+            $stack = array();
+            $current = array();
+            
+            while ($index < count($response)) {
+                $token = $response[$index];
+
+                if ($token == '(') {
+                    array_push($stack, $current);
+                    $current = array();
+                    $index++;
+                } elseif ($token == ')') {
+                    $parent = array_pop($stack);
+                    if ($parent === null) {
+                        return $current;
+                    }
+                    $parent[] = $current;
+                    $current = $parent;
+                    $index++;
+                } else {
+                    $current[] = $token;
+                    $index++;
+                }
+            }
+            return $current;
         }
 
     }
