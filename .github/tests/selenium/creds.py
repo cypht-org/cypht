@@ -19,8 +19,8 @@ chrome_options.add_experimental_option('useAutomationExtension', False)
 chrome_options.add_argument('--disable-blink-features=AutomationControlled')
 chrome_options.add_argument("--window-size=1920,1080")
 
-caps = webdriver.DesiredCapabilities.CHROME.copy()
-caps["goog:loggingPrefs"] = {"browser": "ALL"}
+# Enable browser console logs
+chrome_options.set_capability("goog:loggingPrefs", {"browser": "ALL"})
 
 RECIP='testuser@localhost.org'
 IMAP_ID='0'
@@ -31,7 +31,7 @@ PASS = 'testuser'
 DESIRED_CAP = None
 
 def get_driver(cap):
-    return webdriver.Chrome(service=DRIVER_CMD, options=chrome_options, desired_capabilities=caps)
+    return webdriver.Chrome(service=DRIVER_CMD, options=chrome_options)
 
 def success(driver):
     pass
