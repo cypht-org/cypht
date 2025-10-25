@@ -473,6 +473,12 @@ async function select_imap_folder(path, page = 1, reload, processInTheBackground
         Hm_Message_List.set_unread_state();
     }
 
+    // Trigger Sieve sync for INBOX folder
+    if (path && (path.includes('INBOX') || path.includes('494e424f58'))) {
+        console.log('INBOX detected, triggering Sieve sync. Path:', path);
+        triggerSieveSync();
+    }
+
     return messages;
 };
 
@@ -1653,3 +1659,37 @@ $('.screen-email-like').on("click", function() {
     }
     return false;
 });
+
+/**
+ * Trigger Sieve sync for blocked senders
+ * Called automatically when INBOX is loaded
+ */
+function triggerSieveSync() {
+    // Check if we're on the message_list page
+    const currentPage = getParam('page');
+    if (currentPage !== 'message_list') {
+        return;
+    }
+    
+    // Check if we're viewing INBOX folder
+    const listPath = getListPathParam();
+    if (!listPath || (!listPath.includes('INBOX') && !listPath.includes('494e424f58'))) {
+        console.log('Sieve sync: Not INBOX folder, path:', listPath);
+        return;
+    }
+    
+    console.log('INBOX detected, triggering Sieve sync. Path:', listPath);
+    
+    // Show syncing status using native Cypht messages
+    showMessage('Synchronizing Sieve rules...', 'info');
+    
+    // Make AJAX request to Sieve sync handler
+    console.log('Sieve sync: Making AJAX request...');
+    Hm_Ajax.request([
+        {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_sync'}
+    ], function(response) {
+        console.log('Sieve sync: AJAX response received:', response);
+        // Cypht automatically displays messages from router_user_msgs
+        // No need for custom message handling
+    }, null, true);
+}

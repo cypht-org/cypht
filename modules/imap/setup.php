@@ -308,6 +308,12 @@ add_handler('ajax_share_folders', 'load_imap_folders_permissions',  true);
 add_output('ajax_share_folders', 'get_list_imap_folders_permissions',  true);
 add_handler('ajax_share_folders', 'set_acl_to_imap_folders',  true);
 
+/* lazy sieve sync */
+setup_base_ajax_page('ajax_sieve_sync', 'core');
+add_handler('ajax_sieve_sync', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_sieve_sync', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_sieve_sync', 'sieve_sync', true, 'imap', 'imap_oauth2_token_check', 'after');
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -332,6 +338,7 @@ return array(
         'ajax_imap_snooze',
         'ajax_imap_unsnooze',
         'ajax_imap_junk',
+        'ajax_sieve_sync',
         'message_source',
         'ajax_share_folders',
     ),

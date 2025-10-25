@@ -38,6 +38,9 @@ require APP_PATH.'lib/api.php';
 require APP_PATH.'lib/webdav_formats.php';
 require APP_PATH.'lib/js_libs.php';
 require APP_PATH.'lib/rate_limiter.php';
+require APP_PATH.'lib/local_block_list.php';
+require APP_PATH.'lib/sieve_queue.php';
+require APP_PATH.'lib/SieveSync.php';
 
 require_once APP_PATH.'modules/core/functions.php';
 

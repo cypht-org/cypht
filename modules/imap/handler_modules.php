@@ -6,16 +6,10 @@
  * @subpackage imap
  */
 
-if (!defined('DEBUG_MODE')) { die(); }
-
-// Add helper function for delayed logging
-function delayed_debug_log($message, $data = null, $delay = 1) {
-    if ($data) {
-        Hm_Debug::add($message . ': ' . json_encode($data));
-    } else {
-        Hm_Debug::add($message);
-    }
-    sleep($delay);
+// Add helper function for delayed logging (disabled in production)
+function delayed_debug_log($message, $data = null, $level = 'info') {
+    // Debug logging disabled in production
+    return;
 }
 
 // Include spam report utilities for debugging functions
@@ -785,6 +779,80 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                     $msg['server_name'] = $details['name'];
                     $msg['folder'] = $form['folder'];
                     $uid = $msg['uid'];
+
+                    // Check if sender is in local block list
+                    if (isset($msg['from']) && !empty($msg['from'])) {
+                        $sender_email = trim($msg['from']); // Remove leading/trailing spaces
+                        // Parse email from "Name <email@domain.com>" format
+                        if (preg_match('/<([^>]+)>/', $sender_email, $matches)) {
+                            $sender_email = trim($matches[1]);
+                        } elseif (filter_var($sender_email, FILTER_VALIDATE_EMAIL)) {
+                            // Already a valid email, use as-is
+                        } else {
+                            $sender_email = '';
+                        }
+                        
+                        // Debug: Log what we're checking
+                        delayed_debug_log('Local filter: Checking sender', array(
+                            'original_from' => $msg['from'],
+                            'extracted_email' => $sender_email,
+                            'uid' => $uid,
+                            'folder' => hex2bin($form['folder'])
+                        ));
+                        
+                        // Get block list for comparison
+                        $blocked_list = LocalBlockList::getAll();
+                        delayed_debug_log('Local filter: Block list contents', array(
+                            'blocked_count' => count($blocked_list),
+                            'blocked_list' => $blocked_list
+                        ));
+                        
+                        // If sender is blocked locally, mark as spam and move to Junk
+                        $is_blocked = LocalBlockList::exists($sender_email);
+                        delayed_debug_log('Local filter: EXISTS check result', array(
+                            'sender' => $sender_email,
+                            'is_blocked' => $is_blocked,
+                            'check_result' => $is_blocked ? 'BLOCKED' : 'NOT BLOCKED'
+                        ));
+                        
+                        if (!empty($sender_email) && $is_blocked) {
+                            delayed_debug_log('Local filter: Blocked sender detected - FILTERING NOW', array(
+                                'sender' => $sender_email,
+                                'uid' => $uid,
+                                'folder' => hex2bin($form['folder'])
+                            ));
+                            
+                            // Mark message as junk/spam locally
+                            $msg['is_spam'] = true;
+                            $msg['spam_reason'] = 'Locally blocked sender';
+                            
+                            // Optionally auto-move to Junk folder if not already there
+                            $current_folder = hex2bin($form['folder']);
+                            if ($current_folder !== 'Junk' && $current_folder !== 'Spam') {
+                                $specials = get_special_folders($this, $form['imap_server_id']);
+                                if (array_key_exists('junk', $specials) && $specials['junk']) {
+                                    $junk_folder = $specials['junk'];
+                                    try {
+                                        $move_result = $mailbox->message_action($current_folder, 'MOVE', array($uid), $junk_folder);
+                                        if ($move_result['status']) {
+                                            delayed_debug_log('Auto-moved blocked sender to Junk', array(
+                                                'sender' => $sender_email,
+                                                'uid' => $uid
+                                            ));
+                                            $msg = []; // Don't show in current folder
+                                            $total--;
+                                            continue; // Skip to next message
+                                        }
+                                    } catch (Exception $e) {
+                                        delayed_debug_log('Failed to auto-move blocked sender', array(
+                                            'error' => $e->getMessage(),
+                                            'sender' => $sender_email
+                                        ), 'warning');
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     if ($ceo_use_detect_ceo_fraud && hex2bin($form['folder']) == 'INBOX') {
                         if ($this->isCeoFraud($msg['to'], $msg['subject'], $msg['preview_msg'])) {
@@ -2277,6 +2345,11 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
             require_once APP_PATH.'modules/imap/spam_report_services.php';
         }
         
+        // Include queue integration functions
+        if (!function_exists('queue_spam_sender_for_blocking')) {
+            require_once APP_PATH.'modules/imap/spam_queue_integration.php';
+        }
+        
         // Debug: Log what we've loaded
         delayed_debug_log('Spam report handler: Dependencies loaded', array(
             'sieve_functions_loaded' => function_exists('get_sieve_client_factory'),
@@ -2360,81 +2433,71 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
                             }
                         }
                     }
+                    // Move message to junk folder
                     $move_result = $mailbox->message_action($form_folder, 'MOVE', array($uid), $junk_folder);
                     if ($move_result['status']) {
                         $result['success'] = true;
-                        // Debug: Check user configuration first
-                        $user_imap_servers = $this->user_config->get('imap_servers', array());
-                        delayed_debug_log('Auto-block debug: User IMAP servers', array(
-                            'user_imap_servers_keys' => array_keys($user_imap_servers),
-                            'user_imap_servers_data' => $user_imap_servers
-                        ));
                         
-                        // Debug: Check if the specific server exists in user config
-                        if (isset($user_imap_servers[$form['imap_server_id']])) {
-                            $user_server_config = $user_imap_servers[$form['imap_server_id']];
-                            delayed_debug_log('Auto-block debug: User server config found', array(
-                                'server_id' => $form['imap_server_id'],
-                                'user_server_keys' => array_keys($user_server_config),
-                                'user_server_data' => $user_server_config,
-                                'has_sieve_in_user_config' => isset($user_server_config['sieve_config_host'])
-                            ));
+                        // Extract sender email address
+                        $sender_email = isset($message_data['from']) ? trim($message_data['from']) : '';
+                        // Parse email from "Name <email@domain.com>" format
+                        if (preg_match('/<([^>]+)>/', $sender_email, $matches)) {
+                            $sender_email = trim($matches[1]);
+                        } elseif (filter_var($sender_email, FILTER_VALIDATE_EMAIL)) {
+                            // Already a valid email, use as-is
                         } else {
-                            delayed_debug_log('Auto-block debug: Server not found in user config', array(
-                                'server_id' => $form['imap_server_id'],
-                                'available_server_ids' => array_keys($user_imap_servers)
-                            ));
+                            $sender_email = '';
                         }
                         
-                        // Debug: Check Hm_IMAP_List state
-                        delayed_debug_log('Auto-block debug: Hm_IMAP_List state', array(
-                            'all_servers' => Hm_IMAP_List::dump(),
-                            'specific_server' => Hm_IMAP_List::dump($form['imap_server_id'], true)
-                        ));
-                        
-                        // Debug: Check if IMAP_List is initialized properly
-                        delayed_debug_log('Auto-block debug: IMAP_List initialization', array(
-                            'imap_list_class_exists' => class_exists('Hm_IMAP_List'),
-                            'imap_list_initialized' => method_exists('Hm_IMAP_List', 'dump'),
-                            'user_config_imap_servers_count' => count($user_imap_servers),
-                            'imap_list_dump_count' => count(Hm_IMAP_List::dump())
-                        ));
-                        
-                        // Use Hm_IMAP_List::dump() to get the proper IMAP server configuration
-                        $imap_account = Hm_IMAP_List::dump($form['imap_server_id'], true);
-                        delayed_debug_log('Auto-block check: IMAP account found', array(
-                            'has_account' => !empty($imap_account),
-                            'has_sieve_host' => isset($imap_account['sieve_config_host']),
-                            'sieve_host' => isset($imap_account['sieve_config_host']) ? $imap_account['sieve_config_host'] : 'not set',
-                            'imap_account_keys' => array_keys($imap_account),
-                            'imap_account_data' => $imap_account
-                        ));
-                        
-                        if ($imap_account && isset($imap_account['sieve_config_host'])) {
-                            delayed_debug_log('Auto-block: Starting auto-block process', array(
-                                'junk_folder' => $junk_folder
-                            ));
-                            $auto_block_result = auto_block_spam_sender(
-                                $this->user_config,
-                                $this->config,
-                                $form['imap_server_id'],
-                                $message_data,
-                                $spam_reason,
-                                $junk_folder
-                            );
-                            if (!$auto_block_result['success']) {
-                                $result['error'] .= 'Auto-block failed: ' . $auto_block_result['error'] . '; ';
-                                delayed_debug_log('Auto-block: Failed', array('error' => $auto_block_result['error']));
-                            } else {
-                                delayed_debug_log('Auto-block: Success', array('result' => $auto_block_result));
+                        // Add to local block list for instant filtering
+                        if (!empty($sender_email)) {
+                            $local_blocked = LocalBlockList::add($sender_email);
+                            if ($local_blocked) {
+                                delayed_debug_log('Added to local block list', array(
+                                    'sender' => $sender_email
+                                ));
                             }
-                        } else {
-                            delayed_debug_log('Auto-block: Skipped - missing sieve_config_host in IMAP server configuration', array(
-                                'server_id' => $form['imap_server_id'],
-                                'server_name' => $imap_account['name'],
-                                'available_keys' => array_keys($imap_account)
-                            ));
+                            
+                            // Add to Sieve queue for async sync (if not already pending)
+                            $user_id = $this->session->get('username', 'unknown');
+                            if (!SieveQueue::isPending($user_id, $sender_email, $form['imap_server_id'])) {
+                                $queue_entry_id = SieveQueue::add(
+                                    $user_id,
+                                    $sender_email,
+                                    array(
+                                        'username' => $user_id,
+                                        'imap_server_id' => $form['imap_server_id'],
+                                        'spam_reason' => $spam_reason,
+                                        'message_uid' => $uid,
+                                        'folder' => $form_folder,
+                                        'block_scope' => 'sender',
+                                        'block_action' => 'move_to_junk'
+                                    )
+                                );
+                                
+                                if ($queue_entry_id) {
+                                    delayed_debug_log('Added to Sieve queue', array(
+                                        'entry_id' => $queue_entry_id,
+                                        'sender' => $sender_email,
+                                        'server_id' => $form['imap_server_id']
+                                    ));
+                                    $result['queue_info'] = array(
+                                        'queued' => true,
+                                        'entry_id' => $queue_entry_id,
+                                        'sender' => $sender_email
+                                    );
+                                } else {
+                                    delayed_debug_log('Failed to add to Sieve queue', array(
+                                        'sender' => $sender_email
+                                    ), 'warning');
+                                }
+                            } else {
+                                delayed_debug_log('Sender already pending in Sieve queue', array(
+                                    'sender' => $sender_email
+                                ));
+                            }
                         }
+                        
                     } else {
                         $result['error'] .= 'Move to junk failed; ';
                     }
@@ -2445,7 +2508,15 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
                 $status = isset($bulk_results[0]['success']) ? $bulk_results[0]['success'] : false;
                 $this->out('imap_report_spam_error', !$status);
                 if ($status) {
-                    Hm_Msgs::add('Message reported as spam and moved to junk folder', 'success');
+                    // Check if sender was queued for blocking
+                    if (isset($bulk_results[0]['queue_info']['queued']) && $bulk_results[0]['queue_info']['queued']) {
+                        Hm_Msgs::add(
+                            'Message reported as spam and moved to junk folder. Sender will be blocked automatically.',
+                            'success'
+                        );
+                    } else {
+                        Hm_Msgs::add('Message reported as spam and moved to junk folder', 'success');
+                    }
                 } else {
                     Hm_Msgs::add('Failed to report message as spam', 'danger');
                 }
@@ -2458,10 +2529,38 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
                         $success_count++;
                     }
                 }
+                
+                // Count queued senders
+                $queued_count = 0;
+                foreach ($bulk_results as $result) {
+                    if (isset($result['queue_info']['queued']) && $result['queue_info']['queued']) {
+                        $queued_count++;
+                    }
+                }
+                
                 if ($success_count === count($bulk_results)) {
-                    Hm_Msgs::add('All messages reported as spam and moved to junk folder', 'success');
+                    if ($queued_count > 0) {
+                        $msg = sprintf(
+                            'All %d messages reported as spam and moved to junk folder. %d sender(s) queued for automatic blocking.',
+                            count($bulk_results),
+                            $queued_count
+                        );
+                    } else {
+                        $msg = 'All messages reported as spam and moved to junk folder';
+                    }
+                    Hm_Msgs::add($msg, 'success');
                 } elseif ($success_count > 0) {
-                    Hm_Msgs::add("$success_count of " . count($bulk_results) . " messages reported as spam", 'warning');
+                    if ($queued_count > 0) {
+                        $msg = sprintf(
+                            '%d of %d messages reported as spam. %d sender(s) queued for blocking.',
+                            $success_count,
+                            count($bulk_results),
+                            $queued_count
+                        );
+                    } else {
+                        $msg = "$success_count of " . count($bulk_results) . " messages reported as spam";
+                    }
+                    Hm_Msgs::add($msg, 'warning');
                 } else {
                     Hm_Msgs::add('Failed to report messages as spam', 'danger');
                 }
@@ -2922,6 +3021,62 @@ class Hm_Handler_update_predefined_service extends Hm_Handler_Module {
             Hm_Msgs::add('Service updated successfully', 'success');
         } else {
             Hm_Msgs::add('Failed to update service: Invalid configuration', 'error');
+        }
+    }
+}
+
+/**
+ * Lazy Sieve Sync Handler
+ * Processes the Sieve queue asynchronously via AJAX
+ * @subpackage imap/handler
+ */
+class Hm_Handler_sieve_sync extends Hm_Handler_Module {
+    
+    /**
+     * Process Sieve sync with rate limiting
+     */
+    public function process() {
+        // Ensure IMAP modules are loaded
+        if (!class_exists('SieveSync')) {
+            require_once APP_PATH.'lib/SieveSync.php';
+        }
+        
+        try {
+            // Check rate limiting (30 minute guard)
+            $last_sync = $this->session->get('last_sieve_sync', 0);
+            $now = time();
+            $time_since_last = $now - $last_sync;
+            
+            if ($last_sync && $time_since_last < 1800) { // 30 minutes = 1800 seconds
+                $remaining = 1800 - $time_since_last;
+                $minutes = ceil($remaining / 60); // Round up to next minute
+                Hm_Msgs::add('Sieve sync skipped - please wait ' . $minutes . ' minute' . ($minutes > 1 ? 's' : ''), 'info');
+                return;
+            }
+            
+            // Process the queue with user config and session
+            $result = SieveSync::processQueue($this->user_config, $this->session);
+            
+            // Update last sync timestamp
+            $this->session->set('last_sieve_sync', $now);
+            
+            // Show appropriate message based on result
+            if ($result['status'] === 'success') {
+                if ($result['processed'] > 0) {
+                    Hm_Msgs::add(
+                        sprintf('Sieve sync completed: %d rules added, %d failed', 
+                                $result['synced'], $result['failed']), 
+                        'success'
+                    );
+                } else {
+                    Hm_Msgs::add('Sieve sync completed: No pending rules to sync', 'info');
+                }
+            } else {
+                Hm_Msgs::add('Sieve sync failed: ' . $result['message'], 'error');
+            }
+            
+        } catch (Exception $e) {
+            Hm_Msgs::add('Sieve sync error: ' . $e->getMessage(), 'error');
         }
     }
 }

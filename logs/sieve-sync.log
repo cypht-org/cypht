@@ -1,0 +1,45 @@
+[2025-10-20 17:55:36] [INFO] === Sieve Sync Started ===
+[2025-10-20 17:55:36] [INFO] Options: limit=50, user=, debug=1, dry-run=1, force=
+[2025-10-20 17:55:36] [INFO] Found 2 pending entries
+[2025-10-20 17:55:36] [INFO] Grouped into 1 users
+[2025-10-20 17:55:36] [INFO] Processing user: test@notrewiki.com (2 entries)
+[2025-10-20 17:55:36] [DEBUG] Sieve config: {"provider":"migadu","host":"imap.migadu.com","port":4190,"username":"YOUR_EMAIL@example.com","password":"YOUR_PASSWORD"}
+[2025-10-20 17:55:37] [DEBUG] Created Sieve client: SieveClientMigadu
+[2025-10-20 17:55:37] [INFO] [DRY-RUN] Would connect to imap.migadu.com:4190
+[2025-10-20 17:55:37] [DEBUG] Existing blocked senders: 0
+[2025-10-20 17:55:37] [DEBUG] Generated script for 2 senders
+[2025-10-20 17:55:37] [INFO] [DRY-RUN] Would upload script with 2 new senders
+[2025-10-20 17:55:37] [INFO] [DRY-RUN]   - u4master.master@lab32.evoludata.com
+[2025-10-20 17:55:37] [INFO] [DRY-RUN]   - u10master.master@lab32.evoludata.com
+[2025-10-20 17:55:37] [INFO] Running cleanup...
+[2025-10-20 17:55:37] [INFO] Archived 0 old entries
+[2025-10-20 17:55:37] [INFO] === Sieve Sync Completed ===
+[2025-10-20 17:55:37] [INFO] Processed: 2, Synced: 2, Failed: 0, Skipped: 0
+[2025-10-20 21:22:38] [INFO] === Sieve Sync Started ===
+[2025-10-20 21:22:38] [INFO] Options: limit=50, user=, debug=1, dry-run=1, force=
+[2025-10-20 21:22:38] [INFO] Found 2 pending entries
+[2025-10-20 21:22:38] [INFO] Grouped into 1 users
+[2025-10-20 21:22:38] [INFO] Processing user: test@notrewiki.com (2 entries)
+[2025-10-20 21:22:38] [DEBUG] Sieve config: {"provider":"migadu","host":"imap.migadu.com","port":4190,"username":"YOUR_EMAIL@example.com","password":"YOUR_PASSWORD"}
+[2025-10-20 21:22:38] [DEBUG] Created Sieve client: SieveClientMigadu
+[2025-10-20 21:22:38] [INFO] [DRY-RUN] Would connect to imap.migadu.com:4190
+[2025-10-20 21:22:38] [DEBUG] Existing blocked senders: 0
+[2025-10-20 21:22:38] [DEBUG] Generated script for 2 senders
+[2025-10-20 21:22:38] [INFO] [DRY-RUN] Would upload script with 2 new senders
+[2025-10-20 21:22:38] [INFO] [DRY-RUN]   - u4master.master@lab32.evoludata.com
+[2025-10-20 21:22:38] [INFO] [DRY-RUN]   - u10master.master@lab32.evoludata.com
+[2025-10-20 21:22:38] [INFO] [DRY-RUN] Skipping cleanup
+[2025-10-20 21:22:38] [INFO] === Sieve Sync Completed ===
+[2025-10-20 21:22:38] [INFO] Processed: 2, Synced: 2, Failed: 0, Skipped: 0
+[2025-10-20 21:28:42] [INFO] === Sieve Sync Started ===
+[2025-10-20 21:28:42] [INFO] Options: limit=50, user=, debug=, dry-run=, force=
+[2025-10-20 21:28:42] [INFO] Found 2 pending entries
+[2025-10-20 21:28:42] [INFO] Grouped into 1 users
+[2025-10-20 21:28:42] [INFO] Processing user: test@notrewiki.com (2 entries)
+[2025-10-20 21:28:42] [INFO] Connecting to imap.migadu.com:4190
+[2025-10-20 21:28:47] [ERROR] Connection failed: Sieve Connection Error: Connection failed: Socket creation failed: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond
+[2025-10-20 21:28:47] [ERROR] ✗ Failed: u4master.master@lab32.evoludata.com - Connection failed: Sieve Connection Error: Connection failed: Socket creation failed: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond
+[2025-10-20 21:28:47] [ERROR] ✗ Failed: u10master.master@lab32.evoludata.com - Connection failed: Sieve Connection Error: Connection failed: Socket creation failed: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond
+[2025-10-20 21:28:47] [INFO] Running cleanup...
+[2025-10-20 21:28:47] [INFO] === Sieve Sync Completed ===
+[2025-10-20 21:28:47] [INFO] Processed: 0, Synced: 0, Failed: 2, Skipped: 0
