@@ -105,7 +105,7 @@ Nux_Quick_Services::add('aol', array(
     'auth' => 'login',
     'smtp' => array(
         'server' => 'smtp.aol.com',
-        'port' => 587,
+        'port' => 465,
         'tls' => true
     )
 ));
