@@ -1908,6 +1908,7 @@ if (!class_exists('Hm_IMAP')) {
                         $command = "UID STORE $uid_string +FLAGS (\Deleted)\r\n";
                         break;
                     case 'UNDELETE':
+                    case 'RESTORE':
                         $command = "UID STORE $uid_string -FLAGS (\Deleted)\r\n";
                         break;
                     case 'CUSTOM':
