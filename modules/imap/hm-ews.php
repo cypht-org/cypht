@@ -61,6 +61,16 @@ class Hm_EWS {
         return '';
     }
 
+    public function supports_dsn() {
+        // For EWS, "receipt-like" behavior should use EWS flags instead:
+        //  - IsDeliveryReceiptRequested (already used in send_message)
+        //  - IsReadReceiptRequested (can be added similarly if needed)
+        // TODO: If we decide to expose receipt options in the UI for EWS profiles,
+        //       map those UI controls to the EWS flags above and keep DSN disabled here
+        //       so that SMTP-specific DSN UI remains hidden for EWS connections.
+        return false;
+    }
+
     public function get_folders($folder = null, $only_subscribed = false, $unsubscribed_folders = [], $with_input = false) {
         $result = [];
         if (empty($folder)) {
