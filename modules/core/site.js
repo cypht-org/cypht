@@ -1322,9 +1322,12 @@ var Hm_Folders = {
         hl_save_link();
     },
 
-    update_folder_list: function() {
+    update_folder_list: function(reset_cache = false) {
         Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'}],
+            [
+                {'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'},
+                {'name': 'reset_cache', 'value': reset_cache}
+            ],
             Hm_Folders.update_folder_list_display,
             [],
             true
@@ -1349,7 +1352,7 @@ var Hm_Folders = {
         $('.update_message_list').on("click", function(e) {
             var text = e.target.innerHTML;
             e.target.innerHTML = '<div class="spinner-border spinner-border-sm text-dark role="status"><span class="visually-hidden">Loading...</span></div>';
-            Hm_Folders.update_folder_list();
+            Hm_Folders.update_folder_list(true);
             Hm_Ajax.add_callback_hook('hm_reload_folders', function() {
                 e.target.innerHTML = text;
             });
@@ -2956,3 +2959,20 @@ class Hm_Filter_Modal extends Hm_Modal {
     });
   }
 }
+
+document.addEventListener("show.bs.dropdown", function (event) {
+    const currentToggle = event.target;
+
+    // If it's nested inside a dropdown menu, skip
+    if (currentToggle.closest(".dropdown-menu")) {
+        return;
+    }
+
+    // Close other top-level dropdowns
+    document.querySelectorAll(".dropdown-toggle.show").forEach((openBtn) => {
+        if (openBtn !== currentToggle && !openBtn.closest(".dropdown-menu")) {
+            const dropdownInstance = bootstrap.Dropdown.getInstance(openBtn);
+            if (dropdownInstance) dropdownInstance.hide();
+        }
+    });
+});

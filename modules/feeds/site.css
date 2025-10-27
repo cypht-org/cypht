@@ -25,7 +25,7 @@
 }
 
 /* Mobile responsiveness */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
     .msg_headers .fw-semibold {
         min-width: 60px;
         font-size: 0.9rem;
