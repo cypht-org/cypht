@@ -40,7 +40,7 @@ class SearchTest(WebTest):
 
         # Wait until tbody is empty (re-find table element after page reload)
         WebDriverWait(self.driver, 60).until(
-            lambda driver: len(driver.find_element(By.CLASS_NAME, 'message_table_body').find_elements(By.TAG_NAME, 'tr')) == 0
+            lambda driver: len(driver.find_elements(By.CSS_SELECTOR, '.message_table_body tr')) == 0
         )
 
         # Assert that tbody is actually empty (re-find table element)
