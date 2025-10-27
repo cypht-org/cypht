@@ -564,6 +564,27 @@ class Hm_Handler_profile_status extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_smtp_supports_dsn extends Hm_Handler_Module {
+    public function process() {
+        if (! $this->user_config->get('enable_compose_delivery_receipt_setting')) {
+            return;
+        }
+
+        Hm_SMTP_List::init($this->user_config, $this->session);
+
+        $smtp_id = server_from_compose_smtp_id($this->request->post['compose_smtp_id']);
+        $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
+        $mailbox = Hm_SMTP_List::connect($smtp_id, false, $smtp_details['user'], $smtp_details['pass']);
+        if (! $mailbox || ! $mailbox->authed()) {
+            Hm_Msgs::add("Failed to determine Delivery Status Notification. The server refused connection. user is: ".$smtp_details['user'], "danger");
+            $this->out('dsn_supported', false);
+            return;
+        }
+
+        $this->out('dsn_supported', $mailbox->get_connection()->supports_dsn());
+    }
+}
+
 if (!hm_exists('get_mime_type')) {
     function get_mime_type($filename)
     {
@@ -787,7 +808,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             $specials = get_special_folders($this, $imap_server);
             delete_draft($form['draft_id'], $this->cache, $imap_server, $specials['draft']);
         }
-
+        
         delete_uploaded_files($this->session, $form['draft_id']);
         if ($form['draft_id'] > 0) {
             delete_uploaded_files($this->session, 0);
@@ -1193,7 +1214,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                     (!$html ? '<label for="compose_body">'.$this->trans('Message').'</label>': '').
                 '</div>';
                 if($this->get('enable_compose_delivery_receipt_setting')) {
-                    $res .= '<div class="form-check mb-3"><input value="1" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" class="form-check-input" checked/><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
+                    $res .= '<div class="form-check mb-3"><input value="1" name="compose_delivery_receipt" disabled id="compose_delivery_receipt" type="checkbox" class="form-check-input" checked/><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
                 }
         if ($html == 2) {
             $res .= '<link href="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
@@ -1981,12 +2002,16 @@ if (!hm_exists('get_uploaded_files_from_array')) {
 function get_uploaded_files_from_array($uploaded_files) {
     $parsed_files = [];
     foreach($uploaded_files as $file) {
-        $parsed_path = explode('/', $file);
-        $parsed_files[] = [
-            'filename' => $file,
-            'type' => get_mime_type($file),
-            'name' => end($parsed_path)
-        ];
+        if (is_array($file)) {
+            $parsed_files[] = $file;
+        } else {
+            $parsed_path = explode('/', $file);
+            $parsed_files[] = [
+                'filename' => $file,
+                'type' => get_mime_type($file),
+                'name' => end($parsed_path)
+            ];
+        }
     }
     return $parsed_files;
 }
@@ -2024,7 +2049,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $from = false;
     $name = '';
     $uploaded_files = get_uploaded_files_from_array($uploaded_files);
-
+    
     if ($profile  && $profile['type'] == 'imap' && $mod->module_is_supported('imap')) {
         $from = $profile['replyto'];
         $name = $profile['name'];
@@ -2051,6 +2076,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         return -1;
     }
     $mailbox = new Hm_Mailbox($imap_profile['id'], $mod->user_config, $session, $imap_profile);
+    
     if (! $mailbox->connect()) {
         return -1;
     }
@@ -2064,7 +2090,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     } else {
         $folder = $specials['draft'];
     }
-
+    
     $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name, $profile['id']);
     $res = $mime->process_attachments();
 
@@ -2081,15 +2107,14 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         Hm_Msgs::add('An error occurred saving the draft message', 'danger');
         return -1;
     }
-
+    
     $messages = $mailbox->get_messages($folder, 'ARRIVAL', true, 'DRAFT', 0, 10);
-
+    
     // Remove old version from the mailbox
     if ($id) {
-      $mailbox->message_action($folder, 'DELETE', array($id));
-      $mailbox->message_action($folder, 'EXPUNGE', array($id));
+        $mailbox->message_action($folder, 'DELETE', array($id));
+        $mailbox->message_action($folder, 'EXPUNGE', array($id));
     }
-
     foreach ($messages[1] as $mail) {
         $msg_header = $mailbox->get_message_headers($folder, $mail['uid']);
         // Convert all header keys to lowercase
@@ -2101,7 +2126,9 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
             }
         }
         if (!empty($msg_header_lower['message-id']) && !empty($mime_headers_lower['message-id'])) {
-            if (trim($msg_header_lower['message-id']) === trim($mime_headers_lower['message-id'])) {
+            $msg_message_id = trim(str_replace(array('<', '>'), '', trim($msg_header_lower['message-id'])));
+            $msg_mime_id = trim(str_replace(array('<', '>'), '', trim($mime_headers_lower['message-id'])));
+            if (trim($msg_message_id) === trim($msg_mime_id)) {
                 return $mail['uid'];
             }
         }

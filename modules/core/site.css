@@ -412,6 +412,10 @@ button {
   position: relative;
   white-space: nowrap;
 }
+.email_folders .folders > li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .inner_list li {
   margin: 2px;
   white-space: nowrap;
@@ -963,6 +967,7 @@ div.unseen,
 }
 .mobile .mailbox_list_title {
   font-size: 95%;
+  padding-right: 25px;
 }
 .mobile .folder_cell {
   display: block;
@@ -1257,7 +1262,6 @@ div.unseen,
 }
 [data-title] {
   position: relative;
-  z-index: 10 !important;
 }
 
 #list_controls_menu {
@@ -1274,9 +1278,20 @@ div.unseen,
   width: 100vw;
   left: 0px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  padding-top: 5px;
+  flex-direction: row;
+  justify-content: right;
+}
+.mobile #list_controls_menu.show > a {
+  padding-right: 15px;
+}
+.mobile #list_controls_menu.show form {
+  padding-right: 15px;
 }
 .mobile .imap_sort {
   width: 100%;
+  margin-right: 0;
 }
 .delayed_date {
   color: var(--bs-primary) !important;
@@ -1459,6 +1474,7 @@ div.unseen,
   width: fit-content;
   margin-left: 0;
   padding: 10px 20px;
+  display: block !important;
 }
 
 .mobile .app-logo{
@@ -1589,6 +1605,7 @@ a[disabled] {
 .small_header > div:nth-of-type(2) > div {
   display: flex;
   column-gap: 0.15rem;
+  flex-flow: wrap;
 }
 
 .small_header {
@@ -1626,7 +1643,7 @@ pre.msg_source {
 }
 
 /* Mobile responsive overrides for Bootstrap classes */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .small_header {
     display: flex;
     flex-direction: row;
@@ -1644,26 +1661,27 @@ pre.msg_source {
     font-weight: bold;
   }
 
-  .msg_actions a {
-    font-size: 0.85rem;
-  }
-
+  .mobile .msg_actions a { font-size: 0.85rem; }
   .mobile nav.folder_cell { width: 50%; }
   .mobile .news_cell .subject div { padding-bottom: 0px !important; }
+  .mobile .message_list { position: relative; }
+  .mobile .small_header .col-md-2 {
+    font-weight: bold; white-space: nowrap; width: fit-content;
+  }
+  .mobile .message_list .list_controls.on_mobile {
+    position: absolute; top: 11px; right: 15px;
+  }
+  .mobile .content_title > .flex-wrap {
+    flex-wrap: nowrap !important; margin-bottom: 0px !important;
+  }
+  .mobile .content_title .list_meta { margin-bottom: 0px !important; }
 }
 
-@media (max-width: 575px) {
+@media (max-width: 575.98px) {
   .mobile nav.folder_cell { width: 100%; }
-  .mobile #list_controls_menu.show { left: auto; right: 0px; }
+  .mobile #list_controls_menu.show { left: auto; right: -15px; }
   .mobile .calendar .month_label { padding: 1rem !important; }
   .mobile .calendar .border.m-4 { margin: 1rem !important; }
   .mobile .content_title { gap: 0.25rem; padding-bottom: 10px !important; }
-  .mobile .message_list { position: relative; }
-  .mobile .message_list .list_controls.on_mobile {
-    position: absolute; top: 12px; right: 15px;
-  }
-  .mobile .small_header .col-md-2 {
-    font-weight: bold; white-space: nowrap; width: fit-content !important;
-  }
   .mobile .small_header:nth-child(-n+3) { padding-bottom: 6px !important; }
 }

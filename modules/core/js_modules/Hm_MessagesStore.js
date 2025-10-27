@@ -116,20 +116,27 @@ class Hm_MessagesStore {
             if (messagesReadyCB) {
                 messagesReadyCB(this);
             }
+
+            responses.forEach(response => {
+                response.resolvePromise(response);
+            });
         };
 
         await Promise.all(this.fetch(hideLoadingState).map((req) => {
-            return req.then((response) => {
-                pendingResponses.set(response.sourceId, response);
+            return new Promise((resolve) => {
+                req.then((response) => {
+                    response.resolvePromise = resolve;
+                    pendingResponses.set(response.sourceId, response);
 
-                if (processingTimeout) {
-                    clearTimeout(processingTimeout);
-                }
+                    if (processingTimeout) {
+                        clearTimeout(processingTimeout);
+                    }
 
-                // Process after a short delay to allow batching
-                processingTimeout = setTimeout(processPendingResponses, 10);
-            }, (error) => {
-                console.error('Error loading messages from source:', error);
+                    // Process after a short delay to allow batching
+                    processingTimeout = setTimeout(processPendingResponses, 10);
+                }, (error) => {
+                    console.error('Error loading messages from source:', error);
+                });
             });
         }));
 
@@ -305,7 +312,7 @@ class Hm_MessagesStore {
         } else {
             if (this.path == 'tag') {
                 config.push({ name: "hm_ajax_hook", value: 'ajax_imap_tag_data' });
-                config.push({ name: "folder", value: getParam('tag_id') });
+                config.push({ name: "folder", value: getParam('filter') });
                 configs.push(config);
             } else {
                 let sources = hm_data_sources();
