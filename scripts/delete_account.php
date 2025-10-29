@@ -44,6 +44,6 @@ if ($user) {
         die("User deleted\n\n");
     }
     else {
-        die("An error occured\n\n");
+        die("An error occurred\n\n");
     }
 }

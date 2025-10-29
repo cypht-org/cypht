@@ -306,7 +306,7 @@ class Hm_IMAP_Base {
                 }
             }
 
-            /* merge lines that should have been recieved as one and add to results */
+            /* merge lines that should have been received as one and add to results */
             if ($chunks && !$last_line_cont) {
                 $c++;
             }
