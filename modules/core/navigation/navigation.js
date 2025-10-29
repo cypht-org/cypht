@@ -7,6 +7,10 @@ function trackLocationSearchChanges() {
 }
 
 window.addEventListener('popstate', function(event) {
+    // Signal navigation start for Selenium detection
+    document.body.setAttribute('data-navigation-state', 'loading');
+    window.dispatchEvent(new CustomEvent('navigation-started', { detail: { url: window.location.href } }));
+    
     Hm_Ajax.abort_all_requests();
 
     if (event.state) {
@@ -27,12 +31,18 @@ window.addEventListener('popstate', function(event) {
     unMountSubscribers[previousLocationSearch]?.();
 
     trackLocationSearchChanges();
+    
+    // Signal navigation completion for Selenium detection
+    document.body.setAttribute('data-navigation-state', 'complete');
+    window.dispatchEvent(new CustomEvent('navigation-completed', { detail: { url: window.location.href } }));
 });
 
 window.addEventListener('load', function() {
     if (!hm_is_logged()) {
         return;
     }
+    // Initialize navigation state for Selenium detection
+    document.body.setAttribute('data-navigation-state', 'complete');
     
     const unMountCallback = renderPage(window.location.href);
     history.replaceState({ main: $('#cypht-main').prop('outerHTML'), scripts: extractCustomScripts($(document)) }, "");
@@ -61,6 +71,8 @@ $(document).on('click', '.cypht-layout a', function(event) {
         const targetParams = new URLSearchParams(href.split('?')[1]);
         if (currentPage !== targetParams.toString()) {
             Hm_Ajax.abort_all_requests();
+            // Signal navigation start immediately when clicking
+            document.body.setAttribute('data-navigation-state', 'loading');
             navigate(autoAppendParamsForNavigation(href));
         }
     }
@@ -94,6 +106,10 @@ function autoAppendParamsForNavigation(href)
 }
 
 async function navigate(url, loaderMessage) {
+    // Signal navigation start for Selenium detection
+    document.body.setAttribute('data-navigation-state', 'loading');
+    window.dispatchEvent(new CustomEvent('navigation-started', { detail: { url } }));
+    
     showRoutingToast(loaderMessage);
     Hm_Ajax.abort_all_requests();
 
@@ -168,7 +184,16 @@ async function navigate(url, loaderMessage) {
         unMountSubscribers[previousLocationSearch]?.();
         
         trackLocationSearchChanges();
+        
+        // Signal navigation completion for Selenium detection
+        document.body.setAttribute('data-navigation-state', 'complete');
+        window.dispatchEvent(new CustomEvent('navigation-completed', { detail: { url } }));
+        
     } catch (error) {
+        // Signal navigation error for Selenium detection
+        document.body.setAttribute('data-navigation-state', 'error');
+        window.dispatchEvent(new CustomEvent('navigation-failed', { detail: { url, error: error.message } }));
+        
         Hm_Notices.show(error.message, 'danger');
         console.log(error);
     } finally {
