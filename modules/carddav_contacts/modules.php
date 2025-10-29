@@ -37,7 +37,7 @@ class Hm_Handler_process_add_carddav_contact_from_msg extends Hm_Handler_Module 
         $parts = process_address_fld($form['contact_value']);
         if (!is_array($parts) || count($parts) == 0 || !is_array($parts[0]) ||
             !array_key_exists('email', $parts[0]) || !trim($parts[0]['email'])) {
-                Hm_Msgs::add('ERRUnable to add contact');
+                Hm_Msgs::add('Unable to add contact', 'warning');
                 return;
         }
         $email = $parts[0]['email'];
@@ -82,7 +82,7 @@ class Hm_Handler_process_delete_carddav_contact extends Hm_Handler_Module {
             $this->out('contact_deleted', 1);
         }
         else {
-            Hm_Msgs::add('ERRCould not delete contact');
+            Hm_Msgs::add('Could not delete contact', 'warning');
         }
     }
 }
@@ -332,7 +332,7 @@ class Hm_Output_carddav_contacts_form extends Hm_Output_Module {
             }
             $target .= '</select><br />';
         }
-        return '<div class="add_contact"><form class="add_contact_form" method="POST">'.
+        return '<div class="add_contact_responsive"><form class="add_contact_form" method="POST">'.
             '<button class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
             '<div class="'.$form_class.'">'.$target.''.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.

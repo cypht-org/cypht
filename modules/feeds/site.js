@@ -2,7 +2,6 @@
 
 var feed_test_action = function(event) {
     event.preventDefault();
-    Hm_Notices.hide(true);
     var form = $(this).parent();
     Hm_Ajax.request(
         form.serializeArray(),
@@ -16,7 +15,6 @@ var feed_delete_action = function(event) {
         return false;
     }
     event.preventDefault();
-    Hm_Notices.hide(true);
     var form = $(this).parent();
     Hm_Ajax.request(
         form.serializeArray(),
@@ -48,8 +46,7 @@ var feeds_search_page_content = function(id) {
 };
 
 var display_feeds_search_result = function(res) {
-    var ids = [res.feed_server_ids];
-    Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
+    Hm_Message_List.update(res.formatted_message_list);
 };
 
 var feeds_combined_content_unread = function(id) {
@@ -66,8 +63,7 @@ var feeds_combined_content_unread = function(id) {
 };
 
 var display_feeds_combined_unread = function(res) {
-    var ids = [res.feed_server_ids];
-    Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
+    Hm_Message_List.update(res.formatted_message_list);
 };
 
 var feeds_combined_content = function(id) {
@@ -93,26 +89,12 @@ var set_combined_feeds_state = function() {
 };
 
 var display_feeds_combined = function(res) {
-    var ids = res.feed_server_ids.split(',');
-    Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
+    Hm_Message_List.update(res.formatted_message_list);
     $('.total').text($('.message_table tbody tr').length);
 };
 
-var feeds_combined_inbox_content= function(id) {
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_combined'},
-        {'name': 'feed_server_ids', 'value': id}],
-        display_feeds_combined_inbox,
-        [],
-        false,
-        Hm_Message_List.set_combined_inbox_state
-    );
-    return false;
-};
-
 var display_feeds_combined_inbox = function(res) {
-    var ids = res.feed_server_ids.split(',');
-    Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
+    Hm_Message_List.update(res.formatted_message_list);
 };
 
 var feed_item_view = function(uid, list_path, callback) {
@@ -139,28 +121,14 @@ var display_feed_item_content = function(res) {
     if (!res.feed_msg_headers) {
         return;
     }
-    var msg_uid = getMessageUidParam();
+    const msg_uid = getMessageUidParam();
     $('.msg_text').html('');
     $('.msg_text').append(res.feed_msg_headers);
     $('.msg_text').append(res.feed_msg_text);
     set_message_content();
-    document.title = $('.header_subject th').text();
-    var path = getListPathParam();
-    if (hm_list_parent() == 'feeds') {
-        Hm_Message_List.prev_next_links('formatted_feed_data', path+'_'+msg_uid);
-    }
-    else if (hm_list_parent() == 'combined_inbox') {
-        Hm_Message_List.prev_next_links('formatted_combined_inbox', path+'_'+msg_uid);
-    }
-    else if (hm_list_parent() == 'unread') {
-        Hm_Message_List.prev_next_links('formatted_unread_data', path+'_'+msg_uid);
-    }
-    else if (hm_list_parent() === 'search') {
-        Hm_Message_List.prev_next_links('formatted_search_data', path+'_'+msg_uid);
-    }
-    else {
-        Hm_Message_List.prev_next_links(path, path+'_'+msg_uid);
-    }
+    document.title = $('.header_subject h4').text();
+    const path = getListPathParam();
+    Hm_Message_List.prev_next_links(msg_uid, getParam('list_parent'));
     if (Hm_Message_List.track_read_messages(path+'_'+msg_uid)) {
         if (hm_list_parent() == 'unread') {
             Hm_Message_List.adjust_unread_total(-1);
@@ -184,7 +152,7 @@ var load_feed_list = function(id) {
 
 var display_feed_list = function(res) {
     var ids = [res.feed_server_ids];
-    Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
+    Hm_Message_List.update(res.formatted_message_list);
     var key = 'feeds_'+res.feed_server_ids;
     var data = Hm_Message_List.filter_list();
     data.find('*[style]').attr('style', '');
@@ -230,12 +198,6 @@ var expand_feed_settings = function() {
         }
     }
 };
-
-function feedMessageContentPageHandler(routeParams) {
-    if (routeParams.list_path.substr(0, 4) == 'feed') {
-        feed_item_view();
-    }
-}
 
 function feedServersPageHandler() {
     $('.feed_delete').on('click', feed_delete_action);

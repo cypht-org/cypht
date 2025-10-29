@@ -44,14 +44,13 @@ class Hm_Test_Core_Functions extends TestCase {
      */
     public function test_format_data_sources() {
         $data = array(array(
-            'callback' => 'imap_combined_unread_content',
             'folder' => '494e424f58',
             'type' => 'imap',
             'name' => 'test',
             'id' => 0
         ));
-        $res = 'var hm_data_sources = function() { return [{callback:imap_combined_unread_content,folder:"494e424f58",type:"imap",name:"test",id:"0"}]; };';
-        $res2 = 'var hm_data_sources_foo = function() { return [{callback:imap_combined_unread_content,folder:"494e424f58",type:"imap",name:"test",id:"0",group:"foo"}]; };var hm_data_sources = function() { return []; };';
+        $res = 'var hm_data_sources = function() { return [{folder:"494e424f58",type:"imap",name:"test",id:"0"}]; };';
+        $res2 = 'var hm_data_sources_foo = function() { return [{folder:"494e424f58",type:"imap",name:"test",id:"0",group:"foo"}]; };var hm_data_sources = function() { return []; };';
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
         $this->assertEquals($res, format_data_sources($data, $mod));
         $data[0]['group'] = 'foo';
@@ -84,7 +83,7 @@ class Hm_Test_Core_Functions extends TestCase {
      */
     public function test_get_oauth2_data() {
         $mock_config = new Hm_Mock_Config();
-        $this->assertEquals(array('gmail' => [],'outlook' => []), (get_oauth2_data($mock_config)));
+        $this->assertEquals(array('gmail' => [],'outlook' => [],'office365' => []), (get_oauth2_data($mock_config)));
     }
     /**
      * @preserveGlobalState disabled
@@ -146,7 +145,7 @@ class Hm_Test_Core_Functions extends TestCase {
         $handler_mod->session->auth_state = false;
         save_user_settings($handler_mod, array('password' => 'foo'), false);
         $msgs = Hm_Msgs::get();
-        $this->assertEquals('ERRIncorrect password, could not save settings to the server', $msgs[3]);
+        $this->assertEquals('Incorrect password, could not save settings to the server', $msgs[3]);
 
     }
     /**
@@ -171,7 +170,7 @@ class Hm_Test_Core_Functions extends TestCase {
         $res2 = Hm_Output_Modules::dump();
         $len2 = count($res2['foo']);
         $this->assertEquals(12, $len);
-        $this->assertEquals(20, $len2);
+        $this->assertEquals(19, $len2);
     }
     /**
      * @preserveGlobalState disabled

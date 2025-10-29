@@ -1,7 +1,7 @@
 function applyCalendarPageHandlers() {
-    $('.event_delete').on("click", function() {
+    $('.event_delete a').on("click", function() {
         if (hm_delete_prompt()) {
-            $(this).parent().submit();
+            $(this).closest('form').submit();
         }
     });
     $('.cal_title').on("click", function(e) {

@@ -1,6 +1,14 @@
 // TODO: This function is too large for a route handler, decouple it into multiple functions with action scope focused.
-function applyComposePageHandlers() {
+function applySmtpComposePageHandlers(routeParams) {
     init_resumable_upload()
+
+    setupActionSchedule(function () {
+        $('.smtp_send_placeholder').trigger('click');
+    });
+
+    if (window.HTMLEditor) {
+        useKindEditor();
+    }
 
     var interval = Hm_Utils.get_from_global('compose_save_interval', 30);
     Hm_Timer.add_job(function() { save_compose_state(); }, interval, true);
@@ -59,10 +67,27 @@ function applyComposePageHandlers() {
                 showBtnSendAnywayDontWarnFuture = false;
             }
 
+            // Below we add emails to Trusted sender
+            if (hm_enable_collect_address_on_send) {
+                const parseEmails = (selector) => {
+                    return $(selector).val().split(/[,;]+/).map(e => e.trim()).filter(Boolean);
+                };
+
+                if (true) {
+                    const emailSet = new Set();
+                    ['#compose_to', '#compose_cc', '#compose_bcc'].forEach(selector => {
+                        parseEmails(selector).forEach(email => {
+                            emailSet.add(email);
+                        });
+                    });
+                    const listMails = [...emailSet].join(';');
+                    add_email_in_contact_trusted(listMails);
+                }
+            }
         }
 
-        // If the user has disabled the warning, we should send the message
-        if (Boolean(Hm_Utils.get_from_local_storage(dontWanValueInStorage))) {
+        // If the user has disabled the warning or has enabled it in general settings, we should send the message
+        if (hm_enable_collect_address_on_send || Boolean(Hm_Utils.get_from_local_storage(dontWanValueInStorage))) {
             handleSendAnyway();
         }
         // Otherwise, we should show the modal if we have a headline
@@ -105,16 +130,26 @@ function applyComposePageHandlers() {
         }
 
         async function handleSendAnyway() {
-
-            if ($('.compose_draft_id').val() == '0') {
-            Hm_Notices.show([hm_trans('Please wait, sending message...')]);
-            await waitForValueChange('.compose_draft_id', '0');
+            if ($('.saving_draft').val() !== '0') {
+                if ($('.nexter_input').val()) {
+                    Hm_Notices.show([hm_trans('Please wait, message scheduling in progress...')]);
+                } else {
+                    Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+                }
+                await waitForValueChange('.saving_draft', '0');
             }
 
-            
-        
             if (handleMissingAttachment()) {
-                document.getElementsByClassName("smtp_send")[0].click();
+                if ($('.nexter_input').val()) {
+                    save_compose_state(false, true, $('.nexter_input').val(), function(res) {
+                        if (res.draft_id) {
+                            reset_smtp_form(false);
+                            Hm_Notices.show([hm_trans('Operation successful')]);
+                        }
+                    });
+                } else {
+                    document.getElementsByClassName("smtp_send")[0].click();
+                }
             } else {
                 e.preventDefault();
             }
@@ -164,19 +199,43 @@ function applyComposePageHandlers() {
     if ($('.compose_cc').val() || $('.compose_bcc').val()) {
         toggle_recip_flds();
     }
-    if (window.location.href.search('&reply=1') !== -1 || window.location.href.search('&reply_all=1') !== -1) {
+    // Handle focus management for different compose scenarios
+    if (routeParams.reply == 1 || routeParams.reply_all == 1) {
         replace_cursor_positon ($('textarea[name="compose_body"]'));
     }
-    if (window.location.href.search('&forward=1') !== -1) {
+    else if (routeParams.forward == 1) {
+        replace_cursor_positon ($('textarea[name="compose_body"]'));
         setTimeout(function() {
             save_compose_state();
         }, 100);
     }
+    else {
+        var toField = $('.compose_to');
+        if (toField.val().trim() === '') {
+            toField.focus();
+        } else {
+            $('textarea[name="compose_body"]').focus();
+        }
+    }
+
+    const getSmtpProfileCallback = (res) => {
+        const deliveryReceiptCheckBox = $('#compose_delivery_receipt');
+        if (! res.dsn_supported) {
+            deliveryReceiptCheckBox.prop('checked', false);
+            deliveryReceiptCheckBox.prop('disabled', true);
+            deliveryReceiptCheckBox.next('label').after('<span class="badge bg-warning text-dark ms-2">Not supported by the selected SMTP server</span>');
+        } else {
+            deliveryReceiptCheckBox.prop('disabled', false);
+            deliveryReceiptCheckBox.prop('checked', true);
+            deliveryReceiptCheckBox.next('label').next('span.badge').remove();
+        }
+    };
+
     if ($('.sys_messages').text() != 'Message Sent') {
-        get_smtp_profile($('.compose_server').val());
+        get_smtp_profile($('.compose_server').val(), getSmtpProfileCallback);
     }
     $('.compose_server').on('change', function() {
-        get_smtp_profile($('.compose_server').val());
+        get_smtp_profile($('.compose_server').val(), getSmtpProfileCallback);
     });
     if($('.compose_attach_button').attr('disabled') == 'disabled'){
         check_attachment_dir_access();
@@ -240,11 +299,6 @@ function applyComposePageHandlers() {
             }
         });
     }
-
-    $('.compose_to').on('keyup', function(e) { autocomplete_contact(e, '.compose_to', '#to_contacts'); });
-    $('.compose_cc').on('keyup', function(e) { autocomplete_contact(e, '.compose_cc', '#cc_contacts'); });
-    $('.compose_bcc').on('keyup', function(e) { autocomplete_contact(e, '.compose_bcc', '#bcc_contacts'); });
-    $('.compose_to').focus();
 
     if (window.pgpComposePageHandler) pgpComposePageHandler();
     if (window.profilesComposePageHandler) profilesComposePageHandler();

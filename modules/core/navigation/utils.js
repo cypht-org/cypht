@@ -1,33 +1,34 @@
-const toastHTML = `
-<div class="position-fixed bottom-0 start-0 p-3" style="z-index: 11">
-    <div class="toast bg-primary text-white" id="routing-toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
-    <div class="toast-body">
-        <div class="d-flex align-items-center">
-            <strong>Redirecting...</strong>
-            <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
-        </div>
-    </div>
-    </div>
-</div>
-`
-document.body.insertAdjacentHTML('beforeend', toastHTML)
-
-function showRoutingToast() {
-    bootstrap.Toast.getOrCreateInstance(document.getElementById('routing-toast')).show()
+function showRoutingToast(message = 'Loading in progress...') {
+    if (window.routingToast) hideRoutingToast();
+    window.routingToast = showLoaderToast(message);
 }
 
 function hideRoutingToast() {
-    bootstrap.Toast.getOrCreateInstance(document.getElementById('routing-toast')).hide()
+    window.routingToast?.hide();
+    window.routingToast = null;
 }
 
+// Undefined is used as the default value instead of null to comply with the route handlers, which also use undefined as the default value.
 function getListPathParam() {
-    return new URLSearchParams(window.location.search).get('list_path')
+    return getParam('list_path');
 }
 
 function getMessageUidParam() {
-    return new URLSearchParams(window.location.search).get('uid')
+    return getParam('uid');
 }
 
 function getPageNameParam() {
-    return new URLSearchParams(window.location.search).get('page')
+    return getParam('page');
+}
+
+function getParam(param) {
+    let urlOrFragment = window.location.next || window.location.search;
+    let sp = null;
+    if (urlOrFragment.match(/^https?:\/\//)) {
+        let url = new URL(urlOrFragment);
+        sp = url.searchParams;
+    } else {
+        sp = new URLSearchParams(urlOrFragment);
+    }
+    return sp.get(param) ?? undefined;
 }

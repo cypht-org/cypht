@@ -1,54 +1,5 @@
 'use strict';
 
-/**
- * NOTE: Tiki-Cypht integration dynamically removes everything from the begining of this file
- * up to swipe_event function definition as it uses jquery (over cash.js) and has bootstrap
- * framework already included. If you add code here that you wish to be included in Tiki-Cypht
- * integration, add it below swipe_event function definition.
- */
-
-/* extend cash.js with some useful bits */
-$.inArray = function(item, list) {
-    for (var i in list) {
-        if (list[i] === item) {
-            return i;
-        }
-    }
-    return -1;
-};
-$.isEmptyObject = function(obj) {
-    for (var key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            return false;
-        }
-    }
-    return true;
-};
-$.fn.submit = function() { this[0].submit(); }
-$.fn.focus = function() { this[0].focus(); };
-$.fn.serializeArray = function() {
-    var parts;
-    var res = [];
-    var args = this.serialize().split('&');
-    for (var i in args) {
-        parts = args[i].split('=');
-        if (parts[0] && parts[1]) {
-            res.push({'name': parts[0], 'value': parts[1]});
-        }
-    }
-    return res.map(function(x) {return {name: x.name, value: decodeURIComponent(x.value.replace(/\+/g, " "))}});
-};
-$.fn.sort = function(sort_function) {
-    var list = [];
-    for (var i=0, len=this.length; i < len; i++) {
-        list.push(this[i]);
-    }
-    return $(list.sort(sort_function));
-};
-$.fn.fadeOut = function(timeout = 600) {
-    return this.css("opacity", 0)
-    .css("transition", `opacity ${timeout}ms`)
-};
 $.fn.fadeOutAndRemove = function(timeout = 600) {
     this.fadeOut(timeout)
     var tm = setTimeout(() => {
@@ -58,17 +9,12 @@ $.fn.fadeOutAndRemove = function(timeout = 600) {
     return this;
 };
 
-$.fn.modal = function(action) {
-    const modalElement = this[0];
-    if (modalElement) {
-        const modal = new bootstrap.Modal(modalElement);
-        if (action === 'show') {
-            modal.show();
-        } else if (action === 'hide') {
-            modal.hide();
-        }
-    }
-};
+if (window.innerWidth <= 768) {
+    document.documentElement.classList.add('mobile');
+    document.cookie = "is_mobile_screen=1; path=/; SameSite=Lax";
+} else {
+    document.cookie = "is_mobile_screen=0; path=/; SameSite=Lax";
+}
 
 /* swipe event handler */
 var swipe_event = function(el, callback, direction) {
@@ -111,11 +57,11 @@ var Hm_Ajax = {
     batch_callbacks: {},
     callback_hooks: [],
     p_callbacks: [],
-    aborted: false,
     err_condition: false,
     batch_callback: false,
     active_reqs: 0,
     icon_loading_id: false,
+    active_requests: [],
 
     get_ajax_hook_name: function(args) {
         var index;
@@ -125,6 +71,18 @@ var Hm_Ajax = {
             }
         }
         return;
+    },
+
+    abort_all_requests: function() {
+        let requests = this.active_requests.slice();
+        requests.forEach(function(request) {
+            if (request && request.abort) {
+                request.abort();
+            }
+        });
+
+        this.stop_loading_icon(this.icon_loading_id);
+        $('body').removeClass('wait');
     },
 
     request: function(args, callback, extra, no_icon, batch_callback, on_failure, signal) {
@@ -153,30 +111,23 @@ var Hm_Ajax = {
         if (Hm_Ajax.icon_loading_id !== false) {
             return;
         }
-        var hm_loading_pos = $('.loading_icon').width()/40;
-        $('.loading_icon').show();
-        function move_background_image() {
-            hm_loading_pos = hm_loading_pos + 50;
-            $('.loading_icon').css('background-position', hm_loading_pos+'px 0');
-            Hm_Ajax.icon_loading_id = setTimeout(move_background_image, 100);
-        }
-        move_background_image();
+        NProgress.start()
     },
 
     stop_loading_icon : function(loading_id) {
         clearTimeout(loading_id);
-        $('.loading_icon').hide();
+        NProgress.done();
         Hm_Ajax.icon_loading_id = false;
     },
 
-    process_callback_hooks: function(name, res) {
+    process_callback_hooks: function(name, res, xhr) {
         var hook;
         var func;
         for (var i in Hm_Ajax.callback_hooks) {
             hook = Hm_Ajax.callback_hooks[i];
             if (hook[0] == name || hook[0] == '*') {
                 func = hook[1];
-                func(res);
+                func(res, xhr);
                 if (hook[0] == '*') {
                     if ($.inArray(hook, Hm_Ajax.p_callbacks) === -1) {
                         Hm_Ajax.p_callbacks.push(hook);
@@ -199,15 +150,30 @@ var Hm_Ajax_Request = function() { return {
     index: 0,
     on_failure: false,
     start_time: 0,
+    xhr: null,
 
     xhr_fetch: function(config) {
         var xhr = new XMLHttpRequest();
+        this.xhr = xhr;
+
+        Hm_Ajax.active_requests.push(this);
+
         var data = '';
         if (config.data) {
             data = this.format_xhr_data(config.data);
         }
-        const url = window.location.next ?? window.location.href;
-        xhr.open('POST', url)
+        const url = new URL(window.location.href);
+        if (window.location.next) {
+            url.search = window.location.next.split('?')[1];
+        }
+        for (const param of url.searchParams) {
+            const configItem = config.data.find(item => item.name === param[0]);
+            if (configItem) {
+                url.searchParams.set(configItem.name, configItem.value);
+            }
+        }
+
+        xhr.open('POST', url.toString())
         if (config.signal) {
             config.signal.addEventListener('abort', function() {
                 xhr.abort();
@@ -225,7 +191,6 @@ var Hm_Ajax_Request = function() { return {
         xhr.addEventListener('abort', function() {
             Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
             config.callback.always(Hm_Utils.json_decode(xhr.response, true));
-
         });
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.setRequestHeader('X-Requested-with', 'xmlhttprequest');
@@ -271,10 +236,7 @@ var Hm_Ajax_Request = function() { return {
     },
 
     done: function(res, xhr) {
-        if (Hm_Ajax.aborted) {
-            return;
-        }
-        else if (!res || typeof res == 'string' && (res == 'null' || res.indexOf('<') === 0 || res == '{}')) {
+        if (!res || typeof res == 'string' && (res == 'null' || res.indexOf('<') === 0 || res == '{}')) {
             this.fail(xhr);
             return;
         }
@@ -283,37 +245,28 @@ var Hm_Ajax_Request = function() { return {
             if (hm_encrypt_ajax_requests()) {
                 res = Hm_Utils.json_decode(Hm_Crypt.decrypt(res.payload));
             }
-            if ((res.state && res.state == 'not callable') || !res.router_login_state) {
-                this.fail(xhr, true);
+            if ((res.status && res.status == 'not callable') || !res.router_login_state) {
+                this.fail(xhr, true, !res.router_login_state);
                 return;
             }
             if (Hm_Ajax.err_condition) {
                 Hm_Ajax.err_condition = false;
-                Hm_Notices.hide(true);
             }
             if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
-                Hm_Notices.show(res.router_user_msgs);
+                Object.values(res.router_user_msgs).forEach((msg) => {
+                    Hm_Notices.show(msg.text, msg.type);
+                });
             }
             if (res.folder_status) {
-                for (const name in res.folder_status) {
-                    if (name === getPageNameParam()) {
-                        Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
-                        Hm_Folders.update_unread_counts();
-                        const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number());
-                        messages.load().then(() => {
-                            if (messages.count != res.folder_status[name].messages) {
-                                messages.load(true).then(() => {
-                                    display_imap_mailbox(messages.rows, messages.links);
-                                })
-                            }
-                        });
-                    }
+                for (var name in res.folder_status) {
+                    Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
+                    Hm_Folders.update_unread_counts();
                 }
             }
             if (this.callback) {
                 this.callback(res);
             }
-            Hm_Ajax.process_callback_hooks(this.name, res);
+            Hm_Ajax.process_callback_hooks(this.name, res, xhr);
         }
     },
 
@@ -324,9 +277,13 @@ var Hm_Ajax_Request = function() { return {
         return false;
     },
 
-    fail: function(xhr, not_callable) {
+    fail: function(xhr, not_callable, shouldLogout) {
+        if (shouldLogout) {
+            logout();
+            return;
+        }
         if (not_callable === true || (xhr.status && xhr.status == 500)) {
-            Hm_Notices.show([err_msg('Server Error')]);
+            Hm_Notices.show('Server Error', 'danger');
         }
         else {
             $('.offline').show();
@@ -337,6 +294,12 @@ var Hm_Ajax_Request = function() { return {
 
     always: function(res) {
         Hm_Ajax.active_reqs--;
+
+        var index = Hm_Ajax.active_requests.indexOf(this);
+        if (index > -1) {
+            Hm_Ajax.active_requests.splice(index, 1);
+        }
+
         var batch_count = 1;
         if (this.batch_callback) {
             if (typeof Hm_Ajax.batch_callbacks[this.batch_callback.toString()] != 'undefined') {
@@ -346,7 +309,6 @@ var Hm_Ajax_Request = function() { return {
         Hm_Message_List.set_row_events();
         if (batch_count === 0) {
             Hm_Ajax.batch_callbacks[this.batch_callback.toString()] = 0;
-            Hm_Ajax.aborted = false;
             Hm_Ajax.p_callbacks = [];
             this.batch_callback(res);
             this.batch_callback = false;
@@ -358,6 +320,13 @@ var Hm_Ajax_Request = function() { return {
             $('body').removeClass('wait');
         }
         res = null;
+    },
+
+    abort: function() {
+        if (this.xhr) {
+            this.xhr.abort();
+            this.xhr = null;
+        }
     }
 }};
 
@@ -365,7 +334,7 @@ var Hm_Ajax_Request = function() { return {
  * Show a modal dialog with a title, content and buttons.
  */
 function Hm_Modal(options) {
-    var defaults = {
+    const defaults = {
         title: 'Cypht',
         size: '',
         btnSize: '',
@@ -373,11 +342,13 @@ function Hm_Modal(options) {
     };
 
     this.opts = { ...defaults, ...options };
+    this.customButtons = [];
+    this.init();
+}
 
-    this.init = function () {
-        if (this.modal) {
-            return;
-        }
+Hm_Modal.prototype = {
+    init: function() {
+        this.destroy();
 
         const modal = `
             <div id="${this.opts.modalId}" class="modal fade modal-${this.opts.size}" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
@@ -387,94 +358,180 @@ function Hm_Modal(options) {
                             <h2 class="modal-title">${this.opts.title}</h2>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-
                         <div class="modal-body"></div>
-
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary${this.opts.btnSize? ' btn-' + this.opts.btnSize: ''}" data-bs-dismiss="modal">${hm_trans('Close')}</button>
+                            <button type="button" class="btn btn-secondary${this.opts.btnSize ? ' btn-' + this.opts.btnSize : ''}" data-bs-dismiss="modal">${hm_trans('Close')}</button>
                         </div>
                     </div>
                 </div>
             </div>
         `;
+
         $('body').append(modal);
 
         this.modal = $(`#${this.opts.modalId}`);
         this.modalContent = this.modal.find('.modal-body');
         this.modalTitle = this.modal.find('.modal-title');
         this.modalFooter = this.modal.find('.modal-footer');
+        this.bsModal = new bootstrap.Modal(this.modal[0]);
 
-        this.bsModal = new bootstrap.Modal(document.getElementById(this.opts.modalId));
-    };
+        this.recreateButtons();
+    },
 
-    this.open = () => {
+    destroy: function() {
+        if (this.modal && this.modal.length) {
+            this.customButtons.forEach(btn => {
+                btn.element.off('click', btn.handler);
+            });
+
+            if (this.bsModal) {
+                this.bsModal.dispose();
+            }
+            this.modal.remove();
+        }
+        this.customButtons = [];
+    },
+
+    recreateButtons: function() {
+        this.modalFooter.children().not('.btn-secondary').remove();
+
+        this.customButtons.forEach(btn => {
+            this.createButton(btn.label, btn.classes, btn.handler);
+        });
+    },
+
+    createButton: function(label, classes, handler) {
+        const btn = $(`<button type="button" class="btn ${classes} ${this.opts.btnSize ? 'btn-' + this.opts.btnSize : ''}">${label}</button>`);
+        btn.on('click', handler);
+        this.modalFooter.append(btn);
+        return btn;
+    },
+
+    addFooterBtn: function(label, classes, callback) {
+        this.customButtons.push({
+            label: label,
+            classes: classes,
+            handler: callback
+        });
+        this.createButton(label, classes, callback);
+    },
+
+    open: function() {
+        if (!this.bsModal) {
+            this.bsModal = new bootstrap.Modal(this.modal[0]);
+        }
         this.bsModal.show();
-    };
+    },
 
-    this.hide = () => {
-        this.bsModal.hide();
-    };
+    hide: function() {
+        this.bsModal?.hide();
+    },
 
-    this.addFooterBtn = (label, classes, callback) => {
-        const btn = document.createElement('button');
-        btn.innerHTML = label;
+    setContent: function(content) {
+        this.modalContent.html(content);
+    },
 
-        btn.classList.add('btn', ...classes.split(' '));
-        if (this.opts.btnSize) {
-            btn.classList.add(`btn-${this.opts.btnSize}`);
+    setTitle: function(title) {
+        this.modalTitle.html(title);
+    }
+};
+
+class Hm_Alert {
+    constructor() {
+        this.container = document.querySelector('.sys_messages');
+        if (! this.container) {
+            console.error('Hm_Alert: .sys_messages container not found.');
+        }
+    }
+
+    /**
+     * Create an alert message and append it to the container.
+     *
+     * @param {string} message - The message to display.
+     * @param {string} type - The type of alert (primary, secondary, success, danger, warning, info).
+     * @param {boolean} dismissible - Whether the alert can be dismissed.
+     * @param {integer} dismissTime - Number of seconds before alert auto-closes
+     */
+    createAlert(message, type = 'primary', dismissible = true, dismissTime = 10) {
+        if (!this.container) {
+            return;
         }
 
-        btn.addEventListener('click', callback);
+        const alert = document.createElement('div');
+        alert.className = `d-flex align-items-center alert shadow-lg bg-white fade show flex-sm-row p-2 mb-1`;
+        alert.setAttribute('role', 'alert');
 
-        this.modalFooter.append(btn);
-    };
+        const icon = document.createElement('i');
+        icon.className = `fs-3 text-${type} bi bi-${this.#getIcon(type)}`;
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'd-flex justify-content-center align-items-center px-2';
+        iconContainer.appendChild(icon);
 
-    this.setContent = (content) => {
-        this.modalContent.html(content);
-    };
+        const messageElement = document.createElement('div');
+        messageElement.className = 'flex-grow-1 pe-4';
+        messageElement.innerHTML = message;
 
-    this.setTitle = (title) => {
-        this.modalTitle.html(title);
-    };
+        alert.appendChild(iconContainer);
+        alert.appendChild(messageElement);
 
-    this.init();
+        if (dismissible) {
+            alert.classList.add('alert-dismissible');
+            const closeButton = document.createElement('button');
+            closeButton.type = 'button';
+            closeButton.className = `btn-close`;
+            closeButton.setAttribute('data-bs-dismiss', 'alert');
+            closeButton.setAttribute('aria-label', 'Close');
+            alert.appendChild(closeButton);
+        }
+
+        this.container.appendChild(alert);
+
+        if (dismissible) {
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-20px)';
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 500);
+            }, dismissTime * 1000);
+        }
+    }
+
+    #getIcon(type) {
+        const icons = {
+            success: 'check-circle-fill',
+            danger: 'exclamation-triangle-fill',
+            warning: 'exclamation-octagon-fill',
+            primary: 'info-circle-fill',
+            info: 'info-circle-fill',
+            secondary: 'shield-fill-exclamation',
+        };
+
+        return icons[type] || 'info-circle';
+    }
 }
 
 /* user notification manager */
 var Hm_Notices = {
-    hide_id: false,
+    hm_alert: new Hm_Alert(),
 
-    show: function(msgs) {
-        var message = '';
-        var type = '';
-        for (var i in msgs) {
-            if (msgs[i].match(/^ERR/)) {
-                message = msgs[i].substring(3);
-                type = 'danger';
-            }
-            else {
-                type = 'info';
-                message = msgs[i];
-            }
-
-            Hm_Utils.add_sys_message(message, type);
-        }
+    /**
+     * @param {*} msg : The alert message to display
+     * @param {*} type : The type of message to display (primary, secondary, success, danger, warning, info)
+     */
+    show: function(msg, type = 'success', dismissible = true, dismissTime = 10) {
+        msg = hm_trans(msg);
+        this.hm_alert.createAlert(msg, type, dismissible, dismissTime);
     },
 
-    hide: function(now) {
-        if (Hm_Notices.hide_id) {
-            clearTimeout(Hm_Notices.hide_id);
-        }
-        if (now) {
-            $('.sys_messages').addClass('d-none');
-            Hm_Utils.clear_sys_messages();
-        }
-        else {
-            Hm_Notices.hide_id = setTimeout(function() {
-                $('.sys_messages').addClass('d-none');
-                Hm_Utils.clear_sys_messages();
-            }, 5000);
-        }
+    /**
+     * Shows pending messages on page load
+     */
+    showPendingMessages() {
+        hm_msgs.forEach((msg) => {
+            this.hm_alert.createAlert(msg.text, msg.type);
+        });
     }
 };
 
@@ -541,6 +598,7 @@ function Message_List() {
         'unread': 'formatted_unread_data',
         'flagged': 'formatted_flagged_data',
         'junk': 'formatted_junk_data',
+        'snoozed': 'formatted_snoozed_data',
         'trash': 'formatted_trash_data',
         'sent': 'formatted_sent_data',
         'drafts': 'formatted_drafts_data',
@@ -559,38 +617,15 @@ function Message_List() {
         fixLtrInRtl();
     };
 
-    this.update = function(ids, msgs, type, cache) {
-        var completed = false;
-        this.completed_count++;
-        if (this.completed_count == this.sources.length) {
-            this.completed_count = 0;
-            completed = true;
+    this.update = function(msgs, id, store) {
+        Hm_Utils.tbody().html('');
+        let msgArray = msgs;
+        if (! Array.isArray(msgArray)) {
+            msgArray = Object.entries(msgArray);
         }
-        if ($('input[type=checkbox]', $('.message_table')).filter(function() {return this.checked; }).length > 0) {
-            this.run_callbacks(completed);
-            return 0;
+        for (let row of msgArray) {
+            Hm_Utils.tbody().append(row[0]);
         }
-        if (msgs[0] === "") {
-            this.run_callbacks(completed);
-            return 0;
-        }
-        var msg_rows;
-        if (!cache) {
-            msg_rows = Hm_Utils.tbody();
-        }
-        else {
-            msg_rows = cache;
-        }
-        if (!this.background && !$.isEmptyObject(msgs)) {
-            $('.empty_list').remove();
-        }
-        var msg_ids = this.add_rows(msgs, msg_rows);
-        var count = this.remove_rows(ids, msg_ids, type, msg_rows);
-        this.run_callbacks(completed);
-        if (!cache) {
-            this.set_tab_index();
-        }
-        return count;
     };
 
     this.set_tab_index = function() {
@@ -602,68 +637,27 @@ function Message_List() {
         });
     };
 
-    this.remove_rows = function(ids, msg_ids, type, msg_rows) {
-        var count = $('tr', msg_rows).length;
-        var parts;
-        var re;
-        var i;
-        var id;
-        for (i=0;i<ids.length;i++) {
-            id = ids[i];
-            if ((id+'').search('_') != -1) {
-                parts = id.split('_', 2);
-                re = new RegExp(parts[1]+'$');
-                parts[1] = re;
-            }
-            else {
-                parts = [id, false];
-            }
-            $('tr[class^='+type+'_'+parts[0]+'_]', msg_rows).filter(function() {
-                var id = this.className;
-                if (id.indexOf(' ') != -1) {
-                    id = id.split(' ')[0];
-                }
-                if (!parts[1] || parts[1].exec(id)) {
-                    if ($.inArray(id, msg_ids) == -1) {
-                        count--;
-                        $(this).remove();
-                    }
-                }
-            });
-        }
-        return count;
-    };
-
     this.sort = function(fld) {
         var listitems = Hm_Utils.rows();
         var aval;
         var bval;
         var sort_result = listitems.sort(function(a, b) {
-            switch (Math.abs(fld)) {
-                case 1:
-                case 2:
-                case 3:
-                    aval = $($('td', a)[Math.abs(fld)]).text().replace(/^\s+/g, '');
-                    bval = $($('td', b)[Math.abs(fld)]).text().replace(/^\s+/g, '');
-                    break;
-                case 4:
-                default:
-                    aval = $('input', $($('td', a)[Math.abs(fld)])).val();
-                    bval = $('input', $($('td', b)[Math.abs(fld)])).val();
-                    break;
-            }
-            if (fld == 4 || fld == -4 || !fld) {
-                if (fld == -4) {
+            const sortField = fld.replace('-', '');
+            if (['arrival', 'date'].includes(sortField)) {
+                aval = new Date($(`input.${sortField}`, $('td.dates', a)).val());
+                bval = new Date($(`input.${sortField}`, $('td.dates', b)).val());
+                if (fld.startsWith('-')) {
                     return aval - bval;
                 }
                 return bval - aval;
             }
-            else {
-                if (fld && fld < 0) {
-                    return bval.toUpperCase().localeCompare(aval.toUpperCase());
-                }
-                return aval.toUpperCase().localeCompare(bval.toUpperCase());
+
+            aval = $(`td.${sortField}`, a).text().replace(/^\s+/g, '');
+            bval = $(`td.${sortField}`, b).text().replace(/^\s+/g, '');
+            if (fld.startsWith('-')) {
+                return bval.toUpperCase().localeCompare(aval.toUpperCase());
             }
+            return aval.toUpperCase().localeCompare(bval.toUpperCase());
         });
         this.sort_fld = fld;
         Hm_Utils.tbody().html('');
@@ -671,30 +665,6 @@ function Message_List() {
             Hm_Utils.tbody().append(sort_result[i]);
         }
         this.save_updated_list();
-    };
-
-    this.add_rows = function(msgs, msg_rows) {
-        var msg_ids = [];
-        var row;
-        var id;
-        var index;
-        for (index in msgs) {
-            row = msgs[index][0];
-            id = msgs[index][1];
-            if (this.deleted.indexOf(Hm_Utils.clean_selector(id)) != -1) {
-                continue;
-            }
-            id = id.replace(/ /, '-');
-            if (!$('.'+Hm_Utils.clean_selector(id), msg_rows).length) {
-                this.insert_into_message_list(row, msg_rows);
-                $('.'+Hm_Utils.clean_selector(id), msg_rows).show();
-            }
-            else {
-                $('.'+Hm_Utils.clean_selector(id), msg_rows).replaceWith(row)
-            }
-            msg_ids.push(id);
-        }
-        return msg_ids;
     };
 
     this.insert_into_message_list = function(row, msg_rows) {
@@ -763,7 +733,10 @@ function Message_List() {
         if (action_type == 'unflag' && getListPathParam() == 'flagged') {
             remove = true;
         }
-        else if (action_type == 'delete' || action_type == 'archive') {
+        if (action_type == 'unsnooze' && getListPathParam() == 'snoozed') {
+            remove = true;
+        }
+        else if (action_type == 'delete' || ['archive', 'junk'].includes(action_type)) {
             remove = true;
         }
         if (remove) {
@@ -793,6 +766,12 @@ function Message_List() {
         var class_name = false;
         var index;
         for (index in selected) {
+            const uid = selected[index].split('_')[2];
+            const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
+            store.load().then(store => {
+                store.removeRow(uid);
+            });
+
             class_name = selected[index];
             $('.'+Hm_Utils.clean_selector(class_name)).remove();
             if (action_type == 'delete') {
@@ -839,6 +818,14 @@ function Message_List() {
                 $('.icon', row).empty();
             }
             flagged++;
+
+            // if the message content was present in the local storage, update it too
+            const urlParams = new URLSearchParams(row.find('.subject a').attr('href'));
+            const storageKey = getMessageStorageKey(row.data('uid'), urlParams.get('list_path'));
+            const message = Hm_Utils.get_from_local_storage(storageKey);
+            if (message) {
+                set_message_content(urlParams.get('list_path'), row.data('uid'));
+            }
         }
         return flagged;
     };
@@ -894,7 +881,6 @@ function Message_List() {
                 self.clear_read_messages();
             }
             self.set_row_events();
-            $('.combined_sort').show();
         }
         if (getPageNameParam() == 'search' && hm_run_search() == "0") {
             Hm_Timer.add_job(self.load_sources, interval, true);
@@ -917,27 +903,27 @@ function Message_List() {
     };
 
     /* TODO: remove module specific refs */
-    this.update_title = function() {
+    this.update_title = function(list_path = getListPathParam()) {
         var count = 0;
         var rows = Hm_Utils.rows();
         var tbody = Hm_Utils.tbody();
-        if (getListPathParam() == 'unread') {
+        if (list_path == 'unread') {
             count = rows.length;
             document.title = count+' '+hm_trans('Unread');
         }
-        else if (getListPathParam() == 'flagged') {
+        else if (list_path == 'flagged') {
             count = rows.length;
             document.title = count+' '+hm_trans('Flagged');
         }
-        else if (getListPathParam() == 'combined_inbox') {
+        else if (list_path == 'combined_inbox') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Everything');
         }
-        else if (getListPathParam() == 'email') {
+        else if (list_path == 'email') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Email');
         }
-        else if (getListPathParam() == 'feeds') {
+        else if (list_path == 'feeds') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Feeds');
         }
@@ -981,35 +967,42 @@ function Message_List() {
                 true
             );
         }
-        if (!updated) {
-            self.update_after_action(action_type, selected);
-        }
     };
 
-    this.prev_next_links = function() {
-        let phref;
-        let nhref;
-        const target = $('.msg_headers tr').last();
-        const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
-        messages.load(false, true);
-        const next = messages.getNextRowForMessage(getMessageUidParam());
-        const prev = messages.getPreviousRowForMessage(getMessageUidParam());
-        if (prev) {
-            const prevSubject = $(prev['0']).find('.subject');
-            phref = prevSubject.find('a').prop('href');
-            const subject = new Option(prevSubject.text()).innerHTML;
-            const plink = '<a class="plink" href="'+phref+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
-            $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
-        }
-        if (next) {
-            const nextSubject = $(next['0']).find('.subject');
-            nhref = nextSubject.find('a').prop('href');
-            const subject = new Option(nextSubject.text()).innerHTML;
-            const nlink = '<a class="nlink" href="'+nhref+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
-            $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
-        }
+    this.prev_next_links = function(msgUid, listPath = getListPathParam(), cb = null) {
+        let prevUrl;
+        let nextUrl;
 
-        return [phref, nhref];
+        const target = $('.msg_text .small_header').last();
+        let filter = `${getParam('keyword')}_${getParam('filter')}`;
+        if (getParam('search_terms')) {
+            filter = `${getParam('search_terms')}_${getParam('search_fld')}_${getParam('search_since')}`;
+        }
+        const messages = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), filter, getParam('sort'));
+        messages.load(false, true, false, function() {
+            $('div.prev, div.next').remove();
+            const next = messages.getNextRowForMessage(msgUid);
+            const prev = messages.getPreviousRowForMessage(msgUid);
+            if (prev) {
+                const prevSubject = $(prev['0']).find('.subject a');
+                prevUrl = new URL(prevSubject.prop('href'));
+                prevUrl.searchParams.set('list_parent', listPath);
+                const subject = prevSubject.text().substring(0, 50) + (prevSubject.text().length > 50 ? '...' : '');
+                const plink = '<a class="plink" href="'+prevUrl.href+'"><i class="prevnext bi bi-arrow-up-square-fill"></i> '+subject+'</a>';
+                $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertAfter(target);
+            }
+            if (next) {
+                const nextSubject = $(next['0']).find('.subject a');
+                nextUrl = new URL(nextSubject.prop('href'));
+                nextUrl.searchParams.set('list_parent', listPath);
+                const subject = nextSubject.text().substring(0, 50) + (nextSubject.text().length > 50 ? '...' : '');
+                const nlink = '<a class="nlink" href="'+nextUrl.href+'"><i class="prevnext bi bi-arrow-down-square-fill"></i> '+subject+'</a>';
+                $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertAfter(target.siblings('.prev')[0] || target);
+            }
+            if (cb) {
+                cb([prevUrl?.href, nextUrl?.href]);
+            }
+        });
     };
 
     this.check_empty_list = function() {
@@ -1022,12 +1015,10 @@ function Message_List() {
                 else {
                     $('.message_list').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
                 }
-                $(".page_links").css("display", "none");// Hide page links as message list is empty
             }
         }
         else {
             $('.empty_list').remove();
-            $('.combined_sort').show();
         }
         return count === 0;
     };
@@ -1151,6 +1142,9 @@ function Message_List() {
     }
 
     this.process_row_click = function(e) {
+        if (e.target.tagName === 'A') {
+            return;
+        }
         document.getSelection().removeAllRanges();
         var target = $(e.target);
         var class_name = target[0].className;
@@ -1162,7 +1156,6 @@ function Message_List() {
         while (target[0].tagName != 'TR') { target = target.parent(); }
         var el = $('input[type=checkbox]', target);
         if (!shift && !ctrl) {
-            navigate($('.subject a', target).prop('href'));
             return false;
         }
         else {
@@ -1198,6 +1191,7 @@ function Message_List() {
     this.set_unread_state = function() { self.set_message_list_state('formatted_unread_data'); };
     this.set_search_state = function() { self.set_message_list_state('formatted_search_data'); };
     this.set_junk_state = function() { self.set_message_list_state('formatted_junk_data'); };
+    this.set_snoozed_state = function() { self.set_message_list_state('formatted_snoozed_data'); };
     this.set_trash_state = function() { self.set_message_list_state('formatted_trash_data'); };
     this.set_draft_state = function() { self.set_message_list_state('formatted_drafts_data'); };
     this.set_tag_state = function() { self.set_message_list_state('formatted_tag_data'); };
@@ -1233,12 +1227,15 @@ var Hm_Folders = {
                 if (!Hm_Folders.unread_counts[name]) {
                     Hm_Folders.unread_counts[name] = 0;
                 }
-                if (getListPathParam() == name && getPageNameParam() == 'message_list') {
-                    var title = document.title.replace(/^\[\d+\]/, '');
-                    document.title = '['+Hm_Folders.unread_counts[name]+'] '+title;
-                    /* HERE */
+                const count = Hm_Folders.unread_counts[name] || '';
+                if (count) {
+                    if (getListPathParam() == name && getPageNameParam() == 'message_list') {
+                        var title = document.title.replace(/^\[\d+\]/, '');
+                        document.title = '['+count+'] '+title;
+                        /* HERE */
+                    }
+                    $('.unread_'+name).html('&#160;'+count+'&#160;');
                 }
-                $('.unread_'+name).html('&#160;'+Hm_Folders.unread_counts[name]+'&#160;');
             }
         }
         Hm_Utils.save_to_local_storage('unread_counts', Hm_Utils.json_encode(Hm_Folders.unread_counts));
@@ -1284,7 +1281,6 @@ var Hm_Folders = {
             Hm_Folders.update_folder_list();
             sessionStorage.clear();
             Hm_Utils.restore_local_settings(ui_state);
-            Hm_Utils.expand_core_settings();
             return true;
         }
         return false;
@@ -1327,9 +1323,12 @@ var Hm_Folders = {
         hl_save_link();
     },
 
-    update_folder_list: function() {
+    update_folder_list: function(reset_cache = false) {
         Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'}],
+            [
+                {'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'},
+                {'name': 'reset_cache', 'value': reset_cache}
+            ],
             Hm_Folders.update_folder_list_display,
             [],
             true
@@ -1339,24 +1338,22 @@ var Hm_Folders = {
 
     folder_list_events: function() {
         $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this)); });
-        $('.src_name').on("click", function() {
-            var class_name = $(this).data('source');
-            var icon_element = $(this).find('.bi');
-            Hm_Utils.toggle_section(class_name);
-            setTimeout(() => {
-                var target_element = document.querySelector(class_name);
-                var is_visible = Hm_Utils.is_element_visible(target_element);
-                if (is_visible) {
-                    icon_element.removeClass('bi-chevron-down').addClass('bi-chevron-up');
-                } else {
-                    icon_element.removeClass('bi-chevron-up').addClass('bi-chevron-down');
-                }
-            }, 0);
+        $('.src_name').on('click', function() {
+
+            let transformValue = '';
+            if ($(this).attr('aria-expanded') == 'true') {
+                transformValue = 'rotate(180deg)';
+
+            } else {
+                transformValue = 'rotate(0deg)';
+            }
+
+            $(this).find('i').css('transform', transformValue);
         });
         $('.update_message_list').on("click", function(e) {
             var text = e.target.innerHTML;
             e.target.innerHTML = '<div class="spinner-border spinner-border-sm text-dark role="status"><span class="visually-hidden">Loading...</span></div>';
-            Hm_Folders.update_folder_list();
+            Hm_Folders.update_folder_list(true);
             Hm_Ajax.add_callback_hook('hm_reload_folders', function() {
                 e.target.innerHTML = text;
             });
@@ -1375,11 +1372,11 @@ var Hm_Folders = {
     hl_selected_menu: function() {
         const page = getPageNameParam();
         const path = getListPathParam();
-        
+
         $('.folder_list').find('*').removeClass('selected_menu');
         if (path) {
             if (page == 'message_list' || page == 'message') {
-                $("[data-id='"+Hm_Utils.clean_selector(path)+"']").addClass('selected_menu');
+                $("[data-id='"+Hm_Utils.clean_selector(path)+"']").closest('li').addClass('selected_menu');
                 $('.menu_'+Hm_Utils.clean_selector(path)).addClass('selected_menu');
             }
             else {
@@ -1393,6 +1390,7 @@ var Hm_Folders = {
 
     listen_for_new_messages: function() {
         var target = $('.total_unread_count').get(0);
+        if (!target) return;
         if (!Hm_Folders.observer) {
             Hm_Folders.observer = new MutationObserver(function(mutations) {
                 $('body').trigger('new_message');
@@ -1559,7 +1557,7 @@ var Hm_Utils = {
             if (force_on) {
                 $(class_name).css('display', 'none');
             }
-            $(class_name).toggle();
+            $(`[data-bs-target="${class_name}"]`).trigger('click');
             Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         }
         return false;
@@ -1571,41 +1569,6 @@ var Hm_Utils = {
             Hm_Utils.save_to_local_storage(class_name, $(class_name).css('display'));
         }
         return false;
-    },
-
-    expand_core_settings: function() {
-        var sections = Hm_Utils.get_core_settings();
-        var key;
-        var dsp;
-        for (key in sections) {
-            dsp = sections[key];
-            if (!dsp) {
-                dsp = 'none';
-            }
-            $(key).css('display', dsp);
-            Hm_Utils.save_to_local_storage(key, dsp);
-        }
-    },
-
-    get_core_settings: function() {
-        var dsp;
-        var results = {}
-        var i;
-        var hash = window.location.hash;
-        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting', '.junk_setting', '.trash_setting', '.drafts_setting','.tag_setting'];
-        for (i=0;i<sections.length;i++) {
-            dsp = Hm_Utils.get_from_local_storage(sections[i]);
-            if (hash) {
-                if (hash.replace('#', '.') != sections[i]) {
-                    dsp = 'none';
-                }
-                else {
-                    dsp = 'table-row';
-                }
-            }
-            results[sections[i]] = dsp;
-        }
-        return results;
     },
 
     get_from_local_storage: function(key) {
@@ -1653,12 +1616,21 @@ var Hm_Utils = {
         return false;
     },
 
+    remove_from_local_storage: function(key) {
+        var prefix = window.location.pathname;
+        key = prefix+key;
+        if (Storage !== void(0)) {
+            sessionStorage.removeItem(key);
+        }
+    },
+
     clean_selector: function(str) {
         return str.replace(/(:|\.|\[|\]|\/)/g, "\\$1");
     },
 
     toggle_long_headers: function() {
         $('.long_header').toggle();
+        $('.small_header').toggle();
         $('.all_headers').toggle();
         $('.small_headers').toggle();
         return false;
@@ -1666,31 +1638,6 @@ var Hm_Utils = {
 
     set_unsaved_changes: function(state) {
         $('#unsaved_changes').val(state);
-    },
-
-    /**
-     * Shows pending messages added with the add_sys_message method
-     */
-    show_sys_messages: function() {
-        $('.sys_messages').removeClass('d-none');
-    },
-
-    /**
-     *
-     * @param {*} msg : The alert message to display
-     * @param {*} type : The type of message to display, depending on the type of boostrap5 alert (primary, secondary, success, danger, warning, info, light, dark )
-     */
-    add_sys_message: function(msg, type = 'info') {
-        if (!msg) {
-            return;
-        }
-        const icon = type == 'success' ? 'bi-check-circle' : 'bi-exclamation-circle';
-        $('.sys_messages').append('<div class="alert alert-'+type+' alert-dismissible fade show" role="alert"><i class="bi '+icon+' me-2"></i><span class="' + type + '">'+msg+'</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
-        this.show_sys_messages();
-    },
-
-    clear_sys_messages: function () {
-        $('.sys_messages').html('');
     },
 
     cancel_logout_event: function() {
@@ -1719,7 +1666,7 @@ var Hm_Utils = {
     },
 
     rows: function() {
-        return $('.message_table_body > tr').not('.inline_msg');
+        return this.tbody().find('tr').not('.inline_msg');
     },
 
     tbody: function() {
@@ -1747,7 +1694,7 @@ var Hm_Utils = {
         if (! path) {
             path = window.location.href;
         }
-        window.location.href = path;
+        window.location.href = autoAppendParamsForNavigation(path);
     },
 
     is_valid_email: function (val) {
@@ -1881,10 +1828,6 @@ var decrease_servers = function(section) {
     }
 };
 
-var err_msg = function(msg) {
-    return "ERR"+hm_trans(msg);
-};
-
 var hm_spinner = function(type = 'border', size = '') {
     return `<div class="d-flex justify-content-center spinner">
         <div class="spinner-${type} text-dark${size ? ` spinner-${type}-${size}` : ''}" role="status">
@@ -1893,6 +1836,12 @@ var hm_spinner = function(type = 'border', size = '') {
     </div>`
 };
 
+var hm_spinner_text = function(text, id = 'spinner-text') {
+    return `<div class="d-flex justify-content-between align-items-center p-2 border-bottom" id="${id}">
+        <span class="mailbox-name text-primary">${text}</span>
+        <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+    </div>`;
+};
 var fillImapData = function(details) {
     $('#srv_setup_stepper_imap_address').val(details.server);
     $('#srv_setup_stepper_imap_port').val(details.port);
@@ -1901,6 +1850,9 @@ var fillImapData = function(details) {
     if (details.sieve_config_host) {
         $('#srv_setup_stepper_imap_sieve_host').val(details.sieve_config_host);
         $("#srv_setup_stepper_enable_sieve").trigger("click", false);
+        $('#srv_setup_stepper_imap_sieve_mode_tls')
+                            .prop('checked', details.tls)
+                            .trigger('change');
     }
 
     if(details.tls) {
@@ -1926,7 +1878,6 @@ var fillJmapData = function(details) {
 var imap_smtp_edit_action = function(event) {
     resetQuickSetupForm();
     event.preventDefault();
-    Hm_Notices.hide(true);
     var details = $(this).data('server-details');
 
     $('.imap-jmap-smtp-btn').trigger('click');
@@ -1962,11 +1913,16 @@ var hasLeadingOrTrailingSpaces = function(str) {
     return str !== str.trim();
 };
 
+var add_email_in_contact_trusted = function(list_email) {
+    if (list_email) {
+      Hm_Ajax.request([{ name: 'hm_ajax_hook', value: 'ajax_add_contact' },{ name: 'email_address', value: list_email }]);
+    }
+};
+
 /* create a default message list object */
 var Hm_Message_List = new Message_List();
 
 function sortHandlerForMessageListAndSearchPage() {
-    $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
     $('.source_link').on("click", function() { $('.list_sources').toggle(); $('#list_controls_menu').hide(); return false; });
     if (getListPathParam() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
         $('.menu_unread > a').css('font-weight', 'normal');
@@ -1995,9 +1951,9 @@ $(function() {
 
     /* fire up the job scheduler */
     Hm_Timer.fire();
-    
+
     /* show any pending notices */
-    Hm_Utils.show_sys_messages();
+    Hm_Notices.showPendingMessages();
 
     /* load folder list */
     if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
@@ -2026,7 +1982,7 @@ $(function() {
     $(document).on('paste', '.warn_on_paste', function (e) {
         const paste = (e.clipboardData || window.clipboardData).getData('text');
         if (hasLeadingOrTrailingSpaces(paste)) {
-            Hm_Utils.add_sys_message(hm_trans('Pasted text has leading or trailing spaces'), 'danger');
+            Hm_Notices.show('Pasted text has leading or trailing spaces', 'warning');
         }
     });
 
@@ -2059,7 +2015,7 @@ function fixLtrInRtl() {
     function getElements() {
         var pageName = getPageNameParam();
         if (pageName == "message") {
-            return [...$(".msg_text_inner").find('*'), ...$(".header_subject").find("*")];
+            return [...$(".msg_text_inner").find('*'), ...$(".js-header_subject").find("*")];
         }
         if (pageName == "message_list" || pageName == "?page=history") {
             return [...$('*')];
@@ -2083,157 +2039,6 @@ function fixLtrInRtl() {
 function listControlsMenu() {
     $('#list_controls_menu').toggleClass('show')
     $('.list_sources').hide();
-}
-
-
-// Sortablejs
-const tableBody = document.querySelector('.message_table_body');
-if(tableBody && !hm_mobile()) {
-    const allFoldersClassNames = [];
-    let targetFolder;
-    let movingElement;
-    let movingNumber;
-    Sortable.create(tableBody, {
-        sort: false,
-        group: 'messages',
-        ghostClass: 'drag_target',
-        draggable: ':not(.inline_msg)',
-
-        onMove: (sortableEvent) => {
-            movingElement = sortableEvent.dragged;
-            targetFolder = sortableEvent.related?.className.split(' ')[0];
-            return false;
-        },
-
-        onEnd: () => {
-            // Remove the highlight class from the tr
-            document.querySelectorAll('.message_table_body > tr.drag_target').forEach((row) => {
-                row.classList.remove('drag_target');
-            });
-            return false;
-        }
-    });
-
-    const isValidFolderReference = (className='') => {
-        return className.startsWith('imap_') && allFoldersClassNames.includes(className)
-    }
-
-    Sortable.utils.on(tableBody, 'dragstart', (evt) => {
-        let movingElements = [];
-        // Is the target element checked
-        const isChecked = evt.target.querySelector('.checkbox_cell input[type=checkbox]:checked');
-        if (isChecked) {
-            movingElements = document.querySelectorAll('.message_table_body > tr > .checkbox_cell input[type=checkbox]:checked');
-            // Add a highlight class to the tr
-            movingElements.forEach((checkbox) => {
-                checkbox.parentElement.parentElement.classList.add('drag_target');
-            });
-        } else {
-            // If not, uncheck all other checked elements so that they don't get moved
-            document.querySelectorAll('.message_table_body > tr > .checkbox_cell input[type=checkbox]:checked').forEach((checkbox) => {
-                checkbox.checked = false;
-            });
-        }
-
-        movingNumber = movingElements.length || 1;
-
-        const element = document.createElement('div');
-        element.textContent = `Move ${movingNumber} conversation${movingNumber > 1 ? 's' : ''}`;
-        element.style.position = 'absolute';
-        element.className = 'dragged_element';
-        document.body.appendChild(element);
-
-        function moveElement() {
-            element.style.display = 'none';
-        }
-
-        function removeElement() {
-            element.remove();
-        }
-
-        document.addEventListener('drag', moveElement);
-        document.addEventListener('mouseover', removeElement);
-
-        evt.dataTransfer.setDragImage(element, 0, 0);
-    });
-
-    Sortable.utils.on(tableBody, 'dragend', () => {
-        // If the target is not a folder, do nothing
-        if (!isValidFolderReference(targetFolder ?? '')) {
-            return;
-        }
-
-        const page = getPageNameParam();
-        const selectedRows = [];
-
-        if(movingNumber > 1) {
-            document.querySelectorAll('.message_table_body > tr').forEach(row => {
-                if (row.querySelector('.checkbox_cell input[type=checkbox]:checked')) {
-                    selectedRows.push(row);
-                }
-            });
-        }
-
-        if (selectedRows.length == 0) {
-            selectedRows.push(movingElement);
-        }
-
-        const movingIds = selectedRows.map(row => row.className.split(' ')[0]);
-
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_move_copy_action'},
-            {'name': 'imap_move_ids', 'value': movingIds.join(',')},
-            {'name': 'imap_move_to', 'value': targetFolder},
-            {'name': 'imap_move_page', 'value': page},
-            {'name': 'imap_move_action', 'value': 'move'}],
-            (res) =>{
-                for (const index in res.move_count) {
-                    $('.'+Hm_Utils.clean_selector(res.move_count[index])).remove();
-                    select_imap_folder(getListPathParam());
-                }
-            }
-        );
-
-        // Reset the target folder
-        targetFolder = null;
-    });
-
-    const folderList = document.querySelector('.folder_list');
-
-    const observer = new MutationObserver((mutations) => {
-        const emailFoldersGroups = document.querySelectorAll('.email_folders .inner_list');
-        const emailFoldersElements = document.querySelectorAll('.email_folders .inner_list > li');
-
-        // Keep track of all folders class names
-        allFoldersClassNames.push(...[...emailFoldersElements].map(folder => folder.className.split(' ')[0]));
-
-        emailFoldersGroups.forEach((emailFolders) => {
-            Sortable.create(emailFolders, {
-                sort: false,
-                group: {
-                    put: 'messages'
-                }
-            });
-        });
-
-        emailFoldersElements.forEach((emailFolder) => {
-            emailFolder.addEventListener('dragenter', () => {
-                emailFolder.classList.add('drop_target');
-            });
-            emailFolder.addEventListener('dragleave', () => {
-                emailFolder.classList.remove('drop_target');
-            });
-            emailFolder.addEventListener('drop', () => {
-                emailFolder.classList.remove('drop_target');
-            });
-        });
-    });
-
-    const config = {
-        childList: true
-    };
-
-    observer.observe(folderList, config);
 }
 
 var resetStepperButtons = function() {
@@ -2260,6 +2065,7 @@ function submitSmtpImapServer() {
         { name: 'srv_setup_stepper_imap_port', value: $('#srv_setup_stepper_imap_port').val() },
         { name: 'srv_setup_stepper_imap_tls', value: $('input[name="srv_setup_stepper_imap_tls"]:checked').val() },
         { name: 'srv_setup_stepper_enable_sieve', value: $('#srv_setup_stepper_enable_sieve').prop('checked') },
+        { name: 'srv_setup_stepper_imap_sieve_mode_tls', value: $('#srv_setup_stepper_imap_sieve_mode_tls').prop('checked') },
         { name: 'srv_setup_stepper_create_profile', value: $('#srv_setup_stepper_create_profile').prop('checked') },
         { name: 'srv_setup_stepper_profile_is_default', value: $('#srv_setup_stepper_profile_is_default').prop('checked') },
         { name: 'srv_setup_stepper_profile_signature', value: $('#srv_setup_stepper_profile_signature').val() },
@@ -2313,6 +2119,7 @@ function resetQuickSetupForm() {
     $("#srv_setup_stepper_is_sender").prop('checked', true);
     $("#srv_setup_stepper_is_receiver").prop('checked', true);
     $("#srv_setup_stepper_enable_sieve").prop('checked', false);
+    $("#srv_setup_stepper_imap_sieve_mode_tls").prop('checked', false);
     $("#srv_setup_stepper_only_jmap").prop('checked', false);
     $('#step_config-imap_bloc').show();
     $('#step_config-smtp_bloc').show();
@@ -2324,11 +2131,23 @@ function resetQuickSetupForm() {
 
 function handleCreateProfileCheckboxChange(checkbox) {
     if(checkbox.checked) {
-        $('#srv_setup_stepper_profile_bloc').show();
+        $(checkbox).closest('.form-check').next().show();
     }else{
-        $('#srv_setup_stepper_profile_bloc').hide();
+        $(checkbox).closest('.form-check').next().hide();
     }
 }
+
+$('#profile_quickly_create').on('change', function() {
+    if(this.checked) {
+        $('.form-check-create-profile').hide();
+        $('.form-check-create-profile input').removeAttr("required");
+        $("#profile_quickly_create_value").val('yes');
+    }else{
+        $('.form-check-create-profile').show();
+        $('.form-check-create-profile input').attr("required", true);
+        $("#profile_quickly_create_value").val('no');
+    }
+});
 
 function handleSieveStatusChange (checkbox) {
     if(checkbox.checked) {
@@ -2361,7 +2180,7 @@ function handleSmtpImapCheckboxChange(checkbox) {
     if ($('#srv_setup_stepper_is_sender').prop('checked') && $('#srv_setup_stepper_is_receiver').prop('checked')) {
         $('#srv_setup_stepper_profile_bloc').show();
         $('#srv_setup_stepper_profile_checkbox_bloc').show();
-        
+
     } else if(! $('#srv_setup_stepper_is_sender').prop('checked') || ! $('#srv_setup_stepper_is_receiver').prop('checked')) {
         $('#srv_setup_stepper_profile_bloc').hide();
         $('#srv_setup_stepper_profile_checkbox_bloc').hide();
@@ -2413,7 +2232,7 @@ function display_config_step(stepNumber) {
                     $(`#${item.key}-error`).text('Required');
                     isValid = false;
                 }
-                
+
             } else {
                 $(`#${item.key}-error`).text('');
             }
@@ -2462,6 +2281,7 @@ function display_config_step(stepNumber) {
         if($('#srv_setup_stepper_enable_sieve').is(':checked')) {
             requiredFields.push(
                 {key: 'srv_setup_stepper_imap_sieve_host', value: $('#srv_setup_stepper_imap_sieve_host').val()},
+                {key: 'srv_setup_stepper_imap_sieve_mode_tls', value: $('#srv_setup_stepper_imap_sieve_mode_tls').val()},
             )
         }
 
@@ -2522,11 +2342,17 @@ function getServiceDetails(providerKey){
                         $('#srv_setup_stepper_enable_sieve')
                             .prop('checked', true)
                             .trigger('change');
+                        $('#srv_setup_stepper_imap_sieve_mode_tls')
+                            .prop('checked', serverConfig.sieve.tls)
+                            .trigger('change');
                         $('#srv_setup_stepper_imap_sieve_host').val(serverConfig.sieve.host + ':' + serverConfig.sieve.port);
                     } else {
                         $('#srv_setup_stepper_enable_sieve')
                             .prop('checked', false)
-                            .trigger('change');;
+                            .trigger('change');
+                        $('#srv_setup_stepper_imap_sieve_mode_tls')
+                            .prop('checked', false)
+                            .trigger('change');
                         $('#srv_setup_stepper_imap_sieve_host').val('');
                     }
                 }
@@ -2591,7 +2417,7 @@ function handleAllowResource(element, messagePart, inline = false) {
         if (inline) {
             return inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
         }
-        return get_message_content(messagePart, false, false, false, false, false);
+        return get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), getParam('list_parent'), false, false, false);
     });
 }
 
@@ -2622,7 +2448,8 @@ const handleExternalResources = (inline) => {
     const messageContainer = document.querySelector('.msg_text_inner');
     messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
 
-    const sender = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0] + '_external_resources_allowed';
+    const senderEmail = document.querySelector('#contact_info')?.textContent.match(EMAIL_REGEX)[0];
+    const sender = senderEmail + '_external_resources_allowed';
     const elements = messageContainer.querySelectorAll('[data-src]');
     const blockedResources = [];
     elements.forEach(function (element) {
@@ -2659,24 +2486,29 @@ const handleExternalResources = (inline) => {
             allowAllLink.dataset.src = blockedResources.join(',');
             allowAllLink.textContent = 'Allow all';
             allowAll.appendChild(allowAllLink);
-            handleAllowResource(allowAll, elements[0].dataset.messagePart, inline);
+            handleAllowResource(allowAll, getParam('part'), inline);
         }
         noticesElement.appendChild(allowAll);
 
         const button = document.createElement('a');
+        button.setAttribute('href', '#');
         button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
         button.textContent = 'Always allow from this sender';
         noticesElement.appendChild(button);
+        const popover = sessionAvailableOnlyActionInfo(button)
 
         button.addEventListener('click', function (e) {
             e.preventDefault();
-            Hm_Utils.save_to_local_storage(sender, 1);
-            $('.msg_text_inner').remove();
-            if (inline) {
-                inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
-            } else {
-                get_message_content(elements[0].dataset.messagePart, false, false, false, false, false)
-            }
+            addSenderToImagesWhitelist(senderEmail).then(() => {
+                $('.msg_text_inner').remove();
+                if (inline) {
+                    inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
+                } else {
+                    get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), getParam('list_parent'), false, false, false)
+                }
+            }).finally(() => {
+                popover.dispose();
+            })
         });
     }
 
@@ -2684,14 +2516,14 @@ const handleExternalResources = (inline) => {
 };
 
 const observeMessageTextMutationAndHandleExternalResources = (inline) => {
-    const message = document.querySelector('.msg_text');    
+    const message = document.querySelector('.msg_text');
     if (message) {
         new MutationObserver(function (mutations) {
             mutations.forEach(function (mutation) {
                 if (mutation.addedNodes.length > 0) {
                     mutation.addedNodes.forEach(function (node) {
                         if (node.classList.contains('msg_text_inner')) {
-                            handleExternalResources(inline);                    
+                            handleExternalResources(inline);
                         }
                     });
                 }
@@ -2701,3 +2533,75 @@ const observeMessageTextMutationAndHandleExternalResources = (inline) => {
         });
     }
 };
+
+function setupActionSchedule(callback) {
+    $(document).on('click', '.nexter_date_picker', function (e) {
+        document.querySelector('.nexter_input_date').showPicker();
+    });
+    $(document).on('click', '.nexter_date_helper', function (e) {
+        e.preventDefault();
+        $('.nexter_input').val($(this).attr('data-value')).trigger('change');
+    });
+    $(document).on('input', '.nexter_input_date', function (e) {
+        var now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        $(this).attr('min', now.toJSON().slice(0, 16));
+        if (new Date($(this).val()).getTime() <= now.getTime()) {
+            $('.nexter_date_picker').css('border', '1px solid red');
+        } else {
+            $('.nexter_date_picker').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
+        }
+    });
+    $(document).on('change', '.nexter_input_date', function (e) {
+        const selectedDate = new Date($(this).val());
+        if ($(this).val() && new Date().getTime() < selectedDate.getTime()) {
+            $('.nexter_input').val(selectedDate.toISOString()).trigger('change');
+        }
+    });
+    $(document).on('change', '.nexter_input', callback);
+}
+
+function setupActionSnooze(callback) {
+    $(document).on('click', '.nexter_date_picker_snooze', function (e) {
+        document.querySelector('.nexter_input_date_snooze').showPicker();
+    });
+    $(document).on('click', '.nexter_date_helper_snooze', function (e) {
+        e.preventDefault();
+        $('.nexter_input_snooze').val($(this).attr('data-value')).trigger('change');
+    });
+    $(document).on('input', '.nexter_input_date_snooze', function (e) {
+        var now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        $(this).attr('min', now.toJSON().slice(0, 16));
+        if (new Date($(this).val()).getTime() <= now.getTime()) {
+            $('.nexter_date_picker_snooze').css('border', '1px solid red');
+        } else {
+            $('.nexter_date_picker_snooze').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
+        }
+    });
+    $(document).on('change', '.nexter_input_date_snooze', function (e) {
+        const selectedDate = new Date($(this).val());
+        if ($(this).val() && new Date().getTime() < selectedDate.getTime()) {
+            $('.nexter_input_snooze').val(selectedDate.toISOString()).trigger('change');
+        }
+    });
+    $(document).on('change', '.nexter_input_snooze', callback);
+}
+
+document.addEventListener("show.bs.dropdown", function (event) {
+    const currentToggle = event.target;
+
+    // If it's nested inside a dropdown menu, skip
+    if (currentToggle.closest(".dropdown-menu")) {
+        return;
+    }
+
+    // Close other top-level dropdowns
+    document.querySelectorAll(".dropdown-toggle.show").forEach((openBtn) => {
+        if (openBtn !== currentToggle && !openBtn.closest(".dropdown-menu")) {
+            const dropdownInstance = bootstrap.Dropdown.getInstance(openBtn);
+            if (dropdownInstance) dropdownInstance.hide();
+        }
+    });
+});
+

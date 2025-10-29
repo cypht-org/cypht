@@ -50,11 +50,23 @@ function get_message_list_settings($path, $handler) {
         $per_source_limit = $handler->user_config->get('junk_per_source_setting', DEFAULT_JUNK_PER_SOURCE);
         $mailbox_list_title = array('Junk');
     }
+    elseif ($path == 'snoozed') {
+        $list_path = 'snoozed';
+        $message_list_since = $handler->user_config->get('snoozed_since_setting', DEFAULT_SNOOZED_SINCE);
+        $per_source_limit = $handler->user_config->get('snoozed_per_source_setting', DEFAULT_SNOOZED_PER_SOURCE);
+        $mailbox_list_title = array('Snoozed');
+    }
     elseif ($path == 'trash') {
         $list_path = 'trash';
         $message_list_since = $handler->user_config->get('trash_since_setting', DEFAULT_TRASH_SINCE);
         $per_source_limit = $handler->user_config->get('trash_per_source_setting', DEFAULT_TRASH_PER_SOURCE);
         $mailbox_list_title = array('Trash');
+    }
+    elseif ($path == 'sent') {
+        $list_path = 'sent';
+        $message_list_since = $handler->user_config->get('sent_since_setting', DEFAULT_SENT_SINCE);
+        $per_source_limit = $handler->user_config->get('sent_per_source_setting', DEFAULT_SENT_PER_SOURCE);
+        $mailbox_list_title = array('Sent');
     }
     elseif ($path == 'drafts') {
         $list_path = 'drafts';
@@ -108,14 +120,11 @@ function message_list_meta($input, $output_mod) {
         $since = DEFAULT_SINCE;
     }
     $date = sprintf('%s', mb_strtolower($output_mod->trans($times[$since])));
-    $max = sprintf($output_mod->trans('sources@%d each'), $limit);
+    $max = sprintf($output_mod->trans('%d items per source'), $limit);
+    $sources = '<span class="src_count">0</span>&nbsp;' . $output_mod->trans('sources');
+    $total = '<span class="total">0</span>&nbsp;' .$output_mod->trans('total');
 
-    return '<div class="list_meta d-flex align-items-center fs-6">'.
-        $date.
-        '<b>-</b>'.
-        '<span class="src_count"></span> '.$max.
-        '<b>-</b>'.
-        '<span class="total"></span> '.$output_mod->trans('total').'</div>';
+    return '<div class="list_meta d-flex align-items-center fs-6 text-nowrap me-auto mb-2 mb-md-0">'.$date.':&nbsp;'.$sources.',&nbsp;'.$max.',&nbsp;'.$total.'</div>';
 }}
 
 /**
@@ -126,17 +135,18 @@ function message_list_meta($input, $output_mod) {
  */
 if (!hm_exists('combined_sort_dialog')) {
 function combined_sort_dialog($mod) {
-    $dt_sort = $mod->get('default_sort_order', 'arrival');
-    $sorts = array(
-        '4' => $dt_sort == 'arrival' ? $mod->trans('Arrival Date') : $mod->trans('Sent Date'),
-        '2' => $mod->trans('From'),
-        '3' => $mod->trans('Subject'),
-    );
+    $sorts = [
+        'arrival' => $mod->trans('Arrival Date'),
+        'date' => $mod->trans('Sent Date'),
+        'from' => $mod->trans('From'),
+        'to' => $mod->trans('To'),
+        'subject' => $mod->trans('Subject')
+    ];
 
-    $res = '<select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm">';
+    $res = '<select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm ms-2">';
     foreach ($sorts as $name => $val) {
-        $res .= '<option value="'.$name.'">'.$val.' &darr;</option>';
-        $res .= '<option value="-'.$name.'">'.$val.' &uarr;</option>';
+        $res .= '<option value="'.$name.'"'.($mod->get('list_sort') == $name ? ' selected' : '').'>'.$val.' &darr;</option>';
+        $res .= '<option value="-'.$name.'"'.($mod->get('list_sort') == '-'.$name ? ' selected' : '').'>'.$val.' &uarr;</option>';
     }
     $res .= '</select>';
     return $res;
@@ -167,10 +177,10 @@ function human_readable_interval($date_str) {
     $t['month']  = $t['day']*30;
     $t['year']   = $t['week']*52;
 
-    if ($interval < 0) {
+    if ($interval < -300) {
         return 'From the future!';
     }
-    elseif ($interval == 0) {
+    elseif ($interval <= 0) {
         return 'Just now';
     }
     foreach (array_reverse($t) as $name => $val) {
@@ -201,10 +211,16 @@ function human_readable_interval($date_str) {
  * @return array
  */
 if (!hm_exists('message_list_row')) {
-function message_list_row($values, $id, $style, $output_mod, $row_class='') {
+function message_list_row($values, $id, $style, $output_mod, $row_class='', $msgId = '', $inReplyTo = '') {
     $res = '<tr class="'.$output_mod->html_safe($id);
     if ($row_class) {
         $res .= ' '.$output_mod->html_safe($row_class);
+    }
+    if (!empty($msgId)) {
+        $res .= '" data-msg-id="'.$output_mod->html_safe($msgId);
+    }
+    if (!empty($inReplyTo)) {
+        $res .= '" data-in-reply-to="'.$output_mod->html_safe($inReplyTo);
     }
     $data_uid = "";
     if ($uids = explode("_", $id)) {
@@ -295,15 +311,38 @@ function checkbox_callback($vals, $style, $output_mod) {
 if (!hm_exists('subject_callback')) {
 function subject_callback($vals, $style, $output_mod) {
     $img = '';
-    if (count($vals) == 4 && $vals[3]) {
+    $subject = '';
+    $preview_msg = '';
+    if (isset($vals[3]) && $vals[3]) {
         $img = '<i class="bi bi-filetype-'.$vals[3].'"></i>';
     }
     $subject = $output_mod->html_safe($vals[0]);
+    if (isset($vals[4]) && $vals[4]) {
+        $lines = explode("\n", $vals[4]);
+        $clean = array_filter(array_map('trim', $lines), function ($line) {
+            return $line !== ''
+                && stripos($line, 'boundary=') === false
+                && !preg_match('/^-{2,}==/', $line)
+                && stripos($line, 'content-type:') !== 0
+                && stripos($line, 'charset=') === false
+                && stripos($line, 'content-transfer-encoding:') !== 0;
+        });
+        $clean_text = implode("\n", $clean);
+        $preview_msg = $output_mod->html_safe($clean_text);
+    }
+    
     $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);
     if ($style == 'news') {
-        return sprintf('<div class="subject"><div class="%s" title="%s">%s <a href="%s">%s</a></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $img, $output_mod->html_safe($vals[1]), $hl_subject);
+        if ($output_mod->get('is_mobile')) {
+            return sprintf('<div class="subject"><div class="%s" title="%s">%s <a href="%s">%s</a></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $img, $output_mod->html_safe($vals[1]), $hl_subject);
+        }
+        return sprintf('<div class="subject"><div class="%s" title="%s">%s <a href="%s">%s</a><p class="fw-light">%s</p></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $img, $output_mod->html_safe($vals[1]), $hl_subject, $preview_msg);
     }
-    return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $output_mod->html_safe($vals[1]), $hl_subject);
+
+    if ($output_mod->get('is_mobile')) {
+        return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $output_mod->html_safe($vals[1]), $hl_subject);
+    }
+    return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a><p class="fw-light">%s</p></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $output_mod->html_safe($vals[1]), $hl_subject, $preview_msg);
 }}
 
 /**
@@ -316,12 +355,20 @@ function subject_callback($vals, $style, $output_mod) {
  */
 if (!hm_exists('date_callback')) {
 function date_callback($vals, $style, $output_mod) {
-    $snooze_class = isset($vals[2]) && $vals[2]? ' snoozed_date': '';
+    $delayed_class = isset($vals[2]) && $vals[2]? ' delayed_date': '';
     if ($style == 'news') {
-        return sprintf('<div class="msg_date%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></div>', $snooze_class, $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
+        return sprintf('<div class="msg_date%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></div>', $delayed_class, $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
     }
-    return sprintf('<td class="msg_date%s" title="%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $snooze_class, $output_mod->html_safe(date('r', $vals[1])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
+    return sprintf('<td class="msg_date%s" title="%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $delayed_class, $output_mod->html_safe(date('r', $vals[1])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
 }}
+
+function dates_holders_callback($vals) {
+    $res = '<td class="dates d-none">';
+    $res .= '<input type="hidden" name="arrival" class="arrival" value="'. $vals[0] .'" arial-label="Arrival date" />';
+    $res .= '<input type="hidden" name="date" class="date" value="'. $vals[1] .'" arial-label="Sent date" />';
+    $res .= '</td>';
+    return $res;
+}
 
 /**
  * Callback for an icon in a message list row
@@ -368,25 +415,31 @@ function icon_callback($vals, $style, $output_mod) {
 if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
     $txt = '';
+    $controls = ['read', 'unread', 'flag', 'unflag', 'delete', 'archive', 'junk'];
+    $controls = array_filter($controls, function($val) use ($output_mod) {
+        if (in_array($val, [$output_mod->get('list_path', ''), strtolower($output_mod->get('core_msg_control_folder', ''))])) {
+            return false;
+        }
+        if ($val == 'flag' && $output_mod->get('list_path', '') == 'flagged') {
+            return false;
+        }
+        return true;
+    });
+
     $res = '<a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a>'.
         '<div class="msg_controls fs-6 d-none gap-1 align-items-center">'.
             '<div class="dropdown on_mobile">'.
-                '<button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="coreMsgControlDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Actions</button>'.
-                '<ul class="dropdown-menu" aria-labelledby="coreMsgControlDropdown">'.
-                    '<li><a class="dropdown-item msg_read core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a></li>'.
-                    '<li><a class="dropdown-item msg_unread core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a></li>'.
-                    '<li><a class="dropdown-item msg_flag core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a></li>'.
-                    '<li><a class="dropdown-item msg_unflag core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a></li>'.
-                    '<li><a class="dropdown-item msg_delete core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a></li>'.
-                    '<li><a class="dropdown-item msg_archive core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a></li>'.
-                '</ul>'.
-            '</div>'.
-            '<a class="msg_read core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
-            '<a class="msg_unread core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
-            '<a class="msg_flag core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
-            '<a class="msg_unflag core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
-            '<a class="msg_delete core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>'.
-            '<a class="msg_archive core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a>';
+                '<button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" id="coreMsgControlDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Actions</button>'.
+                '<ul class="dropdown-menu" aria-labelledby="coreMsgControlDropdown">';
+    foreach ($controls as $control) {
+        $res .= '<li><a class="dropdown-item msg_'.$control.' core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="'.$control.'">'.$output_mod->trans(ucfirst($control)).'</a></li>';
+    }
+    $res .= '</ul>'.
+            '</div>';
+
+    foreach ($controls as $control) {
+        $res .= '<a class="msg_'.$control.' core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="'.$control.'">'.$output_mod->trans(ucfirst($control)).'</a>';
+    }
 
     if ($output_mod->get('msg_controls_extra')) {
         $res .= $output_mod->get('msg_controls_extra');
@@ -418,14 +471,14 @@ function message_since_dropdown($since, $name, $output_mod, $original_default_va
         '-1 year' => 'Last year',
         '-5 years' => 'Last 5 years'
     );
-    $res = '<select name="'.$name.'" id="'.$name.'" class="message_list_since form-select form-select-sm w-auto" data-default-value="'.$original_default_value.'">';
+    $res = '<select name="'.$name.'" id="'.$name.'" class="message_list_since form-select form-select-sm" data-default-value="'.$original_default_value.'">';
     $reset = '';
     foreach ($times as $val => $label) {
         $res .= '<option';
         if ($val == $since) {
             $res .= ' selected="selected"';
             if ($val != $original_default_value) {
-                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
             }
 
         }
@@ -443,7 +496,7 @@ function message_since_dropdown($since, $name, $output_mod, $original_default_va
  */
 if (!hm_exists('list_sources')) {
 function list_sources($sources, $output_mod) {
-    $res = '<div class="list_sources">';
+    $res = '<div class="list_sources w-100 mt-2">';
     $res .= '<div class="src_title fs-5 mb-2">'.$output_mod->html_safe('Sources').'</div>';
     foreach ($sources as $src) {
         if (array_key_exists('group', $src) && $src['group'] == 'background') {
@@ -452,17 +505,17 @@ function list_sources($sources, $output_mod) {
         if (array_key_exists('nodisplay', $src) && $src['nodisplay']) {
             continue;
         }
-        if ($src['type'] == 'imap' && !array_key_exists('folder', $src)) {
-            $folder = '_INBOX';
+        if ($src['type'] == 'imap' && !array_key_exists('folder_name', $src)) {
+            $folder = 'INBOX';
         }
-        elseif (!array_key_exists('folder', $src)) {
+        elseif (!array_key_exists('folder_name', $src)) {
             $folder = '';
         }
         else {
-            $folder = '_'.hex2bin($src['folder']);
+            $folder = $src['folder_name'];
         }
         $res .= '<div class="list_src">'.$output_mod->html_safe($src['type']).' '.$output_mod->html_safe($src['name']);
-        $res .= ' '.$output_mod->html_safe(str_replace('_', '', $folder));
+        $res .= ' '.$output_mod->html_safe($folder);
         $res .= '</div>';
     }
     $res .= '</div>';
@@ -523,13 +576,17 @@ function update_search_label_field($search_term, $output_mod) {
  * @return string
  */
 if (!hm_exists('list_controls')) {
-function list_controls($refresh_link, $config_link, $source_link=false, $search_field='') {
-    return '<div class="list_controls no_mobile d-flex gap-3 align-items-center">'.
-        $refresh_link.$source_link.$config_link.$search_field.'</div>
-    <div class="list_controls on_mobile">'.$search_field.'
-        <i class="bi bi-filter-circle" onclick="listControlsMenu()"></i>
-        <div id="list_controls_menu" classs="list_controls_menu">'.$refresh_link.$source_link.$config_link.'</div>
-    </div>';
+function list_controls($refresh_link, $config_link, $source_link = false, $search_field = '') {
+    return '<div class="list_controls no_mobile d-flex gap-3 align-items-center">' .
+                $refresh_link . $source_link . $config_link . $search_field .
+           '</div>' .
+           '<div class="list_controls on_mobile">' .
+                $search_field .
+                '<i class="bi bi-filter-circle" onclick="listControlsMenu()"></i>' .
+                '<div id="list_controls_menu" class="list_controls_menu">' .
+                    $refresh_link . $source_link . $config_link .
+                '</div>' .
+           '</div>';
 }}
 
 /**
@@ -578,7 +635,7 @@ function search_field_selection($current, $output_mod) {
         'TO' => 'To',
         'CC' => 'Cc',
     );
-    $res = '<select class="form-select form-select-sm w-auto" id="search_fld" name="search_fld">';
+    $res = '<select class="form-select form-select-sm" id="search_fld" name="search_fld">';
     foreach ($flds as $val => $name) {
         $res .= '<option ';
         if ($current == $val) {
@@ -588,80 +645,4 @@ function search_field_selection($current, $output_mod) {
     }
     $res .= '</select>';
     return $res;
-}}
-
-/**
- * Build pagination links for a list of messages
- * @subpackage core/functions
- * @param int $page_size number of messages per page
- * @param int $current current page number
- * @param int $total number of messages total
- * @param string $path list path
- * @param string $filter list filter
- * @param string $sort list sort
- * @return string
- */
-if (!hm_exists('build_page_links')) {
-function build_page_links($page_size, $current_page, $total, $path, $filter=false, $sort=false, $keyword=false) {
-    $links = '';
-    $first = '';
-    $last = '';
-    $display_links = 10;
-    if ($filter) {
-        $filter_str = '&amp;filter='.$filter;
-    }
-    else {
-        $filter_str = '';
-    }
-    if ($sort) {
-        $sort_str = '&amp;sort='.$sort;
-    }
-    else {
-        $sort_str = '';
-    }
-    if ($keyword) {
-        $keyword_str = '&amp;keyword='.$keyword;
-    }
-    else {
-        $keyword_str = '';
-    }
-
-    $max_pages = ceil($total/$page_size);
-    if ($max_pages == 1) {
-        return '';
-    }
-    $floor = ($current_page - 1) - intval($display_links/2);
-    if ($floor < 0) {
-        $floor = 1;
-    }
-    $ceil = $floor + $display_links;
-    if ($ceil > $max_pages) {
-        $floor -= ($ceil - $max_pages);
-    }
-    $prev = '<a class="disabled_link"><i class="bi bi-caret-left-fill"></i></a>';
-    $next = '<a class="disabled_link"><i class="bi bi-caret-right-fill"></i></a>';
-
-    if ($floor > 1 ) {
-        $first = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page=1'.$keyword_str.$filter_str.$sort_str.'">1</a> ... ';
-    }
-    if ($ceil < $max_pages) {
-        $last = ' ... <a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$max_pages.$keyword_str.$filter_str.$sort_str.'">'.$max_pages.'</a>';
-    }
-    if ($current_page > 1) {
-        $prev = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page - 1).$keyword_str.$filter_str.$sort_str.'"><i class="bi bi-caret-left-fill"></i></a>';
-    }
-    if ($max_pages > 1 && $current_page < $max_pages) {
-        $next = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page + 1).$keyword_str.$filter_str.$sort_str.'"><i class="bi bi-caret-right-fill"></i></a>';
-    }
-    for ($i=1;$i<=$max_pages;$i++) {
-        if ($i < $floor || $i > $ceil) {
-            continue;
-        }
-        $links .= ' <a ';
-        if ($i == $current_page) {
-            $links .= 'class="current_page fw-bolder" ';
-        }
-        $links .= 'href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$i.$keyword_str.$filter_str.$sort_str.'">'.$i.'</a>';
-    }
-    return $prev.' '.$first.$links.$last.' '.$next;
 }}

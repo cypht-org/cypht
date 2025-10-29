@@ -1,0 +1,43 @@
+# ----------------------------------------------------
+# Rewrite rules (only if mod_rewrite is enabled)
+# ----------------------------------------------------
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteCond %{REQUEST_URI} ^/$
+    RewriteRule ^$ index.php [L]
+
+    # Force HTTPS (uncomment to enable)
+    # RewriteCond %{HTTPS} !=on
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# ----------------------------------------------------
+# Security Rules
+# ----------------------------------------------------
+
+# Block hidden files (starting with .)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Block sensitive project files
+<FilesMatch "\.(env|ini|log|conf|json|lock|yml|yaml|md|txt|sh|bat|ps1|xml|bak|sql|dist|inc|cfg|db|csv)$">
+    Require all denied
+</FilesMatch>
+
+# Allow specific exceptions
+<FilesMatch "^(server_accounts_sample\.yaml|server_accounts_sample\.csv|contact_sample\.csv)$">
+    Require all granted
+</FilesMatch>
+
+# Block certain project/config files
+<FilesMatch "(RELEASE_NOTES|Makefile|Dockerfile|docker-compose\.yml|docker-compose\.dev\.yaml|docker-compose\.prod\.yaml)">
+    Require all denied
+</FilesMatch>
+
+# Prevent access to .git directory
+RedirectMatch 403 /(?:\.git)/.*$
+
+# Disable directory listing
+Options -Indexes

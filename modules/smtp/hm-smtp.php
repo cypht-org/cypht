@@ -14,8 +14,13 @@ class Hm_SMTP_List {
 
     use Hm_Server_List;
 
+    protected static $user_config;
+    protected static $session;
+
     public static function init($user_config, $session) {
         self::initRepo('smtp_servers', $user_config, $session, self::$server_list);
+        self::$user_config = $user_config;
+        self::$session = $session;
     }
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
@@ -25,7 +30,8 @@ class Hm_SMTP_List {
             'port'      => $server['port'],
             'tls'       => $server['tls'],
             'username'  => $user,
-            'password'  => $pass
+            'password'  => $pass,
+            'type'      => array_key_exists('type', $server) && !empty($server['type']) ? $server['type'] : 'smtp',
         );
         if (array_key_exists('auth', $server)) {
             $config['auth'] = $server['auth'];
@@ -33,16 +39,17 @@ class Hm_SMTP_List {
         if (array_key_exists('no_auth', $server)) {
             $config['no_auth'] = true;
         }
-        self::$server_list[$id]['object'] = new Hm_SMTP($config);
-
-        if (!self::$server_list[$id]['object']->connect()) {
+        self::$server_list[$id]['object'] = new Hm_Mailbox($id, self::$user_config, self::$session, $config);
+        if (! self::$server_list[$id]['object']->connect()) {
             return self::$server_list[$id]['object'];
         }
         return false;
     }
+
     public static function get_cache($session, $id) {
         return false;
     }
+
     public static function address_list() {
         $addrs = array();
         foreach (self::$server_list as $server) {
@@ -82,6 +89,7 @@ class Hm_SMTP {
     private $scramAuthenticator;
     private $supports_tls;
     private $supports_auth;
+    private $supports_dsn;
     private $max_message_size;
 
     function __construct($conf) {
@@ -243,6 +251,9 @@ class Hm_SMTP {
                     $auth_mecs = array_slice($line[1], 1);
                     $this->supports_auth = array_map(function($v) { return mb_strtolower($v); }, $auth_mecs);
                     break;
+                case 'dsn': // supports delivery status notifications
+                    $this->supports_dsn = true;
+                    break;
                 case 'size': // advisary maximum message size
                     if(isset($line[1][1]) && is_numeric($line[1][1])) {
                         $this->max_message_size = $line[1][1];
@@ -257,7 +268,7 @@ class Hm_SMTP {
     function connect() {
         $certfile = false;
         $certpass = false;
-        $result = 'An error occurred connecting to the SMTP server';
+        $result = "We couldn't connect to the SMTP server. Please check your internet connection or server settings, and try again.";
         $server = $this->server;
 
         if ($this->tls) {
@@ -276,7 +287,9 @@ class Hm_SMTP {
         else {
             $this->debug[] = 'Could not connect to the SMTP server';
             $this->debug[] = 'fsockopen errors #'.$errorno.'. '.$errorstr;
-            $result = 'Could not connect to the configured SMTP server';
+            // Log technical details for debugging
+            error_log("SMTP connection failed to {$this->server}:{$this->port} - Error #{$errorno}: {$errorstr}");
+            $result = "Unable to connect to the SMTP server. Please check your internet connection or server settings, and try again.";
         }
         $this->banner = $this->get_response();
         $command = 'EHLO '.$this->hostname;
@@ -288,7 +301,9 @@ class Hm_SMTP {
             $this->send_command($command);
             $response = $this->get_response();
             if ($this->compare_response($response, '220') != 0) {
-                $result = 'An error occurred during the STARTTLS command';
+                // Log technical details for debugging
+                error_log("SMTP STARTTLS command failed. Expected 220, got: " . print_r($response, true));
+                $result = "We couldn't secure the connection to the SMTP server (STARTTLS failed). Please try again later.";
             }
             if(isset($certfile) && $certfile) {
                 stream_context_set_option($this->handle, 'tls', 'local_cert', $certfile);
@@ -303,7 +318,9 @@ class Hm_SMTP {
             $this->capabilities($response);
         }
         if($this->compare_response($response,'250') != 0) {
-            $result = 'An error occurred during the EHLO command';
+            // Log technical details for debugging
+            error_log("SMTP EHLO command failed. Expected 250, got: " . print_r($response, true));
+            $result = "We couldn't complete the connection to the SMTP server (EHLO command failed). Please try again.";
         }
         else {
             if($this->auth) {
@@ -345,7 +362,7 @@ class Hm_SMTP {
             if ($result) {
                 return 'Authentication successful';
             }
-            return 'Authentication failed';
+            return "Login to the email server failed. Please check your username and password";
         } else {
             switch ($mech) {
                 case 'external':
@@ -411,15 +428,16 @@ class Hm_SMTP {
                     break;
             }
         }
-
         if (!isset($result)) {
-            $result = 'An error occurred authenticating to the SMTP server';
+            $result = "We couldn't log in to the SMTP server. Please check your username and password.";
             $res = $this->get_response();
             if ($this->compare_response($res, '235') == 0) {
                 $this->state = 'authed';
                 $result = false;
             } else {
-                $result = 'Authorization failure';
+                // Log technical details for debugging
+                error_log("SMTP authentication failed. Expected 235, got: " . print_r($res, true));
+                $result = "Login to the SMTP server was not authorized. Please check your username and password, and try again.";
                 if (isset($res[0][1])) {
                     $result .= ': '.implode(' ', $res[0][1]);
                 }
@@ -562,7 +580,7 @@ class Hm_SMTP {
         $this->send_command($command);
         $res = $this->get_response();
         $bail = false;
-        $result = 'An error occurred sending the message';
+        $result = "Sorry, we couldn't send your message through the SMTP server right now. Please check your connection and try again.";
         if(is_array($recipients)) {
             if ($recipients_params) {
                 $recipients_params = ' ' . $recipients_params;
@@ -592,7 +610,9 @@ class Hm_SMTP {
             $this->send_command($command);
             $res = $this->get_response();
             if ($this->compare_response($res, '354') != 0) {
-                $result = 'An error occurred during the DATA command';
+                // Log technical details for debugging
+                error_log("SMTP DATA command failed. Expected 354, got: " . print_r($res, true));
+                $result = "Sorry, we couldn't send your message right now. The SMTP server didn't accept the message for delivery (DATA command failed). Please try again later.";
             }
             else {
                 $this->send_command($message);
@@ -604,14 +624,22 @@ class Hm_SMTP {
                     $result = false;
                 }
                 else {
-                    $result = 'An error occurred sending the message DATA';
+                    // Log technical details for debugging
+                    error_log("SMTP message delivery failed. Expected 250, got: " . print_r($res, true));
+                    $result = "Your message could not be sent. The SMTP server did not confirm delivery. Please try again later.";
                 }
             }
         }
         else {
-            $result = 'An error occurred during the RCPT command';
+            // Log technical details for debugging
+            error_log("SMTP RCPT command failed for one or more recipients");
+            $result = "There was an error sending your message. One or more of the recipient addresses may be invalid (RCPT command failed). Please check the email addresses and try again.";
         }
         return $result;
+    }
+
+    function supports_dsn() {
+        return $this->supports_dsn;
     }
 
     function puke() {

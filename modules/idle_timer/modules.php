@@ -28,7 +28,7 @@ class Hm_Handler_idle_time_check extends Hm_Handler_Module {
             }
         }
         if ($logout) {
-            Hm_Debug::add('IDLETIMER: timer exceeded, logged out');
+            Hm_Debug::add('IDLETIMER: timer exceeded, logged out', 'warning');
             $this->session->destroy($this->request);
         }
         else {
@@ -48,7 +48,7 @@ class Hm_Handler_process_idle_time extends Hm_Handler_Module {
         }
         $max = $this->user_config->get('idle_time', 1)*60;
         if ($max && $idle_time >= $max) {
-            Hm_Debug::add('IDLETIMER: Logged out after idle period');
+            Hm_Debug::add('IDLETIMER: Logged out after idle period', 'warning');
             $this->session->destroy($this->request);
         }
     }
@@ -107,7 +107,7 @@ class Hm_Output_idle_time_setting extends Hm_Output_Module {
             if ($idle_time == $val) {
                 $res .= 'selected="selected" ';
                 if ($idle_time != '0') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';

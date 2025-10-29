@@ -62,9 +62,9 @@ Nux_Quick_Services::add('office365', array(
     'name' => 'Office365',
     'scope' => 'wl.imap',
     'smtp' => array(
-        'server' => 'outlook.office365.com',
+        'server' => 'smtp.office365.com',
         'port' => 587,
-        'tls'=> 'yes'
+        'tls'=> false
     )
 ));
 
@@ -105,7 +105,7 @@ Nux_Quick_Services::add('aol', array(
     'auth' => 'login',
     'smtp' => array(
         'server' => 'smtp.aol.com',
-        'port' => 587,
+        'port' => 465,
         'tls' => true
     )
 ));
@@ -139,14 +139,14 @@ Nux_Quick_Services::add('zoho', array(
 ));
 
 Nux_Quick_Services::add('fastmail', array(
-    'server' => 'mail.messagingengine.com',
+    'server' => 'imap.fastmail.com',
     'type' => 'imap',
     'tls' => true,
     'port' => 993,
     'name' => 'Fastmail',
     'auth' => 'login',
     'smtp' => array(
-        'server' => 'mail.messagingengine.com',
+        'server' => 'smtp.fastmail.com',
         'port' => 465,
         'tls' => true
     )
@@ -194,7 +194,8 @@ Nux_Quick_Services::add('gandi', array(
     ),
     'sieve' => array(
         'port' => 4190,
-        'host' => 'mail.gandi.net'
+        'host' => 'mail.gandi.net',
+        'tls' => true
     )
 ));
 
@@ -240,7 +241,8 @@ Nux_Quick_Services::add('migadu', array(
     ),
     'sieve' => array(
         'port' => 4190,
-        'host' => 'tls://imap.migadu.com'
+        'host' => 'imap.migadu.com',
+        'tls' => true
     )
 ));
 
@@ -258,7 +260,8 @@ Nux_Quick_Services::add('postale', array(
     ),
     'sieve' => array(
         'port' => 4190,
-        'host' => 'tls://mail.postale.io'
+        'host' => 'mail.postale.io',
+        'tls' => true
     )
 ));
 

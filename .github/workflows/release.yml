@@ -26,14 +26,17 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-dev --optimize-autoloader
 
+      - name: Generate configuration files
+        run: php scripts/config_gen.php
+
       - name: Create tarball
-        run: tar -czvf cypht.tar.gz ./*
+        run: tar czf ../cypht.tar.gz --exclude .git --exclude .gitignore --exclude .travis --exclude .travis.yml --exclude .github --exclude .coveralls.yml --exclude .env.example ./* ./.*
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./cypht.tar.gz
+          asset_path: ../cypht.tar.gz
           asset_name: cypht.tar.gz
           asset_content_type: application/gzip
         env:

@@ -174,13 +174,14 @@ trait Hm_Server_Modify {
 trait Hm_Server_List {
 
     use Hm_Server_Modify;
+    use Searchable;
     use Hm_Repository {
         Hm_Repository::add as repo_add;
         Hm_Repository::get as repo_get;
     }
 
-    public static function init($name, $user_config) {
-        self::initRepo($name, $user_config, self::$server_list);
+    public static function init($name, $user_config, $session) {
+        self::initRepo($name, $user_config, $session, self::$server_list);
     }
 
     /**
@@ -213,6 +214,14 @@ trait Hm_Server_List {
             $list[$index] = $server;
         }
         return $list;
+    }
+
+    /**
+     * Get the dataset for the server list
+     * @return array
+     */
+    protected static function getDataset() {
+        return self::$server_list;
     }
 
     /**
@@ -272,5 +281,31 @@ trait Hm_Server_List {
             }
         }
         return false;
+    }
+
+    private static function appendPasswordAndUsername(array $server) {
+        $server['password'] = $server['pass'];
+        $server['username'] = $server['user'];
+        return $server;
+    }
+
+    public static function getForMailbox($id) {
+        $server = self::get($id, true);
+        if ($server) {
+            return self::appendPasswordAndUsername($server);
+        }
+        return false;
+    }
+
+    public static function dumpForMailbox($id = false) {
+        $list = self::dump($id, true);
+        if ($id !== false) {
+            return self::appendPasswordAndUsername($list);
+        }
+        foreach ($list as $index => $server) {
+            $server = self::appendPasswordAndUsername($server);
+            $list[$index] = $server;
+        }
+        return $list;
     }
 }

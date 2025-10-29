@@ -50,6 +50,8 @@ add_handler('settings', 'process_all_email_since_setting', true, 'core', 'date',
 add_handler('settings', 'process_all_email_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_junk_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_junk_source_max_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_snoozed_since_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_snoozed_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_trash_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_trash_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_drafts_since_setting', true, 'core', 'date', 'after');
@@ -65,9 +67,11 @@ add_handler('settings', 'process_show_list_icons', true, 'core', 'date', 'after'
 add_handler('settings', 'reset_factory', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
+add_handler('settings', 'privacy_settings', true, 'core', 'date', 'after');
 
 add_output('settings', 'start_settings_form', true, 'core', 'content_section_start', 'after');
-add_output('settings', 'start_general_settings', true, 'core', 'start_settings_form', 'after');
+add_output('settings', 'start_search_settings', true, 'core', 'start_settings_form', 'after');
+add_output('settings', 'start_general_settings', true, 'core', 'start_search_settings', 'after');
 add_output('settings', 'language_setting', true, 'core', 'start_general_settings', 'after');
 add_output('settings', 'timezone_setting', true, 'core', 'language_setting', 'after');
 add_output('settings', 'warn_for_unsaved_changes_setting', true, 'core', 'timezone_setting', 'after');
@@ -88,7 +92,10 @@ add_output('settings', 'flagged_source_max_setting', true, 'core', 'flagged_sinc
 add_output('settings', 'start_junk_settings', true, 'core', 'flagged_source_max_setting', 'after');
 add_output('settings', 'junk_since_setting', true, 'core', 'start_junk_settings', 'after');
 add_output('settings', 'junk_source_max_setting', true, 'core', 'junk_since_setting', 'after');
-add_output('settings', 'start_trash_settings', true, 'core', 'junk_source_max_setting', 'after');
+add_output('settings', 'start_snoozed_settings', true, 'core', 'junk_source_max_setting', 'after');
+add_output('settings', 'snoozed_since_setting', true, 'core', 'start_snoozed_settings', 'after');
+add_output('settings', 'snoozed_source_max_setting', true, 'core', 'snoozed_since_setting', 'after');
+add_output('settings', 'start_trash_settings', true, 'core', 'snoozed_source_max_setting', 'after');
 add_output('settings', 'trash_since_setting', true, 'core', 'start_trash_settings', 'after');
 add_output('settings', 'trash_source_max_setting', true, 'core', 'trash_since_setting', 'after');
 add_output('settings', 'start_drafts_settings', true, 'core', 'trash_source_max_setting', 'after');
@@ -101,6 +108,7 @@ add_output('settings', 'start_all_email_settings', true, 'core', 'all_source_max
 add_output('settings', 'all_email_since_setting', true, 'core', 'start_all_email_settings', 'after');
 add_output('settings', 'all_email_source_max_setting', true, 'core', 'all_email_since_setting', 'after');
 add_output('settings', 'end_settings_form', true, 'core', 'content_section_end', 'before');
+add_output('settings', 'privacy_settings', 'true', 'core', 'start_unread_settings', 'before');
 
 /* message list page */
 setup_base_page('message_list');
@@ -154,7 +162,6 @@ add_output('ajax_hm_folders', 'folder_list_content_start', true);
 add_output('ajax_hm_folders', 'main_menu_start', true);
 add_output('ajax_hm_folders', 'search_from_folder_list', true);
 add_output('ajax_hm_folders', 'main_menu_content', true);
-add_output('ajax_hm_folders', 'logout_menu_item', true);
 add_output('ajax_hm_folders', 'main_menu_end', true);
 add_output('ajax_hm_folders', 'email_menu_content', true);
 add_output('ajax_hm_folders', 'settings_menu_start', true);
@@ -183,6 +190,14 @@ add_handler('ajax_quick_servers_setup', 'language',  true, 'core');
 add_handler('ajax_quick_servers_setup', 'date', true, 'core');
 add_handler('ajax_quick_servers_setup', 'http_headers', true, 'core');
 
+/* privacy settings control */
+setup_base_ajax_page('ajax_privacy_settings', 'core');
+add_handler('ajax_privacy_settings', 'privacy_settings',  true, 'core');
+
+setup_base_ajax_page('ajax_combined_message_list', 'core');
+add_handler('ajax_combined_message_list', 'load_user_data', true, 'core');
+add_output('ajax_combined_message_list', 'combined_message_list', true, 'core');
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -202,6 +217,8 @@ return array(
         'notfound',
         'search',
         'ajax_quick_servers_setup',
+        'ajax_privacy_settings',
+        'ajax_combined_message_list'
     ),
     'allowed_output' => array(
         'date' => array(FILTER_UNSAFE_RAW, false),
@@ -216,7 +233,7 @@ return array(
         'msg_text' => array(FILTER_UNSAFE_RAW, false),
         'msg_source' => array(FILTER_UNSAFE_RAW, false),
         'msg_parts' => array(FILTER_UNSAFE_RAW, false),
-        'page_links' => array(FILTER_UNSAFE_RAW, false),
+        'pages' => array(FILTER_VALIDATE_INT, false),
         'folder_status' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'imap_server_id' => array(FILTER_UNSAFE_RAW, false),
         'imap_service_name' => array(FILTER_UNSAFE_RAW, false)
@@ -308,6 +325,9 @@ return array(
         'stay_logged_in' => FILTER_VALIDATE_BOOLEAN,
         'junk_per_source' => FILTER_VALIDATE_INT,
         'junk_since' => FILTER_UNSAFE_RAW,
+        'snoozed_per_source' => FILTER_VALIDATE_INT,
+        'snoozed_since' => FILTER_UNSAFE_RAW,
+        'enable_snooze' => FILTER_VALIDATE_BOOLEAN,
         'trash_per_source' => FILTER_VALIDATE_INT,
         'trash_since' => FILTER_UNSAFE_RAW,
         'drafts_per_source' => FILTER_UNSAFE_RAW,
@@ -338,5 +358,7 @@ return array(
         'srv_setup_stepper_jmap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
         'srv_setup_stepper_jmap_address' => FILTER_UNSAFE_RAW,
         'srv_setup_stepper_imap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
+        'images_whitelist' => FILTER_UNSAFE_RAW,
+        'update' => FILTER_VALIDATE_BOOLEAN,
     )
 );

@@ -195,27 +195,24 @@ var Hm_Pgp = {
         if (Hm_Pgp.error_msg) {
             Hm_Pgp.show_error();
         }
-        else {
-            Hm_Notices.hide(true);
-        }
     },
 
     show_error: function() {
-        Hm_Utils.add_sys_message(Hm_Pgp.error_msg, 'danger');
+        Hm_Notices.show(Hm_Pgp.error_msg, 'danger');
         $('.smtp_send').removeClass('disabled_input');
         Hm_Pgp.error_msg = '';
     },
 
     update_private_keys: function(key) {
         if (!Hm_Pgp.validate_private_key(key)) {
-            Hm_Utils.add_sys_message(hm_trans('Unable to import private key'), 'danger');
+            Hm_Notices.show('Unable to import private key', 'danger');
             return;
         }
         var keys = Hm_Pgp.get_private_keys();
         keys.push(key);
         Hm_Utils.save_to_local_storage('pgp_keys', JSON.stringify(keys));
         Hm_Pgp.list_private_keys();
-        Hm_Utils.add_sys_message(hm_trans('Private key saved'), 'success');
+        Hm_Notices.show('Private key saved', 'success');
     },
 
     get_private_keys: function() {
@@ -241,7 +238,7 @@ var Hm_Pgp = {
 
     read_private_key: function(evt) {
         if (!evt.target.files.length) {
-            Hm_Utils.add_sys_message(hm_trans('Unable to import private key'), 'danger');
+            Hm_Notices.show('Unable to import private key', 'danger');
             return;
         }
         var reader = new FileReader();
@@ -277,7 +274,7 @@ var Hm_Pgp = {
                 }
             }
             Hm_Utils.save_to_local_storage('pgp_keys', JSON.stringify(newkeys));
-            Hm_Utils.add_sys_message(hm_trans('Private key removed'), 'info');
+            Hm_Notices.show('Private key removed', 'info');
             Hm_Pgp.list_private_keys();
         }
     },
@@ -302,7 +299,7 @@ var Hm_Pgp = {
         else {
             msg = 'Encrypting message...';
         }
-        Hm_Utils.add_sys_message(hm_trans(msg), 'info');
+        Hm_Notices.show(msg, 'info');
     }
 }
 

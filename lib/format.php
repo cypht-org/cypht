@@ -45,7 +45,7 @@ class Hm_Format_JSON extends HM_Format {
      * @return string encoded data to be sent to the browser
      */
     public function content($output, $allowed_output) {
-        $output['router_user_msgs'] = Hm_Msgs::get();
+        $output['router_user_msgs'] = Hm_Msgs::getRaw();
         $output = $this->filter_all_output($output, $allowed_output);
         if ($this->config->get('encrypt_ajax_requests', false)) {
             $output = ['payload' => Hm_Crypt_Base::ciphertext(json_encode($output, JSON_FORCE_OBJECT), Hm_Request_Key::generate())];

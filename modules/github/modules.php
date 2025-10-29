@@ -139,7 +139,7 @@ class Hm_Handler_github_event_detail extends Hm_Handler_Module {
                 $api = new Hm_API_Curl();
                 $data = $api->command($url, array('Authorization: token ' . $details['access_token']));
                 $event = array();
-                $uid = mb_substr($form['github_uid'], 9);
+                $uid = explode('_', $form['github_uid'])[2];
                 if (is_array($data)) {
                     foreach ($data as $item) {
                         if ($item['id'] == $uid) {
@@ -168,7 +168,7 @@ class Hm_Handler_process_github_authorization extends Hm_Handler_Module {
                 $result = $oauth2->request_token($details['token_url'], $this->request->get['code'], array('Accept: application/json'));
                 if (count($result) > 0 && array_key_exists('access_token', $result)) {
                     $this->load_repositories($result['access_token']);
-                    Hm_Msgs::add('Github connection established');
+                    Hm_Msgs::add('Github connection established', 'info');
                     $this->user_config->set('github_connect_details', $result);
                     $user_data = $this->user_config->dump();
                     $this->session->set('user_data', $user_data);
@@ -177,14 +177,14 @@ class Hm_Handler_process_github_authorization extends Hm_Handler_Module {
                     $this->session->close_early();
                 }
                 else {
-                    Hm_Msgs::add('ERRAn Error Occurred');
+                    Hm_Msgs::add('An Error Occurred', 'danger');
                 }
             }
             elseif (array_key_exists('error', $this->request->get)) {
-                Hm_Msgs::add('ERR'.ucwords(str_replace('_', ' ', $this->request->get['error'])));
+                Hm_Msgs::add(''.ucwords(str_replace('_', ' ', $this->request->get['error'])), 'danger');
             }
             else {
-                Hm_Msgs::add('ERRAn Error Occurred');
+                Hm_Msgs::add('An Error Occurred', 'danger');
             }
             $this->save_hm_msgs();
             Hm_Dispatch::page_redirect('?page=servers');
@@ -274,11 +274,11 @@ class Hm_Handler_github_process_add_repo extends Hm_Handler_Module {
                         Hm_Msgs::add('Added repository');
                     }
                     else {
-                        Hm_Msgs::add('ERRRepository is already added');
+                        Hm_Msgs::add('Repository is already added', 'warning');
                     }
                 }
                 else {
-                    Hm_Msgs::add('ERRCould not find that repository/owner combination at github.com');
+                    Hm_Msgs::add('Could not find that repository/owner combination at github.com', 'warning');
                 }
             }
         }
@@ -369,7 +369,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                     $this->out('message_list_since', $this->user_config->get('github_since_setting', DEFAULT_GITHUB_SINCE));
                     $this->out('per_source_limit', $this->user_config->get('github_limit_setting', DEFAULT_GITHUB_PER_SOURCE));
                     foreach ($repos as $repo) {
-                        $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => $repo, 'id' => $repo));
+                        $this->append('data_sources', array('type' => 'github', 'name' => $repo, 'id' => $repo));
                     }
                 }
                 else {
@@ -383,14 +383,14 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                         $this->out('list_path', $path, false);
                     }
                     $this->out('custom_list_controls', ' ');
-                    $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => $repo, 'id' => $repo));
+                    $this->append('data_sources', array('type' => 'github', 'name' => $repo, 'id' => $repo));
                 }
             }
             elseif ($this->page == 'message_list' && ($path == 'combined_inbox' || $path == 'unread')) {
                 $github_list = true;
                 if (!$excluded || $path == 'combined_inbox') {
                     foreach ($repos as $repo) {
-                        $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => $repo, 'id' => $repo));
+                        $this->append('data_sources', array('type' => 'github', 'name' => $repo, 'id' => $repo));
                     }
                 }
             }
@@ -404,7 +404,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
         if (!$github_list) {
             foreach ($repos as $repo) {
                 if (!$excluded) {
-                    $this->append('data_sources', array('callback' => 'load_github_data_background', 'group' => 'background', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
+                    $this->append('data_sources', array('group' => 'background', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
                 }
             }
         }
@@ -649,7 +649,7 @@ class Hm_Output_github_connect_section extends Hm_Output_Module {
 
         if (empty($details)) {
             $res .= 'Connect to Github<br /><br />';
-            $res .= '<a class="btn btn-secondary" href="'.$this->get('github_auth_url', '').'">'.$this->trans('Enable').'</a></div></div><div class="end_float"</div>';
+            $res .= '<a class="btn btn-secondary" href="'.$this->get('github_auth_url', '').'" data-external="true">'.$this->trans('Enable').'</a></div></div><div class="end_float"</div>';
         }
         else {
             $res .='<h6>'. $this->trans('Already connected').'</h6>';
@@ -792,7 +792,7 @@ function build_github_subject($event, $output_mod) {
  */
 if (!hm_exists('github_parse_headers')) {
 function github_parse_headers($data, $output_mod) {
-    $res = '<table class="msg_headers"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
+    $res = '<div class="msg_headers d-flex flex-column border-bottom border-2 border-secondary-subtle pb-3 mb-3">';
     if (array_key_exists('type', $data)) {
         $type = build_github_subject($data, $output_mod);
     }
@@ -800,7 +800,7 @@ function github_parse_headers($data, $output_mod) {
         $type = '[Unknown Type]';
     }
     if (array_key_exists('created_at', $data)) {
-        $date = sprintf("%s", date('r', strtotime($data['created_at'])));
+        $date = sprintf("%s (%s)", date('r', strtotime($data['created_at'])), human_readable_interval($data['created_at']));
     }
     else {
         $date = '[No date]';
@@ -822,11 +822,11 @@ function github_parse_headers($data, $output_mod) {
     else {
         $name = '[No Repo]';
     }
-    $res .= '<tr class="header_subject"><th colspan="2">'.$output_mod->html_safe($type).'</th></tr>';
-    $res .= '<tr class="header_date"><th>'.$output_mod->trans('Date').'</th><td>'.$output_mod->html_safe($date).'</td></tr>';
-    $res .= '<tr class="header_from"><th>'.$output_mod->trans('Author').'</th><td>'.$output_mod->html_safe($from).$from_link.'</td></tr>';
-    $res .= '<tr><th>'.$output_mod->trans('Repository').'</th><td>'.$output_mod->html_safe($name).$repo_link.'</td></tr>';
-    $res .= '<tr><td></td><td></td></tr></table>';
+    $res .= '<div class="header_subject d-flex justify-content-center"><h4 class="text-center mb-0 fw-bold">'.$output_mod->html_safe($type).'</h4></div>';
+    $res .= '<div class="header_date d-flex align-items-center py-1"><span class="fw-semibold me-2 text-nowrap">'.$output_mod->trans('Date').':</span><span class="text-break">'.$output_mod->html_safe($date).'</span></div>';
+    $res .= '<div class="header_from d-flex align-items-center py-1"><span class="fw-semibold me-2 text-nowrap">'.$output_mod->trans('Author').':</span><span class="text-break">'.$output_mod->html_safe($from).$from_link.'</span></div>';
+    $res .= '<div class="d-flex align-items-center py-1"><span class="fw-semibold me-2 text-nowrap">'.$output_mod->trans('Repository').':</span><span class="text-break">'.$output_mod->html_safe($name).$repo_link.'</span></div>';
+    $res .= '</div>';
     return $res;
 }}
 
@@ -860,7 +860,7 @@ function github_parse_payload($data, $output_mod) {
             $res .= $output_mod->html_safe(wordwrap($vals['message'], 100));
         }
         if (array_key_exists('html_url', $vals)) {
-            $res .= sprintf('<div class="github_link"><a href="%s">%s</a></div>',
+            $res .= sprintf('<div class="github_link"><a href="%s" data-external="true">%s</a></div>',
                 $output_mod->html_safe($vals['html_url']), $output_mod->html_safe($vals['html_url']));
         }
         if (array_key_exists('url', $vals) && array_key_exists('sha', $vals)) {

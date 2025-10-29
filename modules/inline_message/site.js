@@ -42,7 +42,7 @@ var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callba
     clear_open_msg(inline_msg_style());
     msg_container(inline_msg_style(), path);
 
-    imap_setup_message_view_page(uid, details, list_path, inline_msg_loaded_callback);
+    imap_setup_message_view_page(uid, details, list_path, list_path, inline_msg_loaded_callback);
     $('.part_encoding').hide();
     $('.part_charset').hide();
     $('div', $(path)).removeClass('unseen');
@@ -94,15 +94,19 @@ var get_inline_msg_details = function(link) {
 };
 
 var msg_inline_close = function() {
-    $('.refresh_link').trigger('click');
-    if (inline_msg_style() == 'right') {
-        $('.msg_text').remove();
-        $('.message_table').css('width', '100%');
-    }
-    else {
+    if ($('.inline_msg').length) {
+        if (inline_msg_style() == 'right') {
+            $('.refresh_link').trigger('click');
+            $('.msg_text').remove();
+            $('.message_table').css('width', '100%');
+        } else {
+        $('.refresh_link').trigger('click');
         $('.inline_msg').remove();
+        $('tr').removeClass('hl');
+        }
+    } else {
+        window.history.back();
     }
-    $('tr').removeClass('hl');
 };
 
 var update_imap_links = function(uid, details) {
@@ -118,15 +122,17 @@ var update_imap_links = function(uid, details) {
 };
 
 var capture_subject_click = function() {
-    $('.subject a').off('click');
-    $('.subject a').on("click", function(e) {
+    $(document).off('click', ".subject a");
+    $(document).on("click", ".subject a", function(e) {
         var msg_details = get_inline_msg_details(this);
         var uid = msg_details[0];
         var list_path = msg_details[1];
         var inline_msg_loaded_callback = function() {
-            $('.header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
-            $('.close_inline_msg').on("click", function() { msg_inline_close(); });
-            $('.msg_part_link').on("click", function() { return get_message_content($(this).data('messagePart'), uid, list_path, details, inline_msg_loaded_callback, false, $(this).data('allowImages')); });
+            if ($('.js-header_subject').find('i.bi.bi-x-lg.close_inline_msg').length === 0) {
+                $('.js-header_subject').append('<i class="bi bi-x-lg close_inline_msg"></i>');
+                $('.close_inline_msg').on("click", function() { msg_inline_close(); });
+                $('.msg_part_link').on("click", function() { return get_message_content($(this).data('messagePart'), uid, list_path, list_path, details, inline_msg_loaded_callback); });
+            }
             update_imap_links(uid, details);
         };
 

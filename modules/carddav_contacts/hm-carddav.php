@@ -201,7 +201,7 @@ class Hm_Carddav {
             Hm_Debug::add('CARDDAV: No address path discovered');
             return false;
         }
-        Hm_Debug::add(sprintf('CARDDAV: Found %s address path', $address_path));
+        Hm_Debug::add(sprintf('CARDDAV: Found %s address path', $address_path), 'info');
         $this->address_url = $this->url_concat($address_path);
         return true;
     }
@@ -219,7 +219,7 @@ class Hm_Carddav {
             return $data;
         }
         catch (Exception $oops) {
-            Hm_Msgs::add('ERRUnable to access CardDav server');
+            Hm_Msgs::add('Unable to access CardDav server', 'warning');
             Hm_Debug::add(sprintf('CARDDAV: Could not parse XML: %s', $xml));
         }
         return false;
@@ -264,7 +264,7 @@ class Hm_Carddav {
 
     private function principal_discover() {
         $req_xml = '<d:propfind xmlns:d="DAV:"><d:prop><d:current-user-principal /></d:prop></d:propfind>';
-        Hm_Debug::add(sprintf('CARDDAV: Sending discover XML: %s', $req_xml));
+        Hm_Debug::add(sprintf('CARDDAV: Sending discover XML: %s', $req_xml), 'info');
         return $this->api->command($this->url, $this->auth_headers(), array(), $req_xml, 'PROPFIND');
     }
 
@@ -273,7 +273,7 @@ class Hm_Carddav {
         $headers[] = 'Depth: 1';
         $req_xml = '<d:propfind xmlns:d="DAV:" xmlns:cs="http://calendarserver.org/ns/"><d:prop>'.
            '<d:resourcetype /><d:displayname /><cs:getctag /></d:prop></d:propfind>';
-        Hm_Debug::add(sprintf('CARDDAV: Sending addressbook XML: %s', $req_xml));
+        Hm_Debug::add(sprintf('CARDDAV: Sending addressbook XML: %s', $req_xml), 'info');
         return $this->api->command($this->address_url, $headers, array(), $req_xml, 'PROPFIND');
     }
 
@@ -282,7 +282,7 @@ class Hm_Carddav {
         $headers[] = 'Depth: 1';
         $req_xml = '<card:addressbook-query xmlns:d="DAV:" xmlns:card="urn:ietf:params:xml:ns:carddav">'.
             '<d:prop><d:getetag /><card:address-data /></d:prop></card:addressbook-query>';
-        Hm_Debug::add(sprintf('CARDDAV: Sending contacts XML: %s', $req_xml));
+        Hm_Debug::add(sprintf('CARDDAV: Sending contacts XML: %s', $req_xml), 'info');
         return $this->api->command($url, $headers, array(), $req_xml, 'REPORT');
     }
 

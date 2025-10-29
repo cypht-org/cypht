@@ -47,18 +47,21 @@ var nux_add_account = function() {
 
 var display_final_nux_step = function(res) {
     if (res.nux_account_added) {
+        $('.server_section[data-target=".quick_add_section"]').trigger('click');
         if (res.nux_server_id) {
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_accept_special_folders'},
                 {'name': 'imap_server_id', value: res.nux_server_id},
                 {'name': 'imap_service_name', value: res.nux_service_name}],
                 function () {
-                    Hm_Utils.redirect();
+                    Hm_Folders.reload_folders(true, '.email_folders');
                 }
             );
         } else {
-            Hm_Utils.redirect();
+            Hm_Folders.reload_folders(true, '.email_folders');
         }
+        // refresh data of the same page as well
+        navigate(window.location.href, "Refreshing...");
     }
 };
 
@@ -99,7 +102,7 @@ var expand_server_settings = function() {
     var dsp;
     var i;
     var hash = window.location.hash;
-    var sections = ['.feeds_section', '.quick_add_section', '.smtp_section', '.imap_section', '.server_config_section'];
+    var sections = ['.feeds_section', '.quick_add_section', '.server_config_section'];
     for (i=0;i<sections.length;i++) {
         dsp = Hm_Utils.get_from_local_storage(sections[i]);
         if (hash) {

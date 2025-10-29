@@ -14,8 +14,13 @@ class InlineMsgTests(SettingsHelpers):
         self.wait_with_folder_list()
 
     def set_inline_message_test(self):
+        self.by_css('[data-bs-target=".settings"]').click()
+        self.wait_for_settings_to_expand()
+        list_item = self.by_class('menu_settings')
+        self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
+        self.wait()
         self.checkbox_test('general_setting', 'inline_message', False, 'inline_message')
-        self.dropdown_test('general_setting', 'inline_message_style', 'right', 'inline', 'inline_message')
+        self.dropdown_test('general_setting', 'inline_message_style', 'right', 'inline')
 
     def navigate_msg_test(self):
         try:
@@ -29,8 +34,8 @@ class InlineMsgTests(SettingsHelpers):
             body = self.by_class('message_table_body')
             subject = body.find_element(By.CLASS_NAME, 'subject')
             subject.find_element(By.TAG_NAME, 'a').click()
-            self.wait_on_class('header_subject')
-            detail_subject = self.by_class('header_subject')
+            self.wait_on_class('js-header_subject')
+            detail_subject = self.by_class('js-header_subject')
             header = detail_subject.find_element(By.TAG_NAME, 'th')
             assert header.text.startswith('recent')
 

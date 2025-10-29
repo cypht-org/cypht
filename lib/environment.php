@@ -26,7 +26,7 @@ class Hm_Environment {
         }
         $envFile = static::get('CYPHT_DOTENV');
         if (!file_exists($envFile)) {
-            Hm_Msgs::add('ERR.env file not found at: "' . $envFile . '"');
+            Hm_Msgs::add('.env file not found at: "' . $envFile . '"', 'danger');
             return;
         }
         $dotenvLoader->load($envFile);
@@ -56,6 +56,9 @@ class Hm_Environment {
         define('DEFAULT_IMAP_PER_PAGE', $config->get('default_setting_imap_per_page', 20));
         define('DEFAULT_JUNK_SINCE', $config->get('default_setting_junk_since', '-1 week'));
         define('DEFAULT_JUNK_PER_SOURCE', $config->get('default_setting_junk_per_source', 20));
+        define('DEFAULT_SNOOZED_SINCE', $config->get('default_setting_snoozed_since', '-1 week'));
+        define('DEFAULT_SNOOZED_PER_SOURCE', $config->get('default_setting_snoozed_per_source', 20));
+        define('DEFAULT_ENABLE_SNOOZE', $config->get('default_setting_enable_snooze', true));
         define('DEFAULT_TAGS_SINCE', $config->get('default_setting_tags_since', '-1 week'));
         define('DEFAULT_TAGS_PER_SOURCE', $config->get('default_setting_tags_per_source', 20));
         define('DEFAULT_TRASH_SINCE', $config->get('default_setting_trash_since', '-1 week'));
@@ -65,6 +68,7 @@ class Hm_Environment {
         define('DEFAULT_SIMPLE_MSG_PARTS', $config->get('default_setting_simple_msg_parts', false));
         define('DEFAULT_MSG_PART_ICONS', $config->get('default_setting_msg_part_icons', true));
         define('DEFAULT_PAGINATION_LINKS', $config->get('default_setting_pagination_links', true));
+        define('DEFAULT_REVIEW_SENT_EMAIL', $config->get('default_setting_review_sent_email', true));
         define('DEFAULT_TEXT_ONLY', $config->get('default_setting_text_only', false));
         define('DEFAULT_NO_PASSWORD_SAVE', $config->get('default_setting_no_password_save', false));
         define('DEFAULT_SHOW_LIST_ICONS', $config->get('default_setting_show_list_icons', true));
@@ -84,6 +88,8 @@ class Hm_Environment {
         define('DEFAULT_INLINE_MESSAGE_STYLE', $config->get('default_setting_inline_message_style', 'right'));
         define('DEFAULT_ENABLE_KEYBOARD_SHORTCUTS', $config->get('default_setting_enable_keyboard_shortcuts', false));
         define('DEFAULT_ENABLE_SIEVE_FILTER', $config->get('default_setting_enable_sieve_filter', false));
+        define('DEFAULT_DEBUG_LOG', $config->get('debug_log', false));
+        define('DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND', $config->get('default_setting_enable_collect_address_on_send', false));
     }
 
     /**

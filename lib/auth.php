@@ -160,6 +160,7 @@ class Hm_Auth_IMAP extends Hm_Auth {
     public function __construct($config) {
         $this->site_config = $config;
         require_once APP_PATH.'modules/imap/hm-imap.php';
+        include_once APP_PATH.'modules/sievefilters/hm-sieve.php';
     }
 
     /* IMAP authentication server settings */
@@ -194,7 +195,7 @@ class Hm_Auth_IMAP extends Hm_Auth {
      */
     public function check_credentials($user, $pass) {
         $imap = new Hm_IMAP();
-        list($server, $port, $tls, $sieve_config) = get_auth_config($this->site_config, 'imap');
+        list($server, $port, $tls, $sieve_config, $sieve_tls_mode) = get_auth_config($this->site_config, 'imap');
         if (!$user || !$pass || !$server || !$port) {
             Hm_Debug::add($imap->show_debug(true));
             Hm_Debug::add('Invalid IMAP auth configuration settings');
@@ -203,7 +204,8 @@ class Hm_Auth_IMAP extends Hm_Auth {
         $this->imap_settings = ['server' => $server, 'port' => $port,
             'tls' => $tls, 'username' => $user, 'password' => $pass,
             'no_caps' => false, 'blacklisted_extensions' => ['enable'],
-            'sieve_config_host' => $sieve_config
+            'sieve_config_host' => $sieve_config,
+            'sieve_tls' => $sieve_tls_mode
         ];
         return $this->check_connection($imap);
     }
@@ -235,7 +237,11 @@ class Hm_Auth_LDAP extends Hm_Auth {
         $prefix = 'ldaps://';
         $server = $this->apply_config_value('server', 'localhost');
         $port = $this->apply_config_value('port', 389);
-        if (empty($this->config['enable_tls'])) {
+        if (
+            empty($this->config['enable_tls']) ||
+            $this->config['enable_tls'] === false ||
+            strtolower($this->config['enable_tls']) === "false"
+        ) {
             $prefix = 'ldap://';
         }
         return $prefix.$server.':'.$port;
@@ -259,9 +265,9 @@ class Hm_Auth_LDAP extends Hm_Auth {
     public function check_credentials($user, $pass) {
         list($server, $port, $tls) = get_auth_config($this->site_config, 'ldap');
         $base_dn = $this->site_config->get('ldap_auth_base_dn', false);
-        $uid_attr = $this->site_config->get('ldap_uid_attr', false);
+        $uid_auth_attr = $this->site_config->get('ldap_auth_uid_attr', false);
         if ($server && $port && $base_dn) {
-            $user = sprintf('%s=%s,%s', $uid_attr, $user, $base_dn);
+            $user = sprintf('%s=%s,%s', $uid_auth_attr, $user, $base_dn);
             $this->config = [
                 'server' => $server,
                 'port' => $port,
@@ -300,7 +306,6 @@ class Hm_Auth_LDAP extends Hm_Auth {
      */
     protected function auth() {
         $result = @ldap_bind($this->fh, $this->config['user'], $this->config['pass']);
-        ldap_unbind($this->fh);
         if (!$result) {
             Hm_Debug::add(sprintf('LDAP AUTH failed for %s', $this->config['user']));
         }
@@ -320,6 +325,7 @@ function get_auth_config($config, $prefix) {
     $ret = [$server, $port, $tls];
     if ($prefix == 'imap') {
         $ret[] = $config->get($prefix.'_auth_sieve_conf_host', false);
+        $ret[] = $config->get($prefix.'_auth_sieve_tls_mode', false);
     }
     return $ret;
 }

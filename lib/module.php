@@ -146,7 +146,7 @@ trait Hm_Module_Output {
             $val = $this->output[$name];
             if (!is_null($default) && $typed) {
                 if (gettype($default) != gettype($val)) {
-                    Hm_Debug::add(sprintf('TYPE CONVERSION: %s to %s for %s', gettype($val), gettype($default), $name));
+                    Hm_Debug::add(sprintf('TYPE CONVERSION: %s to %s for %s', gettype($val), gettype($default), $name), 'info');
                     settype($val, gettype($default));
                 }
             }
@@ -347,7 +347,7 @@ abstract class Hm_Handler_Module {
      * @return string
      */
     private function invalid_ajax_key() {
-        if (DEBUG_MODE) {
+        if (DEBUG_MODE or $this->config->get('debug_log')) {
             Hm_Debug::add('REQUEST KEY check failed');
             Hm_Debug::load_page_stats();
             Hm_Debug::show();
@@ -438,8 +438,19 @@ abstract class Hm_Handler_Module {
         return in_array(mb_strtolower($name), $this->config->get_modules(true), true);
     }
 
+   /**
+     * Checks if a config setting is disabled and signals whether to skip further execution.
+     *
+     * @param string $setting_key  The configuration key to check.
+     * @param mixed  $default      The default value to use if the key is not set.
+     * @return bool  True if the feature is disabled and should be skipped.
+     */
+    public function should_skip_execution($setting_key, $default = false) {
+        return !$this->user_config->get($setting_key, $default);
+    }
+
     public function save_hm_msgs() {
-        $msgs = Hm_Msgs::get();
+        $msgs = Hm_Msgs::getRaw();
         if (!empty($msgs)) {
             Hm_Msgs::flush();
             $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
@@ -499,7 +510,7 @@ abstract class Hm_Output_Module {
             }
         }
         else {
-            Hm_Debug::add(sprintf('TRANSLATION NOT FOUND :%s:', $string));
+            Hm_Debug::add(sprintf('TRANSLATION NOT FOUND :%s:', $string), 'warning');
         }
         return str_replace('\n', '<br />', strip_tags($string));
     }

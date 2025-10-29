@@ -21,22 +21,26 @@ class Hm_Handler_process_change_password extends Hm_Handler_Module {
             return;
         }
         if ($form['new_pass1'] !== $form['new_pass2']) {
-            Hm_Msgs::add("ERRNew passwords don't not match");
+            Hm_Msgs::add("New passwords don't not match", "warning");
             return;
         }
         $user = $this->session->get('username', false);
         if (!$this->session->auth($user, $form['old_pass'])) {
-            Hm_Msgs::add("ERRCurrent password is incorrect");
+            Hm_Msgs::add("Current password is incorrect", "warning");
             return;
         }
         $user_config = load_user_config_object($this->config);
         if ($this->session->change_pass($user, $form['new_pass1'])) {
             Hm_Msgs::add("Password changed");
             $user_config->load($user, $form['old_pass']);
-            $user_config->save($user, $form['new_pass1']);
+            try {
+                $user_config->save($user, $form['new_pass1']);
+            } catch (Exception $e) {
+                Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
+            }
             return;
         }
-        Hm_Msgs::add("ERRAn error Occurred");
+        Hm_Msgs::add("An error Occurred", "danger");
     }
 }
 
@@ -60,7 +64,7 @@ class Hm_Handler_process_delete_account extends Hm_Handler_Module {
             Hm_Msgs::add('User account deleted');
         }
         else {
-            Hm_Msgs::add('ERRAn error occurred deleting the account');
+            Hm_Msgs::add('An error occurred deleting the account', 'danger');
         }
     }
 }
@@ -97,12 +101,12 @@ class Hm_Handler_process_create_account extends Hm_Handler_Module {
             return;
         }
         if ($form['create_password'] != $form['create_password_again']) {
-            Hm_Msgs::add('ERRPasswords did not match');
+            Hm_Msgs::add('Passwords did not match', 'warning');
             return;
         }
         $res = $this->session->create($form['create_username'], $form['create_password']);
         if ($res === 1) {
-            Hm_Msgs::add("ERRThat username is already in use");
+            Hm_Msgs::add("That username is already in use", "warning");
         }
         elseif ($res === 2) {
             Hm_Msgs::add("Account Created");
@@ -208,7 +212,7 @@ class Hm_Output_change_password_link extends Hm_Output_Module {
         if ($this->get('internal_users')) {
             $res = '<li class="menu_change_password"><a class="unread_link" href="?page=change_password">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<i class="bi bi-key-fill fs-5 me-2"></i>';
+                $res .= '<i class="bi bi-key-fill menu-icon"></i>';
             }
             $res .= $this->trans('Password').'</a></li>';
             $this->concat('formatted_folder_list', $res);

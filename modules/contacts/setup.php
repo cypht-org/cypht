@@ -16,7 +16,7 @@ add_output('contacts', 'contacts_list', true, 'contacts', 'contacts_content_star
 add_output('contacts', 'contacts_content_end', true, 'contacts', 'contacts_list', 'after');
 add_output('settings', 'contact_auto_collect_setting', true, 'contacts', 'max_google_contacts_number', 'after');
 
-add_output('ajax_hm_folders', 'contacts_page_link', true, 'contacts', 'logout_menu_item', 'before');
+add_output('ajax_hm_folders', 'contacts_page_link', true, 'contacts', 'main_menu_content', 'before');
 
 add_handler('compose', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
 add_handler('compose', 'process_send_to_contact', true, 'contacts', 'save_user_data', 'before');
@@ -52,7 +52,10 @@ add_handler('settings', 'process_contact_auto_collect_setting', true, 'contacts'
 add_output('compose', 'load_contact_mails', true, 'contacts', 'compose_form_end', 'after');
 
 add_handler('settings', 'process_enable_warn_contacts_cc_not_exist_in_list_contact', true, 'contacts', 'save_user_settings', 'before');
+add_handler('settings', 'process_enable_collect_address_on_send_setting', true, 'core', 'save_user_settings', 'before');
 add_output('settings', 'enable_warn_contacts_cc_not_exist_in_list_contact', true, 'contacts', 'start_general_settings', 'after');
+add_output('settings', 'enable_collect_address_on_send_setting', true, 'core', 'enable_warn_contacts_cc_not_exist_in_list_contact', 'after');
+
 
 return array(
     'allowed_pages' => array(
@@ -75,7 +78,9 @@ return array(
         'import_contact' => FILTER_UNSAFE_RAW,
         'contact_auto_collect' => FILTER_VALIDATE_BOOLEAN,
         'enable_warn_contacts_cc_not_exist_in_list_contact' => FILTER_VALIDATE_INT,
-        'email_address' => FILTER_SANITIZE_EMAIL
+        'enable_collect_address_on_send' => FILTER_VALIDATE_INT,
+        'email_address' => FILTER_UNSAFE_RAW,
+        'ldap_dn' => FILTER_UNSAFE_RAW,
     ),
     'allowed_get' => array(
         'contact_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -83,6 +88,7 @@ return array(
         'contact_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'contact_source' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'import_contact' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'dn' => FILTER_UNSAFE_RAW,
     ),
     'allowed_output' => array(
         'contact_deleted' => array(FILTER_VALIDATE_INT, false),

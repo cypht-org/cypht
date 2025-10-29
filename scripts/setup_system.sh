@@ -21,7 +21,7 @@ echo "Creating directory for attachments ${ATTACHMENT_DIR}"
 mkdir -p ${ATTACHMENT_DIR}
 
 # TODO: should a user be created if USER_CONFIG_TYPE=file  ?
-if [[ "${USER_CONFIG_TYPE}" = "DB" && -n "${AUTH_USERNAME}" ]]
+if [ "${USER_CONFIG_TYPE}" = "DB" ] && [ -n "${AUTH_USERNAME}" ]
 then
     php ${SCRIPT_DIR}/../scripts/create_account.php ${AUTH_USERNAME} ${AUTH_PASSWORD}
 fi

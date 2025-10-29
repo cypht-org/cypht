@@ -1,12 +1,4 @@
 $(function () {
-    function tFaToast(message, timer = 3000) {
-        Hm_Notices.show([message]);
-        const tm = setTimeout(function () {
-            Hm_Notices.hide(true);
-            clearTimeout(tm);
-        }, timer);
-    }
-
     function focusElement(elem) {
         elem.focus();
         elem.select();
@@ -79,7 +71,7 @@ $(function () {
 
                 if (checked && !verified) {
                     $(this).prop("checked", false);
-                    tFaToast(err_msg('You need to verify your 2 factor authentication code before processing'));
+                    Hm_Notices.show('You need to verify your 2 factor authentication code before processing', 'warning');
                     return;
                 }
             });
@@ -138,11 +130,7 @@ $(function () {
             var code = getInputCode();
 
             if (!code) {
-                tFaToast(err_msg("You need to enter the verification code"));
-                var tm = setTimeout(function () {
-                    Hm_Notices.hide(true);
-                    clearTimeout(tm);
-                }, 2000);
+                Hm_Notices.show("You need to enter the verification code", 'warning');
                 return;
             }
 
@@ -157,13 +145,13 @@ $(function () {
                         verified = true;
                         formInput.prop("checked", true);
                         confirmationBtn.addClass("valid");
-                        tFaToast("2 factor authentication enabled");
+                        Hm_Notices.show("2 factor authentication enabled");
                     } else {
                         verified = false;
                         formInput.prop("checked", false);
                         $(".tfa_confirmation_input_digit").addClass("invalid");
                         confirmationBtn.addClass("invalid").addClass("shake");
-                        tFaToast("ERR2 factor authentication code does not match");
+                        Hm_Notices.show("2 factor authentication code does not match", 'danger');
                     }
                     confirmationBtn.text("Verify code").removeClass("loading");
                 }

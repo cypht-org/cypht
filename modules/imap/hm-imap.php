@@ -6,11 +6,14 @@
  * @subpackage imap
  */
 
+use ZBateson\MailMimeParser\MailMimeParser;
+
 require_once('hm-imap-base.php');
 require_once('hm-imap-parser.php');
 require_once('hm-imap-cache.php');
 require_once('hm-imap-bodystructure.php');
 require_once('hm-jmap.php');
+require_once('hm-ews.php');
 
 /**
  * IMAP connection manager
@@ -20,22 +23,17 @@ class Hm_IMAP_List {
 
     use Hm_Server_List;
 
-    public static $use_cache = true;
+    public static $use_cache = false;
+    protected static $user_config;
+    protected static $session;
 
     public static function init($user_config, $session) {
         self::initRepo('imap_servers', $user_config, $session, self::$server_list);
+        self::$user_config = $user_config;
+        self::$session = $session;
     }
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
-        if (array_key_exists('type', $server) && $server['type'] == 'jmap') {
-            self::$server_list[$id]['object'] = new Hm_JMAP();
-        }
-        else {
-            self::$server_list[$id]['object'] = new Hm_IMAP();
-        }
-        if (self::$use_cache && $cache && is_array($cache)) {
-            self::$server_list[$id]['object']->load_cache($cache, 'array');
-        }
         $config = array(
             'server'    => $server['server'],
             'port'      => $server['port'],
@@ -45,10 +43,17 @@ class Hm_IMAP_List {
             'password'  => $pass,
             'use_cache' => self::$use_cache
         );
+
         if (array_key_exists('auth', $server)) {
             $config['auth'] = $server['auth'];
         }
-        return self::$server_list[$id]['object']->connect($config);
+
+        self::$server_list[$id]['object'] = new Hm_Mailbox($id, self::$user_config, self::$session, $config);
+        if (self::$use_cache && $cache && is_array($cache)) {
+            self::$server_list[$id]['object']->get_connection()->load_cache($cache, 'array');
+        }
+        
+        return self::$server_list[$id]['object']->connect();
     }
 
     public static function get_cache($hm_cache, $id) {
@@ -57,6 +62,20 @@ class Hm_IMAP_List {
         }
         $res = $hm_cache->get('imap'.$id);
         return $res;
+    }
+
+    public static function get_connected_mailbox($id, $hm_cache = null) {
+        if ($hm_cache) {
+            $cache = self::get_cache($hm_cache, $id);
+        } else {
+            $cache = false;
+        }
+        return self::connect($id, $cache);
+    }
+
+    public static function get_mailbox_without_connection($config) {
+        $config['type'] = array_key_exists('type', $config) ? $config['type'] : 'imap';
+        return new Hm_Mailbox($config['id'], self::$user_config, self::$session, $config);
     }
 }
 
@@ -168,6 +187,8 @@ if (!class_exists('Hm_IMAP')) {
         public $folder_state = false;
         private $scramAuthenticator;
         private $namespace_count = 0;
+
+        protected $list_sub_folders = [];
         /**
          * constructor
          */
@@ -320,7 +341,6 @@ if (!class_exists('Hm_IMAP')) {
             }
             return $authed;
         }
-        
 
         /**
          * attempt starttls
@@ -404,7 +424,7 @@ if (!class_exists('Hm_IMAP')) {
                 }
                 elseif (mb_strpos($line, 'NO') !== false || mb_strpos($line, 'BAD') !== false) {
                     $this->debug[] = 'SETACL failed: ' . $line;
-                    Hm_Msgs::add('ERRSETACL failed:' . $line);
+                    Hm_Msgs::add('SETACL failed:' . $line, 'danger');
                     return false;
                 }
             }
@@ -438,7 +458,7 @@ if (!class_exists('Hm_IMAP')) {
                     return true;
                 } else {
                     $this->debug[] = 'DELETEACL failed: ' . $line;
-                    Hm_Msgs::add('ERRDELETEACL failed: ailure: can\'t delete acl');
+                    Hm_Msgs::add('DELETEACL failed: can\'t delete acl', 'danger');
                     return false;
                 }
             }
@@ -515,14 +535,15 @@ if (!class_exists('Hm_IMAP')) {
          * @param bool $lsub flag to limit results to subscribed folders only
          * @return array associative array of folder details
          */
-        public function get_mailbox_list($lsub=false, $mailbox='', $keyword='*') {
+        public function get_mailbox_list($lsub=false, $mailbox='', $keyword='*', $children_capability=true) {
             /* defaults */
             $folders = array();
             $excluded = array();
             $parents = array();
             $delim = false;
             $inbox = false;
-            $commands = $this->build_list_commands($lsub, $mailbox, $keyword);
+            $commands = $this->build_list_commands($lsub, $mailbox, $keyword, $children_capability);
+
             $cache_command = implode('', array_map(function($v) { return $v[0]; }, $commands)).(string)$mailbox.(string)$keyword;
             $cache = $this->check_cache($cache_command);
             if ($cache !== false) {
@@ -535,6 +556,11 @@ if (!class_exists('Hm_IMAP')) {
 
                 $this->send_command($command);
                 $result = $this->get_response($this->folder_max, true);
+
+                if (!$children_capability) {
+                    $delim = $result[0][count($result[0]) - 2];
+                    $result = $this->preprocess_folders($result, $mailbox, $delim);
+                }
 
                 /* loop through the "parsed" response. Each iteration is one folder */
                 foreach ($result as $vals) {
@@ -692,6 +718,68 @@ if (!class_exists('Hm_IMAP')) {
         }
 
         /**
+         * Preprocess the folder list to determine if a folder has children
+         * @param array $result the folder list
+         * @param string $mailbox the mailbox to limit the results to
+         * @param string $delim the folder delimiter
+         * @return array the processed folder list
+         */
+        function preprocess_folders($result, $mailbox, $delim) {
+            $folderPaths = [];
+            $processedResult = [];
+        
+            // Step 1: Extract all folder paths from the array (using the last element in each sub-array)
+            foreach ($result as $entry) {
+                if (isset($entry[count($entry) - 1]) && is_string($entry[count($entry) - 1])) {
+                    $folderPaths[] = $entry[count($entry) - 1];
+                }
+            }
+        
+            // Step 2: Process each folder to determine if it has subfolders
+            foreach ($result as $entry) {
+                if (isset($entry[count($entry) - 1]) && is_string($entry[count($entry) - 1])) {
+                    $currentFolder = $entry[count($entry) - 1];
+                    $hasChildren = false;
+        
+                    // Check if any other folder starts with the current folder followed by the delimiter
+                    foreach ($folderPaths as $path) {
+                        if (strpos($path, $currentFolder . $delim) === 0) {
+                            $hasChildren = true;
+                            break;
+                        }
+                    }
+        
+                    // Add the appropriate flag (\HasChildren or \HasNoChildren)
+                    $entry = array_merge(
+                        array_slice($entry, 0, 3),
+                        [$hasChildren ? "\\HasChildren" : "\\HasNoChildren"],
+                        array_slice($entry, 3)
+                    );
+        
+                    // Root folder processing
+                    if (empty($mailbox)) {
+                        if (strpos($currentFolder, $delim) === false) {
+                            $processedResult[] = $entry;
+                        }
+                    } else {
+                        // Process subfolders of the given mailbox
+                        $expectedPrefix = $mailbox . $delim;
+                        if (strpos($currentFolder, $expectedPrefix) === 0) {
+                            $remainingPath = substr($currentFolder, strlen($expectedPrefix));
+                            // Include only direct subfolders (no further delimiters in the remaining path)
+                            if (strpos($remainingPath, $delim) === false) {
+                                $processedResult[] = $entry;
+                            }
+                        }
+                    }
+                } else {
+                    $processedResult[] = $entry;
+                }
+            }
+            return $processedResult;
+        }
+
+        /**
          * Sort a folder list with the inbox at the top
          */
         function fsort($a, $b) {
@@ -828,6 +916,7 @@ if (!class_exists('Hm_IMAP')) {
             if ($this->check_response($response, true)) {
                 $attributes = $this->parse_status_response($response);
                 $this->check_mailbox_state_change($attributes);
+                $attributes['id'] = $mailbox;
             }
             return $attributes;
         }
@@ -873,12 +962,14 @@ if (!class_exists('Hm_IMAP')) {
          * @todo refactor. abstract header line continuation parsing for re-use
          * @param mixed $uids an array of uids or a valid IMAP sequence set as a string
          * @param bool $raw flag to disable decoding header values
+         * @param bool $include_content_body flag to include the first 500 bytes of the message body
+         * @param bool $exclude_auto_bcc don't include auto-bcc'ed messages
          * @return array list of headers and values for the specified uids
          */
-        public function get_message_list($uids, $raw=false) {
+        public function get_message_list($uids, $raw=false, $include_content_body = false, $exclude_auto_bcc = true) {
             if (is_array($uids)) {
                 sort($uids);
-                $sorted_string = implode(',', $uids);
+                $sorted_string = implode(',', array_filter($uids));
             }
             else {
                 $sorted_string = $uids;
@@ -890,7 +981,11 @@ if (!class_exists('Hm_IMAP')) {
             if ($this->is_supported( 'X-GM-EXT-1' )) {
                 $command .= 'X-GM-MSGID X-GM-THRID X-GM-LABELS ';
             }
-            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED)])\r\n";
+            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID IN-REPLY-TO X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY)]";
+            if ($include_content_body) {
+                $command .= " BODY.PEEK[TEXT]<0.500>";
+            }
+            $command .= ")\r\n";
             $cache_command = $command.(string)$raw;
             $cache = $this->check_cache($cache_command);
             if ($cache !== false) {
@@ -900,9 +995,10 @@ if (!class_exists('Hm_IMAP')) {
             $res = $this->get_response(false, true);
             $status = $this->check_response($res, true);
             $tags = array('X-GM-MSGID' => 'google_msg_id', 'X-GM-THRID' => 'google_thread_id', 'X-GM-LABELS' => 'google_labels', 'UID' => 'uid', 'FLAGS' => 'flags', 'RFC822.SIZE' => 'size', 'INTERNALDATE' => 'internal_date');
-            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'REFERENCES', 'X-SNOOZED', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
-            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority');
+            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'IN-REPLY-TO', 'REFERENCES', 'X-SNOOZED', 'X-SCHEDULE', 'X-PROFILE-ID', 'X-DELIVERY', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
+            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'in-reply-to' => 'in_reply_to', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body');
             $headers = array();
+
             foreach ($res as $n => $vals) {
                 if (isset($vals[0]) && $vals[0] == '*') {
                     $uid = 0;
@@ -913,6 +1009,7 @@ if (!class_exists('Hm_IMAP')) {
                     $references = '';
                     $date = '';
                     $message_id = '';
+                    $in_reply_to = '';
                     $x_priority = 0;
                     $content_type = '';
                     $to = '';
@@ -923,9 +1020,15 @@ if (!class_exists('Hm_IMAP')) {
                     $google_labels = '';
                     $x_auto_bcc = '';
                     $x_snoozed = '';
+                    $x_schedule = '';
+                    $x_profile_id = '';
+                    $x_delivery = '';
                     $count = count($vals);
+                    $header_founded = false;
+                    $body_founded = false;
                     for ($i=0;$i<$count;$i++) {
-                        if ($vals[$i] == 'BODY[HEADER.FIELDS') {
+                        if ($vals[$i] == 'BODY[HEADER.FIELDS' && !$header_founded) {
+                            $header_founded = true;
                             $i++;
                             while(isset($vals[$i]) && in_array(mb_strtoupper($vals[$i]), $junk)) {
                                 $i++;
@@ -934,13 +1037,36 @@ if (!class_exists('Hm_IMAP')) {
                             $lines = explode("\r\n", $vals[$i]);
                             foreach ($lines as $line) {
                                 $header = mb_strtolower(mb_substr($line, 0, mb_strpos($line, ':')));
-                                if (!$header || (!isset($flds[$header]) && $last_header)) {
+                                if ($last_header && (!$header || !isset($flds[$header]))) {
                                     ${$flds[$last_header]} .= str_replace("\t", " ", $line);
                                 }
                                 elseif (isset($flds[$header])) {
                                     ${$flds[$header]} = mb_substr($line, (mb_strpos($line, ':') + 1));
                                     $last_header = $header;
                                 }
+                            }
+                        }
+                        elseif ($vals[$i] == 'BODY[TEXT' && !$body_founded) {
+                            $body_founded = true;
+                            $content = '';
+                            $i++;
+                            $i++;
+                            while(isset($vals[$i]) && $vals[$i] != ')') {
+                                $content .= $vals[$i];
+                                $i++;
+                            }
+                            $i++;
+                            if (! empty($content)) {
+                                if (substr($content, 0, 3) == "<0>") {
+                                    $content = substr($content, 3);
+                                }
+                                $parser = new MailMimeParser();
+                                $str_parser = $parser->parse($content, false);
+                                $content = $str_parser->getTextContent();
+                            }
+                            $flds['body'] = $content;
+                            if (!$header_founded) {
+                                $i = 0;
                             }
                         }
                         elseif (isset($tags[mb_strtoupper($vals[$i])])) {
@@ -967,12 +1093,18 @@ if (!class_exists('Hm_IMAP')) {
                                 $cset = trim(mb_strtolower(str_replace(array('"', "'"), '', $matches[1])));
                             }
                         }
+
+                        if ($exclude_auto_bcc && trim($x_auto_bcc) === 'cypht') {
+                            continue;
+                        }
+
                         $headers[(string) $uid] = array('uid' => $uid, 'flags' => $flags, 'internal_date' => $internal_date, 'size' => $size,
                                          'date' => $date, 'from' => $from, 'to' => $to, 'subject' => $subject, 'content-type' => $content_type,
                                          'timestamp' => time(), 'charset' => $cset, 'x-priority' => $x_priority, 'google_msg_id' => $google_msg_id,
                                          'google_thread_id' => $google_thread_id, 'google_labels' => $google_labels, 'list_archive' => $list_archive,
-                                         'references' => $references, 'message_id' => $message_id, 'x_auto_bcc' => $x_auto_bcc,
-                                         'x_snoozed'  => $x_snoozed);
+                                         'references' => $references, 'message_id' => $message_id, 'in_reply_to' => $in_reply_to, 'x_auto_bcc' => $x_auto_bcc,
+                                         'x_snoozed'  => $x_snoozed, 'x_schedule' => $x_schedule, 'x_profile_id' => $x_profile_id, 'x_delivery' => $x_delivery);
+                        $headers[$uid]['preview_msg'] = $flds['body'] != "content_body" ? $flds['body'] :  "";
 
                         if ($raw) {
                             $headers[$uid] = array_map('trim', $headers[$uid]);
@@ -981,9 +1113,11 @@ if (!class_exists('Hm_IMAP')) {
                             $headers[$uid] = array_map(array($this, 'decode_fld'), $headers[$uid]);
                         }
 
+
                     }
                 }
             }
+
             if ($status) {
                 return $this->cache_return_val($headers, $cache_command);
             }
@@ -1184,11 +1318,10 @@ if (!class_exists('Hm_IMAP')) {
          * @param string $fld optional field to search
          * @param string $term optional search term
          * @param bool $exclude_deleted extra argument to exclude messages with the deleted flag
-         * @param bool $exclude_auto_bcc don't include auto-bcc'ed messages
          * @param bool $only_auto_bcc only include auto-bcc'ed messages
          * @return array list of IMAP message UIDs that match the search
          */
-        public function search($target='ALL', $uids=false, $terms=array(), $esearch=array(), $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
+        public function search($target='ALL', $uids=false, $terms=array(), $esearch=array(), $exclude_deleted=true, $only_auto_bcc=false) {
             if (!$this->is_clean($this->search_charset, 'charset')) {
                 return array();
             }
@@ -1249,9 +1382,6 @@ if (!class_exists('Hm_IMAP')) {
             }
             if ($only_auto_bcc) {
                $fld .= ' HEADER X-Auto-Bcc cypht';
-            }
-            if ($exclude_auto_bcc && !mb_strstr($this->server, 'yahoo') && $this->server_supports_custom_headers()) {
-               $fld .= ' NOT HEADER X-Auto-Bcc cypht';
             }
             $esearch_enabled = false;
             $command = 'UID SEARCH ';
@@ -1414,6 +1544,10 @@ if (!class_exists('Hm_IMAP')) {
                     $results[$vals[0]] = $vals[1];
                 }
             }
+            if ($flags && is_array($results['Flags'])) {
+                $results['Flags'] = array_unique($results['Flags']);
+                $results['Flags'] = implode(' ', $results['Flags']);
+            }
             if ($status) {
                 return $this->cache_return_val($results, $cache_command);
             }
@@ -1531,6 +1665,7 @@ if (!class_exists('Hm_IMAP')) {
             }
             $command = $command1.$command2;
             $cache_command = $command.(string)$reverse;
+            $this->set_fetch_command($cache_command);
             $cache = $this->check_cache($cache_command);
             if ($cache !== false) {
                 return $cache;
@@ -1630,16 +1765,31 @@ if (!class_exists('Hm_IMAP')) {
                 $this->debug[] = 'Delete mailbox not permitted in read only mode';
                 return false;
             }
-            $command = 'DELETE "'.str_replace('"', '\"', $this->utf7_encode($mailbox))."\"\r\n";
-            $this->send_command($command);
-            $result = $this->get_response(false);
-            $status = $this->check_response($result, false);
-            if ($status) {
-                return true;
+            $this->list_sub_folders[] = $mailbox;
+            $this->get_recursive_subfolders($mailbox, true);
+            $this->list_sub_folders = array_reverse($this->list_sub_folders);
+            foreach ($this->list_sub_folders as $key => $del_folder) {
+                $command = 'DELETE "'.str_replace('"', '\"', $this->utf7_encode($del_folder))."\"\r\n";
+                $this->send_command($command);
+                $result = $this->get_response(false);
+                $status = $this->check_response($result, false);
+                if ($status) {
+                    unset($this->list_sub_folders[$key]);
+                } else {
+                    $this->debug[] = str_replace('A'.$this->command_count, '', $result[0]);
+                    return false;
+                }
             }
-            else {
-                $this->debug[] = str_replace('A'.$this->command_count, '', $result[0]);
-                return false;
+            return true;
+        }
+
+        public function get_recursive_subfolders($parentFolder, $is_delete_action) {
+            $infoFolder = $this->get_folder_list_by_level($parentFolder, false, false, $is_delete_action);
+            if ($infoFolder) {
+                foreach (array_keys($infoFolder) as $folder) {
+                    $this->list_sub_folders[] = $folder;
+                    $this->get_recursive_subfolders($folder, $is_delete_action);
+                }
             }
         }
 
@@ -1707,7 +1857,9 @@ if (!class_exists('Hm_IMAP')) {
         public function message_action($action, $uids, $mailbox=false, $keyword=false) {
             $status = false;
             $command = false;
-            $uid_strings = array();
+            $uid_strings = [];
+            $responses = [];
+            $parseResponseFn = function($response) {};
             if (is_array($uids)) {
                 if (count($uids) > 1000) {
                     while (count($uids) > 1000) {
@@ -1727,7 +1879,7 @@ if (!class_exists('Hm_IMAP')) {
             foreach ($uid_strings as $uid_string) {
                 if ($uid_string) {
                     if (!$this->is_clean($uid_string, 'uid_list')) {
-                        return false;
+                        break;
                     }
                 }
                 switch ($action) {
@@ -1736,6 +1888,9 @@ if (!class_exists('Hm_IMAP')) {
                         break;
                     case 'ARCHIVE':
                         $command = "UID STORE $uid_string +FLAGS (\Archive)\r\n";
+                        break;
+                    case 'JUNK':
+                        $command = "UID STORE $uid_string +FLAGS (\Junk)\r\n";
                         break;
                     case 'FLAG':
                         $command = "UID STORE $uid_string +FLAGS (\Flagged)\r\n";
@@ -1767,20 +1922,35 @@ if (!class_exists('Hm_IMAP')) {
                         break;
                     case 'COPY':
                         if (!$this->is_clean($mailbox, 'mailbox')) {
-                            return false;
+                            break;
                         }
                         $command = "UID COPY $uid_string \"".$this->utf7_encode($mailbox)."\"\r\n";
                         break;
                     case 'MOVE':
                         if (!$this->is_clean($mailbox, 'mailbox')) {
-                            return false;
+                            break;
                         }
+
+                        $parseResponseFn = function($response) use ($uid_string, &$responses) {
+                            if (strpos($uid_string, ',') !== false) {
+                                preg_match('/.*COPYUID \d+ (\d+[:|,]\d+) (\d+[:|,]\d+).*/', $response[0], $matches);
+                                $oldUids = preg_split('/[:|,]/', $matches[1]);
+                                $newUids = preg_split('/[:|,]/', $matches[2]);
+                                foreach ($oldUids as $key => $oldUid) {
+                                    $responses[] = ['oldUid' => $oldUid, 'newUid' => $newUids[$key]];
+                                }
+                            } else {
+                                preg_match('/.*COPYUID \d+ (\d+) (\d+).*/', $response[0], $matches);
+                                $responses[] = ['oldUid' => $matches[1], 'newUid' => $matches[2]];
+                            }
+                        };
+
                         if ($this->is_supported('MOVE')) {
                             $command = "UID MOVE $uid_string \"".$this->utf7_encode($mailbox)."\"\r\n";
                         }
                         else {
-                            if ($this->message_action('COPY', $uids, $mailbox, $keyword)) {
-                                if ($this->message_action('DELETE', $uids, $mailbox, $keyword)) {
+                            if ($this->message_action('COPY', $uids, $mailbox, $keyword)['status']) {
+                                if ($this->message_action('DELETE', $uids, $mailbox, $keyword)['status']) {
                                     $command = "EXPUNGE\r\n";
                                 }
                             }
@@ -1793,6 +1963,7 @@ if (!class_exists('Hm_IMAP')) {
                     $status = $this->check_response($res);
                 }
                 if ($status) {
+                    $parseResponseFn($res);
                     if (is_array($this->selected_mailbox)) {
                         $this->bust_cache($this->selected_mailbox['name']);
                     }
@@ -1801,7 +1972,8 @@ if (!class_exists('Hm_IMAP')) {
                     }
                 }
             }
-            return $status;
+            
+            return ['status' => $status, 'responses' => $responses];
         }
 
         /**
@@ -1849,7 +2021,14 @@ if (!class_exists('Hm_IMAP')) {
          */
         public function append_end() {
             $result = $this->get_response(false, true);
-            return $this->check_response($result, true);
+            if ($this->check_response($result, true)) {
+                $res = preg_grep('/APPENDUID/', array_map('json_encode', $result));
+                if ($res) {
+                    $line = json_decode(reset($res), true);
+                    return $line[5];
+                }
+            }
+            return $result;
         }
 
         /* ------------------ HELPERS ------------------------------------------ */
@@ -2133,27 +2312,56 @@ if (!class_exists('Hm_IMAP')) {
         }
 
         /**
-         * use the SORT extension to get a sorted UID list
+         * use the SORT extension to get a sorted UID list and also perform term search if available
          * @param string $sort sort order. can be one of ARRIVAL, DATE, CC, TO, SUBJECT, FROM, or SIZE
          * @param bool $reverse flag to reverse the sort order
          * @param string $filter can be one of ALL, SEEN, UNSEEN, ANSWERED, UNANSWERED, DELETED, UNDELETED, FLAGGED, or UNFLAGGED
          * @return array list of IMAP message UIDs
          */
-        public function get_message_sort_order($sort='ARRIVAL', $reverse=true, $filter='ALL', $esort=array()) {
+        public function get_message_sort_order($sort='ARRIVAL', $reverse=true, $filter='ALL', $terms=array(), $exclude_deleted=true, $only_auto_bcc=false) {
             if (!$this->is_clean($sort, 'keyword') || !$this->is_clean($filter, 'keyword') || !$this->is_supported('SORT')) {
-                return false;
+                return [];
             }
-            $esort_enabled = false;
-            $esort_res = array();
-            $command = 'UID SORT ';
-            if (!empty($esort) && $this->is_supported('ESORT')) {
-                $valid = array_filter($esort, function($v) { return in_array($v, array('MIN', 'MAX', 'COUNT', 'ALL')); });
-                if (!empty($valid)) {
-                    $esort_enabled = true;
-                    $command .= 'RETURN ('.implode(' ', $valid).') ';
+            if (!empty($terms)) {
+                foreach ($terms as $vals) {
+                    if (!$this->is_clean($vals[0], 'search_str') || !$this->is_clean($vals[1], 'search_str')) {
+                        return [];
+                    }
                 }
             }
-            $command .= '('.$sort.') US-ASCII '.$filter."\r\n";
+            if ($this->search_charset) {
+                $charset = mb_strtoupper($this->search_charset).' ';
+            }
+            else {
+                $charset = 'US-ASCII ';
+            }
+            if (!empty($terms)) {
+                $flds = array();
+                foreach ($terms as $vals) {
+                    if (mb_substr($vals[1], 0, 4) == 'NOT ') {
+                        $flds[] = 'NOT '.$vals[0].' "'.str_replace('"', '\"', mb_substr($vals[1], 4)).'"';
+                    }
+                    else {
+                        $flds[] = $vals[0].' "'.str_replace('"', '\"', $vals[1]).'"';
+                    }
+                }
+                $fld = ' '.implode(' ', $flds);
+            }
+            else {
+                $fld = '';
+            }
+            if ($exclude_deleted) {
+                $fld .= ' NOT DELETED';
+            }
+            if ($only_auto_bcc) {
+               $fld .= ' HEADER X-Auto-Bcc cypht';
+            }
+            if ($filter == 'ALL') {
+                $filter = '';
+                $charset = trim($charset);
+            }
+            $command = 'UID SORT ';
+            $command .= '('.$sort.') '.$charset.$filter.$fld."\r\n";
             $cache_command = $command.(string)$reverse;
             $cache = $this->check_cache($cache_command);
             if ($cache !== false) {
@@ -2170,9 +2378,6 @@ if (!class_exists('Hm_IMAP')) {
             $status = $this->check_response($res, true);
             $uids = array();
             foreach ($res as $vals) {
-                if ($vals[0] == '*' && mb_strtoupper($vals[1]) == 'ESEARCH') {
-                    $esort_res = $this->parse_esearch_response($vals);
-                }
                 if ($vals[0] == '*' && mb_strtoupper($vals[1]) == 'SORT') {
                     array_shift($vals);
                     array_shift($vals);
@@ -2186,9 +2391,6 @@ if (!class_exists('Hm_IMAP')) {
             }
             if ($reverse) {
                 $uids = array_reverse($uids);
-            }
-            if ($esort_enabled) {
-                $uids = $esort_res;
             }
             if ($status) {
                 return $this->cache_return_val($uids, $cache_command);
@@ -2292,7 +2494,7 @@ if (!class_exists('Hm_IMAP')) {
          * @return array list of headers
          */
 
-        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=array()) {
+        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=array(), $include_preview = false) {
             $result = array();
 
             /* select the mailbox if need be */
@@ -2332,7 +2534,7 @@ if (!class_exists('Hm_IMAP')) {
 
             /* get the headers and build a result array by UID */
             if (!empty($uids)) {
-                $headers = $this->get_message_list($uids);
+                $headers = $this->get_message_list($uids, false, $include_preview);
                 foreach($uids as $uid) {
                     if (isset($headers[$uid])) {
                         $result[$uid] = $headers[$uid];
@@ -2347,9 +2549,15 @@ if (!class_exists('Hm_IMAP')) {
          * @param string $level mailbox name or empty string for the top level
          * @return array list of matching folders
          */
-        public function get_folder_list_by_level($level='', $only_subscribed=false, $with_input = false) {
+        public function get_folder_list_by_level($level='', $only_subscribed=false, $with_input = false, $count_children = false) {
             $result = array();
-            $folders = $this->get_mailbox_list($only_subscribed, $level, '%');
+            $folders = array();
+            if ($this->server_support_children_capability()) {
+                $folders = $this->get_mailbox_list($only_subscribed, $level, '%');
+            } else {
+                $folders = $this->get_mailbox_list($only_subscribed, $level, "*", false);
+            }
+            
             foreach ($folders as $name => $folder) {
                 $result[$name] = array(
                     'name' => $folder['name'],
@@ -2364,9 +2572,12 @@ if (!class_exists('Hm_IMAP')) {
                 if ($with_input) {
                     $result[$name]['special'] = $folder['special'];
                 }
+                if ($folder['has_kids'] && $count_children) {
+                    $result[$name]['number_of_children'] = count($this->get_folder_list_by_level($folder['name'], false, false));
+                }
             }
             if ($only_subscribed || $with_input) {
-                $subscribed_folders = array_column($this->get_mailbox_list(true), 'name');
+                $subscribed_folders = array_column($this->get_mailbox_list(true, children_capability:$this->server_support_children_capability()), 'name');
                 foreach ($result as $key => $folder) {
                     $result[$key]['subscribed'] = in_array($folder['name'], $subscribed_folders);
                     if (!$with_input) {
@@ -2377,29 +2588,14 @@ if (!class_exists('Hm_IMAP')) {
             return $result;
         }
 
-        /**
-         * Test if the server supports searching by custom headers.
-         * 
-         * This function sends a test search command to check if the server supports 
-         * searching by custom headers (e.g., X-Auto-Bcc). If the server does not support 
-         * this feature, it will return false.
-         *
-         * Reference: Stalwart's current limitation on searching by custom headers 
-         * discussed in the following GitHub thread:
-         * https://github.com/stalwartlabs/mail-server/discussions/477
-         * 
-         * Note: This function should be removed once Stalwart starts supporting custom headers.
-         *
-         * @return boolean true if the server supports searching by custom headers.
-         */
-        protected function server_supports_custom_headers() {
-            $test_command = 'UID SEARCH HEADER "X-NonExistent-Header" "test"'."\r\n";
+        public function server_support_children_capability() {
+            $test_command = 'CAPABILITY'."\r\n";
             $this->send_command($test_command);
             $response = $this->get_response(false, true);
             $status = $this->check_response($response, true);
 
             // Keywords that indicate the header search is not supported
-            $keywords = ['is', 'not', 'supported.'];
+            $keywords = ['CHILDREN'];
 
             if (!$status) {
                 return false;
@@ -2419,10 +2615,11 @@ if (!class_exists('Hm_IMAP')) {
 
             // If all keywords are found, the header search is not supported
             if ($sequence_match) {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
+
     }
 }

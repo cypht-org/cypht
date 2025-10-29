@@ -59,6 +59,44 @@ class Hm_Handler_compose_profile_data extends Hm_Handler_Module {
 /**
  * @subpackage profile/handler
  */
+class Hm_Handler_process_smtp_server_data_delete extends Hm_Handler_Module {
+    public function process() {
+        if (isset($this->request->post['smtp_delete'])) {
+            $deleted_server_id = $this->get('deleted_server_id', '');
+            Hm_Profiles::init($this);
+            $servers = Hm_Profiles::getBy($deleted_server_id,'smtp_id');
+            if ($servers) {
+                foreach ($servers as $server) {
+                    Hm_Profiles::del($server['id']);
+                    Hm_Msgs::add("Profile {$server['name']} has been deleted since its server was removed.");
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage profile/handler
+ */
+class Hm_Handler_process_imap_server_data_delete extends Hm_Handler_Module {
+    public function process() {
+        if (isset($this->request->post['imap_delete'])) {
+            $deleted_server_id = $this->get('deleted_server_id', '');
+            Hm_Profiles::init($this);
+            $servers = Hm_Profiles::getBy($deleted_server_id,'imap_id');
+            if ($servers) {
+                foreach ($servers as $server) {
+                    Hm_Profiles::del($server['id']);
+                    Hm_Msgs::add("Profile {$server['name']} has been deleted since its server was removed.");
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage profile/handler
+ */
 class Hm_Handler_process_profile_delete extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('profile_delete', 'profile_id'));
@@ -67,14 +105,17 @@ class Hm_Handler_process_profile_delete extends Hm_Handler_Module {
         }
 
         if (($profile = Hm_Profiles::get($form['profile_id']))) {
-            if (array_key_exists('autocreate', $profile)) {
-                Hm_Msgs::add('ERRAutomatically created profile cannot be deleted');
+
+            $server = Hm_SMTP_List::get($profile['smtp_id'], false);
+
+            if (array_key_exists('autocreate', $profile) && $server) {
+                Hm_Msgs::add('Automatically created profile cannot be deleted', 'warning');
                 return;
             }
             Hm_Profiles::del($form['profile_id']);
             Hm_Msgs::add('Profile Deleted');
         } else {
-            Hm_Msgs::add('ERRProfile ID not found');
+            Hm_Msgs::add('Profile ID not found', 'warning');
             return;
         }
     }
@@ -89,6 +130,16 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
         }
         list($success, $form) = $this->process_form(array('profile_id', 'profile_address',
             'profile_smtp', 'profile_replyto', 'profile_name', 'profile_imap', 'profile_rmk'));
+            
+        if (isset($this->request->post['profile_quickly_create_value']) && $this->request->post['profile_quickly_create_value'] === "yes") {
+            $array_profil_imap = explode("|", $form['profile_imap']);
+            if (count($array_profil_imap) == 2) {
+                $profile_name = explode("@", $array_profil_imap[1]);
+                $form['profile_name'] = $profile_name[0];
+                $form['profile_address'] = $array_profil_imap[1];
+                $form['profile_replyto'] = $array_profil_imap[1];
+            }
+        }
         if (!$success) {
             return;
         }
@@ -140,7 +191,7 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
                     ($existing_profile["address"] === $profile["address"] && $existing_profile["smtp_id"] === $profile["smtp_id"]) ||
                     ($existing_profile["replyto"] === $profile["replyto"] && $existing_profile["smtp_id"] === $profile["smtp_id"])
                 ) {
-                    Hm_Msgs::add('ERRProfile with this email address or reply-to address already exists');
+                    Hm_Msgs::add('Profile with this email address or reply-to address already exists', 'warning');
                     return;
                 }
             }
@@ -150,6 +201,26 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
 
         if ($default) {
             Hm_Profiles::setDefault($form['profile_id']);
+        }
+    }
+}
+
+/**
+ * @subpackage profile/handler
+ * If no 'imap_server_id' is provided, we select a default server based on the user profile.
+ * This handler works in conjunction with imap_folders/Hm_Handler_folders_server_id,
+ * which handles the case where 'imap_server_id' is explicitly provided.
+ */
+class Hm_Handler_load_default_server_from_profiles extends Hm_Handler_Module {
+    public function process() {
+        if (!array_key_exists('imap_server_id', $this->request->get)) {
+            Hm_Profiles::init($this);
+            $defaultProfile = Hm_Profiles::getDefault();
+            $server = Hm_IMAP_List::getBy($defaultProfile['server'],'server', true);
+            if (!is_null($server) && !empty($server['id'])) {
+                $this->out('folder_server', $server['id']);
+                $this->out('trigger_default_submit', true);
+            }
         }
     }
 }
@@ -195,7 +266,7 @@ class Hm_Output_profile_page_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-person-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-person-fill menu-icon"></i>';
         }
         $res .= $this->trans('Profiles').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -210,7 +281,7 @@ class Hm_Output_profile_page_link extends Hm_Output_Module {
  */
 class Hm_Output_compose_signature_button extends Hm_Output_Module {
     protected function output() {
-        return '<input type="hidden" value="'.$this->trans('You need at least one configured profile to sign messages').'" id="sign_msg" />'.
+        return '<input type="hidden" value="'.$this->trans('You need at least one profile with a signature to sign messages. Please configure a signature in your profile settings.').'" id="sign_msg" />'.
             '<input class="compose_sign btn btn-light float-end mt-3 me-2 border" type="button" value="'.$this->trans('Sign').'" />';
     }
 }
@@ -289,7 +360,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     '<td class="d-none d-sm-table-cell">'.(mb_strlen($profile['rmk']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.($profile['default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="text-right"><a href="?page=profiles&amp;profile_id='.$this->html_safe($profile['id']).'" title="'.$this->trans('Edit').'">'.
-                    '<i class="bi bi-gear-fill"></i></a></td>'.
+                    '<i class="bi bi-pencil-fill"></i></a></td>'.
                     '</tr>';
             }
             $res .= '</table></div>';
@@ -322,22 +393,29 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res .= '<div class="edit_profile row p-3" '.($form_vals['name'] ? '' : 'style="display: none;"').'><div class="col-12 col-lg-8 col-xl-5">';
 
     $res .= '<form method="post" action="?page=profiles">';
+    if (empty($form_vals['id'])) {
+        $res .= '<div class="form-check form-switch mt-3 mb-3">';
+        $res .= '<input class="form-check-input" name="profile_quickly_create" type="checkbox" role="switch" id="profile_quickly_create">';
+        $res .= '<input type="hidden" name="profile_quickly_create_value" id="profile_quickly_create_value" value="non">';
+        $res .= '<label class="form-check-label" for="profile_quickly_create">'.$out_mod->trans('Quickly create Profile').'</label>';
+        $res .= '</div>';
+    }
     $res .= '<input type="hidden" name="profile_id" value="'.$out_mod->html_safe($id).'" />';
     $res .= '<input type="hidden" name="hm_page_key" value="'.$out_mod->html_safe(Hm_Request_Key::generate()).'" />';
 
     // Display Name
-    $res .= '<div class="form-floating mb-3">';
+    $res .= '<div class="form-floating mb-3 form-check-create-profile">';
     $res .= '<input type="text" required name="profile_name" class="form-control" value="'.$out_mod->html_safe($form_vals['name']).'" placeholder="'.$out_mod->trans('Display Name').' *">';
     $res .= '<label>'.$out_mod->trans('Display Name').' *</label></div>';
 
     // Email Address
-    $res .= '<div class="form-floating mb-3">';
+    $res .= '<div class="form-floating mb-3 form-check-create-profile">';
     $res .= '<input type="email" required name="profile_address" class="form-control" value="'.$out_mod->html_safe($form_vals['address']).'" placeholder="'.$out_mod->trans('E-mail Address').' *">';
     $res .= '<label>'.$out_mod->trans('E-mail Address').' *</label></div>';
 
     // Reply-to
-    $res .= '<div class="form-floating mb-3">';
-    $res .= '<input type="email" required name="profile_replyto" class="form-control" value="'.$out_mod->html_safe($form_vals['replyto']).'" placeholder="'.$out_mod->trans('Reply-to').' *">';
+    $res .= '<div class="form-floating mb-3 form-check-create-profile">';
+    $res .= '<input type="email" name="profile_replyto" class="form-control" value="'.$out_mod->html_safe($form_vals['replyto']).'" placeholder="'.$out_mod->trans('Reply-to').' *">';
     $res .= '<label>'.$out_mod->trans('Reply-to').' *</label></div>';
 
     // IMAP Server
@@ -363,19 +441,19 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res .= '<label>'.$out_mod->trans('SMTP Server').' *</label></div>';
 
     // Signature
-    $res .= '<div class="form-floating mb-3">';
+    $res .= '<div class="form-floating mb-3 form-check-create-profile">';
     $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control" style="min-height : 120px" placeholder="'.$out_mod->trans('Signature').'">'.$out_mod->html_safe($form_vals['sig']).'</textarea>';
     $res .= '<label>'.$out_mod->trans('Signature').'</label></div>';
 
     // Remark
-    $res .= '<div class="form-floating mb-3">';
+    $res .= '<div class="form-floating mb-3 form-check-create-profile">';
     $res .= '<textarea cols="80" rows="4" name="profile_rmk" class="form-control" style="min-height : 120px" placeholder="'.$out_mod->trans('Remark').'">'.$out_mod->html_safe($form_vals['rmk']).'</textarea>';
     $res .= '<label>'.$out_mod->trans('Remark').'</label></div>';
 
     // Set as default
     $res .= '<div class="form-check mb-3">';
-    $res .= '<input type="checkbox" class="form-check-input" '.($form_vals['default'] ? 'checked="checked"' : '').' name="profile_default">';
-    $res .= '<label class="form-check-label">'.$out_mod->trans('Set as default').'</label></div>';
+    $res .= '<input type="checkbox" class="form-check-input" '.($form_vals['default'] ? 'checked="checked"' : '').' name="profile_default" id="profile_default">';
+    $res .= '<label for="profile_default" class="form-check-label">'.$out_mod->trans('Set as default').'</label></div>';
 
     // Submit buttons
     $res .= '<div>';

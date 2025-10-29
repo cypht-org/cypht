@@ -56,7 +56,7 @@ class Hm_Handler_wordpress_msg_action extends Hm_Handler_Module {
                     }
                     $res = wp_fetch_content($wp_details, WPCOM_READ_URL, $post);
                     if (!is_array($res) || !array_key_exists('success', $res) || $res['success'] != 1) {
-                        Hm_Msgs::add('ERRUnable to update read status of WordPress notification');
+                        Hm_Msgs::add('Unable to update read status of WordPress notification', 'danger');
                     }
                 }
             }
@@ -86,7 +86,7 @@ class Hm_Handler_wp_load_sources extends Hm_Handler_Module {
                 $excluded = true;
             }
             if (!$excluded) {
-                $this->append('data_sources', array('callback' => 'load_wp_notices_for_combined_list', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
+                $this->append('data_sources', array('load_wp_notices_for_combined_list', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
             }
         }
     }
@@ -117,7 +117,7 @@ class Hm_Handler_get_wp_notice_data extends Hm_Handler_Module {
                         $post = array('counts['.$wp_id.']' => 5);
                         $res = wp_fetch_content($wp_details, WPCOM_READ_URL, $post);
                         if (!is_array($res) || !array_key_exists('success', $res) || $res['success'] != 1) {
-                            Hm_Msgs::add('ERRUnable to update read status of WordPress notification');
+                            Hm_Msgs::add('nable to update read status of WordPress notification', 'danger');
                         }
                     }
                     $this->out('wp_notice_details', $details);
@@ -147,7 +147,7 @@ class Hm_Handler_wordpress_list_type extends Hm_Handler_Module {
                 $this->out('mailbox_list_title', array('WordPress.com Notifications'));
                 $this->out('message_list_since', $this->user_config->get('wordpress_since_setting', DEFAULT_WORDPRESS_SINCE));
                 $this->out('per_source_limit', 100);
-                $this->append('data_sources', array('callback' => 'load_wp_notices', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
+                $this->append('data_sources', array('load_wp_notices', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
             }
             else {
                 $this->out('list_path', $path, false);
@@ -203,14 +203,14 @@ class Hm_Handler_process_wordpress_authorization extends Hm_Handler_Module {
                     $this->session->close_early();
                 }
                 else {
-                    Hm_Msgs::add('ERRAn Error Occured');
+                    Hm_Msgs::add('An Error Occured', 'danger');
                 }
             }
             elseif (array_key_exists('error', $this->request->get)) {
-                Hm_Msgs::add('ERR'.ucwords(str_replace('_', ' ', $this->request->get['error'])));
+                Hm_Msgs::add(ucwords(str_replace('_', ' ', $this->request->get['error'])), 'danger');
             }
             else {
-                Hm_Msgs::add('ERRAn Error Occured');
+                Hm_Msgs::add('An Error Occured', 'danger');
             }
             $this->save_hm_msgs();
             Hm_Dispatch::page_redirect('?page=servers');
@@ -461,14 +461,26 @@ function wp_build_notice_headers($data, $output_mod) {
     if (!$subject) {
         $subject = '[No subject]';
     }
-    return '<table class="msg_headers">'.
-        '<col class="header_name_col"><col class="header_val_col"></colgroup>'.
-        '<tr class="header_subject"><th colspan="2">'.$output_mod->html_safe(html_entity_decode($data['subject']['text'])).
-        '</th></tr>'.
-        '<tr class="header_date"><th>'.$output_mod->trans('Date').'</th><td>'.date('r', $data['timestamp']).
-        ' ('.human_readable_interval(date('r', $data['timestamp'])).')</td></tr>'.
-        '<tr class="header_type"><th>'.$output_mod->trans('Type').'</th><td>'.$data['type'].'</td></tr>'.
-        '<tr class="header_cid"><th>'.$output_mod->trans('Id').'</th><td>'.$data['id'].'</td></tr><tr><td></td><td></td></tr></table>';
+    $txt = '';
+    $txt .= '<div class="container-fluid p-0 ml-0 border-bottom border-secondary-subtle text-muted">';
+    $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+    $txt .= '<div class="col-12">';
+    $txt .= '<span class="fs-5 fw-normal text-dark">' . $output_mod->html_safe(html_entity_decode($data['subject']['text'])) . '</span>';
+    $txt .= '</div></div>';
+    $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+    $txt .= '<div class="col-md-2 d-none d-md-block"><span class="text-muted">'.$output_mod->trans('Date').'</span></div>';
+    $txt .= '<div class="col-md-10"><small class="text-muted">'.date('r', $data['timestamp']).' ('.human_readable_interval(date('r', $data['timestamp'])).')</small></div>';
+    $txt .= '</div>';
+    $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+    $txt .= '<div class="col-md-2 d-none d-md-block"><span class="text-muted">'.$output_mod->trans('Type').'</span></div>';
+    $txt .= '<div class="col-md-10">'.$output_mod->html_safe($data['type']).'</div>';
+    $txt .= '</div>';
+    $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+    $txt .= '<div class="col-md-2 d-none d-md-block"><span class="text-muted">'.$output_mod->trans('Id').'</span></div>';
+    $txt .= '<div class="col-md-10">'.$output_mod->html_safe($data['id']).'</div>';
+    $txt .= '</div>';
+    $txt .= '</div>';
+    return $txt;
 }}
 
 /**

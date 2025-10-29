@@ -8,11 +8,11 @@ const modulesRoutes = [
     },
     {
         page: 'message_list',
-        handler: 'applyImapMessageListPageHandlers'
+        handler: 'applyMessageListPageHandlers'
     },
     {
         page: 'message',
-        handler: 'applyImapMessageContentPageHandlers'
+        handler: 'applyMessagePageHandlers'
     },
     {
         page: 'compose',
@@ -77,6 +77,14 @@ const modulesRoutes = [
     {
         page: 'sieve_filters',
         handler: 'applySieveFiltersPageHandler'
+    },
+    {
+        page: 'shortcuts',
+        handler: 'applyShortcutsPageHandlers'
+    },
+    {
+        page: 'tags',
+        handler: 'applyTagsPageHandlers'
     }
 ]
 

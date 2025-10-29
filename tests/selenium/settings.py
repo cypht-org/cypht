@@ -3,11 +3,13 @@
 from base import WebTest, USER, PASS
 from selenium.webdriver.common.by import By
 from runner import test_runner
-from selenium.webdriver.support.ui import Select
-
+from selenium.webdriver.support.ui import Select, WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import StaleElementReferenceException
+import time
 
 class SettingsHelpers(WebTest):
-
     def is_unchecked(self, name):
         selected = self.by_name(name).is_selected()
         print(f"The selected status of checkbox '{name}' is:", selected)
@@ -17,27 +19,46 @@ class SettingsHelpers(WebTest):
         assert self.by_name(name).is_selected() == True
 
     def toggle(self, name):
-        self.by_name(name).click()
+        elem = self.by_name(name)
+        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
+        time.sleep(1)
+        elem.click()
 
     def close_section(self, section):
-        self.by_css('[data-target=".'+section+'"]').click()
+        elem = self.by_css('[data-target=".'+section+'"]')
+        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
+        time.sleep(1)
+        elem.click()
 
     def save_settings(self):
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(1)
+        alert_message = self.by_class('sys_messages')
         self.by_name('save_settings').click()
         self.wait_with_folder_list()
         self.safari_workaround()
-        assert self.by_class('sys_messages').text == 'Settings updated'
+        WebDriverWait(self.driver, 20).until(EC.staleness_of(alert_message))
+        ignored_exceptions=(NoSuchElementException,StaleElementReferenceException,)
+        _ = WebDriverWait(self.driver, 10, ignored_exceptions=ignored_exceptions).until(
+            EC.presence_of_element_located((By.CLASS_NAME, 'sys_messages'))
+        )
+        alert_message = self.by_class('sys_messages')
+        assert alert_message.text.strip() == 'Settings updated'
 
     def settings_section(self, section):
         if not self.by_class('settings').is_displayed():
-            self.by_css('[data-source=".settings"]').click()
+            self.by_css('[data-bs-target=".settings"]').click()
+            self.wait_for_settings_to_expand()
         list_item = self.by_class('menu_settings')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
         self.wait_with_folder_list()
-        self.wait_for_navigation_to_complete()
+        if not self.element_exists('content_title') or self.by_class('content_title').text != 'Site Settings':
+            self.wait_for_navigation_to_complete()
         if not self.by_class(section).is_displayed():
-            self.by_css('[data-target=".'+section+'"]').click()
+            elem = self.by_css('[data-target=".'+section+'"]')
+            self.driver.execute_script("arguments[0].scrollIntoView()", elem)
+            time.sleep(1)
+            elem.click()
 
     def checkbox_test(self, section, name, checked, mod=False):
         if mod and not self.mod_active(mod):
@@ -70,25 +91,29 @@ class SettingsHelpers(WebTest):
         if mod and not self.mod_active(mod):
             return
         self.settings_section(section)
-        assert self.by_name(name).get_attribute('value') == current
-        Select(self.by_name(name)).select_by_value(new)
+        dropdown = self.by_name(name)
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", dropdown)
+        WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(dropdown))
+        assert dropdown.get_attribute('value') == current
+        Select(dropdown).select_by_value(new)
         self.save_settings()
         assert self.by_name(name).get_attribute('value') == new
 
 
 class SettingsTests(SettingsHelpers):
-
     def __init__(self):
         WebTest.__init__(self)
         self.login(USER, PASS)
         self.wait()
 
     def load_settings_page(self):
-        self.by_css('[data-source=".settings"]').click()
+        self.wait(By.CSS_SELECTOR, '[data-bs-target=".settings"]')
+        self.by_css('[data-bs-target=".settings"]').click()
+        self.wait_for_settings_to_expand()
         list_item = self.by_class('menu_settings')
-        list_item.find_element(By.TAG_NAME, 'a').click()
-        self.wait_with_folder_list()
-        self.wait_for_navigation_to_complete()
+        self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
+        self.wait_on_class('settings_table')
+        print(self.by_class('content_title').text)
         assert self.by_class('content_title').text == 'Site Settings'
 
     def list_style_test(self):
@@ -114,6 +139,9 @@ class SettingsTests(SettingsHelpers):
 
     def msg_part_icons_test(self):
         self.checkbox_test('general_setting', 'msg_part_icons', True)
+
+    def review_sent_email_test(self):
+        self.checkbox_test('general_setting', 'review_sent_email', True)
 
     def simple_msg_parts_test(self):
         self.checkbox_test('general_setting', 'simple_msg_parts', False)
@@ -210,12 +238,12 @@ if __name__ == '__main__':
 
         # general options
         'load_settings_page',
-        'list_style_test',
-        'start_page_test',
-        'tz_test',
-        'theme_test',
-        'imap_per_page_test',
         'mail_format_test',
+        'theme_test',
+        'list_style_test',
+        'tz_test',
+        'start_page_test',
+        'imap_per_page_test',
         'auto_bcc_test',
         'keyboard_shortcuts_test',
         'inline_message_test',
@@ -223,6 +251,7 @@ if __name__ == '__main__':
         'msg_list_icons_test',
         'msg_part_icons_test',
         'simple_msg_parts_test',
+        'review_sent_email_test',
         'text_only_test',
         'disable_delete_prompt_test',
         'no_password_save_test',

@@ -16,18 +16,24 @@ class ServersTest(WebTest):
         return self.by_css('[data-target=".{0}_section"]'.format(name)).click()
 
     def load_servers_page(self):
+        self.load()
+        self.wait()
         self.wait_with_folder_list()
-        self.by_css('[data-source=".settings"]').click()
+        self.by_css('[data-bs-target=".settings"]').click()
+        self.wait_for_settings_to_expand()
         list_item = self.by_class('menu_servers')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
+        self.wait()
         self.wait_with_folder_list()
         self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Servers'
 
     def server_stmp_and_imap_add(self):
         self.toggle_server_section('server_config')
+        self.wait_on_class('imap-jmap-smtp-btn')
         self.by_id('add_new_server_button').click()
-        name = self.by_name('srv_setup_stepper_profile_name')
+        # self.wait_on_class('srv_setup_stepper_profile_name')
+        name = self.by_id('srv_setup_stepper_profile_name')
         name.send_keys('Test')
         email = self.by_name('srv_setup_stepper_email')
         email.send_keys('test@localhost')
@@ -36,7 +42,16 @@ class ServersTest(WebTest):
         next_button = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable((By.ID, "step_config_action_next"))
         )
-        next_button.click()
+         # Scroll to the button and wait for any animations/overlays to finish
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", next_button)
+        sleep(0.5)  # Wait for smooth scroll to complete
+
+        # Try multiple click methods for better reliability
+        try:
+            next_button.click()
+        except Exception as e:
+            print(f"Normal click failed: {e}. Trying JavaScript click...")
+            self.driver.execute_script("arguments[0].click();", next_button)
         # show step two
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, '//h2[text()="Step 2"]'))
@@ -55,7 +70,10 @@ class ServersTest(WebTest):
         reply_to.send_keys('test@localhost')
         signature = self.by_name('srv_setup_stepper_profile_signature')
         signature.send_keys('Test')
-        self.by_id('step_config_action_finish').click()
+        elem = self.by_id('step_config_action_finish')
+        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
+        sleep(1)
+        elem.click()
         wait = WebDriverWait(self.driver, 30)
         element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "sys_messages")))
         sys_message_text = element.text

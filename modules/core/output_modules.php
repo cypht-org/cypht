@@ -15,15 +15,16 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
      * Add a search form to the top of the folder list
      */
     protected function output() {
-        $res = '<li class="menu_search"><form method="get">';
-        $res .= '<div class="d-flex bd-highlight">';
+        $res = '<li class="menu_search mb-2"><form method="get">';
+        $res .= '<div class="input-group">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<div class="ps-1 pe-2"><a class="unread_link" href="?page=search">';
-            $res .= '<i class="bi bi-search"></i></a></div>';
+            $res .= '<a href="?page=search" class="input-group-text" id="basic-addon1">' .
+            '<i class="bi bi-search"></i>' .
+            '</a>';
         }
-        $res .= '<div class="flex-fill bd-highlight"><input type="hidden" name="page" value="search" />'.
-            '<input type="search" class="search_terms form-control form-control-sm" '.
-            'name="search_terms" placeholder="'.$this->trans('Search').'" /></div></div></form></li>';
+        $res .= '<input type="hidden" name="page" value="search" />'.
+            '<input type="search" class="search_terms form-control form-control-sm" aria-describedby="basic-addon1" '.
+            'name="search_terms" placeholder="'.$this->trans('Search').'" /></div></form></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -70,7 +71,7 @@ class Hm_Output_save_reminder extends Hm_Output_Module {
         $changed = $this->get('changed_settings', array());
         if (!empty($changed)) {
             return '<div class="save_reminder"><a title="'.$this->trans('You have unsaved changes').
-                '" href="?page=save"><i class="bi bi-save2-fill fs-2"></i></a></div>';
+                '" href="?page=save"><i class="bi bi-save2-fill fs-4"></i></a></div>';
         }
         return '';
     }
@@ -141,7 +142,7 @@ class Hm_Output_js_search_data extends Hm_Output_Module {
      * adds two JS functions used on the search page
      */
     protected function output() {
-        return '<script type="text/javascript">'.
+        return '<script type="text/javascript" id="search-data">'.
             'var hm_search_terms = function() { return "'.$this->html_safe($this->get('search_terms', ''), true).'"; };'.
             'var hm_run_search = function() { return "'.$this->html_safe($this->get('run_search', 0)).'"; };'.
             '</script>';
@@ -354,22 +355,13 @@ class Hm_Output_msgs extends Hm_Output_Module {
      */
     protected function output() {
         $res = '';
-        $msgs = Hm_Msgs::get();
+        $msgs = Hm_Msgs::getRaw();
         $logged_out_class = '';
         if (!$this->get('router_login_state') && !empty($msgs)) {
             $logged_out_class = ' logged_out';
         }
-        $res .= '<div class="d-none position-fixed top-0 end-0 mt-3 me-3 sys_messages'.$logged_out_class.'">';
-        foreach ($msgs as $msg) {
-            if (preg_match("/ERR/", $msg)) {
-                $res .= sprintf('<div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">%s</span>', $this->trans(mb_substr((string) $msg, 3)));
-            }
-            else {
-                $res .= sprintf('<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span class="info">%s</span>', $this->trans($msg));
-            }
-            $res .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-        }
-        $res .= '</div>';
+        $res .= '<div class="position-fixed top-0 col-sm-4 col-md-3 end-0 mt-3 me-3 sys_messages'.$logged_out_class.'"></div>';
+        $res .= '<script type="text/javascript">var hm_msgs = '.json_encode($msgs).'</script>';
         return $res;
     }
 }
@@ -432,6 +424,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
         $res = '<body class="'.($this->get('is_mobile', false) ? 'mobile' : '').'"><noscript class="noscript">'.
             sprintf($this->trans('You need to have Javascript enabled to use %s, sorry about that!'),
                 $this->html_safe($this->get('router_app_name'))).'</noscript>';
+        $res .= '<script type="text/javascript">window.inAppContext = true;</script>';
         if (!$this->get('router_login_state')) {
             $res .= '<script type="text/javascript">sessionStorage.clear();</script>';
         }
@@ -442,6 +435,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
             $res .= '<a class="unsaved_icon" href="?page=save" title="'.$this->trans('Unsaved Changes').
                 '"><i class="bi bi-save2-fill fs-5 unsaved_reminder"></i></a>';
         }
+        $res .= '<div class="cypht-layout">';
         return $res;
     }
 }
@@ -510,10 +504,7 @@ class Hm_Output_header_css extends Hm_Output_Module {
                     $res .= '<link href="'.WEB_ROOT.sprintf("%ssite.css", $rel_name).'" media="all" rel="stylesheet" type="text/css" />';
                 }
             }
-            // load pcss3t.cs only if one of: ['contacts','local_contacts','ldap_contacts','gmail_contacts'] is enabled
-            if(count(array_intersect(['contacts','local_contacts','ldap_contacts','gmail_contacts'], $mods)) > 0){
-                $res .= '<link href="'.WEB_ROOT.'third_party/contact-group.css" media="all" rel="stylesheet" type="text/css" />';
-            }
+            $res .= '<link href="'.WEB_ROOT.'third_party/nprogress.css" media="all" rel="stylesheet" type="text/css" />';
         }
         else {
             $res .= '<link href="'.WEB_ROOT.'site.css?v='.CACHE_ID.'" ';
@@ -541,12 +532,8 @@ class Hm_Output_page_js extends Hm_Output_Module {
     protected function output() {
         if (DEBUG_MODE) {
             $res = '';
-            $js_lib = '<script type="text/javascript" src="'.WEB_ROOT.'vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/cash.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/resumable.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/ays-beforeunload-shim.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/jquery.are-you-sure.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/sortable.min.js"></script>';
+            $js_exclude_dependencies = explode(',', $this->get('router_js_exclude_deps', ''));
+            $js_lib = get_js_libs($js_exclude_dependencies);
             if ($this->get('encrypt_ajax_requests', '') || $this->get('encrypt_local_storage', '')) {
                 $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/forge.min.js"></script>';
             }
@@ -558,6 +545,12 @@ class Hm_Output_page_js extends Hm_Output_Module {
                 if (in_array($mod, $mods, true)) {
                     $directoriesPattern = str_replace('/', DIRECTORY_SEPARATOR, "{*,*/*}");
                     foreach (glob($name.'js_modules' . DIRECTORY_SEPARATOR . $directoriesPattern . "*.js", GLOB_BRACE) as $js) {
+                        if (preg_match('/\[(.+)\]/', $js, $matches)) {
+                            $dep = $matches[1];
+                            if (in_array($dep, $js_exclude_dependencies)) {
+                                continue;
+                            }
+                        }
                         $res .= '<script type="text/javascript" src="'.WEB_ROOT.str_replace(APP_PATH, '', $js).'"></script>';
                     }
 
@@ -581,7 +574,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
                     * They have to be loaded after each module's js files, because routes.js depend on the handlers defined in the modules.
                     * Therefore, navigation.js is also loaded after routes.js, because the routes should be loaded beforehand to be able to navigate.
                 */
-                foreach (['routes', 'navigation'] as $js) {
+                foreach (['routes', 'navigation', 'navbar'] as $js) {
                     $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%snavigation/%s.js", $core, $js).'"></script>';
                 }
             }
@@ -604,10 +597,10 @@ class Hm_Output_page_js extends Hm_Output_Module {
  */
 class Hm_Output_content_end extends Hm_Output_Module {
     /**
-     * Closes the body and html tags
+     * Closes the layout wrapper, body, and html tags
      */
     protected function output() {
-        return '</body></html>';
+        return '</div></body></html>';
     }
 }
 
@@ -620,12 +613,15 @@ class Hm_Output_js_data extends Hm_Output_Module {
      * Uses function wrappers to make the data immutable from JS
      */
     protected function output() {
-        $res = '<script type="text/javascript">'.
+        $settings = $this->get('user_settings', array());
+        $enable_snooze = $settings['enable_snooze'] ?? DEFAULT_ENABLE_SNOOZE;
+        $enable_collect_address_on_send = $settings['enable_collect_address_on_send_setting'] ?? DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND;
+        $res = '<script type="text/javascript" id="data-store">'.
             'var globals = {};'.
             'var hm_is_logged = function () { return '.($this->get('is_logged') ? '1' : '0').'; };'.
             'var hm_empty_folder = function() { return "'.$this->trans('So alone').'"; };'.
             'var hm_mobile = function() { return '.($this->get('is_mobile') ? '1' : '0').'; };'.
-            'var hm_debug = function() { return "'.(DEBUG_MODE ? '1' : '0').'"; };'.
+            'var hm_debug = function() { return "' . ((DEBUG_MODE || DEFAULT_DEBUG_LOG) ? '1' : '0') . '"; };'.
             'var hm_mailto = function() { return '.($this->get('mailto_handler') ? '1' : '0').'; };'.
             'var hm_page_name = function() { return "'.$this->html_safe($this->get('router_page_name')).'"; };'.
             'var hm_language_direction = function() { return "'.$this->html_safe($this->dir).'"; };'.
@@ -640,7 +636,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {
-            $res .= 'var hm_delete_prompt = function() { return confirm("'.$this->trans('Are you sure?').'"); };';
+            $res .= 'var hm_delete_prompt = function() { return confirm("'.$this->trans('This action cannot be undone. Are you sure you want to delete this?').'"); };';
         }
         else {
             $res .= 'var hm_delete_prompt = function() { return true; };';
@@ -655,6 +651,8 @@ class Hm_Output_js_data extends Hm_Output_Module {
             '    return key;'.
             '};';
         $res .= 'window.hm_default_timezone = "'.$this->get('default_timezone','UTC').'";';
+        $res .= 'window.hm_default_setting_enable_snooze = ' . ($enable_snooze ? 'true' : 'false') . ';' . PHP_EOL;
+        $res .= 'window.hm_enable_collect_address_on_send = ' . ($enable_collect_address_on_send ? 'true' : 'false') . ';' . PHP_EOL; 
         $res .= 'var hm_module_is_supported = function(module) {'.
             '    return '.json_encode($this->get('enabled_modules', array())).'.indexOf(module) !== -1;'.
             '};';
@@ -663,18 +661,6 @@ class Hm_Output_js_data extends Hm_Output_Module {
     }
 }
 
-/**
- * Outputs a load icon
- * @subpackage core/output
- */
-class Hm_Output_loading_icon extends Hm_Output_Module {
-    /**
-     * Sort of ugly loading icon animated with js/css
-     */
-    protected function output() {
-        return '<div class="loading_icon"></div>';
-    }
-}
 
 /**
  * Start the main form on the settings page
@@ -720,7 +706,7 @@ class Hm_Output_start_page_setting extends Hm_Output_Module {
             if ($start_page == $val) {
                 $res .= 'selected="selected" ';
                 if ($start_page != DEFAULT_START_PAGE) {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
@@ -757,7 +743,7 @@ class Hm_Output_default_sort_order_setting extends Hm_Output_Module {
             if ($default_sort_order == $val) {
                 $res .= 'selected="selected" ';
                 if ($default_sort_order != 'arrival') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
@@ -794,7 +780,7 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
             if ($list_style == $val) {
                 $res .= 'selected="selected" ';
                 if ($list_style != DEFAULT_LIST_STYLE) {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
@@ -812,7 +798,7 @@ class Hm_Output_mailto_handler_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('mailto_handler', $settings) && $settings['mailto_handler']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -831,7 +817,7 @@ class Hm_Output_no_folder_icon_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('no_folder_icons', $settings) && $settings['no_folder_icons']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -856,7 +842,7 @@ class Hm_Output_no_password_setting extends Hm_Output_Module {
             $checked = '';
         }
         if(isset($settings['no_password_save']) && $settings['no_password_save'] !== DEFAULT_NO_PASSWORD_SAVE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="no_password_save">'.$this->trans('Don\'t save account passwords between logins').'</label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="no_password_save" name="no_password_save" data-default-value="'.(DEFAULT_NO_PASSWORD_SAVE ? 'true' : 'false') . '" />'.$reset.'</td></tr>';
@@ -870,7 +856,7 @@ class Hm_Output_delete_prompt_setting extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings');
         $reset = '';
-        $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+        $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         if (array_key_exists('disable_delete_prompt', $settings) && $settings['disable_delete_prompt']) {
             $checked = ' checked="checked"';
         }
@@ -878,7 +864,7 @@ class Hm_Output_delete_prompt_setting extends Hm_Output_Module {
             $checked = '';
         }
         if(isset($settings['disable_delete_prompt']) && $settings['disable_delete_prompt'] !== DEFAULT_DISABLE_DELETE_PROMPT) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="disable_delete_prompt">'.$this->trans('Disable prompts when deleting').'</label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="disable_delete_prompt" name="disable_delete_prompt" data-default-value="'.(DEFAULT_DISABLE_DELETE_PROMPT ? 'true' : 'false') . '" />'.$reset.'</td></tr>';
@@ -897,7 +883,7 @@ class Hm_Output_delete_attachment_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
         }
         else {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="allow_delete_attachment">'.$this->trans('Allow delete attachment').'</label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="allow_delete_attachment" name="allow_delete_attachment" data-default-value="false" />'.$reset.'</td></tr>';
@@ -975,6 +961,22 @@ class Hm_Output_start_all_email_settings extends Hm_Output_Module {
 }
 
 /**
+ * Start the search box for settings
+ * @subpackage core/output
+ */
+class Hm_Output_start_search_settings extends Hm_Output_Module {
+    /**
+     * General settings like langauge and timezone will go here
+     */
+    protected function output() {
+        return '<tr><td colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 py-4">'.
+            '<form><input type="search" id="settingsSearch" class="form-control" placeholder="'.$this->trans('Type a setting').'">'.
+            '<div id="noSettingsFound" class="d-none mt-3">'.$this->trans('No settings found!').'</div>'.
+            '</td></tr>';
+    }
+}
+
+/**
  * Start the general settings section
  * @subpackage core/output
  */
@@ -1005,7 +1007,7 @@ class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
             $sources = $settings['unread_per_source'];
         }
         if ($sources != DEFAULT_UNREAD_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="unread_setting"><td><label for="unread_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1049,7 +1051,7 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
             $sources = $settings['flagged_per_source'];
         }
         if ($sources != DEFAULT_FLAGGED_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="flagged_setting"><td><label for="flagged_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1096,7 +1098,7 @@ class Hm_Output_all_email_source_max_setting extends Hm_Output_Module {
             $sources = $settings['all_email_per_source'];
         }
         if ($sources != DEFAULT_ALL_EMAIL_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="email_setting"><td><label for="all_email_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1120,7 +1122,7 @@ class Hm_Output_all_source_max_setting extends Hm_Output_Module {
             $sources = $settings['all_per_source'];
         }
         if ($sources != DEFAULT_ALL_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="all_setting"><td><label for="all_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1196,7 +1198,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
             if ($id == $mylang) {
                 $res .= 'selected="selected" ';
                 if ($id != 'en') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$id.'">'.$lang.'</option>';
@@ -1231,7 +1233,7 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
             if ($zone == $myzone) {
                 $res .= 'selected="selected" ';
                 if ($zone != $this->get('default_timezone','UTC')) {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_timezone"></i></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_timezone"></i></span>';
                 }
             }
             $res .= 'value="'.$zone.'">'.$zone.'</option>';
@@ -1252,7 +1254,7 @@ class Hm_Output_msg_list_icons_setting extends Hm_Output_Module {
         $reset = '';
         if (array_key_exists('show_list_icons', $settings) && $settings['show_list_icons']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="show_list_icons">'.
             $this->trans('Show icons in message lists').'</label></td>'.
@@ -1287,8 +1289,7 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
      * Opens the folder list nav tag
      */
     protected function output() {
-        $res = '<a class="folder_toggle" href="#">'.$this->trans('Show folders').'<i class="bi bi-list fs-5"></i></a>'.
-            '<nav class="folder_cell"><div class="folder_list">';
+        $res = '<nav class="folder_cell"><div class="folder_list">';
         return $res;
     }
 }
@@ -1318,14 +1319,16 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
      * Opens a div and unordered list tag
      */
     protected function output() {
-        $res = '<div class="src_name main_menu d-flex justify-content-between pe-2" data-source=".main">'.$this->trans('Main');
-        if (DEBUG_MODE) {
-            $res .= ' <span title="'.
+        $res = '';
+        if (DEBUG_MODE or DEFAULT_DEBUG_LOG) {
+            $res .= '<span title="'.
                 $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.').
                 '" class="debug_title">'.$this->trans('Debug').'</span>';
         }
-        $res .= '<i class="bi bi-chevron-down"></i>'.
-        '</div><div class="main"><ul class="folders">';
+        $theme = $this->get('theme');
+        $logo = $theme === 'darkly' ? 'modules/core/assets/images/logo.svg' : 'modules/core/assets/images/logo_dark.svg' ;
+        $res .= '<a href="?page=home" class="menu_home"><img class="app-logo" src="'.WEB_ROOT.$logo.'"></a>';
+        $res .= '<div class="main"><ul class="folders">';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -1352,54 +1355,43 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         if ($total_accounts > 1) {
             $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<i class="bi bi-box2-fill fs-5 me-2"></i>';
+                $res .= '<i class="bi bi-box2-fill menu-icon"></i>';
             }
-            $res .= $this->trans('Everything').'</a><span class="combined_inbox_count"></span></li>';
+            $res .= '<span class="nav-label">'.$this->trans('Everything').'</span</a><span class="combined_inbox_count"></span></li>';
         }
         $res .= '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-envelope-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-envelope-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Unread').'</a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Unread').'</span></a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li>';
         $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-flag-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-flag-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Flagged').'</a> <span class="flagged_count"></span></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Flagged').'</span></a> <span class="flagged_count"></span></li>';
         $res .= '<li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-envelope-x-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-envelope-x-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Junk').'</a></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Junk').'</span></a></li>';
         $res .= '<li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-trash3-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-trash3-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Trash').'</a></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Trash').'</span></a></li>';
         $res .= '<li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-pencil-square fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-pencil-square menu-icon"></i>';
         }
-        $res .= $this->trans('Drafts').'</a></li>';
-
-        if ($this->format == 'HTML5') {
-            return $res;
+        $res .= '<span class="nav-label">'.$this->trans('Drafts').'</span></a></li>';
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting']) {
+            $res .= '<li class="menu_snoozed"><a class="unread_link" href="?page=message_list&amp;list_path=snoozed">';
+            if (!$this->get('hide_folder_icons')) {
+                $res .= '<i class="bi bi-clock-fill menu-icon"></i>';
+            }
+            $res .= '<span class="nav-label">'.$this->trans('Snoozed').'</span></a></li>';
         }
-        $this->concat('formatted_folder_list', $res);
-    }
-}
-
-/**
- * Outputs the logout link in the Main menu of the folder list
- * @subpackage core/output
- */
-class Hm_Output_logout_menu_item extends Hm_Output_Module {
-    protected function output() {
-        $res =  '<li class="menu_logout"><a class="unread_link logout_link" href="#">';
-        if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-power fs-5 me-2"></i>';
-        }
-        $res .= $this->trans('Logout').'</a></li>';
 
         if ($this->format == 'HTML5') {
             return $res;
@@ -1438,22 +1430,18 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
             $parts = explode('_', $src);
             array_pop($parts);
             $name = ucwords(implode(' ', $parts));
+            $class = $this->html_safe($src);
             if (!$single) {
-                $res .= '<div class="src_name d-flex justify-content-between pe-2" data-source=".'.$this->html_safe($src).'">'.$this->trans($name).
+                $res .= '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".'.$this->html_safe($src).'">'.$this->trans($name).
                     '<i class="bi bi-chevron-down"></i></div>';
+                $class .= ' collapse';
             }
 
-            if ($single) {
-                $res .= '<div ';
-            }
-            else {
-                $res .= '<div style="display: none;" ';
-            }
-            $res .= 'class="'.$this->html_safe($src).'"><ul class="folders">';
+            $res .= '<div class="'.$class.'"><ul class="folders">';
             if ($name == 'Email' && count($this->get('imap_servers', array()))  > 1) {
                 $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<i class="bi bi-globe-americas fs-5 me-2"></i>';
+                    $res .= '<i class="bi bi-globe-americas menu-icon"></i>';
                 }
                 $res .= $this->trans('All').'</a> <span class="unread_mail_count"></span></li>';
             }
@@ -1475,14 +1463,9 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
      * Opens an unordered list
      */
     protected function output() {
-        $res = '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">'.$this->trans('Settings').
+        $res = '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">'.$this->trans('Settings').
             '<i class="bi bi-chevron-down"></i></div>'.
-            '<ul style="display: none;" class="settings folders">';
-        $res .= '<li class="menu_home"><a class="unread_link" href="?page=home">';
-        if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-house-door-fill fs-5 me-2"></i>';
-        }
-        $res .= $this->trans('Home').'</a></li>';
+            '<ul id="settings-menu-start" class="collapse settings folders">';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -1543,7 +1526,7 @@ class Hm_Output_settings_servers_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-pc-display-horizontal fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-pc-display-horizontal menu-icon"></i>';
         }
         $res .= $this->trans('Servers').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -1561,7 +1544,7 @@ class Hm_Output_settings_site_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_settings"><a class="unread_link" href="?page=settings">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-gear-wide-connected fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-gear-wide-connected menu-icon"></i>';
         }
         $res .= $this->trans('Site').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -1582,7 +1565,7 @@ class Hm_Output_settings_save_link extends Hm_Output_Module {
         }
         $res = '<li class="menu_save"><a class="unread_link" href="?page=save">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-download fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-download menu-icon"></i>';
         }
         $res .= $this->trans('Save').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -1615,8 +1598,26 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
      * Adds collapse and reload links
      */
     protected function output() {
-        $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
-        $res .= '<a href="#" class="hide_folders">'.$this->trans('Hide folders').'<i class="bi bi-caret-left-fill fs-5"></i></a>';
+        $res = '<div class="sidebar-footer">';
+        $res .= '<a class="logout_link" href="#" title="'. $this->trans('Logout') .'">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<i class="bi bi-power menu-icon"></i>';
+        }
+        $res .= '<span class="nav-label">' . $this->trans('Logout') .'</span>';
+        $res .= '</a>';
+        $res .= '<a href="#" class="update_message_list" title="'. $this->trans('Reload') .'">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<i class="bi bi-arrow-clockwise menu-icon"></i>';
+        }
+        $res .= '<span class="nav-label">' . $this->trans('Reload') . '</span>';
+        $res .= '</a>';
+        
+        // Add menu-toggle for desktop only (not mobile)
+        $res .= '<div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>';
+        
+        /** Sidebar footer end */
+
+
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -1646,7 +1647,7 @@ class Hm_Output_content_section_start extends Hm_Output_Module {
      * Opens a main tag for the primary content section
      */
     protected function output() {
-        return '<main class="container-fluid content_cell"><div class="offline">'.$this->trans('Offline').'</div><div class="row m-0 position-relative">';
+        return '<main class="container-fluid content_cell" id="cypht-main"><div class="offline">'.$this->trans('Offline').'</div><div class="row m-0">';
     }
 }
 
@@ -1701,9 +1702,9 @@ class Hm_Output_modals extends Hm_Output_Module {
         $share_folder_modal .= '</thead>';
         $share_folder_modal .= '<tbody></tbody>';
         $share_folder_modal .= '</table>';
-        
+
         $share_folder_modal .= '</div>';
-        
+
         $share_folder_modal .= '<div class="col-lg-4 col-md-12">';
         $share_folder_modal .= '<form id="shareForm" action="" method="POST">';
         $share_folder_modal .= '<input type="hidden" name="server_id" id="server_id" value="">';
@@ -1788,16 +1789,23 @@ class Hm_Output_message_start extends Hm_Output_Module {
             else {
                 $list_name = $this->trans(ucwords(str_replace('_', ' ', $this->get('list_parent', ''))));
             }
+            $additional = '';
             if ($this->get('list_parent') == 'advanced_search') {
                 $page = 'advanced_search';
             }
             elseif ($this->get('list_parent') == 'search') {
                 $page = 'search';
+                foreach (['list_page', 'list_sort', 'search_terms', 'search_fld', 'search_since'] as $field) {
+                    if ($value = $this->get($field)) {
+                        $field = $field == 'list_sort' ? 'sort' : $field;
+                        $additional .= "&amp;$field=" . $this->html_safe($value);
+                    }
+                }
             }
             else {
                 $page = 'message_list';
             }
-            $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).'">'.$list_name.'</a>';
+            $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).$additional.'">'.$list_name.'</a>';
             if (count($this->get('mailbox_list_title', array())) > 0) {
                 $mb_title = array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()));
                 if (($key = array_search($list_name, $mb_title)) !== false) {
@@ -1888,7 +1896,8 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
                 $header_flds[] = '<th></th>';
             }
         }
-        $res = '<div class="p-3"><table class="message_table table pt-5">';
+        $res = '<div class="p-3">';
+        $res .= '<table class="message_table table">';
         if (!$this->get('no_message_list_headers')) {
             if (!empty($col_flds)) {
                 $res .= '<colgroup>'.implode('', $col_flds).'</colgroup>';
@@ -1982,8 +1991,8 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             $search_field = '';
         }
         $res = '';
-        $res .= '<div class="message_list p-0 '.$this->html_safe($this->get('list_path')).'_list"><div class="content_title d-flex gap-3 justify-content-between px-3 align-items-center">';
-        $res .= '<div class="d-flex align-items-center gap-1">' . message_controls($this).'<div class="mailbox_list_title">'.
+        $res .= '<div class="message_list p-0 '.$this->html_safe($this->get('list_path')).'_list"><div class="content_title d-flex flex-wrap justify-content-between px-3 align-items-center">';
+        $res .= '<div class="d-flex align-items-center gap-1 flex-wrap mb-2 mb-md-0">' . message_controls($this).'<div class="mailbox_list_title ms-2">'.
             implode('<i class="bi bi-caret-right-fill path_delim"></i>', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array()))).'</div>';
         if (!$this->get('is_mobile') && mb_substr((string) $this->get('list_path'), 0, 5) != 'imap_') {
@@ -2007,7 +2016,7 @@ class Hm_Output_message_list_end extends Hm_Output_Module {
      * Close the table opened in Hm_Output_message_list_start
      */
     protected function output() {
-        $res = '</tbody></table></div><div class="mb-5 page_links d-flex justify-content-center gap-3 align-content-center"></div></div>';
+        $res = '</tbody></table></div></div>';
         return $res;
     }
 }
@@ -2018,13 +2027,13 @@ class Hm_Output_message_list_end extends Hm_Output_Module {
  */
 class Hm_Output_search_move_copy_controls extends Hm_Output_Module {
     protected function output() {
-        $res = '<span class="ctr_divider"></span> <a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
-        $res .= '<a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="move">'.$this->trans('Move').'</a>';
-        $res .= '<div class="move_to_location"></div>';
+        $res = '<span class="ctr_divider"></span> <div class="d-flex align-items-start gap-1 dropdown"><a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="copy" data-bs-toggle="dropdown">'.$this->trans('Copy').'</a>';
+        $res .= '<a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="move" data-bs-toggle="dropdown">'.$this->trans('Move').'</a>';
+        $res .= '<div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div>';
         $res .= '<input type="hidden" class="move_to_type" value="" />';
         $res .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
         $res .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
-        $res .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
+        $res .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" /></div>';
         // $res = "<strong>COPY/MOVE</strong>";
         $this->concat('msg_controls_extra', $res);
     }
@@ -2061,7 +2070,7 @@ class Hm_Output_junk_source_max_setting extends Hm_Output_Module {
             $sources = $settings['junk_per_source'];
         }
         if ($sources != DEFAULT_JUNK_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="junk_setting"><td><label for="junk_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -2120,7 +2129,7 @@ class Hm_Output_trash_source_max_setting extends Hm_Output_Module {
             $sources = $settings['trash_per_source'];
         }
         if ($sources != DEFAULT_TRASH_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="trash_setting"><td><label for="trash_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -2147,7 +2156,62 @@ class Hm_Output_trash_since_setting extends Hm_Output_Module {
             '<td>'.message_since_dropdown($since, 'trash_since', $this, DEFAULT_TRASH_SINCE).'</td></tr>';
     }
 }
-
+/**
+ * Starts the Snoozed section on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_snoozed_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control the snoozed messages view
+     */
+    protected function output() {
+        return '<tr><td data-target=".snoozed_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
+            '<i class="bi bi-clock-fill fs-5 me-2"></i>'.
+            $this->trans('Snoozed').'</td></tr>';
+    }
+}
+/**
+ * Option for the maximum number of messages per source for the Snoozed page
+ * @subpackage core/output
+ */
+class Hm_Output_snoozed_source_max_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_snoozed_source_max_setting
+     */
+    protected function output() {
+        $sources = DEFAULT_SNOOZED_PER_SOURCE;
+        $settings = $this->get('user_settings', array());
+        $reset = '';
+        if (array_key_exists('snoozed_per_source', $settings)) {
+            $sources = $settings['snoozed_per_source'];
+        }
+        if ($sources != DEFAULT_SNOOZED_PER_SOURCE) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
+        }
+        return '<tr class="snoozed_setting"><td><label for="snoozed_per_source">'.
+            $this->trans('Max messages per source for Snoozed').'</label></td>' .
+            '<td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="snoozed_per_source" name="snoozed_per_source" value="'.$this->html_safe($sources).'" data-default-value="'.DEFAULT_SNOOZED_PER_SOURCE.'" />'.$reset.'</td></tr>';
+    }
+}
+/**
+ * Option for the snoozed messages date range
+ * @subpackage core/output
+ */
+class Hm_Output_snoozed_since_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_snoozed_since_setting
+     */
+    protected function output() {
+        $since = DEFAULT_SNOOZED_SINCE;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('snoozed_since', $settings) && $settings['snoozed_since']) {
+            $since = $settings['snoozed_since'];
+        }
+        return '<tr class="snoozed_setting"><td><label for="snoozed_since">'.
+            $this->trans('Show snoozed messages since').'</label></td>'.
+            '<td>'.message_since_dropdown($since, 'snoozed_since', $this, DEFAULT_SNOOZED_SINCE).'</td></tr>';
+    }
+}
 /**
  * Starts the Draft section on the settings page
  * @subpackage core/output
@@ -2179,7 +2243,7 @@ class Hm_Output_drafts_source_max_setting extends Hm_Output_Module {
             $sources = $settings['drafts_per_source'];
         }
         if ($sources != DEFAULT_DRAFT_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="drafts_setting"><td><label for="drafts_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -2218,7 +2282,7 @@ class Hm_Output_warn_for_unsaved_changes_setting extends Hm_Output_Module {
         $reset = '';
         if (array_key_exists('warn_for_unsaved_changes', $settings) && $settings['warn_for_unsaved_changes']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="warn_for_unsaved_changes">'.
             $this->trans('Warn for unsaved changes').'</label></td>'.
@@ -2237,7 +2301,8 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
         $hasJmapActivated = in_array('jmap', $this->get('router_module_list'), true);
 
         if($hasImapActivated){
-            $imap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return !array_key_exists('type', $v) || $v['type'] != 'jmap'; }));
+            $servers = array_filter($this->get('imap_servers', array()), fn($s) => ($s['type'] ?? null) !== 'ews');
+            $imap_servers_count = count($servers);
             $accordionTitle .= 'IMAP';
             $configuredText .=  '<span class="imap_server_count"> ' . $imap_servers_count .'</span> IMAP';
             $hasEssentialModuleActivated = true;
@@ -2256,7 +2321,8 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
         }
 
         if($hasSmtpActivated){
-            $smtp_servers_count = count($this->get('smtp_servers', array()));
+            $servers = array_filter($this->get('smtp_servers', array()), fn($s) => ($s['type'] ?? null) !== 'ews');
+            $smtp_servers_count = count($servers);
             if($accordionTitle != ''){
                 $accordionTitle .= ' - ';
                 $configuredText .= ' / ';
@@ -2311,12 +2377,12 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                             <span id="srv_setup_stepper_profile_name-error" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input required type="text" id="srv_setup_stepper_email" name="srv_setup_stepper_email" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Email or Username').'">
+                                            <input required type="text" id="srv_setup_stepper_email" name="srv_setup_stepper_email" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Email or Username').'" autocomplete="username">
                                             <label class="" for="srv_setup_stepper_email">'.$this->trans('Email or Username').'</label>
                                             <span id="srv_setup_stepper_email-error" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input required type="password" id="srv_setup_stepper_password" name="srv_setup_stepper_password" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Password').'">
+                                            <input required type="password" id="srv_setup_stepper_password" name="srv_setup_stepper_password" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Password').'" autocomplete="new-password">
                                             <label class="" for="srv_setup_stepper_password">'.$this->trans('Password').'</label>
                                             <span id="srv_setup_stepper_password-error" class="invalid-feedback"></span>
                                         </div>
@@ -2410,5 +2476,35 @@ class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
 class Hm_Output_server_config_stepper_accordion_end_part extends Hm_Output_Module {
     protected function output() {
         return '</div></div></div>';
+    }
+}
+
+class Hm_Output_privacy_settings extends Hm_Output_Module {
+    static $settings = [
+        'images_whitelist' => [
+            'type' => 'text',
+            'label' => 'External images whitelist',
+            'description' => 'Cypht automatically prevents untrusted external images from loading in messages. Add senders from whom you want to allow images to load.',
+            'separator' => ','
+        ]
+    ];
+
+    protected function output()
+    {
+        return getSettingsSectionOutput('privacy', $this->trans('Privacy'), 'shield', self::$settings, $this->get('user_settings', array()));
+    }
+}
+
+class Hm_output_combined_message_list extends Hm_Output_Module {
+    protected function output() {
+        $messageList = [];
+        $style = $this->get('news_list_style') || $this->get('is_mobile') ? 'news' : 'email';
+        if ($this->get('imap_combined_inbox_data')) {
+            $messageList = array_merge($messageList, format_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'combined_inbox', $style));
+        }
+        if ($this->get('feed_list_data')) {
+            $messageList = array_merge($messageList, $this->get('feed_list_data'), Hm_Output_filter_feed_list_data::formatMessageList($this));
+        }
+        $this->out('formatted_message_list', $messageList);
     }
 }

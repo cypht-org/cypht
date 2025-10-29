@@ -1,4 +1,3 @@
-
 # this is a demo of using the production cypht image
 
 services:
@@ -13,12 +12,19 @@ services:
       - MYSQL_DATABASE=cypht
       - MYSQL_USER=cypht
       - MYSQL_PASSWORD=cypht_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ucypht", "-pcypht_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   cypht:
-    image: cypht/cypht:2.4.0
+    image: cypht/cypht:2.4.2
+    depends_on:
+      db:
+        condition: service_healthy
     ports:
       - "80:80"
-    # env_file:
-    #  - /etc/cypht-prod.env
     environment:
       - AUTH_USERNAME=admin
       - AUTH_PASSWORD=admin
@@ -30,3 +36,9 @@ services:
       - DB_PASS=cypht_password
       - SESSION_TYPE=DB
       - USER_CONFIG_TYPE=DB
+    volumes:
+      - ./data/log/nginx:/var/log/nginx
+      - ./data/log/php:/var/log/php
+      - ./data/log/supervisord:/var/log/supervisord
+      - ./data/fonts:/usr/local/share/cypht/site/fonts
+

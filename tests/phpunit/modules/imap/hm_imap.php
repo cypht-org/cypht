@@ -392,17 +392,17 @@ class Hm_Test_Hm_IMAP extends TestCase {
      */
     public function test_message_action() {
         /* TODO: coverage and assertions */
-        $this->assertTrue($this->imap->message_action('DELETE', array(1), 'foo'));
-        $this->assertTrue($this->imap->message_action('READ', array(1), 'foo'));
-        $this->assertTrue($this->imap->message_action('FLAG', array(1), 'foo'));
-        $this->assertTrue($this->imap->message_action('UNFLAG', array(1), 'foo'));
-        $this->assertTrue($this->imap->message_action('ANSWERED', array(1), 'foo'));
-        $this->assertTrue($this->imap->message_action('UNREAD', array(1), 'foo'));
-        $this->assertTrue($this->imap->message_action('UNDELETE', array(1), 'foo'));
-        $this->assertTrue($this->imap->message_action('CUSTOM', array(1), 'foo', 'bar'));
-        $this->assertTrue($this->imap->message_action('MOVE', array(1), 'Sent'));
-        $this->assertTrue($this->imap->message_action('EXPUNGE', array(1)));
-        $this->assertTrue($this->imap->message_action('COPY', array(1), 'Sent'));
+        $this->assertTrue($this->imap->message_action('DELETE', array(1), 'foo')['status']);
+        $this->assertTrue($this->imap->message_action('READ', array(1), 'foo')['status']);
+        $this->assertTrue($this->imap->message_action('FLAG', array(1), 'foo')['status']);
+        $this->assertTrue($this->imap->message_action('UNFLAG', array(1), 'foo')['status']);
+        $this->assertTrue($this->imap->message_action('ANSWERED', array(1), 'foo')['status']);
+        $this->assertTrue($this->imap->message_action('UNREAD', array(1), 'foo')['status']);
+        $this->assertTrue($this->imap->message_action('UNDELETE', array(1), 'foo')['status']);
+        $this->assertTrue($this->imap->message_action('CUSTOM', array(1), 'foo', 'bar')['status']);
+        $this->assertTrue($this->imap->message_action('MOVE', array(1), 'Sent')['status']);
+        $this->assertTrue($this->imap->message_action('EXPUNGE', array(1))['status']);
+        $this->assertTrue($this->imap->message_action('COPY', array(1), 'Sent')['status']);
     }
     /**
      * @preserveGlobalState disabled

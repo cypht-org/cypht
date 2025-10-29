@@ -56,7 +56,7 @@ class Hm_Test_Msgs extends TestCase {
      */
     public function test_show() {
         Hm_Msgs::add('msg');
-        $this->assertEquals("Array\n(\n    [0] => msg\n)\n", Hm_Msgs::show());
+        $this->assertEquals("Array\n(\n    [0] => SUCCESS: msg\n)\n", Hm_Msgs::show());
     }
     /**
      * @preserveGlobalState disabled

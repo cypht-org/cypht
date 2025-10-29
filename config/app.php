@@ -100,7 +100,7 @@ return [
     /*
     | Attribute to use as the unique identifier for users
     */
-    'ldap_uid_attr' => env('LDAP_UID_ATTR', 'uid'),
+    'ldap_auth_uid_attr' => env('LDAP_AUTH_UID_ATTR', 'uid'),
 
     /*
     | -------------------
@@ -140,10 +140,18 @@ return [
     /*
     |
     | The hostname/IP address and port sieve is listening on. Example: example.org:4190
-    | Note: Add tls:// prefix to enable explicit STARTTLS
+    | Keep this blank to disable sieve filter support on login
     |
     */
-    'imap_auth_sieve_conf_host' => env('IMAP_AUTH_SIEVE_CONF_HOST', 'tls://mail.gandi.net:4190'),
+    'imap_auth_sieve_conf_host' => env('IMAP_AUTH_SIEVE_CONF_HOST', ''),
+
+    /*
+    |
+    | this will add the tls:// prefix to the sieve host if set to true
+    | to make this work make sure you set DEFAULT_SETTING_ENABLE_SIEVE_FILTER to true
+    |
+    */
+    'imap_auth_sieve_tls_mode' => env('IMAP_AUTH_SIEVE_TLS_MODE', true),
 
     /*
     | -------------------
@@ -426,7 +434,9 @@ return [
     | 'cache_class' => env('CACHE_CLASS')
     */
 
+    'allow_session_cache' => env('ALLOW_SESSION_CACHE', false),
 
+    'cache_class' => env('CACHE_CLASS'),
     /*
     | -------------
     | Redis Support
@@ -778,6 +788,8 @@ return [
     //     */
     //     'developer',
 
+        'debug_log' => env('DEBUG_LOG', false),
+
     //     /*
     //     | -------
     //     | Github
@@ -1017,6 +1029,13 @@ return [
 
     /*
     |
+    | Show the message after sending
+    | Defaults to true
+    */
+    'default_setting_review_sent_email' => env('DEFAULT_SETTING_REVIEW_SENT_EMAIL', true),
+
+    /*
+    |
     | Prefer text parts when viewing a message
     | Defaults to false
     */
@@ -1049,6 +1068,27 @@ return [
     | Defaults 20
     */
     'default_setting_junk_per_source' => env('DEFAULT_SETTING_JUNK_PER_SOURCE', 20),
+
+    /*
+    |
+    | Per source time limit for snoozed page
+    | Defaults to 1 week
+    */
+    'default_setting_snoozed_since' => env('DEFAULT_SETTING_SNOOZED_SINCE', '-1 week'),
+
+        /*
+    |
+    | Per source number limit for snoozed page
+    | Defaults 20
+    */
+    'default_setting_snoozed_per_source' => env('DEFAULT_SETTING_SNOOZED_PER_SOURCE', 20),
+
+    /*
+    |
+    | Enable snooze functionality for messages
+    | Defaults to false
+    */
+    'default_setting_enable_snooze' => env('DEFAULT_SETTING_ENABLE_SNOOZE', false),
 
     /*
     |
@@ -1184,6 +1224,14 @@ return [
     'default_setting_search_since' => env('DEFAULT_SETTING_SEARCH_SINCE', '-1 week'),
 
     /*
+    | Enable the "collect address" feature on the send page
+    | This will collect email addresses from the "To", "CC", and "BCC" fields
+    | and save them to the contacts module
+    | Defaults to false
+    */
+    'default_setting_enable_collect_address_on_send' => env('DEFAULT_SETTING_ENABLE_COLLECT_ADDRESS_ON_SEND', false),
+
+    /*
     |
     | Timezone for date displays
     | Defaults to UTC
@@ -1293,7 +1341,7 @@ return [
     | Display message style inline from the message list
     | Defaults to right
     */
-    'default_setting_inline_message_style' => env('DEFAULT_SETTING_INLINE_MESSAGE', 'right'),
+    'default_setting_inline_message_style' => env('DEFAULT_SETTING_INLINE_MESSAGE_STYLE', 'right'),
 
     /*
     |
@@ -1314,4 +1362,6 @@ return [
     | Use this setting switch between the legacy login page and the fancy one
     */
     'fancy_login' => env('FANCY_LOGIN', false),
+
+    'js_exclude_deps' => env('JS_EXCLUDE_DEPS', ''),
 ];

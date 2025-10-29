@@ -22,6 +22,9 @@ var Hm_No_Op = {
 };
 
 $(function() {
+    if (! window.inAppContext) {
+        return;
+    }
     Hm_Timer.add_job(Hm_No_Op.update, Hm_No_Op.interval, true);
     $('*').on('click', function() { Hm_No_Op.reset(); });
 });

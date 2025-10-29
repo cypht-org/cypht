@@ -4,4 +4,8 @@ function applyBlockListPageHandlers() {
 
 function applySieveFiltersPageHandler() {
     sieveFiltersPageHandler();
+
+    return () => {
+        cleanUpSieveFiltersPage();
+    };
 }

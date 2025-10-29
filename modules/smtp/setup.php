@@ -9,6 +9,7 @@ add_module_to_all_pages('handler', 'smtp_default_server', true, 'smtp', 'load_us
 add_handler('compose', 'load_smtp_reply_to_details', true, 'smtp', 'load_user_data', 'after');
 add_handler('compose', 'load_smtp_is_imap_draft', true, 'smtp', 'load_user_data', 'after');
 add_handler('compose', 'smtp_from_replace', true, 'smtp', 'load_user_data', 'after');
+add_handler('compose', 'smtp_subject_replace', true, 'smtp', 'load_user_data', 'after');
 add_handler('compose', 'load_smtp_servers_from_config', true, 'smtp', 'load_smtp_reply_to_details', 'after');
 add_handler('compose', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_handler('compose', 'process_compose_form_submit', true, 'smtp', 'load_smtp_servers_from_config', 'after');
@@ -21,13 +22,14 @@ add_output('compose', 'compose_form_attach', true, 'smtp', 'compose_form_end', '
 add_handler('compose', 'load_smtp_is_imap_forward_as_attachment', true, 'smtp', 'load_user_data', 'after');
 add_handler('compose', 'load_smtp_is_imap_forward', true, 'smtp', 'load_smtp_is_imap_forward_as_attachment', 'after');
 
+
 add_handler('functional_api', 'default_smtp_server', true, 'smtp');
 
 add_handler('profiles', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
 add_handler('profiles', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 
 /* servers page */
-add_handler('servers', 'load_smtp_servers_from_config', true, 'smtp', 'language', 'after');
+add_handler('servers', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
 add_handler('servers', 'process_add_smtp_server', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_handler('servers', 'add_smtp_servers_to_page_data', true, 'smtp', 'process_add_smtp_server', 'after');
 add_handler('servers', 'save_smtp_servers', true, 'smtp', 'add_smtp_servers_to_page_data', 'after');
@@ -52,8 +54,6 @@ add_handler('ajax_smtp_debug', 'load_smtp_servers_from_config',  true);
 add_handler('ajax_smtp_debug', 'add_smtp_servers_to_page_data',  true);
 add_handler('ajax_smtp_debug', 'smtp_connect', true);
 add_handler('ajax_smtp_debug', 'smtp_delete', true);
-add_handler('ajax_smtp_debug', 'smtp_forget', true);
-add_handler('ajax_smtp_debug', 'smtp_save', true);
 add_handler('ajax_smtp_debug', 'save_smtp_servers', true);
 add_handler('ajax_smtp_debug', 'save_user_data',  true, 'core');
 add_handler('ajax_smtp_debug', 'date', true, 'core');
@@ -87,15 +87,16 @@ setup_base_ajax_page('ajax_smtp_delete_draft', 'core');
 add_handler('ajax_smtp_delete_draft', 'process_delete_draft', true, 'smtp', 'load_user_data', 'after');
 
 /* folder list link */
-add_output('ajax_hm_folders', 'compose_page_link', true, 'smtp', 'logout_menu_item', 'before');
+add_output('ajax_hm_folders', 'compose_page_link', true, 'smtp', 'main_menu_content', 'before');
 add_handler('ajax_hm_folders', 'smtp_auto_bcc_check',  true, 'smtp', 'load_imap_servers_from_config', 'after');
-add_output('ajax_hm_folders', 'sent_folder_link', true, 'smtp', 'logout_menu_item', 'before');
+add_output('ajax_hm_folders', 'sent_folder_link', true, 'smtp', 'main_menu_content', 'before');
 
 add_handler('ajax_update_server_pw', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
 
 setup_base_ajax_page('ajax_profiles_status', 'core');
 add_handler('ajax_profiles_status', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_profiles_status', 'profile_status', true, 'smtp', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_profiles_status', 'smtp_supports_dsn', true, 'smtp', 'profile_status', 'after');
 
 /* resumable clear chunks */
 add_handler('ajax_clear_attachment_chunks', 'login', false, 'core');
@@ -104,6 +105,20 @@ add_handler('ajax_clear_attachment_chunks', 'clear_attachment_chunks',  true);
 
 add_handler('settings', 'process_enable_compose_delivery_receipt_setting', true, 'core', 'save_user_settings', 'before');
 add_output('settings', 'enable_compose_delivery_receipt_setting', true, 'core', 'start_general_settings', 'after');
+/* send delayed emails */
+setup_base_ajax_page('ajax_send_scheduled_messages', 'core');
+add_handler('ajax_send_scheduled_messages', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_send_scheduled_messages', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
+add_handler('ajax_send_scheduled_messages', 'compose_profile_data',  true, 'profiles');
+add_handler('ajax_send_scheduled_messages', 'send_scheduled_messages', true, 'smtp');
+
+setup_base_ajax_page('ajax_re_schedule_message_sending', 'core');
+add_handler('ajax_re_schedule_message_sending', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_re_schedule_message_sending', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
+add_handler('ajax_re_schedule_message_sending', 'compose_profile_data',  true, 'profiles');
+add_handler('ajax_re_schedule_message_sending', 're_schedule_message_sending', true, 'smtp');
+
+add_output('message_list', 'scheduled_send_msg_control', true, 'smtp', 'imap_custom_controls', 'after');
 
 return array(
     'allowed_pages' => array(
@@ -114,7 +129,9 @@ return array(
         'ajax_profiles_status',
         'ajax_attachment_reminder_check',
         'ajax_get_test_chunk',
-        'ajax_upload_chunk'
+        'ajax_upload_chunk',
+        'ajax_send_scheduled_messages',
+        'ajax_re_schedule_message_sending'
     ),
     'allowed_get' => array(
         'imap_draft' => FILTER_VALIDATE_INT,
@@ -127,6 +144,7 @@ return array(
         'compose_to' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'mailto_uri' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'compose_from' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'compose_subject' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'resumableChunkNumber' => FILTER_VALIDATE_INT,
         'resumableTotalChunks' => FILTER_VALIDATE_INT,
         'resumableChunkSize' => FILTER_VALIDATE_INT,
@@ -146,17 +164,20 @@ return array(
         'msg_sent_and_archived' => array(FILTER_VALIDATE_BOOLEAN, false),
         'sent_msg_id' => array(FILTER_VALIDATE_BOOLEAN, false),
         'enable_attachment_reminder' => array(FILTER_VALIDATE_BOOLEAN, false),
+        'scheduled_msg_count' => array(FILTER_VALIDATE_INT, false),
+        'dsn_supported' => array(FILTER_VALIDATE_BOOLEAN, false),
     ),
     'allowed_post' => array(
         'post_archive' => FILTER_VALIDATE_INT,
+        'send_tomorrow_morning' => FILTER_UNSAFE_RAW,
+        'send_today_afternoon' => FILTER_UNSAFE_RAW,
+        'schedule_sending' => FILTER_UNSAFE_RAW,
         'attachment_id' => FILTER_UNSAFE_RAW,
         'smtp_compose_type' => FILTER_VALIDATE_INT,
         'new_smtp_name' => FILTER_UNSAFE_RAW,
         'new_smtp_address' => FILTER_UNSAFE_RAW,
         'new_smtp_port' => FILTER_UNSAFE_RAW,
         'smtp_connect' => FILTER_VALIDATE_INT,
-        'smtp_forget' => FILTER_VALIDATE_INT,
-        'smtp_save' => FILTER_VALIDATE_INT,
         'smtp_delete' => FILTER_VALIDATE_INT,
         'smtp_send' => FILTER_VALIDATE_INT,
         'submit_smtp_server' => FILTER_UNSAFE_RAW,
@@ -190,5 +211,8 @@ return array(
         'send_uploaded_files' => FILTER_UNSAFE_RAW,
         'next_email_post' => FILTER_UNSAFE_RAW,
         'enable_attachment_reminder' => FILTER_VALIDATE_INT,
+        'schedule' => FILTER_UNSAFE_RAW,
+        'schedule_date' => FILTER_UNSAFE_RAW,
+        'scheduled_msg_ids' => FILTER_UNSAFE_RAW,
     )
 );

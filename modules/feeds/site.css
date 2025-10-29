@@ -1,1 +1,48 @@
 .feeds_setting, .feeds_section { display: none; }
+
+.msg_headers {
+    color: #777;
+    max-width: 100%;
+}
+
+.msg_headers .header_subject h4 {
+    color: #333;
+    font-size: 1.25rem;
+}
+
+.msg_headers .fw-semibold {
+    color: #555;
+    min-width: 80px;
+}
+
+.msg_headers a {
+    color: var(--bs-primary);
+    text-decoration: none;
+}
+
+.msg_headers a:hover {
+    text-decoration: underline;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 767.98px) {
+    .msg_headers .fw-semibold {
+        min-width: 60px;
+        font-size: 0.9rem;
+    }
+    
+    .msg_headers .header_subject h4 {
+        font-size: 1.1rem;
+    }
+
+    .msg_headers .header_link {
+        align-items: flex-start !important;
+    }
+
+    .msg_headers .header_link a {
+        display: block;
+        white-space: nowrap !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}

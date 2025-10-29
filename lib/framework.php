@@ -10,6 +10,7 @@ const VERSION = .1;
 
 /* load the framework */
 require APP_PATH.'lib/repository.php';
+require APP_PATH.'lib/searchable.php';
 require APP_PATH.'lib/module.php';
 require APP_PATH.'lib/modules.php';
 require APP_PATH.'lib/modules_exec.php';
@@ -35,13 +36,9 @@ require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
 require APP_PATH.'lib/api.php';
 require APP_PATH.'lib/webdav_formats.php';
+require APP_PATH.'lib/js_libs.php';
 
 require_once APP_PATH.'modules/core/functions.php';
-
-/* load random bytes polyfill if needed */
-if (!function_exists('random_bytes')) {
-    require VENDOR_PATH.'paragonie/random_compat/lib/random.php';
-}
 
 /* check for and load the correct libsodium interface */
 if (!defined('LIBSODIUM')) {
@@ -71,7 +68,7 @@ if (!class_exists('Hm_Functions')) {
          */
         public static function setcookie($name, $value, $lifetime = 0, $path = '', $domain = '', $secure = false, $html_only = false, $same_site = 'Strict') {
             $prefix = ($lifetime != 0 && $lifetime < time()) ? 'Deleting' : 'Setting';
-            Hm_Debug::add(sprintf('%s cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',$prefix, $name, $lifetime, $path, $domain, $secure, $html_only));
+            Hm_Debug::add(sprintf('%s cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',$prefix, $name, $lifetime, $path, $domain, $secure, $html_only), 'info');
             return setcookie($name, $value, [
                 'expires' => $lifetime,
                 'path' => $path,
@@ -139,7 +136,7 @@ if (!class_exists('Hm_Functions')) {
             if (extension_loaded('curl')) {
                 return curl_init();
             } else {
-                Hm_Msgs::add('ERRPlease enable the cURL extension.');
+                Hm_Msgs::add('Please enable the cURL extension.', 'warning');
                 return false;
             }
         }
@@ -151,7 +148,7 @@ if (!class_exists('Hm_Functions')) {
             $response = curl_exec($handle);
             if ($response === false) {
                 $error = curl_error($handle);
-                Hm_Msgs::add('ERRcURL error: '.$error);
+                Hm_Msgs::add('cURL error: '.$error, 'danger');
             }
             return $response;
         }
@@ -264,7 +261,7 @@ function hm_exists($name) {
     $caller = array_shift($bt);
     $module = hm_get_module_from_path($caller['file']);
     if (function_exists($name)) {
-        Hm_Debug::add(sprintf('Function in %s replaced: %s', $module, $name));
+        Hm_Debug::add(sprintf('Function in %s replaced: %s', $module, $name), 'warning');
         return true;
     }
     return false;

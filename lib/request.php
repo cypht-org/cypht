@@ -84,11 +84,11 @@ class Hm_Request {
         if (!$config->get('disable_empty_superglobals', false)) {
             $this->empty_super_globals();
         }
-        Hm_Debug::add('Using sapi: '.$this->sapi);
-        Hm_Debug::add('Request type: '.$this->type);
-        Hm_Debug::add('Request path: '.$this->path);
-        Hm_Debug::add('TLS request: '.intval($this->tls));
-        Hm_Debug::add('Mobile request: '.intval($this->mobile));
+        Hm_Debug::add('Using sapi: '.$this->sapi, 'info');
+        Hm_Debug::add('Request type: '.$this->type, 'info');
+        Hm_Debug::add('Request path: '.$this->path, 'info');
+        Hm_Debug::add('TLS request: '.intval($this->tls), 'info');
+        Hm_Debug::add('Mobile request: '.intval($this->mobile), 'info');
     }
 
     /**
@@ -175,6 +175,12 @@ class Hm_Request {
             $this->mobile = true;
             return;
         }
+
+        if (!empty($_COOKIE['is_mobile_screen']) && $_COOKIE['is_mobile_screen'] == '1') {
+            $this->mobile = true;
+            return;
+        }
+
         if (!empty($this->server['HTTP_USER_AGENT'])) {
             if (preg_match("/(iphone|ipod|ipad|android|blackberry|webos|opera mini)/i", $this->server['HTTP_USER_AGENT'])) {
                 $this->mobile = true;

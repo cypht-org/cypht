@@ -53,7 +53,14 @@ function format_msg_html($str, $images=false) {
  */
 if (!hm_exists('sanitize_email_html')) {
 function sanitize_email_html($html) {
-    $html = preg_replace('/<([^>]+)style\s*=\s*["\'][^"\']*background-image\s*:\s*url\((["\']?)https?:\/\/.*?\2\)[^"\']*["\']/i', '<$1', $html);
+    $html = preg_replace_callback(
+        '/<([^>]+)\s*style\s*=\s*(["\'])(.*?)\2/i',
+        function($matches) {
+            $content = preg_replace('/background-image\s*:\s*url\([^)]*\)\s*;?\s*/i', '', $matches[3]);
+            return '<' . $matches[1] . ' style=' . $matches[2] . $content . $matches[2];
+        },
+        $html
+    );
 
     return $html;
 }}
@@ -135,11 +142,6 @@ function reply_to_address($headers, $type) {
     $msg_cc = '';
     $headers = lc_headers($headers);
     $parsed = array();
-    $delivered_address = false;
-    if (array_key_exists('delivered-to', $headers)) {
-        $delivered_address = array('email' => $headers['delivered-to'],
-            'comment' => '', 'label' => '');
-    }
 
     if ($type == 'forward') {
         return $msg_to;
@@ -153,9 +155,6 @@ function reply_to_address($headers, $type) {
         }
     }
     if ($type == 'reply_all') {
-        if ($delivered_address) {
-            $parsed[] = $delivered_address;
-        }
         if (array_key_exists('cc', $headers)) {
             list($cc_parsed, $msg_cc) = format_reply_address($headers['cc'], $parsed);
             $parsed += $cc_parsed;
@@ -462,8 +461,7 @@ class HTMLToText {
 
     function __construct($html) {
         $doc = new DOMDocument();
-        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        $doc->loadHTML(htmlentities($html, ENT_QUOTES, 'UTF-8'));
+        $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         if (trim($html) && $doc->hasChildNodes()) {
             $this->parse_nodes($doc->childNodes);
         }
