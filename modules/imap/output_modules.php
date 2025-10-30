@@ -199,14 +199,14 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
             // Start Bootstrap container
             $txt .= '<div class="container-fluid p-0 ml-0 border-bottom border-secondary-subtle text-muted">';
-            
+
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
                     if ($fld == mb_strtolower($name)) {
                         if ($fld == 'subject') {
                             $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
                             $txt .= '<div class="col-12">';
-                            if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
+                            if (array_key_exists('flags', lc_headers($headers)) && mb_stristr(lc_headers($headers)['flags'], 'flagged')) {
                                 $txt .= '<i class="bi bi-star-half account_icon"></i> ';
                             }
                             $txt .= '<span class="fs-5 fw-normal text-dark js-header_subject">' . $this->html_safe($value) . '</span>';
@@ -274,10 +274,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $txt .= '</div></div></div></div></div>';
                         }
                         elseif ($fld == 'reply-to') {
-                            $from = addr_parse($headers['From']);
+                            $from = addr_parse(lc_headers($headers)['from'] ?? '');
                             $replyEmails = array_map(function ($addr) {
                                 return $addr['email'];
-                            }, process_address_fld($headers['Reply-To']));
+                            }, process_address_fld(lc_headers($headers)['reply-to'] ?? ''));
 
                             if (count($replyEmails) === 1 && ($replyEmails[0] === $from['email'])) {
                                 $txt .= '<div class="row g-0 py-1 long_header">';
@@ -310,7 +310,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     }
                 }
             }
-            $is_draft = isset($headers['Flags']) && mb_stristr($headers['Flags'], 'draft');
+            $is_draft = array_key_exists('flags', lc_headers($headers)) && mb_stristr(lc_headers($headers)['flags'], 'draft');
             if($is_draft) {
                 $txt .= '<div class="row g-0 py-2"><div class="col-12 text-center text-md-start"><a class="btn btn-primary" href="?page=compose'.$reply_args.'&imap_draft=1"><i class="bi bi-pencil"></i> '.$this->trans('Edit Draft').'</a></div></div>';
             }
@@ -331,11 +331,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     }
                 }
             }
-            
+
             if ($this->get('list_headers')) {
                 $txt .= format_list_headers($this);
             }
-            
+
             $lc_headers = lc_headers($headers);
             if (array_key_exists('to', $lc_headers)) {
                 $addr_list = process_address_fld($lc_headers['to']);
@@ -365,9 +365,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<a href="#" class="hlink all_headers text-decoration-none btn btn-sm btn-outline-secondary">'.$this->trans('All headers').'</a>';
             $txt .= '<a class="hlink small_headers text-decoration-none btn btn-sm btn-outline-secondary" href="#">'.$this->trans('Small headers').'</a>';
             $txt .= '</div>';
-            
+
             $txt .= '<div class="d-flex flex-wrap gap-2">';
-            if (!isset($headers['Flags']) || !mb_stristr($headers['Flags'], 'draft')) {
+            if (!array_key_exists('flags', $lc_headers) || !mb_stristr($lc_headers['flags'], 'draft')) {
                 $txt .= '<a class="reply_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
                 if ($size > 1) {
                     $txt .= '<a class="reply_all_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
@@ -376,7 +376,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 }
                 $txt .= forward_dropdown($this, $reply_args);
             }
-            if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
+            if (array_key_exists('flags', $lc_headers) && mb_stristr($lc_headers['flags'], 'flagged')) {
                 $txt .= '<a id="flag_msg" class="flagged_link hlink text-decoration-none btn btn-sm btn-outline-secondary hide" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
                 $txt .= '<a id="unflag_msg" class="unflagged_link hlink text-decoration-none btn btn-sm btn-outline-secondary" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             } else {
@@ -391,17 +391,17 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if (!$this->get('is_archive_folder')) {
                 $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
             }
-            
+
             if($this->get('tags')){
-                $txt .= tags_dropdown($this, $headers);
+                $txt .= tags_dropdown($this);
             }
-            if (isset($headers['X-Schedule'])) {
+            if (isset($lc_headers['x-schedule'])) {
                 $txt .= schedule_dropdown($this, true);
             }
 
             $settings = $this->get('user_settings', array());
             if(array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting']) {
-                $txt .= snooze_dropdown($this, isset($headers['X-Snoozed']));
+                $txt .= snooze_dropdown($this, isset($lc_headers['x-snoozed']));
             }
             if ($this->get('sieve_filters_enabled') && !$is_draft) {
                 $server_id = $this->get('msg_server_id');
@@ -410,7 +410,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $user_config = $this->get('user_config');
                     $contact_list = $user_config->get('contacts', []);
                     $existing_emails = array_column($contact_list, 'email_address');
-                    $sender = addr_parse($headers['From'])['email'];
+                    $sender = addr_parse($lc_headers['from'] ?? '')['email'];
                     $domain = '*@'.get_domain($sender);
                     $blocked_senders = get_blocked_senders_array($imap_server, $this->get('site_config'), $this->get('user_config'));
                     $sender_blocked = in_array($sender, $blocked_senders);
@@ -420,7 +420,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                         $txt .= block_filter_dropdown($this);
                     }
                 } else {
-                    $txt .= '<span class="btn btn-sm" data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
+                    $txt .= '<span class="text-decoration-none btn btn-sm btn-outline-danger" data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
             }
 
@@ -796,7 +796,7 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
                 }
                 $res .= '</tr>';
             }
-        }   
+        }
         return $res;
     }
 }
@@ -933,7 +933,7 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
             foreach ($this->get('imap_folders', array()) as $id => $folder) {
                 $res .= '<li class="imap_'.$id.'_"><a href="#" class="imap_folder_link" data-target="imap_'.$id.'_">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<i class="bi bi-folder fs-5 me-2"></i>';
+                    $res .= '<i class="bi bi-folder me-2"></i>';
                 }
                 $res .= $this->html_safe($folder).'</a></li>';
             }
@@ -1316,7 +1316,7 @@ class Hm_Output_setting_enable_snooze extends Hm_Output_Module {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="enable_snooze">'.
-            $this->trans('Enable Snooze functionality').'</label></td>'.
+            $this->trans('Enable Snooze functionality').' <span class="badge bg-warning text-dark ms-2">'.$this->trans('Experimental').'</span></label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.' id="enable_snooze" name="enable_snooze" data-default-value="'.(DEFAULT_ENABLE_SNOOZE ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
     }
 }
@@ -1353,7 +1353,7 @@ class Hm_Output_snooze_msg_control extends Hm_Output_Module {
         if (!$enable_snooze) {
             return;
         }
-        
+
         $parts = explode('_', $this->get('list_path'));
         $unsnooze = $parts[0] == 'imap' && hex2bin($parts[2]) == 'Snoozed';
         $res = snooze_dropdown($this, $unsnooze);

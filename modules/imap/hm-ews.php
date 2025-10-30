@@ -565,12 +565,21 @@ class Hm_EWS {
         $result = $this->ews->GetItem($request);
         $messages = [];
 
-        foreach ($result as $message) {
-            $flags = $this->extract_flags($message);
-            $uid = bin2hex($message->getItemId()->getId());
-            $msg = $this->getMessageProperties($message, $uid, $flags, $include_preview);
-            $messages[$uid] = $msg;
+        // For a mailbox with a single item, EWS returns the item directly instead of an array
+        if (! is_array($result)) {
+            $uid = bin2hex($result->getItemId()->getId());
+            $flags = $this->extract_flags($result);
+            $messages[$uid] = $this->getMessageProperties($result, $uid, $flags, $include_preview);
+            return $messages;
+        } else {
+            foreach ($result as $message) {
+                $flags = $this->extract_flags($message);
+                $uid = bin2hex($message->getItemId()->getId());
+                $msg = $this->getMessageProperties($message, $uid, $flags, $include_preview);
+                $messages[$uid] = $msg;
+            }
         }
+
         return $messages;
     }
 

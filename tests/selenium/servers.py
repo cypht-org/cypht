@@ -30,8 +30,10 @@ class ServersTest(WebTest):
 
     def server_stmp_and_imap_add(self):
         self.toggle_server_section('server_config')
+        self.wait_on_class('imap-jmap-smtp-btn')
         self.by_id('add_new_server_button').click()
-        name = self.by_name('srv_setup_stepper_profile_name')
+        # self.wait_on_class('srv_setup_stepper_profile_name')
+        name = self.by_id('srv_setup_stepper_profile_name')
         name.send_keys('Test')
         email = self.by_name('srv_setup_stepper_email')
         email.send_keys('test@localhost')

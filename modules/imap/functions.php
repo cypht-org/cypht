@@ -127,7 +127,8 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
 
     foreach ($folders as $folder_name => $folder) {
         $folder_name = bin2hex($folder_name);
-        $results .= '<li class="'. ($folder['children'] ? 'm-has-children ' : '') .'imap_'.$id.'_'.$output_mod->html_safe($folder_name).'" data-number-children="'.$output_mod->html_safe($folder['number_of_children']).'">';
+        $childrenCount = isset($folder['number_of_children']) ? $folder['number_of_children'] : 0;
+        $results .= '<li class="'. ($folder['children'] ? 'm-has-children ' : '') .'imap_'.$id.'_'.$output_mod->html_safe($folder_name).'" data-number-children="'.$output_mod->html_safe($childrenCount).'">';
 
         if ($folder['children']) {
             $results .= '<div class="m-has-children-wrapper"><a href="#" class="imap_folder_link expand_link d-inline-flex" data-target="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"><i class="bi bi-plus-circle-fill"></i></a>';
@@ -800,7 +801,7 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                     }
                 }
                 if ($sent) {
-                    $msgs = $mailbox->search($folder, $search_type, $terms, null, null, true, false, true);
+                    $msgs = $mailbox->search($folder, $search_type, $terms, null, null, true, true);
                 }
                 else {
                     $msgs = $mailbox->search($folder, $search_type, $terms);
@@ -814,7 +815,7 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                     rsort($msgs);
                     $msgs = array_slice($msgs, 0, $limit);
                 }
-                foreach ($mailbox->get_message_list($folder, $msgs) as $msg) {
+                foreach ($mailbox->get_message_list($folder, $msgs, !$sent) as $msg) {
                     if (array_key_exists('content-type', $msg) && mb_stristr($msg['content-type'], 'multipart/mixed')) {
                         $msg['flags'] .= ' \Attachment';
                     }
@@ -1511,16 +1512,18 @@ function snooze_dropdown($output, $unsnooze = false) {
 }}
 
 if (!hm_exists('tags_dropdown')) {
-function tags_dropdown($context, $headers) {
+function tags_dropdown($context) {
+    $msgUid = $context->get('msg_text_uid');
+    $msgTags = Hm_Tags::getTagIdsWithMessage($msgUid);
+
     $folders = $context->get('tags', array());
     $txt = '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Tags').'</a>
+                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" href="#" aria-expanded="true">'.$context->trans('Tags').'</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuTag">';
 
-    $tags =  !empty($headers['X-Cypht-Tags']) ? explode(',', $headers['X-Cypht-Tags']) : array();
     foreach ($folders as $folder) {
         $tag = $folder['name'];
-        $is_checked = in_array($folder['id'], array_map('trim', $tags));
+        $is_checked = in_array($folder['id'], $msgTags);
         $txt .= '<li class="d-flex dropdown-item gap-2">';
         $txt .= '<input class="form-check-input me-1 label-checkbox" type="checkbox" value="" aria-label="..." data-id="'.$folder['id'].'" '.($is_checked ? 'checked' : '').'>';
         $txt .= '<span>'.$context->trans($tag).'</span>';
