@@ -1317,6 +1317,10 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
             $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
 
+        if (empty($ids)) {
+            return;
+        }
+
         list($sort, $reverse) = process_sort_arg($this->request->get['sort'], $this->user_config->get('default_sort_order_setting', 'arrival'));
 
         if (isset($this->request->post['list_path'])) {
@@ -1363,6 +1367,9 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
         foreach ($ids as $key => $id) {
             $details = Hm_IMAP_List::dump($id);
             $mailbox = Hm_IMAP_List::get_connected_mailbox($id, $this->cache);
+            if (!$mailbox) {
+                continue;
+            }
             if($this->get('list_path') == 'snoozed' && !$mailbox->folder_exists('Snoozed')) {
                 continue;
             }
