@@ -190,6 +190,348 @@ var hm_sieve_possible_actions = function() {
     ];
 };
 
+const Hm_Filters = (function (my) {
+  my.save_filter = function (imap_account, gen_script = false) {
+    let is_editing_filter = false;
+    let current_editing_filter_name = "";
+    function ordinal_number(n) {
+      let ord = "th";
+
+      if (n % 10 == 1 && n % 100 != 11) {
+        ord = "st";
+      } else if (n % 10 == 2 && n % 100 != 12) {
+        ord = "nd";
+      } else if (n % 10 == 3 && n % 100 != 13) {
+        ord = "rd";
+      }
+
+      return n + ord;
+    }
+    let validation_failed = false;
+    let conditions_parsed = [];
+    let actions_parsed = [];
+
+    let conditions = $("select[name^=sieve_selected_conditions_field]")
+      .map(function (idx, elem) {
+        return $(elem).val();
+      })
+      .get();
+
+    let conditions_type = $("select[name^=sieve_selected_conditions_options]")
+      .map(function (idx, elem) {
+        return $(elem).val();
+      })
+      .get();
+
+    let conditions_value = $("input[name^=sieve_selected_option_value]")
+      .map(function (idx, elem) {
+        return $(elem).val();
+      })
+      .get();
+
+    let conditions_extra_value = $(
+      "input[name^=sieve_selected_extra_option_value]"
+    )
+      .map(function (idx, elem) {
+        return $(elem).val();
+      })
+      .get();
+
+    let idx = 0;
+    if (conditions.length === 0) {
+      Hm_Notices.show("You must provide at least one condition", "warning");
+      return false;
+    }
+
+    conditions.forEach(function (elem, key) {
+      if (conditions_value[idx] === "" && conditions_value[idx] !== "none") {
+        let order = ordinal_number(key + 1);
+        Hm_Notices.show(
+          "The " + order + " condition (" + elem + ") must be provided",
+          "warning"
+        );
+        validation_failed = true;
+      }
+      conditions_parsed.push({
+        condition: elem,
+        type: conditions_type[idx],
+        extra_option: conditions[idx].extra_option,
+        extra_option_value: conditions_extra_value[idx],
+        value: conditions_value[idx],
+      });
+      idx++;
+    });
+
+    let actions_type = $("select[name^=sieve_selected_actions]")
+      .map(function (idx, elem) {
+        return $(elem).val();
+      })
+      .get();
+
+    let actions_value = $("[name^=sieve_selected_action_value]")
+      .map(function (idx, elem) {
+        return $(elem).val();
+      })
+      .get();
+
+    let actions_field_type = $("[name^=sieve_selected_action_value]")
+      .map(function (idx, elem) {
+        return $(elem).attr("type");
+      })
+      .get();
+
+    let actions_extra_value = $(
+      "input[name^=sieve_selected_extra_action_value]"
+    )
+      .map(function (idx, elem) {
+        return $(elem).val();
+      })
+      .get();
+
+    if (actions_type.length === 0) {
+      Hm_Notices.show("You must provide at least one action", "warning");
+      return false;
+    }
+
+    idx = 0;
+    actions_type.forEach(function (elem, key) {
+      if (actions_value[idx] === "" && actions_field_type[idx] !== "hidden") {
+        let order = ordinal_number(key + 1);
+        Hm_Notices.show(
+          "The " + order + " action (" + elem + ") must be provided",
+          "warning"
+        );
+        validation_failed = true;
+      }
+      actions_parsed.push({
+        action: elem,
+        value: actions_value[idx],
+        extra_option: actions_type[idx].extra_option,
+        extra_option_value: actions_extra_value[idx],
+      });
+      idx++;
+    });
+
+    if ($("#stop_filtering").is(":checked")) {
+      actions_parsed.push({
+        action: "stop",
+        value: "",
+        extra_option: "",
+        extra_option_value: "",
+      });
+    }
+
+    if ($(".modal_sieve_filter_name").val() == "") {
+      Hm_Notices.show("Filter name is required", "danger");
+      return false;
+    }
+
+    if (validation_failed) {
+      return false;
+    }
+
+    Hm_Ajax.request(
+      [
+        { name: "hm_ajax_hook", value: "ajax_sieve_save_filter" },
+        { name: "imap_account", value: imap_account },
+        {
+          name: "sieve_filter_name",
+          value: $(".modal_sieve_filter_name").val(),
+        },
+        {
+          name: "sieve_filter_priority",
+          value: $(".modal_sieve_filter_priority").val(),
+        },
+        { name: "is_editing_filter", value: is_editing_filter },
+        {
+          name: "current_editing_filter_name",
+          value: current_editing_filter_name,
+        },
+        { name: "conditions_json", value: JSON.stringify(conditions_parsed) },
+        { name: "actions_json", value: JSON.stringify(actions_parsed) },
+        {
+          name: "filter_test_type",
+          value: $(".modal_sieve_filter_test").val(),
+        },
+        { name: "gen_script", value: gen_script },
+      ],
+      function (res) {
+        if (Object.keys(res.script_details).length === 0) {
+          window.location.href = "?page=sieve_filters";
+        } else {
+          edit_script_modal.open();
+          $(".modal_sieve_script_textarea").val(res.script_details.gen_script);
+          $(".modal_sieve_script_name").val(res.script_details.filter_name);
+          $(".modal_sieve_script_priority").val(
+            res.script_details.filter_priority
+          );
+        }
+      }
+    );
+
+    return true;
+  };
+
+  my.save_script = function (imap_account) {
+    if ($(".modal_sieve_script_name").val() === "") {
+      Hm_Notices.show("You must provide a name for your script", "warning");
+      return false;
+    }
+    if ($(".modal_sieve_script_textarea").val() === "") {
+      Hm_Notices.show("Empty script", "warning");
+      return false;
+    }
+    Hm_Ajax.request(
+      [
+        { name: "hm_ajax_hook", value: "ajax_sieve_save_script" },
+        { name: "imap_account", value: imap_account },
+        {
+          name: "sieve_script_name",
+          value: $(".modal_sieve_script_name").val(),
+        },
+        {
+          name: "sieve_script_priority",
+          value: $(".modal_sieve_script_priority").val(),
+        },
+        { name: "is_editing_script", value: is_editing_script },
+        { name: "current_editing_script", value: current_editing_script_name },
+        { name: "script", value: $(".modal_sieve_script_textarea").val() },
+      ],
+      function (res) {
+        window.location = window.location;
+      }
+    );
+  };
+
+  my.add_filter_condition = function () {
+    let header_fields = "";
+    let message_fields = "";
+
+    hm_sieve_condition_fields().Message.forEach(function (value) {
+      if (value.selected === true) {
+        message_fields +=
+          '<option selected value="' +
+          value.name +
+          '">' +
+          value.description +
+          "</option>";
+      } else {
+        message_fields +=
+          '<option value="' +
+          value.name +
+          '">' +
+          value.description +
+          "</option>";
+      }
+    });
+
+    hm_sieve_condition_fields().Header.forEach(function (value) {
+      if (value.selected === true) {
+        header_fields +=
+          '<option selected value="' +
+          value.name +
+          '">' +
+          value.description +
+          "</option>";
+      } else {
+        header_fields +=
+          '<option value="' +
+          value.name +
+          '">' +
+          value.description +
+          "</option>";
+      }
+    });
+
+    let extra_options =
+      '<td class="col-sm-3"><input type="hidden" class="condition_extra_value form-control form-control-sm" name="sieve_selected_extra_option_value[]" /></td>';
+    $(".sieve_list_conditions_modal").append(
+      "                            <tr>" +
+        '                                <td class="col-sm-2">' +
+        '                                    <select class="add_condition_sieve_filters form-control form-control-sm" name="sieve_selected_conditions_field[]">' +
+        '                                        <optgroup label="Message">' +
+        message_fields +
+        "                                        </optgroup>" +
+        '                                        <optgroup label="Header">' +
+        header_fields +
+        "                                        </optgroup>" +
+        "                                    </select>" +
+        "                                </td>" +
+        extra_options +
+        '                                <td class="col-sm-3">' +
+        '                                    <select class="condition_options form-control form-control-sm" name="sieve_selected_conditions_options[]">' +
+        '                                        <option value="Contains">' +
+        "                                            Contains" +
+        "                                        </option>" +
+        '                                        <option value="!Contains">' +
+        "                                            Not Contains" +
+        "                                        </option>" +
+        '                                        <option value="Matches">' +
+        "                                            Matches" +
+        "                                        </option>" +
+        '                                        <option value="!Matches">' +
+        "                                            Not Matches" +
+        "                                        </option>" +
+        '                                        <option value="Regex">' +
+        "                                            Regex" +
+        "                                        </option>" +
+        '                                        <option value="!Regex">' +
+        "                                            Not Regex" +
+        "                                        </option>" +
+        "                                    </select>" +
+        "                                </td>" +
+        '                                <td class="col-sm-3">' +
+        '                                    <input type="text" name="sieve_selected_option_value[]" class="form-control form-control-sm" />' +
+        "                                </td>" +
+        '                                <td class="col-sm-1 text-end align-middle">' +
+        '                                    <a href="#" class="delete_condition_modal_button btn btn-sm btn-secondary">Delete</a>' +
+        "                                </td>" +
+        "                            </tr>"
+    );
+  };
+
+  my.add_filter_action = function (default_value = "") {
+    let possible_actions_html = "";
+
+    hm_sieve_possible_actions().forEach(function (value) {
+      if (value.selected === true) {
+        possible_actions_html +=
+          '<option selected value="' +
+          value.name +
+          '">' +
+          value.description +
+          "</option>";
+        return;
+      }
+      possible_actions_html +=
+        '<option value="' + value.name + '">' + value.description + "</option>";
+    });
+    let extra_options =
+      '<td class="col-sm-3"><input type="hidden" class="condition_extra_action_value form-control form-control-sm" name="sieve_selected_extra_action_value[]" /></td>';
+    $(".filter_actions_modal_table").append(
+      '<tr class="border" default_value="' +
+        default_value +
+        '">' +
+        '   <td class="col-sm-3">' +
+        '       <select class="sieve_actions_select form-control form-control-sm" name="sieve_selected_actions[]">' +
+        "          " +
+        possible_actions_html +
+        "       </select>" +
+        "    </td>" +
+        extra_options +
+        '    <td class="col-sm-5">' +
+        '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
+        "    </input>" +
+        '    <td class="col-sm-1 text-end align-middle">' +
+        '           <a href="#" class="delete_action_modal_button btn btn-sm btn-secondary">Delete</a>' +
+        "    </td>" +
+        "</tr>"
+    );
+  };
+
+  return my;
+})({});
+
     const add_filter_condition = Hm_Filters.add_filter_condition;
     const add_filter_action = Hm_Filters.add_filter_action;
 
