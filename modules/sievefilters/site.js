@@ -443,51 +443,48 @@ const Hm_Filters = (function (my) {
       }
     });
 
-    let extra_options =
-      '<td class="col-sm-3"><input type="hidden" class="condition_extra_value form-control form-control-sm" name="sieve_selected_extra_option_value[]" /></td>';
-    $(".sieve_list_conditions_modal").append(
-      "                            <tr>" +
-        '                                <td class="col-sm-2">' +
-        '                                    <select class="add_condition_sieve_filters form-control form-control-sm" name="sieve_selected_conditions_field[]">' +
-        '                                        <optgroup label="Message">' +
-        message_fields +
-        "                                        </optgroup>" +
-        '                                        <optgroup label="Header">' +
-        header_fields +
-        "                                        </optgroup>" +
-        "                                    </select>" +
-        "                                </td>" +
-        extra_options +
-        '                                <td class="col-sm-3">' +
-        '                                    <select class="condition_options form-control form-control-sm" name="sieve_selected_conditions_options[]">' +
-        '                                        <option value="Contains">' +
-        "                                            Contains" +
-        "                                        </option>" +
-        '                                        <option value="!Contains">' +
-        "                                            Not Contains" +
-        "                                        </option>" +
-        '                                        <option value="Matches">' +
-        "                                            Matches" +
-        "                                        </option>" +
-        '                                        <option value="!Matches">' +
-        "                                            Not Matches" +
-        "                                        </option>" +
-        '                                        <option value="Regex">' +
-        "                                            Regex" +
-        "                                        </option>" +
-        '                                        <option value="!Regex">' +
-        "                                            Not Regex" +
-        "                                        </option>" +
-        "                                    </select>" +
-        "                                </td>" +
-        '                                <td class="col-sm-3">' +
-        '                                    <input type="text" name="sieve_selected_option_value[]" class="form-control form-control-sm" />' +
-        "                                </td>" +
-        '                                <td class="col-sm-1 text-end align-middle">' +
-        '                                    <a href="#" class="delete_condition_modal_button btn btn-sm btn-secondary">Delete</a>' +
-        "                                </td>" +
-        "                            </tr>"
-    );
+    const extra_options = `
+      <td class="col-sm-3">
+        <input type="hidden" 
+          class="condition_extra_value form-control form-control-sm" 
+            name="sieve_selected_extra_option_value[]" />
+      </td>
+    `;
+
+    $(".sieve_list_conditions_modal").append(`
+      <tr>
+        <td class="col-sm-2">
+          <select class="add_condition_sieve_filters form-control form-control-sm"
+            name="sieve_selected_conditions_field[]">
+              <optgroup label="Message">
+                ${message_fields}
+              </optgroup>
+              <optgroup label="Header">
+                ${header_fields}
+              </optgroup>
+          </select>
+        </td>
+          ${extra_options}
+        <td class="col-sm-3">
+          <select class="condition_options form-control form-control-sm" 
+            name="sieve_selected_conditions_options[]">
+            <option value="Contains">Contains</option>
+            <option value="!Contains">Not Contains</option>
+            <option value="Matches">Matches</option>
+            <option value="!Matches">Not Matches</option>
+            <option value="Regex">Regex</option>
+            <option value="!Regex">Not Regex</option>
+          </select>
+        </td>
+
+        <td class="col-sm-3">
+          <input type="text" name="sieve_selected_option_value[]" class="form-control form-control-sm" />
+        </td>
+        <td class="col-sm-1 text-end align-middle">
+          <a href="#" class="delete_condition_modal_button btn btn-sm btn-secondary">Delete</a>
+        </td>
+      </tr>
+    `);
   };
 
   my.add_filter_action = function (default_value = "") {
@@ -506,27 +503,32 @@ const Hm_Filters = (function (my) {
       possible_actions_html +=
         '<option value="' + value.name + '">' + value.description + "</option>";
     });
-    let extra_options =
-      '<td class="col-sm-3"><input type="hidden" class="condition_extra_action_value form-control form-control-sm" name="sieve_selected_extra_action_value[]" /></td>';
-    $(".filter_actions_modal_table").append(
-      '<tr class="border" default_value="' +
-        default_value +
-        '">' +
-        '   <td class="col-sm-3">' +
-        '       <select class="sieve_actions_select form-control form-control-sm" name="sieve_selected_actions[]">' +
-        "          " +
-        possible_actions_html +
-        "       </select>" +
-        "    </td>" +
-        extra_options +
-        '    <td class="col-sm-5">' +
-        '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
-        "    </input>" +
-        '    <td class="col-sm-1 text-end align-middle">' +
-        '           <a href="#" class="delete_action_modal_button btn btn-sm btn-secondary">Delete</a>' +
-        "    </td>" +
-        "</tr>"
-    );
+
+    const extra_options = `
+      <td class="col-sm-3">
+        <input type="hidden"
+            class="condition_extra_action_value form-control form-control-sm"
+            name="sieve_selected_extra_action_value[]" />
+      </td>
+    `;
+
+    $(".filter_actions_modal_table").append(`
+      <tr class="border" default_value="${default_value}">
+        <td class="col-sm-3">
+          <select class="sieve_actions_select form-control form-control-sm"
+            name="sieve_selected_actions[]">
+            ${possible_actions_html}
+          </select>
+        </td>
+        ${extra_options}
+        <td class="col-sm-5">
+          <input type="hidden" name="sieve_selected_action_value[]" value="">
+        </td>
+        <td class="col-sm-1 text-end align-middle">
+          <a href="#" class="delete_action_modal_button btn btn-sm btn-secondary">Delete</a>
+        </td>
+      </tr>
+    `);
   };
 
   return my;
@@ -540,10 +542,9 @@ const Hm_Filters = (function (my) {
 *                                      MODAL EVENTS
 **************************************************************************************/
 var hm_sieve_button_events = function (edit_filter_modal, edit_script_modal) {
-
   $(document)
-    .off("click")
-    .on("click", ".sievefilters_accounts_title", function () {
+    .off("click.sieve_toggle")
+    .on("click.sieve_toggle", ".sievefilters_accounts_title", function () {
       $(this).parent().find(".sievefilters_accounts").toggleClass("d-none");
     });
 
@@ -577,7 +578,7 @@ var hm_sieve_button_events = function (edit_filter_modal, edit_script_modal) {
    */
   $(document).on("click", ".delete_else_action_modal_button", function (e) {
     e.preventDefault();
-    $(this).parent().parent().remove();
+    $(this).closest("tr").remove();
   });
 
   /**
@@ -585,7 +586,7 @@ var hm_sieve_button_events = function (edit_filter_modal, edit_script_modal) {
    */
   $(document).on("click", ".delete_action_modal_button", function (e) {
     e.preventDefault();
-    $(this).parent().parent().remove();
+    $(this).closest("tr").remove();
   });
 
   /**
@@ -593,7 +594,7 @@ var hm_sieve_button_events = function (edit_filter_modal, edit_script_modal) {
    */
   $(document).on("click", ".delete_condition_modal_button", function (e) {
     e.preventDefault();
-    $(this).parent().parent().remove();
+    $(this).closest("tr").remove();
   });
 
   /**

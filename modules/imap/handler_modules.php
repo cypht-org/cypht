@@ -1965,8 +1965,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $this->out('show_pagination_links', $this->user_config->get('pagination_links_setting', true));
             $this->out('auto_advance_email_enabled', $this->user_config->get('auto_advance_email_setting', true));
 
-            $parts = explode('_', 'imap_' . $form['imap_server_id'] . '_' . $form['folder'], 3);
-            $details = Hm_IMAP_List::dump($parts[1]);
+            $details = Hm_IMAP_List::dump($form['imap_server_id']);
             $mailbox_name = $details['name'];
 
 

@@ -987,57 +987,58 @@ $(function () {
 
         if ($.isEmptyObject(data)) {
             Hm_Notices.show(
-            "Please check at least one condition to create a filter.",
-            "danger"
+                "Please check at least one condition to create a filter.",
+                "danger"
+            );
+            $btn.prop("disabled", false);
+            return;
+        }
+
+        edit_filter_modal.open();
+
+    const allFields = hm_sieve_condition_fields();
+    const availableFields = [
+        ...allFields.Message.map((f) => f.name),
+        ...allFields.Header.map((f) => f.name),
+    ];
+
+    for (const [key, value] of Object.entries(data)) {
+        // If key is not in available fields, skip it
+        if (!availableFields.includes(key)) {
+        continue;
+        }
+
+        add_filter_condition();
+
+        const $lastRow = $(".sieve_list_conditions_modal tr").last();
+        const $selectField = $lastRow.find(
+            ".add_condition_sieve_filters"
         );
-        $btn.prop("disabled", false);
-        return;
+        const $selectOp = $lastRow.find(".condition_options");
+        const $inputVal = $lastRow.find(
+            'input[name="sieve_selected_option_value[]"]'
+        );
+        $selectField.val(key);
+        $selectOp.val("Contains");
+        $inputVal.val(value);
     }
 
-    edit_filter_modal.open();
+    if (data["reply-to"]) {
+        add_filter_action("autoreply");
 
-    // After modal content is ready, auto-fill conditions
-    setTimeout(() => {
-        const allFields = hm_sieve_condition_fields();
-        const availableFields = [
-          ...allFields.Message.map((f) => f.name),
-          ...allFields.Header.map((f) => f.name),
-        ];
+        const $lastRow = $(".filter_actions_modal_table tr").last();
+        const $select = $lastRow.find(".sieve_actions_select");
+        $select.val("autoreply").trigger("change");
 
-        for (const [key, value] of Object.entries(data)) {
-          // If key is not in available fields, skip it
-          if (!availableFields.includes(key)) {
-            console.warn("Skipping unrecognized field:", key);
-            continue;
-          }
-
-          add_filter_condition();
-
-          const $lastRow = $(".sieve_list_conditions_modal tr").last();
-          const $selectField = $lastRow.find(".add_condition_sieve_filters");
-          const $selectOp = $lastRow.find(".condition_options");
-          const $inputVal = $lastRow.find('input[name="sieve_selected_option_value[]"]');
-          $selectField.val(key);
-          $selectOp.val("Contains");
-          $inputVal.val(value);
-
-            }
-
-            if (data["reply-to"]) {
-
-                add_filter_action("autoreply");
-
-                const $lastRow = $(".filter_actions_modal_table tr").last();
-                const $select = $lastRow.find(".sieve_actions_select");
-                $select.val("autoreply").trigger("change");
-
-                // Focus the input field for the message
-                const $input = $lastRow.find('input[name="sieve_selected_action_value[]"]');
-                if ($input.length) {
-                    $input.focus();
-                }
-            }
-        }, 250);
+            // Focus the input field for the message
+        const $input = $lastRow.find(
+            'input[name="sieve_selected_action_value[]"]'
+        );
+        if ($input.length) {
+            $input.focus();
+        }
+    }
+   
     });
 });
 
