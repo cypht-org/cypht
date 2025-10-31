@@ -53,7 +53,8 @@ class Hm_Handler_process_delete_contact extends Hm_Handler_Module {
 class Hm_Handler_process_add_contact extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
-        list($success, $form) = $this->process_form(array('contact_source', 'contact_email', 'contact_name', 'add_contact'));
+        // exit(var_dump($this->request->post));
+        list($success, $form) = $this->process_form(array('contact_source', 'contact_email', 'contact_name'));
         if ($success && $form['contact_source'] == 'local') {
             $details = array('source' => 'local', 'email_address' => $form['contact_email'], 'display_name' => $form['contact_name']);
             if (array_key_exists('contact_phone', $this->request->post) && $this->request->post['contact_phone']) {
@@ -67,6 +68,7 @@ class Hm_Handler_process_add_contact extends Hm_Handler_Module {
             }
             $contacts->add_contact($details);
             Hm_Msgs::add('Contact Added');
+            $this->out('contact_added', 1);
         }
     }
 }
@@ -217,77 +219,169 @@ class Hm_Handler_load_local_contacts extends Hm_Handler_Module {
  */
 class Hm_Output_contacts_form extends Hm_Output_Module {
     protected function output() {
-
-        $email = '';
-        $name = '';
-        $phone = '';
-        $form_class = 'contact_form';
-        $button = '<input class="btn btn-primary add_contact_submit" type="submit" name="add_contact" value="'.$this->trans('Add').'" />';
-        $title = $this->trans('Add Local');
         $current = $this->get('current_contact', array());
-        if (!empty($current)) {
-            if (array_key_exists('email_address', $current)) {
-                $email = $current['email_address'];
-            }
-            if (array_key_exists('display_name', $current)) {
-                $name = $current['display_name'];
-            }
-            if (array_key_exists('phone_number', $current)) {
-                $phone = $current['phone_number'];
-            }
-            if (array_key_exists('group', $current)) {
-                $group = $current['group'];
-            }
-            $form_class = 'contact_update_form  mt-3';
-            $title = $this->trans('Update Local');
-            $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
-                '<input class="btn btn-primary edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
+        $is_edit = !empty($current);
+        
+        // Build the modal
+        $res = '<div class="modal fade" id="localContactModal" tabindex="-1" aria-labelledby="localContactModalLabel" aria-hidden="true">';
+        $res .= '<div class="modal-dialog modal-dialog-centered modal-lg">';
+        $res .= '<div class="modal-content custom-modal-content">';
+        
+        // Modal Header
+        $res .= '<div class="modal-header custom-modal-header">';
+        $res .= '<h5 class="modal-title d-flex align-items-center" id="localContactModalLabel">';
+        $res .= '<div class="modal-icon-wrapper me-2">';
+        $res .= '<i class="bi bi-person-plus" style="font-size: 24px;"></i>';
+        $res .= '</div>';
+        $res .= $is_edit ? $this->trans('Edit Local Contact') : $this->trans('Add Local Contact');
+        $res .= '</h5>';
+        $res .= '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'; 
+        $res .= '</div>';
+
+        // Modal Body
+        $res .= '<div class="modal-body custom-modal-body">';
+        
+        // Toggle buttons for Manual vs CSV (only show for new contacts, not edit)
+        if (!$is_edit) {
+            $res .= '<div class="contact-method-toggle">';
+            $res .= '<button type="button" class="method-btn active" id="manual-entry-btn">';
+            $res .= '<i class="bi bi-person-plus" style="width: 18px; height: 18px;"></i>';
+            $res .= '<span>' . $this->trans('Manual Entry') . '</span>';
+            $res .= '</button>';
+            $res .= '<button type="button" class="method-btn" id="csv-import-btn">';
+            $res .= '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+            $res .= '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>';
+            $res .= '<polyline points="14 2 14 8 20 8"/>';
+            $res .= '<line x1="12" y1="18" x2="12" y2="12"/>';
+            $res .= '<line x1="9" y1="15" x2="15" y2="15"/>';
+            $res .= '</svg>';
+            $res .= '<span>' . $this->trans('Import CSV') . '</span>';
+            $res .= '</button>';
+            $res .= '</div>';
         }
-        $form_html = '<div class="add_contact_responsive"><form class="add_contact_form search_terms" method="POST">'.
-            '<button class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
-            '<div class="'.$form_class.'">'.
-            '<input type="hidden" name="contact_source" value="local" />'.
-            '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<label class="form-label" for="contact_email">'.$this->trans('E-mail Address').' *</label>'.
-            '<input class="form-control" required placeholder="'.$this->trans('E-mail Address').'" id="contact_email" type="email" name="contact_email" '.
-            'value="'.$this->html_safe($email).'" /><br />'.
-            '<label class="form-label" for="contact_name">'.$this->trans('Full Name').' *</label>'.
-            '<input class="form-control" required placeholder="'.$this->trans('Full Name').'" id="contact_name" type="text" name="contact_name" '.
-            'value="'.$this->html_safe($name).'" /><br />'.
-            '<label class="form-label" for="contact_phone">'.$this->trans('Telephone Number').'</label>'.
-            '<input class="form-control" placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="text" name="contact_phone" '.
-            'value="'.$this->html_safe($phone).'" /><br />'.
-            '<label class="form-label" for="contact_group">'.$this->trans('Contact Group').'</label>'.
-            '<select class="form-select" id="contact_group" name="contact_group">'.
-            '<option value="'.$this->trans('Personal Addresses').'"'.(isset($group) && $this->html_safe($group) == $this->trans('Personal Addresses') ? ' selected' : '').'>'.$this->trans('Personal Addresses').'</option>'.
-            '<option value="'.$this->trans('Trusted Senders').'"'.(isset($group) && $this->html_safe($group) == $this->trans('Trusted Senders') ? ' selected' : '').'>'.$this->trans('Trusted Senders').'</option>'.
-            '<option value="'.$this->trans('Collected Recipients').'"'.(isset($group) && $this->html_safe($group) == $this->trans('Collected Recipients') ? ' selected' : '').'>'.$this->trans('Collected Recipients').'</option>' .
-            '</select><br />'.
-            $button.' <input type="button" class="btn btn-secondary reset_contact" value="'.
-            $this->trans('Cancel').'" /></div></form></div>';
-        return $form_html;
+
+        // Get current values for edit mode
+        $email = isset($current['email_address']) ? $this->html_safe($current['email_address']) : '';
+        $name = isset($current['display_name']) ? $this->html_safe($current['display_name']) : '';
+        $phone = isset($current['phone_number']) ? $this->html_safe($current['phone_number']) : '';
+        $group = isset($current['group']) ? $this->html_safe($current['group']) : 'Personal Addresses';
+
+        // Manual Entry Form
+        $res .= '<form class="contact-manual-form" id="manual-contact-form" method="POST">';
+        $res .= '<input type="hidden" name="contact_source" value="local" />';
+        $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+        
+        if ($is_edit) {
+            $res .= '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />';
+        }
+        
+        $res .= '<div class="row">';
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="contact_name" class="form-label">';
+        $res .= $this->trans('Display Name') . ' <span class="text-danger">*</span>';
+        $res .= '</label>';
+        $res .= '<input type="text" class="form-control custom-input" id="contact_name" name="contact_name" placeholder="John Doe" value="'.$name.'" required>';
+        $res .= '</div>';
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="contact_email" class="form-label">';
+        $res .= $this->trans('Email Address') . ' <span class="text-danger">*</span>';
+        $res .= '</label>';
+        $res .= '<input type="email" class="form-control custom-input" id="contact_email" name="contact_email" placeholder="john.doe@example.com" value="'.$email.'" required>';
+        $res .= '</div>';
+        $res .= '</div>';
+        $res .= '<div class="mb-3">';
+        $res .= '<label for="contact_phone" class="form-label">';
+        $res .= $this->trans('Phone Number');
+        $res .= '</label>';
+        $res .= '<input type="tel" class="form-control custom-input" id="contact_phone" name="contact_phone" placeholder="+1 234 567 8900" value="'.$phone.'">';
+        $res .= '</div>';
+        $res .= '<div class="mb-3">';
+        $res .= '<label for="contact_group" class="form-label">';
+        $res .= $this->trans('Category');
+        $res .= '</label>';
+        $res .= '<select class="form-select custom-input" id="contact_group" name="contact_group">';
+        $res .= '<option value="Collected Recipients"'.($group == 'Collected Recipients' ? ' selected' : '').'>' . $this->trans('Collected Recipients') . '</option>';
+        $res .= '<option value="Trusted Senders"'.($group == 'Trusted Senders' ? ' selected' : '').'>' . $this->trans('Trusted Senders') . '</option>';
+        $res .= '<option value="Personal Addresses"'.($group == 'Personal Addresses' ? ' selected' : '').'>' . $this->trans('Personal Addresses') . '</option>';
+        $res .= '</select>';
+        $res .= '</div>';
+        $res .= '</form>';
+
+        // CSV Import Section (hidden by default, only for new contacts)
+        if (!$is_edit) {
+            $csv_sample_path = WEB_ROOT.'modules/local_contacts/assets/data/contact_sample.csv';
+            
+            $res .= '<div class="csv-import-section" style="display: none;">';
+            $res .= '<form id="csv-import-form" method="POST" enctype="multipart/form-data">';
+            $res .= '<input type="hidden" name="contact_source" value="csv" />';
+            $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+            
+            $res .= '<div class="csv-info-card">';
+            $res .= '<div class="csv-info-icon">';
+            $res .= '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+            $res .= '<circle cx="12" cy="12" r="10"/>';
+            $res .= '<line x1="12" y1="16" x2="12" y2="12"/>';
+            $res .= '<line x1="12" y1="8" x2="12.01" y2="8"/>';
+            $res .= '</svg>';
+            $res .= '</div>';
+            $res .= '<div>';
+            $res .= '<h6 class="csv-info-title">' . $this->trans('CSV Format Requirements') . '</h6>';
+            $res .= '<p class="csv-info-text">';
+            $res .= $this->trans('Your CSV file must include headers') . ': <strong>display_name</strong>, <strong>email_address</strong>, <strong>phone_number</strong>';
+            $res .= '</p>';
+            $res .= '<a href="'.$csv_sample_path.'" class="csv-download-link" download data-external="true">';
+            $res .= $this->trans('Download sample CSV file');
+            $res .= '</a>';
+            $res .= '</div>';
+            $res .= '</div>';
+            $res .= '<div class="csv-upload-area">';
+            $res .= '<input type="file" id="contact_csv" name="contact_csv" accept=".csv" class="csv-file-input" required>';
+            $res .= '<label for="contact_csv" class="csv-upload-label">';
+            $res .= '<div class="csv-upload-icon">';
+            $res .= '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+            $res .= '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>';
+            $res .= '<polyline points="17 8 12 3 7 8"/>';
+            $res .= '<line x1="12" y1="3" x2="12" y2="15"/>';
+            $res .= '</svg>';
+            $res .= '</div>';
+            $res .= '<p class="csv-upload-text">';
+            $res .= '<strong>' . $this->trans('Click to upload') . '</strong> ' . $this->trans('or drag and drop');
+            $res .= '</p>';
+            $res .= '<p class="csv-upload-hint">' . $this->trans('CSV files only') . '</p>';
+            $res .= '</label>';
+            $res .= '</div>';
+            $res .= '</form>';
+            $res .= '</div>';
+        }
+        
+        $res .= '</div>';
+
+        // Modal Footer
+        $res .= '<div class="modal-footer custom-modal-footer">';
+        $res .= '<button type="button" class="btn btn-secondary custom-btn-secondary" data-bs-dismiss="modal">';
+        $res .= $this->trans('Cancel');
+        $res .= '</button>';
+        $res .= '<button type="submit" class="btn btn-primary custom-btn-primary" id="submit-local-contact-btn">';
+        $res .= $is_edit ? $this->trans('Update Contact') : $this->trans('Add Contact');
+        $res .= '</button>';
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        return $res;
     }
 }
 
 /**
  * @subpackage import_local_contacts/output
+ * This class is now deprecated as CSV import is integrated into Hm_Output_contacts_form
  */
 class Hm_Output_import_contacts_form extends Hm_Output_Module {
     protected function output() {
-        $form_class = 'contact_form';
-        $button = '<input class="btn btn-primary add_contact_submit" type="submit" name="import_contact" id="import_contact" value="'.$this->trans('Add').'" />';
-        $notice = 'Please ensure your CSV header file follows the format: display_name,email_address,phone_number';
-        $title = $this->trans('Import from CSV file');
-        $csv_sample_path = WEB_ROOT.'modules/local_contacts/assets/data/contact_sample.csv';
-
-        return '<div class="add_contact_responsive"><form class="add_contact_form" method="POST" enctype="multipart/form-data">'.
-            '<button class="server_title mt-2 btn btn-light" title="'.$notice.'"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
-            '<div class="'.$form_class.'">'.
-            '<div><a href="'.$csv_sample_path.'" data-external="true">'.$this->trans('download a sample csv file').'</a></div><br />'.
-            '<input type="hidden" name="contact_source" value="csv" />'.
-            '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<label class="screen_reader" for="contact_csv">'.$this->trans('Csv File').'</label>'.
-            '<input class="form-control" required id="contact_csv" type="file" name="contact_csv" accept=".csv"/> <br />'.$button.' <input type="button" class="btn btn-secondary reset_contact" value="'.
-            $this->trans('Cancel').'" /></div></form></div>';
+        // This output module is no longer needed as CSV import is now part of the main contact modal
+        // Keeping it for backward compatibility but it outputs nothing
+        return '';
     }
 }

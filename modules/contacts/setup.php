@@ -14,8 +14,6 @@ add_handler('contacts', 'check_imported_contacts', true, 'contacts', 'load_user_
 add_output('contacts', 'contacts_content_start', true, 'contacts', 'content_section_start', 'after');
 add_output('contacts', 'contacts_list', true, 'contacts', 'contacts_content_start', 'after');
 add_output('contacts', 'contacts_content_end', true, 'contacts', 'contacts_list', 'after');
-//TODO: Remove this output after moving the modal forms to their respective modules
-add_output('contacts', 'contact_forms', true, 'contacts', 'contacts_content_end', 'after');
 add_output('settings', 'contact_auto_collect_setting', true, 'contacts', 'max_google_contacts_number', 'after');
 
 add_output('ajax_hm_folders', 'contacts_page_link', true, 'contacts', 'main_menu_content', 'before');

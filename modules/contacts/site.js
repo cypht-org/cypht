@@ -291,78 +291,6 @@ var initContactTabs = function() {
     });
 };
 
-var initLocalContactModal = function() {
-    $('#manual-entry-btn').on('click', function() {
-        $(this).addClass('active');
-        $('#csv-import-btn').removeClass('active');
-        $('.contact-manual-form').show();
-        $('.csv-import-section').hide();
-        $('#submit-local-contact-btn').text('Add Contact');
-    });
-
-    $('#csv-import-btn').on('click', function() {
-        $(this).addClass('active');
-        $('#manual-entry-btn').removeClass('active');
-        $('.contact-manual-form').hide();
-        $('.csv-import-section').show();
-        $('#submit-local-contact-btn').text('Import Contacts');
-    });
-
-    $('#submit-local-contact-btn').on('click', function(e) {
-        e.preventDefault();
-        
-        if ($('#manual-entry-btn').hasClass('active')) {
-            var name = $('#contact_name').val();
-            var email = $('#contact_email').val();
-            var phone = $('#contact_phone').val();
-            var category = $('#contact_category').val();
-            
-            if (!name || !email) {
-                //TODO: Use better error display
-                alert('Please fill in the required fields (Name and Email)');
-                return;
-            }
-            Hm_Ajax.request(
-                [
-                    {'name': 'hm_ajax_hook', 'value': 'ajax_add_contact'},
-                    {'name': 'contact_name', 'value': name},
-                    {'name': 'contact_email', 'value': email},
-                    {'name': 'contact_phone', 'value': phone},
-                    {'name': 'contact_category', 'value': category},
-                    {'name': 'contact_source', 'value': 'local:local'}
-                ],
-                function(res) {
-                    if (res.contact_added) {
-                        const modalElement = document.getElementById('localContactModal');
-                        const modal = bootstrap.Modal.getInstance(modalElement);
-                        if (modal) {
-                            modal.hide();
-                        }
-                        window.location.reload();
-                    }
-                }
-            );
-        } else {
-            var fileInput = $('#contact_csv')[0];
-            if (!fileInput.files.length) {
-                alert('Please select a CSV file');
-                return;
-            }
-            //TODO: Implement CSV import functionality
-            console.log('CSV import not implemented yet');
-        }
-    });
-
-    $('#localContactModal').on('hidden.bs.modal', function() {
-        $('#manual-contact-form')[0].reset();
-        $('#manual-entry-btn').addClass('active');
-        $('#csv-import-btn').removeClass('active');
-        $('.contact-manual-form').show();
-        $('.csv-import-section').hide();
-        $('#submit-local-contact-btn').text('Add Contact');
-    });
-};
-
 var initPagination = function() {
     $(document).on('click', '.pagination-btn:not([disabled]), .pagination-number', function(e) {
         e.preventDefault();
@@ -384,10 +312,8 @@ var getUrlParameter = function(name) {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
-//TODO: Move JS related to local contacts to /modules/local_contacts/
 $(document).ready(function() {
     initContactTabs();
-    initLocalContactModal();
     initPagination();
 });
 
