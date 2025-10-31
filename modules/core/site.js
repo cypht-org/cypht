@@ -435,7 +435,6 @@ Hm_Modal.prototype = {
         this.modalTitle.html(title);
     }
 };
-
 class Hm_Alert {
     constructor() {
         this.container = document.querySelector('.sys_messages');
@@ -2588,6 +2587,39 @@ function setupActionSnooze(callback) {
     $(document).on('change', '.nexter_input_snooze', callback);
 }
 
+class Hm_Filter_Modal extends Hm_Modal {
+  constructor(current_account) {
+    super({
+      size: "xl",
+      modalId: "myEditFilterModal",
+    });
+    const save_filter = Hm_Filters.save_filter;
+    const modalContent = document.querySelector("#edit_filter_modal");
+    if (modalContent) {
+      this.setContent(modalContent.innerHTML);
+      modalContent.remove();
+    } else {
+      this.setContent("<p>Could not load filter editor</p>");
+    }
+
+    this.addFooterBtn("Save", "btn-primary ms-auto", async () => {
+      let result = save_filter(current_account);
+      if (result) {
+        Hm_Notices.show("Filter saved", "success");
+        this.hide();
+      }
+    });
+
+    this.addFooterBtn("Convert to code", "btn-warning", async () => {
+      let result = save_filter(current_account, true);
+      if (result) {
+        Hm_Notices.show("Filter saved", "success");
+        this.hide();
+      }
+    });
+  }
+}
+
 document.addEventListener("show.bs.dropdown", function (event) {
     const currentToggle = event.target;
 
@@ -2604,4 +2636,3 @@ document.addEventListener("show.bs.dropdown", function (event) {
         }
     });
 });
-
