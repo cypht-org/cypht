@@ -18,6 +18,7 @@ website
 tests/phpunit/clover.xml
 tests/phpunit/coveralls-upload.json
 tests/phpunit/data/foo.txt
+tests/phpunit/.phpunit.cache/
 scripts/test.php
 /vendor/
 /.idea/

@@ -9,7 +9,6 @@ class Hm_Test_DB extends TestCase {
 
     public $config;
     public function setUp(): void {
-        require 'bootstrap.php';
         $this->config = new Hm_Mock_Config();
     }
     /**

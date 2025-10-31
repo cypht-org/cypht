@@ -214,7 +214,9 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
             session_id($request->cookie[$this->cname]);
         }
         list($secure, $path, $domain) = $this->set_session_params($request);
-        session_set_cookie_params($this->lifetime, $path, $domain, $secure);
+        if (ini_get('session.use_cookies')) {
+            session_set_cookie_params($this->lifetime, $path, $domain, $secure);
+        }
         Hm_Functions::session_start();
         $this->session_key = session_id();
         $this->start_session_data($request);

@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Uid_Cache extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
         Test_Uid_Cache::load(array(array('foo', 'bar'),array()));
     }
     /**

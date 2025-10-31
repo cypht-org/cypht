@@ -6,11 +6,6 @@ use PHPUnit\Framework\TestCase;
  * tests for Hm_Crypt
  */
 class Hm_Test_Crypt_Base extends TestCase {
-
-    public function setUp(): void {
-        define('LIBSODIUM', false);
-        require 'bootstrap.php';
-    }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess

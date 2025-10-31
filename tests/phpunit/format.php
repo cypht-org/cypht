@@ -11,7 +11,6 @@ class Hm_Test_Format extends TestCase {
     public $json;
     public $html5;
     public function setUp(): void {
-        require 'bootstrap.php';
         $config = new Hm_Mock_Config();
         $this->json = new Hm_Format_JSON($config);
         $this->html5 = new Hm_Format_HTML5($config);

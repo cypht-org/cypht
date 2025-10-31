@@ -6,7 +6,6 @@ class Hm_Test_Dispatch extends TestCase {
 
     public $config;
     public function setUp(): void {
-        require 'bootstrap.php';
         require 'helpers.php';
         define('CONFIG_FILE', merge_config_files(APP_PATH.'config'));
         $this->config = new Hm_Mock_Config();

@@ -9,7 +9,6 @@ class Hm_Test_User_File_Config extends TestCase {
 
     public $config;
     public function setUp(): void {
-        require 'bootstrap.php';
         $mock_config = new Hm_Mock_Config();
         $this->config = new Hm_User_Config_File($mock_config);
     }
