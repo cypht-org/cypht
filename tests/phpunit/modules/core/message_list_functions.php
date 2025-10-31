@@ -80,8 +80,8 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
      */
     public function test_subject_callback() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
-        $this->assertEquals('<td class="subject"><div class=""><a title="foo" href="bar">foo</a><p class="fw-light"></p></div></td>', subject_callback(array('foo', 'bar', array()), 'email', $mod));
-        $this->assertEquals('<div class="subject"><div class="" title="foo"><i class="bi bi-filetype-code"></i> <a href="bar">foo</a><p class="fw-light"></p></div></div>', subject_callback(array('foo', 'bar', array(), 'code'), 'news', $mod));
+        $this->assertEquals('<td class="subject"><div class="">  <a title="foo" href="bar">foo</a><p class="fw-light"></p></div></td>', subject_callback(array('foo', 'bar', array()), 'email', $mod));
+        $this->assertEquals('<div class="subject"><div class="" title="foo"> <i class="bi bi-filetype-code"></i> <a href="bar">foo</a><p class="fw-light"></p></div></div>', subject_callback(array('foo', 'bar', array(), 'code'), 'news', $mod));
     }
     /**
      * @preserveGlobalState disabled

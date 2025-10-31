@@ -737,6 +737,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
         $include_content_body = false;
         $include_preview = $this->user_config->get('active_preview_message_setting', false);
         $ceo_use_detect_ceo_fraud = $this->user_config->get('ceo_use_detect_ceo_fraud_setting', false);
+        $active_body_structure = $this->user_config->get('active_body_structure_setting', true);
         if ($include_preview || $ceo_use_detect_ceo_fraud) {
             $include_content_body = true;
         }
@@ -764,9 +765,9 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                     $existingEmails = array_map(function($c){
                         return $c->value('email_address');
                     },$contact_list);
-                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, $existingEmails, $include_content_body);
+                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, $existingEmails, $include_content_body, $active_body_structure);
                 } else {
-                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, null, $include_content_body);
+                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, null, $include_content_body, $active_body_structure);
                 }
                 foreach ($results as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
@@ -2157,6 +2158,13 @@ class Hm_Handler_process_setting_active_preview_message extends Hm_Handler_Modul
     public function process() {
         function process_active_preview_message_callback($val) { return $val; }
         process_site_setting('active_preview_message', $this, 'process_active_preview_message_callback', true, true);
+    }
+}
+
+class Hm_Handler_process_setting_active_body_structure extends Hm_Handler_Module {
+    public function process() {
+        function process_active_body_structure_callback($val) { return $val; }
+        process_site_setting('active_body_structure', $this, 'process_active_body_structure_callback', true, true);
     }
 }
 
