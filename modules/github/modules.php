@@ -715,7 +715,7 @@ class Hm_Output_github_limit_setting extends Hm_Output_Module {
             $limit = $settings['github_limit'];
         }
         return '<tr class="github_all_setting"><td><label for="github_limit">'.$this->trans('Max Github notices per repository').'</label></td>'.
-            '<td class="d-flex"><input type="text" id="github_limit" name="github_limit" size="2" value="'.$this->html_safe($limit).'" data-default-value="'.DEFAULT_GITHUB_PER_SOURCE.'"/></td></tr>';
+            '<td class="d-flex"><input type="text" class="form-control form-control-sm w-auto" id="github_limit" name="github_limit" size="2" value="'.$this->html_safe($limit).'" data-default-value="'.DEFAULT_GITHUB_PER_SOURCE.'"/></td></tr>';
     }
 }
 

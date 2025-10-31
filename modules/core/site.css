@@ -829,8 +829,7 @@ div.unseen,
   background-color: var(--bs-secondary-bg);
   bottom: 0px;
   right: 0px;
-  padding: 20px;
-  padding-left: 20px;
+  padding: 10px 20px;
   z-index: 1000;
 }
 .long_session {
@@ -1039,7 +1038,7 @@ div.unseen,
   font-size: 115%;
   padding-left: 5px;
   top: 0px;
-  left: 60px !important;
+  left: 50px !important;
 }
 @media (orientation: landscape) {
   .mobile .msg_controls {
@@ -1426,7 +1425,7 @@ div.unseen,
   z-index: 1000;
   text-align: left;
   top: 0;
-  padding: 10px 0 10px 20px;
+  padding: 10px 0 10px 18px;
   background: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
@@ -1473,7 +1472,7 @@ div.unseen,
   backdrop-filter: none;
   width: fit-content;
   margin-left: 0;
-  padding: 10px 20px;
+  padding: 10px 15px;
   display: block !important;
 }
 
@@ -1640,6 +1639,11 @@ pre.msg_source {
 
 .msg_text .col-md-2 {
   font-weight: bold;
+}
+
+.form-check-input:checked {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
 }
 
 /* Mobile responsive overrides for Bootstrap classes */
