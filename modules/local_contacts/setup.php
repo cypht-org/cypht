@@ -23,4 +23,27 @@ add_handler('ajax_delete_contact', 'load_local_contacts', true, 'local_contacts'
 add_handler('ajax_delete_contact', 'process_delete_contact', true, 'local_contacts', 'save_user_data', 'before');
 
 
-return array();
+return array(
+    'allowed_pages' => array(
+        'contacts'
+    ),
+    'allowed_post' => array(
+        'contact_email' => FILTER_SANITIZE_EMAIL,
+        'contact_name' => FILTER_UNSAFE_RAW,
+        'contact_phone' => FILTER_UNSAFE_RAW,
+        'contact_group' => FILTER_UNSAFE_RAW,
+        'contact_id' => FILTER_UNSAFE_RAW,
+        'add_contact' => FILTER_UNSAFE_RAW,
+        'edit_contact' => FILTER_UNSAFE_RAW,
+        'import_contact' => FILTER_UNSAFE_RAW,
+        'contact_source' => FILTER_UNSAFE_RAW,
+    ),
+    'allowed_get' => array(
+        'contact_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'contact_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'contact_source' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    ),
+    'allowed_output' => array(
+        'current_contact' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+    ),
+);
