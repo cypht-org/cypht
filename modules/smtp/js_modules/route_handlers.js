@@ -63,7 +63,7 @@ function applySmtpComposePageHandlers(routeParams) {
             var checkInList = check_cc_exist_in_contacts_list();
             // if contact_cc not exist in contact list for user
             if (checkInList) {
-                modalContentHeadline = "Adress mail not exist in your contact list";
+                modalContentHeadline = "Address mail not exist in your contact list";
                 showBtnSendAnywayDontWarnFuture = false;
             }
 

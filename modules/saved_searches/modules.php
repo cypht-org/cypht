@@ -52,7 +52,7 @@ class Hm_Handler_update_search extends Hm_Handler_Module {
                 Hm_Msgs::add('Saved search updated', 'info');
             }
             else {
-                Hm_Msgs::add('Unable to update the search paramaters', 'danger');
+                Hm_Msgs::add('Unable to update the search parameters', 'danger');
             }
         }
     }
