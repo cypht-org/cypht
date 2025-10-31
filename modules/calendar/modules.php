@@ -232,7 +232,7 @@ class Hm_Output_calendar_content extends Hm_Output_Module {
             $out = new Hm_Cal_Output($this, $events);
             $out = $out->output($data, $date, $view);
             return '<div class="calendar p-0"><div class="content_title d-flex justify-content-between px-3"><span class="calendar_content_title">'.$this->trans('Calendar').'</span>'.
-                '<a href="?page=calendar&amp;action=add" title="'.$this->trans('Add Event').'" class="btn btn-light btn-sm">'.
+                '<a href="?page=calendar&amp;action=add" title="'.$this->trans('Add Event').'" class="btn btn-light btn-sm text-decoration-none">'.
                 '<i class="bi bi-plus-circle me-2"></i> '.$this->trans('Add Event').'</a></div>'.
                 $out.'</div>';
         }
