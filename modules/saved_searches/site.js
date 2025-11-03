@@ -19,7 +19,7 @@ var delete_search = function(event) {
     if (!hm_delete_prompt()) {
         return false;
     }
-    var name = $('.search_terms').val();
+    var name = $('.search_name').val();
     event.preventDefault();
     if (name.length) {
         Hm_Ajax.request(

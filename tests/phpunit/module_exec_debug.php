@@ -5,9 +5,18 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Module_Exec_Debug extends TestCase {
 
     public $module_exec;
+
+    public static function setUpBeforeClass(): void {
+        putenv('CYPHT_TEST_DEBUG_MODE=true');
+        $_ENV['CYPHT_TEST_DEBUG_MODE'] = 'true';
+    }
+
+    public static function tearDownAfterClass(): void {
+        putenv('CYPHT_TEST_DEBUG_MODE');
+        unset($_ENV['CYPHT_TEST_DEBUG_MODE']);
+    }
+
     public function setUp(): void {
-        define('DEBUG_MODE', true);
-        require 'bootstrap.php';
         $config = new Hm_Mock_Config();
         $this->module_exec = new Hm_Module_Exec($config);
     }

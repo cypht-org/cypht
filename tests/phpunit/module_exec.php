@@ -9,7 +9,6 @@ class Hm_Test_Module_Exec extends TestCase {
 
     public $module_exec;
     public function setUp(): void {
-        require 'bootstrap.php';
         $config = new Hm_Mock_Config();
         $this->module_exec = new Hm_Module_Exec($config);
     }
@@ -62,7 +61,6 @@ class Hm_Test_Module_Exec extends TestCase {
      */
     public function test_run_output_module() {
         require APP_PATH.'/modules/core/setup.php';
-        require APP_PATH.'/modules/core/modules.php';
         $request = new Hm_Mock_Request('HTTP');
         $session = new Hm_Mock_Session();
         Hm_Output_Modules::add('test', 'date', false, false, false, true, 'core');
@@ -79,7 +77,6 @@ class Hm_Test_Module_Exec extends TestCase {
      */
     public function test_run_handler_modules() {
         require APP_PATH.'/modules/core/setup.php';
-        require APP_PATH.'/modules/core/modules.php';
         $request = new Hm_Mock_Request('HTTP');
         $session = new Hm_Mock_Session();
         Hm_Handler_Modules::add('test', 'date', false, false, false, true, 'core');
@@ -95,7 +92,13 @@ class Hm_Test_Module_Exec extends TestCase {
     public function test_run_handler_module() {
         $request = new Hm_Mock_Request('HTTP');
         $session = new Hm_Mock_Session();
-        $this->assertEquals(array(array('test' => 'foo'), array()), $this->module_exec->run_handler_module(array('test' => 'foo'), array(), 'date', array(false, true), $session));
+        $result = $this->module_exec->run_handler_module(array('test' => 'foo'), array(), 'date', array(false, true), $session);
+
+        // Verify that the original data is preserved and date is added
+        $this->assertEquals('foo', $result[0]['test']);
+        $this->assertArrayHasKey('date', $result[0]);
+        $this->assertMatchesRegularExpression('/^\d{1,2}:\d{2}:\d{2}$/', $result[0]['date']);
+        $this->assertEquals(array('date'), $result[1]);
     }
     /**
      * @preserveGlobalState disabled
