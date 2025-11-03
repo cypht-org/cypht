@@ -27,21 +27,23 @@ class WebTest:
     def __init__(self, cap=None):
         self.read_ini()
         self.driver = get_driver(cap)
-        # Ensure a consistent, generous viewport in CI to avoid responsive layout issues
-        try:
-            if os.getenv("GITHUB_ACTIONS") == "true":
-                # Force a wide viewport in headless CI regardless of driver defaults
-                self.driver.set_window_size(1920, 1080)
-            else:
-                # Locally, expand height while preserving current width
-                current_size = self.driver.get_window_size()
-                self.driver.set_window_size(current_size['width'], 5000)
-        except Exception:
-            # Continue even if sizing fails (some drivers/headless modes may reject it)
-            pass
         self.browser = False
         if 'browserName' in self.driver.capabilities:
             self.browser = self.driver.capabilities['browserName'].lower()
+
+        # Ensure a consistent, generous viewport in CI to avoid responsive layout issues
+        try:
+            if os.getenv("GITHUB_ACTIONS") == "true":
+                self.driver.set_window_rect(x=0, y=0, width=1920, height=1080)
+                actual_size = self.driver.get_window_size()
+                if actual_size['width'] < 1000:  # If still too small, try alternative method
+                    self.driver.execute_script("window.resizeTo(1920, 1080);")
+            else:
+                current_size = self.driver.get_window_size()
+                self.driver.set_window_size(current_size['width'], 5000)
+        except Exception as e:
+            print(f" - Warning: Could not set window size: {e}")
+
         self.load()
 
     def read_ini(self):
@@ -58,10 +60,16 @@ class WebTest:
     def load(self):
         print(" - loading site")
         self.go(SITE_URL)
+        # In headless mode, maximize_window() doesn't work and can cause issues
+        # Set window size explicitly instead
         try:
-            self.driver.maximize_window()
+            if os.getenv("GITHUB_ACTIONS") == "true":
+                self.driver.set_window_rect(x=0, y=0, width=1920, height=1080)
+                self.driver.execute_script("window.resizeTo(1920, 1080);")
+            else:
+                self.driver.maximize_window()
         except Exception:
-            print(" - Could not maximize browser :(")
+            print(" - Could not set window size :(")
         if self.browser == 'safari':
             try:
                 self.driver.set_window_size(1920,1080)
