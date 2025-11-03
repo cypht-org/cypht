@@ -541,9 +541,6 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     }
                 }
                 $this->out('custom_list_controls_type', $custom_link);
-                if (array_key_exists('keyword', $this->request->get)) {
-                    $this->out('list_keyword', $this->request->get['keyword']);
-                }
                 if (array_key_exists('filter', $this->request->get)) {
                     if (in_array($this->request->get['filter'], array('all', 'unseen', 'seen',
                         'answered', 'unanswered', 'flagged', 'unflagged'), true)) {
@@ -604,6 +601,10 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                 }
             } elseif ($default_sort_order = $this->user_config->get('default_sort_order_setting', false)) {
                 $this->out('list_sort', $default_sort_order);
+            }
+
+            if (array_key_exists('keyword', $this->request->get)) {
+                $this->out('list_keyword', $this->request->get['keyword']);
             }
         }
     }
@@ -1358,6 +1359,11 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
         }
 
         $terms = [[search_since_based_on_setting($this->user_config), $date]];
+
+        if ($this->request->get['keyword']) {
+            $keyword = validate_search_terms($this->request->get['keyword']);
+            $terms[] = [validate_search_fld(DEFAULT_SEARCH_FLD), $keyword];
+        }
 
         $messages = [];
         $status = [];
