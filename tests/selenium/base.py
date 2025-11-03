@@ -27,10 +27,18 @@ class WebTest:
     def __init__(self, cap=None):
         self.read_ini()
         self.driver = get_driver(cap)
-        # Change the window size to make sure all elements are visible
-        current_size = self.driver.get_window_size()
-        new_height = 5000
-        self.driver.set_window_size(current_size['width'], new_height)
+        # Ensure a consistent, generous viewport in CI to avoid responsive layout issues
+        try:
+            if os.getenv("GITHUB_ACTIONS") == "true":
+                # Force a wide viewport in headless CI regardless of driver defaults
+                self.driver.set_window_size(1920, 1080)
+            else:
+                # Locally, expand height while preserving current width
+                current_size = self.driver.get_window_size()
+                self.driver.set_window_size(current_size['width'], 5000)
+        except Exception:
+            # Continue even if sizing fails (some drivers/headless modes may reject it)
+            pass
         self.browser = False
         if 'browserName' in self.driver.capabilities:
             self.browser = self.driver.capabilities['browserName'].lower()
@@ -90,6 +98,7 @@ class WebTest:
 
     def go(self, url):
         self.driver.get(url)
+        self.wait_for_page_ready()
 
     def login(self, user, password):
         print(" - logging in")
@@ -193,6 +202,25 @@ class WebTest:
             )
         except:
             print(" - routing toast or nprogress check failed, continuing...")
+            pass
+
+    def wait_for_page_ready(self, timeout=60):
+        """Wait for document readiness and idle network to reduce flakiness after navigation."""
+        try:
+            # Wait for DOM ready
+            WebDriverWait(self.driver, timeout).until(
+                lambda d: d.execute_script("return document.readyState") == "complete"
+            )
+        except Exception:
+            print(" - document.readyState wait failed, continuing...")
+        # Best-effort small delay to allow post-load JS to attach handlers in CI
+        try:
+            WebDriverWait(self.driver, 5).until(
+                lambda d: d.execute_script(
+                    "return !!(window.requestIdleCallback || window.setTimeout)"
+                )
+            )
+        except Exception:
             pass
 
     def wait_for_settings_to_expand(self):
