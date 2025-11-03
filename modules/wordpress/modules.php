@@ -203,14 +203,14 @@ class Hm_Handler_process_wordpress_authorization extends Hm_Handler_Module {
                     $this->session->close_early();
                 }
                 else {
-                    Hm_Msgs::add('An Error Occured', 'danger');
+                    Hm_Msgs::add('An Error Occurred', 'danger');
                 }
             }
             elseif (array_key_exists('error', $this->request->get)) {
                 Hm_Msgs::add(ucwords(str_replace('_', ' ', $this->request->get['error'])), 'danger');
             }
             else {
-                Hm_Msgs::add('An Error Occured', 'danger');
+                Hm_Msgs::add('An Error Occurred', 'danger');
             }
             $this->save_hm_msgs();
             Hm_Dispatch::page_redirect('?page=servers');

@@ -10,7 +10,6 @@ class Hm_Test_Handler_Module extends TestCase {
     public $parent;
     public $handler_mod;
     public function setUp(): void {
-        require 'bootstrap.php';
         $this->parent = build_parent_mock();
         $this->handler_mod = new Hm_Handler_Test($this->parent, 'home');
     }

@@ -148,7 +148,7 @@ class Hm_Handler_process_import_contact extends Hm_Handler_Module {
                     $message = $create_count.' contacts created, '.$update_count.' contacts updated, '.$invalid_mail_count.' Invalid email address';
                     $type = 'success';
                 } else {
-                    $message = 'An error occured';
+                    $message = 'An error occurred';
                 }
 
                 $this->session->set('imported_contact', $import_result);

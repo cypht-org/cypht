@@ -10,7 +10,6 @@ class Hm_Test_Servers extends TestCase {
     protected $id;
 
     public function setUp(): void {
-        require 'bootstrap.php';
         $this->id = Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1));
         Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'id' => 'abcd'));
     }

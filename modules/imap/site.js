@@ -1412,7 +1412,7 @@ $('.screen-email-like').on("click", function() {
             btnSize: 'sm'
         });
 
-        var modalContentHeadline = "Adress mail exist in your Block list";
+        var modalContentHeadline = "Address mail exists in your Block list";
         modal.addFooterBtn(hm_trans('Add Emails to Trust contact'), 'btn-warning', handleAddEmail);
         modal.setContent(modalContentHeadline + list_html + `<p>${hm_trans('If you add these, all will be unblocked.<br>Are you sure you want to add this in your Trust contact?')}</p>`);
         modal.open();

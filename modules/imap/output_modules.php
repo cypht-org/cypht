@@ -183,7 +183,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
       protected function output() {
         if ($this->get('msg_headers')) {
             $txt = '';
-            $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'reply-to', 'cc', 'flags');
+            $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'reply-to', 'cc', 'x-original-bcc', 'flags');
             $reply_args = sprintf('&amp;list_path=%s&amp;uid=%s',
                 $this->html_safe($this->get('msg_list_path')),
                 $this->html_safe($this->get('msg_text_uid'))
@@ -297,6 +297,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                     $new_value[] = $this->trans(trim($v));
                                 }
                                 $value = implode(', ', $new_value);
+                            }
+                            if (mb_strtolower($name) == 'x-original-bcc') {
+                                $name = 'Bcc';
                             }
                             $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
                             $txt .= '<div class="col-md-2"><span class="text-muted">'.$this->trans($name).'</span></div>';
@@ -1649,6 +1652,23 @@ class Hm_Output_setting_active_preview_message extends Hm_Output_Module {
         return $res;
     }
 }
+
+class Hm_Output_setting_active_body_structure extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $checked = "checked";
+        if (array_key_exists('active_body_structure', $settings)) {
+            if (!$settings['active_body_structure']) {
+                $checked = "";
+            }
+        }
+
+        $res = '<tr class="general_setting"><td><label for="active_body_structure">'.
+            $this->trans('Analyze the structure of the message (BODYSTRUCTURE)').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="active_body_structure" name="active_body_structure" '.$checked.' ></td></tr>';
+        return $res;
+    }
+}
+
 class Hm_Output_setting_ceo_detection_fraud extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());

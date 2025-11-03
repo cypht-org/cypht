@@ -231,7 +231,7 @@ class Hm_Output_advanced_search_content_start extends Hm_Output_Module {
         return '<div class="search_content px-0"><div class="content_title d-flex align-items-center px-3">'.
             '<i class="bi bi-caret-down-fill adv_expand_all cursor-pointer"></i>'.
             '<i class="bi bi-caret-up adv_collapse_all cursor-pointer"></i>'.
-            '<lable class="ms-2">'.$this->trans('Advanced Search').'</label></div>';
+            '<label class="ms-2">'.$this->trans('Advanced Search').'</label></div>';
     }
 }
 

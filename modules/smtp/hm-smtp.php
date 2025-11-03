@@ -111,13 +111,33 @@ class Hm_SMTP {
         else {
             $this->port = 25;
         }
-        if (isset($conf['tls']) && $conf['tls']) {
-            $this->tls = true;
+        $this->tls = false;
+        $this->starttls = false;
+        if (isset($conf['tls'])) {
+            $tls_val = $conf['tls'];
+            if (is_string($tls_val)) {
+                $normalized = mb_strtolower(trim($tls_val));
+                if ($normalized === 'starttls') {
+                    $this->starttls = true;
+                }
+                elseif ($normalized === 'tls' || $normalized === 'ssl' || $normalized === 'true' || $normalized === '1') {
+                    $this->tls = true;
+                }
+                elseif ($normalized === 'false' || $normalized === '0' || $normalized === '') {
+                    // leave both false
+                }
+                elseif ($tls_val) {
+                    $this->tls = true;
+                }
+            }
+            elseif ($tls_val === true || $tls_val === 1) {
+                $this->tls = true;
+            }
+            elseif ($tls_val) {
+                $this->tls = true;
+            }
         }
-        else {
-            $this->tls = false;
-        }
-        if (!$this->tls) {
+        if (!$this->tls && !$this->starttls) {
             $this->starttls = true;
         }
         $this->request_auths = array(

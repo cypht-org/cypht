@@ -322,4 +322,40 @@ return array(
         "Literäääl\r\n".
         "A2 OK {7}\r\n".
         "Literal\r\n",
+
+    'A5 UID FETCH 1731,1732 (FLAGS INTERNALDATE RFC822.SIZE BODYSTRUCTURE BODY.PEEK[HEADER.FIELDS (SUBJECT FROM DATE CONTENT-TYPE TO)] BODY.PEEK[1.MIME])' =>
+        "* 92 FETCH (UID 1731 FLAGS (\Seen) INTERNALDATE \"02-May-2017 16:32:24 -0500\" RFC822.SIZE 1940 BODYSTRUCTURE ((\"text\" \"plain\" (\"charset\" \"utf-8\") NIL NIL \"7bit\" 1317 32 NIL NIL NIL NIL) \"text\" \"calendar\" (\"charset\" \"utf-8\" \"method\" \"REQUEST\") NIL NIL \"base64\" 1234 NIL (\"attachment\" (\"filename\" \"meeting.ics\")) NIL NIL) BODY[HEADER.FIELDS (SUBJECT FROM DATE CONTENT-TYPE TO)] {240}\r\n" .
+        "Subject: Meeting Invitation\r\n" .
+        "To: root@shop.jackass.com\r\n" .
+        "Content-Type: multipart/mixed; boundary=\"boundary123\"\r\n" .
+        "From: root@shop.jackass.com\r\n" .
+        "Date: Tue, 02 May 2017 16:32:24 -0500\r\n" .
+        "\r\n" .
+        " BODY[1.MIME] {45}\r\n" .
+        "Content-Type: text/calendar; method=REQUEST\r\n" .
+        "\r\n" .
+        ")\r\n" .
+        "* 93 FETCH (UID 1732 FLAGS (\Seen) INTERNALDATE \"11-May-2017 14:28:40 -0500\" RFC822.SIZE 1089 BODYSTRUCTURE ((\"text\" \"plain\" (\"charset\" \"utf-8\") NIL NIL \"7bit\" 1317 32 NIL NIL NIL NIL) \"application\" \"ics\" (\"name\" \"event.ics\") NIL NIL \"base64\" 567 NIL (\"attachment\" (\"filename\" \"event.ics\")) NIL NIL) BODY[HEADER.FIELDS (SUBJECT FROM DATE CONTENT-TYPE TO)] {240}\r\n" .
+        "Subject: Another Event\r\n" .
+        "To: root@shop.jackass.com\r\n" .
+        "Content-Type: multipart/mixed; boundary=\"boundary456\"\r\n" .
+        "From: root@shop.jackass.com\r\n" .
+        "Date: Thu, 11 May 2017 14:28:40 -0500\r\n" .
+        "\r\n" .
+        " BODY[1.MIME] {35}\r\n" .
+        "Content-Type: application/ics\r\n" .
+        "\r\n" .
+        ")\r\n" .
+        "A5 OK Fetch completed (0.001 + 0.000 secs).\r\n",
+
+    'A5 UID FETCH 1733 (FLAGS INTERNALDATE RFC822.SIZE BODYSTRUCTURE BODY.PEEK[HEADER.FIELDS (SUBJECT FROM DATE CONTENT-TYPE TO)])' =>
+        "* 94 FETCH (UID 1733 FLAGS (\Seen) INTERNALDATE \"12-May-2017 10:15:30 -0500\" RFC822.SIZE 2500 BODYSTRUCTURE (\"text\" \"plain\" (\"charset\" \"utf-8\") NIL NIL \"7bit\" 1500 45 NIL NIL NIL NIL) BODY[HEADER.FIELDS (SUBJECT FROM DATE CONTENT-TYPE TO)] {180}\r\n" .
+        "Subject: Regular Email\r\n" .
+        "To: root@shop.jackass.com\r\n" .
+        "Content-Type: text/plain; charset=\"utf-8\"\r\n" .
+        "From: root@shop.jackass.com\r\n" .
+        "Date: Fri, 12 May 2017 10:15:30 -0500\r\n" .
+        "\r\n" .
+        ")\r\n" .
+        "A5 OK Fetch completed (0.001 + 0.000 secs).\r\n",
 );

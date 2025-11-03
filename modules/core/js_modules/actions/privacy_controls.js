@@ -8,7 +8,7 @@ async function addSenderToImagesWhitelist(email) {
         ], (response) => {
             resolve(response);
         }, [], false, undefined, () => {
-            Hm_Notices.show('An error occured while adding the sender to the whitelist', 'danger');
+            Hm_Notices.show('An error occurred while adding the sender to the whitelist', 'danger');
             reject();
         });
     });
