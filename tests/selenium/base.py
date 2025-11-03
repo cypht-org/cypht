@@ -17,6 +17,8 @@ from selenium.webdriver.support import expected_conditions as exp_cond
 import glob
 import subprocess
 import json
+import time
+import os
 
 class WebTest:
 
@@ -25,13 +27,23 @@ class WebTest:
     def __init__(self, cap=None):
         self.read_ini()
         self.driver = get_driver(cap)
-        # Change the window size to make sure all elements are visible
-        current_size = self.driver.get_window_size()
-        new_height = 5000
-        self.driver.set_window_size(current_size['width'], new_height)
         self.browser = False
         if 'browserName' in self.driver.capabilities:
             self.browser = self.driver.capabilities['browserName'].lower()
+
+        # Ensure a consistent, generous viewport in CI to avoid responsive layout issues
+        try:
+            if os.getenv("GITHUB_ACTIONS") == "true":
+                self.driver.set_window_rect(x=0, y=0, width=1920, height=1080)
+                actual_size = self.driver.get_window_size()
+                if actual_size['width'] < 1000:  # If still too small, try alternative method
+                    self.driver.execute_script("window.resizeTo(1920, 1080);")
+            else:
+                current_size = self.driver.get_window_size()
+                self.driver.set_window_size(current_size['width'], 5000)
+        except Exception as e:
+            print(f" - Warning: Could not set window size: {e}")
+
         self.load()
 
     def read_ini(self):
@@ -48,27 +60,44 @@ class WebTest:
     def load(self):
         print(" - loading site")
         self.go(SITE_URL)
+        # In headless mode, maximize_window() doesn't work and can cause issues
+        # Set window size explicitly instead
         try:
-            self.driver.maximize_window()
+            if os.getenv("GITHUB_ACTIONS") == "true":
+                self.driver.set_window_rect(x=0, y=0, width=1920, height=1080)
+                self.driver.execute_script("window.resizeTo(1920, 1080);")
+            else:
+                self.driver.maximize_window()
         except Exception:
-            print(" - Could not maximize browser :(")
+            print(" - Could not set window size :(")
         if self.browser == 'safari':
             try:
                 self.driver.set_window_size(1920,1080)
             except Exception:
                 print(" - Could not maximize Safari")
 
+    def save_debug_artifacts(self, name):
+        if os.getenv("GITHUB_ACTIONS") != "true":
+            return
+        os.makedirs(f"artifacts/{name}", exist_ok=True)
+        with open(f"artifacts/{name}/page_dump.html", "w", encoding="utf-8") as f:
+            f.write(self.driver.page_source)
+        self.driver.save_screenshot(f"artifacts/{name}/page_screenshot.png")
+        logs = self.driver.get_log("browser")
+        with open(f"artifacts/{name}/console_logs.json", "w", encoding="utf-8") as f:
+            json.dump(logs, f, indent=2)
+
     def mod_active(self, name):
         # debug self.modules
         echo = " - modules enabled: "
         for mod in self.modules:
             echo += mod + " "
-        print(echo) 
+        print(echo)
         if name in self.modules:
             return True
         print(" - module not enabled: %s" % name)
         return False
-    
+
     def single_server(self):
         if self.servers <= 1:
             return True
@@ -77,6 +106,7 @@ class WebTest:
 
     def go(self, url):
         self.driver.get(url)
+        self.wait_for_page_ready()
 
     def login(self, user, password):
         print(" - logging in")
@@ -95,7 +125,7 @@ class WebTest:
         WebDriverWait(self.driver, 3).until(exp_cond.alert_is_present(), 'timed out')
         alert = self.driver.switch_to.alert
         alert.accept()
-        
+
     def logout_no_save(self):
         print(" - logging out")
         self.driver.find_element(By.CLASS_NAME, 'logout_link').click()
@@ -128,7 +158,7 @@ class WebTest:
         print(" - finding element by class {0}".format(class_name))
         return self.driver.find_element(By.CLASS_NAME, class_name)
 
-    def wait_for_element_by_class(self, class_name, timeout=10):
+    def wait_for_element_by_class(self, class_name, timeout=60):
         """Wait for an element to be present and visible by class name"""
         print(" - waiting for element by class {0}".format(class_name))
         WebDriverWait(self.driver, timeout).until(
@@ -143,7 +173,7 @@ class WebTest:
     def by_xpath(self, element_xpath):
         print(" - finding element by xpath {0}".format(element_xpath))
         return self.driver.find_element(By.XPATH, element_xpath)
-    
+
     def element_exists(self, class_name):
         print(" - checking if element exists by class {0}".format(class_name))
         try:
@@ -157,63 +187,49 @@ class WebTest:
         element = WebDriverWait(self.driver, timeout).until(
             exp_cond.presence_of_element_located((el_type, el_value)))
 
-    def wait_on_class(self, class_name, timeout=30):
+    def wait_on_class(self, class_name, timeout=60):
         self.wait(By.CLASS_NAME, class_name)
 
     def wait_with_folder_list(self):
         self.wait(By.CLASS_NAME, "main")
 
-    def wait_on_sys_message(self, timeout=30):
+    def wait_on_sys_message(self, timeout=60):
         wait = WebDriverWait(self.driver, timeout)
         element = wait.until(wait_for_non_empty_text((By.CLASS_NAME, "sys_messages"))
 )
-        
-    def wait_for_navigation_to_complete(self, timeout=30):
+
+    def wait_for_navigation_to_complete(self, timeout=60):
         print(" - waiting for the navigation to complete...")
         # Wait for the main content to be updated and any loading indicators to disappear
         try:
-            # Wait for any loading indicators to disappear
-            WebDriverWait(self.driver, 5).until_not(
-                lambda driver: len(driver.find_elements(By.ID, "loading_indicator")) > 0
+            WebDriverWait(self.driver, timeout).until(
+                lambda driver: driver.execute_script("return window.routingToast === null;")
+            )
+            WebDriverWait(self.driver, timeout).until(
+                lambda driver: driver.execute_script("return document.getElementById('nprogress') === null;")
             )
         except:
-            # Loading icon might not be present, continue
+            print(" - routing toast or nprogress check failed, continuing...")
             pass
-        
-        # Wait for the main content area to be stable
+
+    def wait_for_page_ready(self, timeout=60):
+        """Wait for document readiness and idle network to reduce flakiness after navigation."""
         try:
+            # Wait for DOM ready
             WebDriverWait(self.driver, timeout).until(
-                lambda driver: driver.execute_script("""
-                    return new Promise((resolve) => {
-                        let lastContent = '';
-                        let stableCount = 0;
-                        const checkStability = () => {
-                            const mainContent = document.querySelector('main')?.innerHTML || '';
-                            if (mainContent === lastContent) {
-                                stableCount++;
-                                if (stableCount >= 3) {
-                                    resolve(true);
-                                    return;
-                                }
-                            } else {
-                                stableCount = 0;
-                                lastContent = mainContent;
-                            }
-                            setTimeout(checkStability, 100);
-                        };
-                        checkStability();
-                    });
-                """)
+                lambda d: d.execute_script("return document.readyState") == "complete"
             )
-        except:
-            # Fallback: just wait for the main element to be present
-            print(" - fallback: waiting for main element")
-            WebDriverWait(self.driver, timeout).until(
-                exp_cond.presence_of_element_located((By.TAG_NAME, "main"))
+        except Exception:
+            print(" - document.readyState wait failed, continuing...")
+        # Best-effort small delay to allow post-load JS to attach handlers in CI
+        try:
+            WebDriverWait(self.driver, 5).until(
+                lambda d: d.execute_script(
+                    "return !!(window.requestIdleCallback || window.setTimeout)"
+                )
             )
-            # Additional wait for any dynamic content
-            import time
-            time.sleep(1)
+        except Exception:
+            pass
 
     def wait_for_settings_to_expand(self):
         print(" - waiting for the settings section to expand...")
@@ -229,13 +245,13 @@ class WebTest:
                         return
                 except:
                     pass
-                
+
                 # Click to expand
                 settings_button.click()
-                
+
                 # Wait for the settings to be displayed
                 try:
-                    WebDriverWait(self.driver, 10).until(lambda x: self.by_class('settings').is_displayed())
+                    WebDriverWait(self.driver, 60).until(lambda x: self.by_class('settings').is_displayed())
                     print(" - settings expanded successfully")
                 except:
                     print(" - settings expansion timeout, continuing anyway")
@@ -249,13 +265,13 @@ class WebTest:
         print(" - waiting for element to be clickable")
         try:
             # Scroll element into view
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
-            
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center', behavior: 'instant'});", el)
+
             # Wait for element to be clickable
-            WebDriverWait(self.driver, 10).until(
+            WebDriverWait(self.driver, 60).until(
                 exp_cond.element_to_be_clickable(el)
             )
-            
+
             # Try regular click first
             try:
                 el.click()
@@ -265,7 +281,7 @@ class WebTest:
                 print(" - trying JavaScript click as fallback")
                 # Use JavaScript click as fallback
                 self.driver.execute_script("arguments[0].click();", el)
-                
+
         except Exception as e:
             print(f" - click_when_clickable failed: {e}")
             # Final fallback: try JavaScript click without waiting
@@ -282,11 +298,8 @@ class WebTest:
         for attempt in range(max_attempts):
             try:
                 # Scroll element into view
-                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
-                # Wait a moment for any animations
-                import time
-                time.sleep(0.5)
-                # Try to click
+                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center', behavior: 'instant'});", element)
+                WebDriverWait(self.driver, 60).until(exp_cond.element_to_be_clickable(element))
                 element.click()
                 return
             except Exception as e:

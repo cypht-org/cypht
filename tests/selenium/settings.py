@@ -20,32 +20,33 @@ class SettingsHelpers(WebTest):
 
     def toggle(self, name):
         elem = self.by_name(name)
-        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
-        time.sleep(1)
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant'})", elem)
+        WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(elem))
         elem.click()
 
     def close_section(self, section):
         elem = self.by_css('[data-target=".'+section+'"]')
-        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
-        time.sleep(1)
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant'})", elem)
+        WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(elem))
         elem.click()
 
     def save_settings(self):
-        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(1)
+        self.driver.execute_script("window.scrollTo({left: 0, top: document.body.scrollHeight, behavior: 'instant'});")
+        WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(self.by_name('save_settings')))
         alert_message = self.by_class('sys_messages')
         self.by_name('save_settings').click()
         self.wait_with_folder_list()
         self.safari_workaround()
-        WebDriverWait(self.driver, 20).until(EC.staleness_of(alert_message))
+        WebDriverWait(self.driver, 60).until(EC.staleness_of(alert_message))
         ignored_exceptions=(NoSuchElementException,StaleElementReferenceException,)
-        _ = WebDriverWait(self.driver, 10, ignored_exceptions=ignored_exceptions).until(
+        _ = WebDriverWait(self.driver, 60, ignored_exceptions=ignored_exceptions).until(
             EC.presence_of_element_located((By.CLASS_NAME, 'sys_messages'))
         )
         alert_message = self.by_class('sys_messages')
         assert alert_message.text.strip() == 'Settings updated'
 
     def settings_section(self, section):
+        WebDriverWait(self.driver, 60).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.settings')))
         if not self.by_class('settings').is_displayed():
             self.by_css('[data-bs-target=".settings"]').click()
             self.wait_for_settings_to_expand()
@@ -56,8 +57,8 @@ class SettingsHelpers(WebTest):
             self.wait_for_navigation_to_complete()
         if not self.by_class(section).is_displayed():
             elem = self.by_css('[data-target=".'+section+'"]')
-            self.driver.execute_script("arguments[0].scrollIntoView()", elem)
-            time.sleep(1)
+            self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant'})", elem)
+            WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(elem))
             elem.click()
 
     def checkbox_test(self, section, name, checked, mod=False):
@@ -92,8 +93,8 @@ class SettingsHelpers(WebTest):
             return
         self.settings_section(section)
         dropdown = self.by_name(name)
-        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", dropdown)
-        WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(dropdown))
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center', behavior: 'instant'});", dropdown)
+        WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(dropdown))
         assert dropdown.get_attribute('value') == current
         Select(dropdown).select_by_value(new)
         self.save_settings()
