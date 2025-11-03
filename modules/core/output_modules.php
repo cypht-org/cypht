@@ -1978,10 +1978,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             }
             $config_link = '<a title="'.$this->trans('Configure').'" href="?page=settings#'.$path.'_setting"><i class="bi bi-gear-wide refresh_list"></i></a>';
             $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a>';
-            $search_field = '<form method="GET">
-            <input type="hidden" name="page" value="message_list" />
-            <input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/>
-            <input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="form-control imap_keyword" name="keyword" value="'.$this->html_safe($terms).'"/></form>';
+            $search_field = '<form method="GET"><input type="hidden" name="page" value="message_list" /><input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/><input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="form-control imap_keyword" name="keyword" value="'.$this->html_safe($terms).'"/></form>';
 
         }
         else {
