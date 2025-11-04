@@ -315,7 +315,7 @@ class Hm_Output_advanced_search_save_icon extends Hm_Output_Module {
         if (!$name) {
             return '<div class="advanced_search_save_controls mt-3">' .
                 '<button type="button" class="btn btn-primary btn-sm show_save_advanced_search" title="'.$this->trans('Save this search').'">' .
-                '<i class="bi bi-bookmark-plus"></i> '.$this->trans('Save Search').'</button>' .
+                '<i class="bi bi-bookmark-plus"></i> '.$this->trans('Save search').'</button>' .
                 '<div class="save_advanced_search_form mt-2" style="display: none;">' .
                 '<input type="text" class="advanced_search_name form-control form-control-sm mb-2" placeholder="'.$this->trans('Search Name').'" style="max-width: 300px;" />' .
                 '<button type="button" class="btn btn-primary btn-sm save_advanced_search_btn me-2">'.$this->trans('Save').'</button>' .
