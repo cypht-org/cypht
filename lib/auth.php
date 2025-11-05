@@ -183,7 +183,6 @@ class Hm_Auth_IMAP extends Hm_Auth {
             return true;
         }
         elseif ($imap->get_state() != 'connected') {
-            error_log(sprintf('Unable to connect to the IMAP auth server %s', $this->imap_settings['server']));
             Hm_Debug::add($imap->show_debug(true));
             Hm_Debug::add(sprintf('Unable to connect to the IMAP auth server %s', $this->imap_settings['server']));
             return false;
@@ -203,11 +202,10 @@ class Hm_Auth_IMAP extends Hm_Auth {
      * @return bool true if authentication worked
      */
     public function check_credentials($user, $pass) {
-        $imap = new Hm_IMAP();
-        $this->imap_instance = $imap;
+        $this->imap_instance = new Hm_IMAP();;
         list($server, $port, $tls, $sieve_config, $sieve_tls_mode) = get_auth_config($this->site_config, 'imap');
         if (!$user || !$pass || !$server || !$port) {
-            Hm_Debug::add($imap->show_debug(true));
+            Hm_Debug::add($this->imap_instance->show_debug(true));
             Hm_Debug::add('Invalid IMAP auth configuration settings');
             return false;
         }
@@ -217,7 +215,7 @@ class Hm_Auth_IMAP extends Hm_Auth {
             'sieve_config_host' => $sieve_config,
             'sieve_tls' => $sieve_tls_mode
         ];
-        return $this->check_connection($imap);
+        return $this->check_connection($this->imap_instance);
     }
 
     /**
