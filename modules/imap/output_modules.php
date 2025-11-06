@@ -493,7 +493,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $pass_value = '';
             }
             $res .= '<div class="' . mb_strtolower($type) . '_server mb-3">';
-            $res .= '<form class="imap_connect" method="POST">';
+            $res .= '<form class="imap_connect" method="POST"><div class="row">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
             $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-xl-2 col-lg-2 col-md-6 overflow-auto" >';
@@ -546,7 +546,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2 mt-3" />';
 
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
-            $res .= '</div></div></div></form>';
+            $res .= '</div></div></div></form></div>';
         }
         $res .= '';
         return $res;
@@ -1549,7 +1549,7 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
                 $pass_value = '';
             }
             $res .= '<div class="ews_server mt-3 mb-3">';
-            $res .= '<form class="imap_connect" method="POST">';
+            $res .= '<form class="imap_connect" method="POST"><div class="row">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
             $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-xl-2 col-lg-2 col-md-6">';
@@ -1591,7 +1591,7 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
             $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
 
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
-            $res .= '</div></div></div></form>';
+            $res .= '</div></div></div></form></div>';
         }
 
         $res .= '
