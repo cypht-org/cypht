@@ -290,6 +290,7 @@ td {
 .server_content,
 .profile_content,
 .user_settings {
+  position: relative;
   display: table;
   table-layout: fixed;
   width: 100%;
@@ -297,7 +298,7 @@ td {
   background: #fff;
   height: 100%;
   margin-right: 20px;
-  padding-bottom: 40px;
+  padding-bottom: 20px;
 }
 .user_settings table {
   table-layout: fixed;
@@ -312,12 +313,13 @@ td {
   color: var(--bs-body-color);
 }
 .reset_factory_button {
+  position: absolute;
+  bottom: 40px;
+  right: 10px;
+  margin-right: 37px;
   cursor: pointer;
   color: #666;
   font-size: 100%;
-  padding: 10px !important;
-  float: right !important;
-  margin-right: 20px;
 }
 .disabled_link {
   pointer-events: none;
@@ -1270,7 +1272,7 @@ div.unseen,
   right: 0px;
   display: none;
   padding: 0px 5px 5px 10px;
-  background-color: #fff;
+  background-color: var(--bs-body-bg);
 }
 .mobile #list_controls_menu.show {
   display: flex;
@@ -1313,7 +1315,7 @@ div.unseen,
   position: absolute;
   right: 0px;
   top: 54px;
-  background-color: #fafafa;
+  background-color: var(--bs-body-bg);
   font-size: 85%;
   padding: 15px 20px;
   display: none;
@@ -1355,16 +1357,6 @@ div.unseen,
 .on_mobile {
   display: none;
 }
-.mobile .no_mobile {
-  display: none !important;
-}
-.mobile .on_mobile {
-  display: block !important;
-}
-.mobile .move_to_location {
-  right: 0;
-}
-
 .server_title {
   font-size: 110%;
   margin-bottom: 0px;
@@ -1426,7 +1418,7 @@ div.unseen,
   text-align: left;
   top: 0;
   padding: 10px 0 10px 18px;
-  background: #fff;
+  background: var(--bs-body-bg);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
 }
@@ -1570,11 +1562,6 @@ a[disabled] {
   color: var(--bs-white);
 }
 
-.mobile .search_content .p-3 {
-  flex: 1 1 auto;
-  overflow: auto;
-}
-
 .search_content .refresh_link {
   display: none;
 }
@@ -1627,11 +1614,6 @@ a[disabled] {
   white-space: nowrap;
 }
 
-.mobile .folders {
-  margin-top: 1rem;
-  margin-left: 1rem !important;
-}
-
 pre.msg_source {
   white-space: pre-wrap;
   word-break: break-word;
@@ -1645,6 +1627,17 @@ pre.msg_source {
   background-color: var(--bs-primary);
   border-color: var(--bs-primary);
 }
+
+.mobile .no_mobile { display: none !important; }
+.mobile .on_mobile { display: block !important; }
+.mobile .move_to_location { right: 0; }
+.mobile .search_content .p-3 { flex: 1 1 auto; overflow: auto; }
+.mobile .search_form { padding-left: 0; }
+.mobile .folders { margin-top: 1rem; margin-left: 1rem !important; }
+.mobile .server_section { overflow: hidden; }
+.mobile .add_server .txt_fld { width: 100%; }
+.mobile .user_settings table td { padding: 5px 10px; }
+.mobile .reset_factory_button { margin-right: 1rem; }
 
 /* Mobile responsive overrides for Bootstrap classes */
 @media (max-width: 767.98px) {
