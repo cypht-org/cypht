@@ -650,16 +650,36 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $folder = $this->request->post['folder'];
             }
             $path = sprintf("imap_%s_%s", $form['imap_server_id'], $folder);
-            $page_cache = $this->cache->get('imap_folders_'.$path);
+            $with_subscription = isset($this->request->post['subscription_state']) && $this->request->post['subscription_state'];
+
             if (array_key_exists('imap_prefetch', $this->request->post)) {
                 $prefetched = $this->session->get('imap_prefetched_ids', array());
                 $prefetched[] = $form['imap_server_id'];
                 $this->session->set('imap_prefetched_ids', array_unique($prefetched, SORT_STRING));
             }
-            $with_subscription = isset($this->request->post['subscription_state']) && $this->request->post['subscription_state'];
+
+            // Check cache FIRST before connecting to IMAP
+            $page_cache = $this->cache->get('imap_folders_'.$path);
+            if ($page_cache && is_array($page_cache) && isset($page_cache['folders'])) {
+                $this->out('imap_expanded_folder_data', $page_cache['folders']);
+                $this->out('imap_expanded_folder_id', $form['imap_server_id']);
+                $this->out('imap_expanded_folder_path', $path);
+                $this->out('with_input', $with_subscription);
+                $this->out('folder', $folder);
+                $this->out('can_share_folders', $page_cache['can_share_folders']);
+
+                if (isset($page_cache['quota'])) {
+                    $this->out('quota', $page_cache['quota']);
+                    $this->out('quota_max', $page_cache['quota_max']);
+                }
+                return;
+            }
+
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {
-                $this->out('can_share_folders', stripos($mailbox->get_capability(), 'ACL') !== false);
+                $can_share_folders = stripos($mailbox->get_capability(), 'ACL') !== false;
+                $this->out('can_share_folders', $can_share_folders);
+                $quota_data = array();
                 $quota_root = $mailbox->get_quota($folder ? $folder : 'INBOX', true);
                 if ($quota_root && isset($quota_root[0]['name'])) {
                     $quota = $mailbox->get_quota($quota_root[0]['name'], false);
@@ -667,19 +687,14 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                         $current = floatval($quota[0]['current']);
                         $max = floatval($quota[0]['max']);
                         if ($max > 0) {
-                            $this->out('quota', ceil(($current / $max) * 100));
-                            $this->out('quota_max', $max / 1024);
+                            $quota_percent = ceil(($current / $max) * 100);
+                            $quota_max = $max / 1024;
+                            $this->out('quota', $quota_percent);
+                            $this->out('quota_max', $quota_max);
+                            $quota_data = array('quota' => $quota_percent, 'quota_max' => $quota_max);
                         }
                     }
                 }
-            }
-            if ($page_cache) {
-                $this->out('imap_expanded_folder_data', $page_cache);
-                $this->out('imap_expanded_folder_id', $form['imap_server_id']);
-                $this->out('imap_expanded_folder_path', $path);
-                $this->out('with_input', $with_subscription);
-                $this->out('folder', $folder);
-                return;
             }
             if ($mailbox && $mailbox->authed()) {
                 $only_subscribed = $this->user_config->get('only_subscribed_folders_setting', false);
@@ -694,7 +709,16 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 if (isset($msgs[$folder])) {
                     unset($msgs[$folder]);
                 }
-                $this->cache->set('imap_folders_'.$path, $msgs);
+
+                $cache_data = array(
+                    'folders' => $msgs,
+                    'can_share_folders' => $can_share_folders ?? false
+                );
+                if (!empty($quota_data)) {
+                    $cache_data = array_merge($cache_data, $quota_data);
+                }
+                $this->cache->set('imap_folders_'.$path, $cache_data);
+
                 $this->out('imap_expanded_folder_data', $msgs);
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
