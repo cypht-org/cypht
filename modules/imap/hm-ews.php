@@ -1043,8 +1043,20 @@ class Hm_EWS {
             $struct[$part_num]['md5'] = '';
             $struct[$part_num]['disposition'] = $part->getContentDisposition();
 
-            if ($filename = $part->getFilename()) {
+            $filename = $part->getFilename();
+            if (! $filename) {
+                $filename = $part->getHeaderParameter('Content-Type', 'name');
+            }
+            if (! $filename) {
+                $filename = $part->getHeaderParameter('Content-Disposition', 'filename');
+            }
+            if ($filename) {
                 $struct[$part_num]['file_attributes'] = ['filename' => $filename];
+
+                if (! isset($struct[$part_num]['attributes']) || ! is_array($struct[$part_num]['attributes'])) {
+                    $struct[$part_num]['attributes'] = [];
+                }
+                $struct[$part_num]['attributes']['name'] = $filename;
 
                 if ($part->getContentDisposition() == 'attachment') {
                     $struct[$part_num]['file_attributes']['attachment'] = true;
