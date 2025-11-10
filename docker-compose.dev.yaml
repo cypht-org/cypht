@@ -14,12 +14,32 @@ services:
       - MYSQL_USER=cypht
       - MYSQL_PASSWORD=cypht_password
     stop_grace_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    stop_grace_period: 30s
+
   cypht:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
       args:
         WITH_DEBUG: true
+    depends_on:
+      db:
+        condition: service_started
+      redis:
+        condition: service_healthy
     volumes:
       - ./data/users:/var/lib/hm3/users
       - ./data/attachments:/var/lib/hm3/attachments
@@ -41,6 +61,12 @@ services:
       - DB_PASS=cypht_password
       - SESSION_TYPE=DB
       - USER_CONFIG_TYPE=DB
+      - ENABLE_REDIS=true
+      - REDIS_SERVER=redis
+      - REDIS_PORT=6379
+      - REDIS_INDEX=1
+      - REDIS_PASS=
+      - REDIS_SOCKET=
     extra_hosts:
       host.docker.internal: host-gateway  # for xdebug
     stop_grace_period: 30s

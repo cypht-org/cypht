@@ -18,10 +18,26 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
   cypht:
     image: cypht/cypht:2.4.2
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     ports:
       - "80:80"
@@ -36,9 +52,14 @@ services:
       - DB_PASS=cypht_password
       - SESSION_TYPE=DB
       - USER_CONFIG_TYPE=DB
+      - ENABLE_REDIS=true
+      - REDIS_SERVER=redis
+      - REDIS_PORT=6379
+      - REDIS_INDEX=1
+      - REDIS_PASS=
+      - REDIS_SOCKET=
     volumes:
       - ./data/log/nginx:/var/log/nginx
       - ./data/log/php:/var/log/php
       - ./data/log/supervisord:/var/log/supervisord
       - ./data/fonts:/usr/local/share/cypht/site/fonts
-
