@@ -59,8 +59,14 @@ if ($dbh) {
 }
 
 if ($user && $pass) {
-    $res = $auth->create($user, $pass);
-    switch ($res) {
+    $res = Hm_DB::execute($dbh, 'select username from hm_user where username = ?', [$user]);
+    if (!empty($res)) {
+        fwrite(STDOUT, "User '{$user}' already exists. Skipping creation...\n");
+        exit(0);
+    }
+
+    $result = $auth->create($user, $pass);
+    switch ($result) {
         case 1:
             fwrite(STDERR, "Error: Unable to create user account.\n");
             exit(2);
