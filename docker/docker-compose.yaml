@@ -19,7 +19,7 @@ services:
       retries: 5
 
   cypht:
-    image: cypht/cypht:2.5.0
+    image: cypht/cypht:2.5.1
     depends_on:
       db:
         condition: service_healthy
