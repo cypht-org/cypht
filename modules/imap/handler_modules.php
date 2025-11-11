@@ -1384,7 +1384,7 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
 
         $terms = [[search_since_based_on_setting($this->user_config), $date]];
 
-        if ($this->request->get['keyword']) {
+        if (array_key_exists('keyword', $this->request->get) && $this->request->get['keyword']) {
             $keyword = validate_search_terms($this->request->get['keyword']);
             $terms[] = [validate_search_fld(DEFAULT_SEARCH_FLD), $keyword];
         }
