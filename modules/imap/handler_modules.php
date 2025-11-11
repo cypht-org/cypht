@@ -6,10 +6,29 @@
  * @subpackage imap
  */
 
-// Add helper function for delayed logging (disabled in production)
+// Add helper function for delayed logging (enabled when DEBUG_MODE is true)
 function delayed_debug_log($message, $data = null, $level = 'info') {
-    // Debug logging disabled in production
-    return;
+    if (!defined('DEBUG_MODE') || !DEBUG_MODE) {
+        return;
+    }
+
+    $entry = array(
+        'timestamp' => gmdate('c'),
+        'level' => $level,
+        'message' => $message
+    );
+
+    if ($data !== null) {
+        $entry['context'] = $data;
+    }
+
+    $payload = '[delayed_debug] ' . json_encode($entry, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+    if ($payload !== false) {
+        error_log($payload);
+    } else {
+        error_log('[delayed_debug] Logging failure: ' . $message);
+    }
 }
 
 // Include spam report utilities for debugging functions

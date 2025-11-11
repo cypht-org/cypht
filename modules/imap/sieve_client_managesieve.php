@@ -54,7 +54,8 @@ class SieveClientManageSieve extends SieveClientBase {
             $this->username = $username;
             $this->options = array_merge(array(
                 'use_tls' => true,
-                'timeout' => 30
+                'timeout' => 30,
+                'auth_mechanism' => 'PLAIN'
             ), $options);
             
             $this->debug('Connecting to Sieve server', array(
@@ -71,14 +72,34 @@ class SieveClientManageSieve extends SieveClientBase {
             // Create ManageSieve client
             $this->client = new \PhpSieveManager\ManageSieve\Client($host, $port);
             
-            // Enable TLS if requested
-            if ($this->options['use_tls']) {
-                if (!$this->client->connect($username, $password, 'PLAIN', '', 'tls')) {
-                    throw new SieveConnectionException('Failed to connect with TLS');
-                }
-            } else {
-                if (!$this->client->connect($username, $password)) {
+            $authMechanism = strtoupper($this->options['auth_mechanism']);
+            $useTls = (bool)$this->options['use_tls'];
+
+            $this->debug('Attempting ManageSieve connection', array(
+                'use_tls' => $useTls,
+                'auth_mechanism' => $authMechanism
+            ));
+
+            try {
+                if (!$this->client->connect($username, $password, $useTls, '', $authMechanism)) {
                     throw new SieveConnectionException('Failed to connect');
+                }
+            } catch (Exception $primaryException) {
+                if ($useTls) {
+                    $this->debug('TLS ManageSieve connection failed, retrying without TLS', array(
+                        'error' => $primaryException->getMessage()
+                    ));
+
+                    // Recreate client to ensure a clean socket
+                    $this->client = new \PhpSieveManager\ManageSieve\Client($host, $port);
+                    if (!$this->client->connect($username, $password, false, '', $authMechanism)) {
+                        throw $primaryException;
+                    }
+
+                    // Remember that TLS was disabled successfully so downstream code is consistent
+                    $this->options['use_tls'] = false;
+                } else {
+                    throw $primaryException;
                 }
             }
             
@@ -127,7 +148,7 @@ class SieveClientManageSieve extends SieveClientBase {
             
             // Activate if requested
             if ($activate) {
-                if (!$this->client->setActive($ruleName)) {
+            if (!$this->client->activateScript($ruleName)) {
                     throw new SieveRuleException('Script uploaded but activation failed');
                 }
             }
@@ -161,7 +182,7 @@ class SieveClientManageSieve extends SieveClientBase {
             
             $this->debug('Removing rule', array('name' => $ruleName));
             
-            if (!$this->client->deleteScript($ruleName)) {
+            if (!$this->client->removeScripts($ruleName)) {
                 throw new SieveRuleException('Failed to delete script');
             }
             
@@ -201,7 +222,8 @@ class SieveClientManageSieve extends SieveClientBase {
             foreach ($scripts as $scriptName) {
                 $rules[] = array(
                     'name' => $scriptName,
-                    'active' => ($scriptName === $this->client->getActive()),
+                    // The upstream library does not expose active state directly
+                    'active' => null,
                     'size' => 0 // Size not available from this API
                 );
             }
@@ -269,7 +291,7 @@ class SieveClientManageSieve extends SieveClientBase {
             
             $this->debug('Activating rule', array('name' => $ruleName));
             
-            if (!$this->client->setActive($ruleName)) {
+            if (!$this->client->activateScript($ruleName)) {
                 throw new SieveException('Failed to activate script');
             }
             
@@ -299,7 +321,7 @@ class SieveClientManageSieve extends SieveClientBase {
             
             $this->debug('Deactivating all rules');
             
-            if (!$this->client->setActive('')) {
+            if (!$this->client->activateScript('')) {
                 throw new SieveException('Failed to deactivate all scripts');
             }
             
