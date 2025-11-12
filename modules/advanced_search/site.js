@@ -117,11 +117,8 @@ var adv_select_imap_folder = function(el) {
     folders.find('li').each(function(index) {
         const wrapper = $('<div class="d-flex justify-content-between wrapper"></div>');
         $(this).wrapInner(wrapper);
-        const allSpecialFoldersCheckbox = `
-        <span class="form-check">
-            <label class="form-check-label" for="all_special_folders-${index}">All special folders</label>
-            <input class="form-check-input" type="checkbox" name="all_special_folders" id="all_special_folders-${index}">
-        </span>
+        const pickSpecialFoldersButton = `
+        <a href="#" class="btn btn-light btn-sm pick_special_folders">Pick special folders</a>
         `;
         const allFoldersCheckbox = `
         <span class="form-check">
@@ -130,7 +127,7 @@ var adv_select_imap_folder = function(el) {
         </span>
         `;
         const checkboxesWrapper = $('<div class="d-flex gap-3"></div>');
-        checkboxesWrapper.append(allSpecialFoldersCheckbox);
+        checkboxesWrapper.append(pickSpecialFoldersButton);
         checkboxesWrapper.append(allFoldersCheckbox);
         $(this).find('.wrapper').append(checkboxesWrapper);
     });
@@ -141,8 +138,8 @@ var adv_select_imap_folder = function(el) {
     $('.adv_folder_list').html(folders.html());
 
     $('.adv_folder_link', list_container).on("click", function() { return expand_adv_folder_list($(this).data('target')); });
-    $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').off('click');
-    $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').on("click", function() { adv_folder_select($(this).data('id')); return false; });
+    $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').not('.pick_special_folders').off('click');
+    $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').not('.pick_special_folders').on("click", function() { adv_folder_select($(this).data('id')); return false; });
     $('.close_adv_folders').on("click", function() {
         $('.adv_folder_list').html('');
         $('.adv_folder_list').hide();
