@@ -1,5 +1,7 @@
 'use strict';
 
+var existingRecipients = [];
+
 var delete_contact = function(id, source, type) {
     if (!hm_delete_prompt()) {
         return false;
@@ -15,6 +17,10 @@ var delete_contact = function(id, source, type) {
             }
         }
     );
+};
+
+var remove_recipient_from_list = function(recipientId) {
+    existingRecipients = existingRecipients.filter(item => item !== recipientId);
 };
 
 var add_contact_from_message_view = function() {
@@ -95,6 +101,9 @@ var autocomplete_contact = function(e, class_name, list_div) {
                         var suggestion = JSON.parse(res.contact_suggestions[i].replace(/&quot;/g, '"'))
                         
                         div.html(suggestion.contact);
+                        if (existingRecipients.includes(suggestion.contact_id)) {
+                            continue;
+                        }
                         if ($(class_name).val().match(div.text())) {
                             continue;
                         }
@@ -187,6 +196,7 @@ var add_autocomplete = function(event, class_name, list_div, fld_val) {
 
     if (!fld_val) {
         fld_val = get_search_term(class_name);
+        existingRecipients.push($(event.target).data('id'));
     }
     var new_address = $(event.target).text()
     var existing = $(class_name).val();
