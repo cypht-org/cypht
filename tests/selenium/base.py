@@ -200,17 +200,74 @@ class WebTest:
 
     def wait_for_navigation_to_complete(self, timeout=60):
         print(" - waiting for the navigation to complete...")
-        # Wait for the main content to be updated and any loading indicators to disappear
+        import time
+        # First, check if we have navigation state attributes (new method)
         try:
-            WebDriverWait(self.driver, timeout).until(
-                lambda driver: driver.execute_script("return window.routingToast === null;")
+            # Wait for navigation to start (state changes to 'loading')
+            WebDriverWait(self.driver, 5).until(
+                lambda driver: driver.execute_script(
+                    'return document.body.getAttribute("data-navigation-state") === "loading"'
+                )
             )
+            print(" - navigation start detected")
+
+            # Then wait for navigation to complete (state changes to 'complete')
             WebDriverWait(self.driver, timeout).until(
-                lambda driver: driver.execute_script("return document.getElementById('nprogress') === null;")
+                lambda driver: driver.execute_script(
+                    'return document.body.getAttribute("data-navigation-state") === "complete"'
+                )
             )
-        except:
-            print(" - routing toast or nprogress check failed, continuing...")
-            pass
+            print(" - navigation completion detected via state attribute")
+
+            # Small delay to ensure DOM is settled
+            time.sleep(0.5)
+            return
+
+        except Exception as state_error:
+            print(f" - navigation state monitoring failed: {state_error}, trying fallback methods")
+
+            # Fallback 1: Try to detect fetch requests
+            try:
+                get_current_navigations_request_entries_length = lambda: self.driver.execute_script(
+                    'return window.performance.getEntriesByType("resource").filter((r) => r.initiatorType === "fetch").length'
+                )
+                navigation_length = get_current_navigations_request_entries_length()
+
+                WebDriverWait(self.driver, min(timeout, 10)).until(
+                    lambda driver: get_current_navigations_request_entries_length() > navigation_length
+                )
+                print(" - navigation detected via fetch requests")
+
+                time.sleep(0.5)
+                return
+
+            except Exception as fetch_error:
+                print(f" - fetch monitoring failed: {fetch_error}, trying final fallback")
+
+                # Fallback 2: Check for loading indicators and main element
+                try:
+                    WebDriverWait(self.driver, 5).until_not(
+                        lambda driver: len(driver.find_elements(By.ID, "loading_indicator")) > 0
+                    )
+                    print(" - loading indicator disappeared")
+                except:
+                    pass
+
+                try:
+                    WebDriverWait(self.driver, min(timeout, 15)).until(
+                        exp_cond.presence_of_element_located((By.TAG_NAME, "main"))
+                    )
+                    print(" - main element present")
+
+                    time.sleep(1)
+
+                except Exception as main_error:
+                    print(f" - all navigation waiting methods failed: {state_error}, {fetch_error}, {main_error}")
+                    time.sleep(2)
+
+        except Exception as e:
+            print(f" - unexpected error in navigation waiting: {e}")
+            time.sleep(2)
 
     def wait_for_page_ready(self, timeout=60):
         """Wait for document readiness and idle network to reduce flakiness after navigation."""
