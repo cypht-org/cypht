@@ -266,6 +266,7 @@ function applySmtpComposePageHandlers(routeParams) {
     $(document).on('click', '.bubble_close', function(e) {
         e.stopPropagation();
         $(".bubble_dropdown-content").remove();
+        remove_recipient_from_list($(this).parent().data('id'));
         $(this).parent().remove();
     });
 
