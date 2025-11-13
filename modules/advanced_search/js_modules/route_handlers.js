@@ -81,6 +81,14 @@ function applyAdvancedSearchPageHandlers() {
             }
         });
 
+        const account = $(this).closest('li').find('.adv_folder_link');
+        const accountLabel = account.text();
+        const accountId = account.data('target');
+
+        const isFolderSelected = (folder) => get_adv_sources().find(source => source.label === getFolderLabel(folder));
+
+        const getFolderLabel = (folder) => accountLabel + ' > ' + folder;
+
         modal.setContent(`
         <div class="d-flex gap-3 flex-wrap">
             <div class="form-check form-switch">
@@ -89,16 +97,12 @@ function applyAdvancedSearchPageHandlers() {
             </div>
             ${specialFolders.map(folder => `
             <div class="form-check form-switch">
-                <input class="form-check-input special_folder_checkbox" type="checkbox" data-folder-id="${folder}">
+                <input class="form-check-input special_folder_checkbox" type="checkbox" data-folder-id="${folder}" ${isFolderSelected(folder) ? 'checked' : ''}>
                 <label class="form-check-label" for="${folder}">${folder}</label>
             </div>
             `).join('')}
         </div>    
         `);
-
-        const account = $(this).closest('li').find('.adv_folder_link');
-        const accountLabel = account.text();
-        const accountId = account.data('target');
 
         modal.addFooterBtn('Pick', 'btn-primary', function() {
             const selectedFolders = [];
@@ -106,7 +110,7 @@ function applyAdvancedSearchPageHandlers() {
                 selectedFolders.push($(this).data('folder-id'));
             });
             selectedFolders.forEach(folder => {
-                add_source_to_list(accountId + folder, accountLabel +' &gt; '+folder, false);
+                add_source_to_list(accountId + folder, getFolderLabel(folder), false);
             });
             modal.hide();
         });
@@ -122,5 +126,13 @@ function applyAdvancedSearchPageHandlers() {
             const allChecked = $('.special_folder_checkbox').length === $('.special_folder_checkbox:checked').length;
             $('#all').prop('checked', allChecked);
         });
+
+        if (specialFolders.every(folder => isFolderSelected(folder))) {
+            $('#all').prop('checked', true);
+        }
     });
+
+    return () => {
+        $('body').off("click", ".pick_special_folders");
+    }
 }

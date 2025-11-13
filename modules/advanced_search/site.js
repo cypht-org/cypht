@@ -183,6 +183,8 @@ var adv_folder_select = function(id) {
 };
 
 var add_source_to_list = function(id, label, includeSubfolders) {
+    if (get_adv_sources().find(source => source.label === label))  return;
+
     var close = $(globals.close_html);
     close.addClass('adv_remove_source');
     close.attr('data-target', id);
