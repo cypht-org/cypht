@@ -87,18 +87,13 @@ var expand_adv_folder = function(res) {
     }
 };
 
-$(document).on("change", "input[name='all_folders'],input[name='all_special_folders']", function() {
+$(document).on("change", "input[name='all_folders']", function() {
     const folderLi = $(this).closest('li');
-    const divergentCheckboxName = this.name === 'all_folders' ? 'all_special_folders' : 'all_folders';
-    const divergentCheckbox = $(this).closest('div').find(`input[name='${divergentCheckboxName}']`)
     
     if ($(this).is(':checked')) {
         folderLi.find('a').attr('disabled', 'disabled');
-        divergentCheckbox.prop('checked', false);
-        divergentCheckbox.attr('disabled', 'disabled');
     } else {
         folderLi.find('a').removeAttr('disabled');
-        divergentCheckbox.removeAttr('disabled');
     }
 });
 
@@ -247,13 +242,7 @@ var get_adv_sources = function() {
     const searchInAllFolders = $('.adv_folder_list li input[name="all_folders"]:checked');
     searchInAllFolders.each(function() {
         const li = $(this).closest('li');
-        sources.push({'source': li.attr('class'), 'label': li.find('a').text(), allFolders: true});
-    });
-
-    const searchInSpecialFolders = $('.adv_folder_list li input[name="all_special_folders"]:checked');
-    searchInSpecialFolders.each(function() {
-        const li = $(this).closest('li');
-        sources.push({'source': li.attr('class'), 'label': li.find('a').text(), specialFolders: true});
+        sources.push({'source': li.attr('class'), 'label': li.find('a').first().text(), allFolders: true});
     });
     
     const selected_sources = $('div', $('.adv_source_list'));
@@ -262,9 +251,8 @@ var get_adv_sources = function() {
     }
     selected_sources.each(function() {
         const source = this.className;
-        const mailboxSource = source.split('_').slice(0, 2).join('_');
-        if (!sources.find(s => s.source.indexOf(mailboxSource) > -1)) {
-            sources.push({'source': source, 'label': $('a', $(this)).text(), subFolders: $(this).data('subfolders')});
+        if (!sources.find(s => s.source === source)) {
+            sources.push({'source': source, 'label': $(this).text(), subFolders: $(this).data('subfolders')});
         }
     });
     return sources;
@@ -440,8 +428,6 @@ var send_requests = function(requests) {
 
         if (request['all_folders']) {
             params.push({name: 'all_folders', value: true});
-        } else if (request['all_special_folders']) {
-            params.push({name: 'all_special_folders', value: true});
         } else if (request['sub_folders']) {
             params.push({name: 'include_subfolders', value: true});
         }
@@ -504,10 +490,8 @@ var build_adv_search_requests = function(terms, sources, targets, times, other) 
                     time = times[ti];
                     const config = {'source': source.source, 'time': time, 'other': other,
                         'targets': target_vals, 'terms': term_vals};
-                    if (source.allFolders) {
+                    if (source.allFolders || source.source.split('_').filter(part => part.trim() !== '').length === 2) {
                         config['all_folders'] = true;
-                    } else if (source.specialFolders) {
-                        config['all_special_folders'] = true;
                     } else if (source.subFolders) {
                         config['sub_folders'] = true;
                     }
@@ -564,7 +548,7 @@ var apply_saved_search = function() {
         }
     }
     for (var i=0, len=details['sources'].length; i < len; i++) {
-        add_source_to_list(details['sources'][i]['source'], details['sources'][i]['label']);
+        add_source_to_list(details['sources'][i]['source'], details['sources'][i]['label'], details['sources'][i]['subFolders'] || false);
     }
     for (var i=0, len=details['targets'].length; i < len; i++) {
         if (i == 0) {

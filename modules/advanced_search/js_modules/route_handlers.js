@@ -89,12 +89,27 @@ function applyAdvancedSearchPageHandlers() {
             </div>
             ${specialFolders.map(folder => `
             <div class="form-check form-switch">
-                <input class="form-check-input special_folder_checkbox" type="checkbox" id="${folder}" data-folder-id="${folder}">
+                <input class="form-check-input special_folder_checkbox" type="checkbox" data-folder-id="${folder}">
                 <label class="form-check-label" for="${folder}">${folder}</label>
             </div>
             `).join('')}
         </div>    
         `);
+
+        const account = $(this).closest('li').find('.adv_folder_link');
+        const accountLabel = account.text();
+        const accountId = account.data('target');
+
+        modal.addFooterBtn('Pick', 'btn-primary', function() {
+            const selectedFolders = [];
+            $('.special_folder_checkbox:checked').each(function() {
+                selectedFolders.push($(this).data('folder-id'));
+            });
+            selectedFolders.forEach(folder => {
+                add_source_to_list(accountId + folder, accountLabel +' &gt; '+folder, false);
+            });
+            modal.hide();
+        });
     
         modal.open();
 
