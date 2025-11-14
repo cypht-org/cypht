@@ -110,7 +110,7 @@ function applyAdvancedSearchPageHandlers() {
                 selectedFolders.push($(this).data('folder-id'));
             });
             selectedFolders.forEach(folder => {
-                add_source_to_list(accountId + folder, getFolderLabel(folder), false);
+                add_source_to_list(accountId + folder, getFolderLabel(folder), true);
             });
             modal.hide();
         });
