@@ -1638,6 +1638,7 @@ pre.msg_source {
 .mobile .add_server .txt_fld { width: 100%; }
 .mobile .user_settings table td { padding: 5px 10px; }
 .mobile .reset_factory_button { margin-right: 1rem; }
+.mobile .message_list .list_controls.on_mobile form { display: inline-block; }
 
 /* Mobile responsive overrides for Bootstrap classes */
 @media (max-width: 767.98px) {
@@ -1666,19 +1667,26 @@ pre.msg_source {
     font-weight: bold; white-space: nowrap; width: fit-content;
   }
   .mobile .message_list .list_controls.on_mobile {
-    position: absolute; top: 11px; right: 15px;
+    position: absolute; top: 10px; right: 15px;
   }
+  .mobile .message_list .list_controls.on_mobile .form-control {
+    padding-top: 0.2rem; padding-bottom: 0.2rem; }
   .mobile .content_title > .flex-wrap {
     flex-wrap: nowrap !important; margin-bottom: 0px !important;
   }
   .mobile .content_title .list_meta { margin-bottom: 0px !important; }
+  .mobile .msg_text .small_header .col-md-2 { width: 16.667%; }
+  .mobile .msg_text .small_header > div + div { width: 83.333%; }
+  .mobile #list_controls_menu.show { left: auto; right: -15px; }
 }
 
 @media (max-width: 575.98px) {
   .mobile nav.folder_cell { width: 100%; }
-  .mobile #list_controls_menu.show { left: auto; right: -15px; }
   .mobile .calendar .month_label { padding: 1rem !important; }
   .mobile .calendar .border.m-4 { margin: 1rem !important; }
   .mobile .content_title { gap: 0.25rem; padding-bottom: 10px !important; }
   .mobile .small_header:nth-child(-n+3) { padding-bottom: 6px !important; }
+  .mobile .msg_text .small_header .col-md-2 { width: 20%; }
+  .mobile .msg_text .small_header > div + div { width: 80%; }
+  .mobile .msg_text .small_header > div.d-none + div { width: 100%; }
 }
