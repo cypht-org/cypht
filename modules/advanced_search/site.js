@@ -87,18 +87,13 @@ var expand_adv_folder = function(res) {
     }
 };
 
-$(document).on("change", "input[name='all_folders'],input[name='all_special_folders']", function() {
+$(document).on("change", "input[name='all_folders']", function() {
     const folderLi = $(this).closest('li');
-    const divergentCheckboxName = this.name === 'all_folders' ? 'all_special_folders' : 'all_folders';
-    const divergentCheckbox = $(this).closest('div').find(`input[name='${divergentCheckboxName}']`)
     
     if ($(this).is(':checked')) {
         folderLi.find('a').attr('disabled', 'disabled');
-        divergentCheckbox.prop('checked', false);
-        divergentCheckbox.attr('disabled', 'disabled');
     } else {
         folderLi.find('a').removeAttr('disabled');
-        divergentCheckbox.removeAttr('disabled');
     }
 });
 
@@ -117,11 +112,8 @@ var adv_select_imap_folder = function(el) {
     folders.find('li').each(function(index) {
         const wrapper = $('<div class="d-flex justify-content-between wrapper"></div>');
         $(this).wrapInner(wrapper);
-        const allSpecialFoldersCheckbox = `
-        <span class="form-check">
-            <label class="form-check-label" for="all_special_folders-${index}">All special folders</label>
-            <input class="form-check-input" type="checkbox" name="all_special_folders" id="all_special_folders-${index}">
-        </span>
+        const pickSpecialFoldersButton = `
+        <a href="#" class="btn btn-light btn-sm pick_special_folders">Pick special folders</a>
         `;
         const allFoldersCheckbox = `
         <span class="form-check">
@@ -130,7 +122,7 @@ var adv_select_imap_folder = function(el) {
         </span>
         `;
         const checkboxesWrapper = $('<div class="d-flex gap-3"></div>');
-        checkboxesWrapper.append(allSpecialFoldersCheckbox);
+        checkboxesWrapper.append(pickSpecialFoldersButton);
         checkboxesWrapper.append(allFoldersCheckbox);
         $(this).find('.wrapper').append(checkboxesWrapper);
     });
@@ -141,8 +133,8 @@ var adv_select_imap_folder = function(el) {
     $('.adv_folder_list').html(folders.html());
 
     $('.adv_folder_link', list_container).on("click", function() { return expand_adv_folder_list($(this).data('target')); });
-    $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').off('click');
-    $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').on("click", function() { adv_folder_select($(this).data('id')); return false; });
+    $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').not('.pick_special_folders').off('click');
+    $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').not('.pick_special_folders').on("click", function() { adv_folder_select($(this).data('id')); return false; });
     $('.close_adv_folders').on("click", function() {
         $('.adv_folder_list').html('');
         $('.adv_folder_list').hide();
@@ -191,6 +183,8 @@ var adv_folder_select = function(id) {
 };
 
 var add_source_to_list = function(id, label, includeSubfolders) {
+    if (get_adv_sources().find(source => source.label === label))  return;
+
     var close = $(globals.close_html);
     close.addClass('adv_remove_source');
     close.attr('data-target', id);
@@ -250,13 +244,7 @@ var get_adv_sources = function() {
     const searchInAllFolders = $('.adv_folder_list li input[name="all_folders"]:checked');
     searchInAllFolders.each(function() {
         const li = $(this).closest('li');
-        sources.push({'source': li.attr('class'), 'label': li.find('a').text(), allFolders: true});
-    });
-
-    const searchInSpecialFolders = $('.adv_folder_list li input[name="all_special_folders"]:checked');
-    searchInSpecialFolders.each(function() {
-        const li = $(this).closest('li');
-        sources.push({'source': li.attr('class'), 'label': li.find('a').text(), specialFolders: true});
+        sources.push({'source': li.attr('class'), 'label': li.find('a').first().text(), allFolders: true});
     });
     
     const selected_sources = $('div', $('.adv_source_list'));
@@ -265,9 +253,8 @@ var get_adv_sources = function() {
     }
     selected_sources.each(function() {
         const source = this.className;
-        const mailboxSource = source.split('_').slice(0, 2).join('_');
-        if (!sources.find(s => s.source.indexOf(mailboxSource) > -1)) {
-            sources.push({'source': source, 'label': $('a', $(this)).text(), subFolders: $(this).data('subfolders')});
+        if (!sources.find(s => s.source === source)) {
+            sources.push({'source': source, 'label': $(this).text(), subFolders: $(this).data('subfolders')});
         }
     });
     return sources;
@@ -443,8 +430,6 @@ var send_requests = function(requests) {
 
         if (request['all_folders']) {
             params.push({name: 'all_folders', value: true});
-        } else if (request['all_special_folders']) {
-            params.push({name: 'all_special_folders', value: true});
         } else if (request['sub_folders']) {
             params.push({name: 'include_subfolders', value: true});
         }
@@ -507,10 +492,8 @@ var build_adv_search_requests = function(terms, sources, targets, times, other) 
                     time = times[ti];
                     const config = {'source': source.source, 'time': time, 'other': other,
                         'targets': target_vals, 'terms': term_vals};
-                    if (source.allFolders) {
+                    if (source.allFolders || source.source.split('_').filter(part => part.trim() !== '').length === 2) {
                         config['all_folders'] = true;
-                    } else if (source.specialFolders) {
-                        config['all_special_folders'] = true;
                     } else if (source.subFolders) {
                         config['sub_folders'] = true;
                     }
@@ -567,7 +550,7 @@ var apply_saved_search = function() {
         }
     }
     for (var i=0, len=details['sources'].length; i < len; i++) {
-        add_source_to_list(details['sources'][i]['source'], details['sources'][i]['label']);
+        add_source_to_list(details['sources'][i]['source'], details['sources'][i]['label'], details['sources'][i]['subFolders'] || false);
     }
     for (var i=0, len=details['targets'].length; i < len; i++) {
         if (i == 0) {

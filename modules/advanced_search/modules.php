@@ -91,12 +91,9 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
         }
 
         $searchInAllFolders = $this->request->post['all_folders'] ?? false;
-        $searchInSpecialFolders = $this->request->post['all_special_folders'] ?? false;
         $includeSubfolders = $this->request->post['include_subfolders'] ?? false;
         if ($searchInAllFolders) {
             $msg_list = $this->all_folders_search($mailbox, $flags, $params, $limit);
-        } elseif ($searchInSpecialFolders) {
-            $msg_list = $this->special_folders_search($mailbox, $flags, $params, $limit);
         } else if ($includeSubfolders) {
             $msg_list = $this->all_folders_search($mailbox, $flags, $params, $limit, $this->folder);
         } else if (! $mailbox->select_folder($this->folder)) {
@@ -118,20 +115,6 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
         $msg_list = array();
         foreach ($folders as $folder) {
             $this->folder = $folder['name'];
-            $msgs = $this->imap_search($flags, $mailbox, $params, $limit);
-            $msg_list = array_merge($msg_list, $msgs);
-        }
-        return $msg_list;
-    }
-
-    private function special_folders_search($mailbox, $flags, $params, $limit) {
-        $specials = $this->user_config->get('special_imap_folders', array());
-        $folders = $specials[$this->imap_id] ?? [];
-
-        $msg_list = array();
-        foreach ($folders as $folder) {
-            $this->folder = $folder;
-            $mailbox->select_folder($this->folder);
             $msgs = $this->imap_search($flags, $mailbox, $params, $limit);
             $msg_list = array_merge($msg_list, $msgs);
         }
@@ -176,7 +159,13 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
         }
         $source_parts = explode('_', $val);
         $this->imap_id = $source_parts[1];
-        $this->folder = hex2bin($source_parts[2]);
+
+        $folder = $source_parts[2];
+        if (ctype_xdigit($folder)) {
+            $this->folder = hex2bin($folder);
+        } else {
+            $this->folder = $folder;
+        }
         return true;
     }
 

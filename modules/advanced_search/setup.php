@@ -43,7 +43,6 @@ return array(
         'adv_terms' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
         'adv_targets' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
         'all_folders' => FILTER_VALIDATE_BOOLEAN,
-        'all_special_folders' => FILTER_VALIDATE_BOOLEAN,
         'include_subfolders' => FILTER_VALIDATE_BOOLEAN,
     )
 );
