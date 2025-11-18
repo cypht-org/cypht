@@ -75,9 +75,10 @@ function applyAdvancedSearchPageHandlers() {
         const serverId = $(this).closest('li').data('serverId');
         const specialFolders = [];
         ['archive', 'draft', 'junk', 'sent', 'trash'].forEach(folderType => {
-            const folderName = hm_special_folders()[serverId][folderType];
-            if (folderName) {
-                specialFolders.push(folderName);
+            const folders = hm_special_folders()?.[serverId];
+            const folder = folders?.find(f => f.type === folderType);
+            if (folder) {
+                specialFolders.push(folder);
             }
         });
 
@@ -92,13 +93,13 @@ function applyAdvancedSearchPageHandlers() {
         modal.setContent(`
         <div class="d-flex gap-3 flex-wrap">
             <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="all">
-                <label class="form-check-label" for="all">All Folders</label>
+                <input class="form-check-input" type="checkbox" id="all-special-folders">
+                <label class="form-check-label" for="all-special-folders">All Folders</label>
             </div>
             ${specialFolders.map(folder => `
             <div class="form-check form-switch">
-                <input class="form-check-input special_folder_checkbox" type="checkbox" data-folder-id="${folder}" ${isFolderSelected(folder) ? 'checked' : ''}>
-                <label class="form-check-label" for="${folder}">${folder}</label>
+                <input class="form-check-input special_folder_checkbox" type="checkbox" id="${folder.id}" ${isFolderSelected(folder.label) ? 'checked' : ''}>
+                <label class="form-check-label" for="${folder.id}">${folder.label}</label>
             </div>
             `).join('')}
         </div>    
@@ -107,28 +108,28 @@ function applyAdvancedSearchPageHandlers() {
         modal.addFooterBtn('Pick', 'btn-primary', function() {
             const selectedFolders = [];
             $('.special_folder_checkbox:checked').each(function() {
-                selectedFolders.push($(this).data('folder-id'));
+                selectedFolders.push(specialFolders.find(folder => folder.id === $(this).attr('id')));
             });
             selectedFolders.forEach(folder => {
-                add_source_to_list(accountId + folder, getFolderLabel(folder), true);
+                add_source_to_list(accountId + folder.id, getFolderLabel(folder.label), true);
             });
             modal.hide();
         });
     
         modal.open();
 
-        $('#all').on('change', function() {
+        $('#all-special-folders').on('change', function() {
             const checked = $(this).is(':checked');
             $('.special_folder_checkbox').prop('checked', checked);
         });
 
         $('.special_folder_checkbox').on('change', function() {
             const allChecked = $('.special_folder_checkbox').length === $('.special_folder_checkbox:checked').length;
-            $('#all').prop('checked', allChecked);
+            $('#all-special-folders').prop('checked', allChecked);
         });
 
-        if (specialFolders.every(folder => isFolderSelected(folder))) {
-            $('#all').prop('checked', true);
+        if (specialFolders.every(folder => isFolderSelected(folder.label))) {
+            $('#all-special-folders').prop('checked', true);
         }
     });
 

@@ -616,6 +616,14 @@ class Hm_Output_js_data extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         $enable_snooze = $settings['enable_snooze'] ?? DEFAULT_ENABLE_SNOOZE;
         $enable_collect_address_on_send = $settings['enable_collect_address_on_send_setting'] ?? DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND;
+        $specialFolders = $settings['special_imap_folders'];
+        $formattedSpecialFolders = [];
+        foreach ($specialFolders as $serverId => $folders) {
+            $formattedSpecialFolders[$serverId] = [];
+            foreach ($folders as $type => $folder) {
+                $formattedSpecialFolders[$serverId][] = ['type' => $type, 'label' => $folder, 'id' => bin2hex($folder)];
+            }
+        }
         $res = '<script type="text/javascript" id="data-store">'.
             'var globals = {};'.
             'var hm_is_logged = function () { return '.($this->get('is_logged') ? '1' : '0').'; };'.
@@ -633,7 +641,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_web_root_path = function() { return "'.WEB_ROOT.'"; };'.
             'var hm_flag_image_src = function() { return "<i class=\"bi bi-star-half\"></i>"; };'.
             'var hm_check_dirty_flag = function() { return '.($this->get('warn_for_unsaved_changes', '') ? '1' : '0').'; };'.
-            'var hm_special_folders = function() { return '.json_encode($settings['special_imap_folders']).'; };'.
+            'var hm_special_folders = function() { return '.json_encode($formattedSpecialFolders).'; };'.
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {

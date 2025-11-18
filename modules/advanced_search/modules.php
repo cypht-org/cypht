@@ -108,7 +108,8 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
 
     private function all_folders_search($mailbox, $flags, $params, $limit, $parent = '') {
         if ($parent) {
-            $folders = $mailbox->get_subfolders($parent);
+            $folders = [['name' => $parent]];
+            $folders = array_merge($folders, $mailbox->get_subfolders($parent));
         } else {
             $folders = $mailbox->get_folders();
         }
@@ -160,12 +161,7 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
         $source_parts = explode('_', $val);
         $this->imap_id = $source_parts[1];
 
-        $folder = $source_parts[2];
-        if (ctype_xdigit($folder)) {
-            $this->folder = hex2bin($folder);
-        } else {
-            $this->folder = $folder;
-        }
+        $this->folder = hex2bin($source_parts[2]);
         return true;
     }
 
