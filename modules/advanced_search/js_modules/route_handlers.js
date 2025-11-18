@@ -72,7 +72,7 @@ function applyAdvancedSearchPageHandlers() {
             size: 'lg',
         });
 
-        const serverId = $(this).closest('li').attr("class").split('_')[1];
+        const serverId = $(this).closest('li').data('serverId');
         const specialFolders = [];
         ['archive', 'draft', 'junk', 'sent', 'trash'].forEach(folderType => {
             const folderName = hm_special_folders()[serverId][folderType];
