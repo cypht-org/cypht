@@ -53,7 +53,9 @@ Hm_Server_Wrapper::init($user_config, $session);
 Hm_Tags_Wrapper::init($user_config, $session);
 
 $environment = Hm_Environment::getInstance();
-$environment->load('.env.example');
+// Load test environment configuration from .env.test
+// Create this file by copying .env.test.example: cp .env.test.example .env.test
+$environment->load('.env.test');
 /* set the default since and per_source values */
 $environment->define_default_constants($mock_config);
 

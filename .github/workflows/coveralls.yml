@@ -48,7 +48,7 @@ jobs:
         run: |
           FILE=/tmp/test.db
           cat tests/phpunit/data/schema_sqlite.sql | sqlite3 ${FILE}
-          cat tests/phpunit/data/seed.sql | sqlite3 ${FILE}
+          cat tests/phpunit/data/seed_sqlite.sql | sqlite3 ${FILE}
         env:
           DB_DRIVER: sqlite
           DB_NAME: cypht_test

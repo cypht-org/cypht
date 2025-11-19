@@ -9,8 +9,16 @@ define('MIGRATIONS_PATH', APP_PATH.'database/migrations');
 require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
 
+// Allow specifying environment file via --env argument
+// Usage: php setup_database.php --env=.env.test
+$envFile = '.env';
+$options = getopt('', ['env:']);
+if (isset($options['env'])) {
+    $envFile = $options['env'];
+}
+
 $environment = Hm_Environment::getInstance();
-$environment->load();
+$environment->load($envFile);
 
 /* get config object */
 $config = new Hm_Site_Config_File();
