@@ -17,6 +17,11 @@ if (isset($options['env'])) {
     $envFile = $options['env'];
 }
 
+if (!file_exists(APP_PATH . $envFile)) {
+    echo "Environment file {$envFile} not found. Please create it from the example file.\n";
+    exit(1);
+}
+
 $environment = Hm_Environment::getInstance();
 $environment->load($envFile);
 
