@@ -52,8 +52,8 @@ class Hm_Handler_process_delete_contact extends Hm_Handler_Module {
  */
 class Hm_Handler_process_add_contact extends Hm_Handler_Module {
     public function process() {
+        exit(var_dump($this->request->post));
         $contacts = $this->get('contact_store');
-        // exit(var_dump($this->request->post));
         list($success, $form) = $this->process_form(array('contact_source', 'contact_email', 'contact_name'));
         if ($success && $form['contact_source'] == 'local') {
             $details = array('source' => 'local', 'email_address' => $form['contact_email'], 'display_name' => $form['contact_name']);
