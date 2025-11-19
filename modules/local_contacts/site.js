@@ -30,9 +30,10 @@ var initLocalContactModal = function() {
                 alert('Please fill in the required fields (Name and Email)');
                 return;
             }
+            $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Adding...');
             Hm_Ajax.request(
                 [
-                    {'name': 'hm_ajax_hook', 'value': 'process_add_contact'},
+                    {'name': 'hm_ajax_hook', 'value': 'ajax_add_contact'},
                     {'name': 'contact_name', 'value': name},
                     {'name': 'contact_email', 'value': email},
                     {'name': 'contact_phone', 'value': phone},
@@ -40,6 +41,7 @@ var initLocalContactModal = function() {
                     {'name': 'contact_source', 'value': 'local:local'}
                 ],
                 function(res) {
+                    $('#submit-local-contact-btn').prop('disabled', false).text('Add Contact');
                     if (res.contact_added) {
                         const modalElement = document.getElementById('localContactModal');
                         const modal = bootstrap.Modal.getInstance(modalElement);
@@ -48,6 +50,11 @@ var initLocalContactModal = function() {
                         }
                         window.location.reload();
                     }
+                },
+                [],
+                false,
+                function() {
+                    alert("HELLO")
                 }
             );
         } else {
