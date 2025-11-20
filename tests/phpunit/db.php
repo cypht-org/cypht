@@ -18,11 +18,12 @@ class Hm_Test_DB extends TestCase {
     public function test_build_dsn() {
         setup_db($this->config);
         $this->assertEquals('object', gettype(Hm_DB::connect($this->config)));
+        $db_name = $this->config->get('db_name', 'cypht_test');
         if ($this->config->data['db_driver'] == 'mysql') {
-            $this->assertEquals('mysql:host=127.0.0.1;dbname=cypht_test', Hm_DB::build_dsn());
+            $this->assertEquals('mysql:host=127.0.0.1;dbname='.$db_name, Hm_DB::build_dsn());
         }
         if ($this->config->data['db_driver'] == 'pgsql') {
-            $this->assertEquals('pgsql:host=127.0.0.1;dbname=cypht_test', Hm_DB::build_dsn());
+            $this->assertEquals('pgsql:host=127.0.0.1;dbname='.$db_name, Hm_DB::build_dsn());
         }
         $this->config->data['db_driver'] = 'sqlite';
         $this->config->data['db_socket'] = '/tmp/test.db';
@@ -33,7 +34,7 @@ class Hm_Test_DB extends TestCase {
         $this->config->data['db_connection_type'] = 'socket';
         $this->config->data['db_socket'] = '/test';
         $this->assertEquals('boolean', gettype(Hm_DB::connect($this->config)));
-        $this->assertEquals('mysql:unix_socket=/test;dbname=cypht_test', Hm_DB::build_dsn());
+        $this->assertEquals('mysql:unix_socket=/test;dbname='.$db_name, Hm_DB::build_dsn());
     }
     /**
      * @preserveGlobalState disabled
