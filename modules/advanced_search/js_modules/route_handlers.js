@@ -62,4 +62,78 @@ function applyAdvancedSearchPageHandlers() {
         }
     }
     Hm_Message_List.check_empty_list();
+
+    $('body').on("click", ".pick_special_folders", function(e) {
+        e.preventDefault();
+
+        const modal = new Hm_Modal({
+            modalId: 'pick_special_folders_modal',
+            title: 'Pick Special Folders',
+            size: 'lg',
+        });
+
+        const serverId = $(this).closest('li').data('serverId');
+        const specialFolders = [];
+        ['archive', 'draft', 'junk', 'sent', 'trash'].forEach(folderType => {
+            const folders = hm_special_folders()?.[serverId];
+            const folder = folders?.find(f => f.type === folderType);
+            if (folder) {
+                specialFolders.push(folder);
+            }
+        });
+
+        const account = $(this).closest('li').find('.adv_folder_link');
+        const accountLabel = account.text();
+        const accountId = account.data('target');
+
+        const isFolderSelected = (folder) => get_adv_sources().find(source => source.label === getFolderLabel(folder));
+
+        const getFolderLabel = (folder) => accountLabel + ' > ' + folder;
+
+        modal.setContent(`
+        <div class="d-flex gap-3 flex-wrap">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="all-special-folders">
+                <label class="form-check-label" for="all-special-folders">All Folders</label>
+            </div>
+            ${specialFolders.map(folder => `
+            <div class="form-check form-switch">
+                <input class="form-check-input special_folder_checkbox" type="checkbox" id="${folder.id}" ${isFolderSelected(folder.label) ? 'checked' : ''}>
+                <label class="form-check-label" for="${folder.id}">${folder.label}</label>
+            </div>
+            `).join('')}
+        </div>    
+        `);
+
+        modal.addFooterBtn('Pick', 'btn-primary', function() {
+            const selectedFolders = [];
+            $('.special_folder_checkbox:checked').each(function() {
+                selectedFolders.push(specialFolders.find(folder => folder.id === $(this).attr('id')));
+            });
+            selectedFolders.forEach(folder => {
+                add_source_to_list(accountId + folder.id, getFolderLabel(folder.label), true);
+            });
+            modal.hide();
+        });
+    
+        modal.open();
+
+        $('#all-special-folders').on('change', function() {
+            const checked = $(this).is(':checked');
+            $('.special_folder_checkbox').prop('checked', checked);
+        });
+
+        $('.special_folder_checkbox').on('change', function() {
+            const allChecked = $('.special_folder_checkbox').length === $('.special_folder_checkbox:checked').length;
+            $('#all-special-folders').prop('checked', allChecked);
+        });
+
+        if (specialFolders.every(folder => isFolderSelected(folder.label))) {
+            $('#all-special-folders').prop('checked', true);
+        }
+    });
+
+    return () => {
+        $('body').off("click", ".pick_special_folders");
+    }
 }
