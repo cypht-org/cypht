@@ -13,7 +13,7 @@ add_handler('compose', 'smtp_subject_replace', true, 'smtp', 'load_user_data', '
 add_handler('compose', 'load_smtp_servers_from_config', true, 'smtp', 'load_smtp_reply_to_details', 'after');
 add_handler('compose', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_handler('compose', 'process_compose_form_submit', true, 'smtp', 'load_smtp_servers_from_config', 'after');
-add_output('compose', 'compose_title', true, 'smtp', 'content_section_start', 'after');
+add_output('compose', 'compose_title', true, 'smtp', 'version_upgrade_checker', 'after');
 add_output('compose', 'compose_form_start', true, 'smtp', 'compose_title', 'after');
 add_output('compose', 'compose_form_draft_list', true, 'smtp', 'compose_form_start', 'before');
 add_output('compose', 'compose_form_content', true, 'smtp', 'compose_form_start', 'after');

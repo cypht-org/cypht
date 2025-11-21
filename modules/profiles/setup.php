@@ -11,7 +11,7 @@ add_handler('profiles', 'profile_data', true, 'profiles', 'load_user_data', 'aft
 add_handler('profiles', 'profile_edit_data', true, 'profiles', 'profile_data', 'after');
 add_handler('profiles', 'process_profile_delete', true, 'profiles', 'profile_data', 'after');
 add_handler('profiles', 'process_profile_update', true, 'profiles', 'process_profile_delete', 'after');
-add_output('profiles', 'profile_edit_form', true, 'profiles', 'content_section_start', 'after');
+add_output('profiles', 'profile_edit_form', true, 'profiles', 'version_upgrade_checker', 'after');
 add_output('profiles', 'profile_content', true, 'profiles', 'profile_edit_form', 'after');
 
 add_handler('folders', 'load_default_server_from_profiles', true, 'profiles', 'folders_server_id', 'before');

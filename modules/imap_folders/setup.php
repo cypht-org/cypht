@@ -16,7 +16,7 @@ add_module_to_all_pages('handler', 'fix_folder_assignments', true, 'imap_folders
 setup_base_page('folders', 'core');
 add_handler('folders', 'folders_server_id', true, 'imap_folders', 'load_user_data', 'after');
 add_handler('folders', 'special_folders', true, 'imap_folders', 'folders_server_id', 'after');
-add_output('folders', 'folders_content_start', true, 'imap_folders', 'content_section_start', 'after');
+add_output('folders', 'folders_content_start', true, 'imap_folders', 'version_upgrade_checker', 'after');
 add_output('folders', 'folders_server_select', true, 'imap_folders', 'folders_folder_subscription_button', 'after');
 add_output('folders', 'folders_create_dialog', true, 'imap_folders', 'folders_server_select', 'after');
 add_output('folders', 'folders_rename_dialog', true, 'imap_folders', 'folders_create_dialog', 'after');
@@ -79,7 +79,7 @@ setup_base_page('folders_subscription', 'core');
 add_handler('folders_subscription', 'folders_server_id', true, 'imap_folders', 'load_user_data', 'after');
 add_handler('folders_subscription', 'special_folders', true, 'imap_folders', 'folders_server_id', 'after');
 add_handler('folders_subscription', 'get_only_subscribed_folders_setting', true, 'imap_folders');
-add_output('folders_subscription', 'folders_subscription_content_start', true, 'imap_folders', 'content_section_start', 'after');
+add_output('folders_subscription', 'folders_subscription_content_start', true, 'imap_folders', 'version_upgrade_checker', 'after');
 add_output('folders_subscription', 'folders_server_select', true, 'imap_folders', 'folders_subscription_content_start', 'after');
 add_output('folders_subscription', 'folders_folder_subscription', true, 'imap_folders', 'folders_server_select', 'after');
 

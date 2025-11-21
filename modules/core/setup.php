@@ -14,13 +14,13 @@ output_source('core');
 /* homepage */
 setup_base_page('home');
 add_handler('home', 'check_missing_passwords', true, 'core', 'load_user_data', 'after');
-add_output('home', 'home_heading', true, 'core', 'content_section_start', 'after');
+add_output('home', 'home_heading', true, 'core', 'version_upgrade_checker', 'after');
 add_output('home', 'home_password_dialogs', true, 'core', 'home_heading', 'after');
 
 /* servers page */
 setup_base_page('servers');
 add_handler('servers', 'reload_folder_cookie', true, 'core', 'save_user_data', 'after');
-add_output('servers', 'server_content_start', true, 'core', 'content_section_start', 'after');
+add_output('servers', 'server_content_start', true, 'core', 'version_upgrade_checker', 'after');
 add_output('servers', 'server_config_stepper', true, 'core', 'server_content_start', 'after');
 add_output('servers', 'server_config_stepper_end_part', true, 'core', 'server_config_stepper', 'after');
 add_output('servers', 'server_config_stepper_accordion_end_part', true, 'core', 'server_config_stepper_end_part', 'after');
@@ -32,7 +32,7 @@ setup_base_page('compose');
 /* save settings */
 setup_base_page('save');
 add_handler('save', 'process_save_form', true, 'core', 'load_user_data', 'after');
-add_output('save', 'save_form', true, 'core', 'content_section_start', 'after');
+add_output('save', 'save_form', true, 'core', 'version_upgrade_checker', 'after');
 
 /* settings */
 setup_base_page('settings');
