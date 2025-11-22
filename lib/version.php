@@ -1,28 +1,16 @@
 <?php
 
-define('CYPHT_VERSION', '3.0');
-define('CYPHT_BRANCH', 'dev'); // stable, beta, dev
+define('CYPHT_VERSION', '2.5.0');
 
-$installedVersion = env('CYPHT_INSTALLED_VERSION');
+// $releases = json_decode(file_get_contents('https://github.com/cypht-org/cypht/blob/master/releases.json?raw=true'), true);
+$releases = json_decode(file_get_contents(APP_PATH.'releases.json'), true); // TODO: This should be replaced by the line above in production
+$latestRelease = end($releases['release']);
 
-$needUpgrade = false;
-
-if (! $installedVersion && CYPHT_BRANCH !== 'dev') {
+if (version_compare(CYPHT_VERSION, $latestRelease['version'], '<')) {
     $needUpgrade = true;
-}
-
-if ($installedVersion && version_compare($installedVersion, CYPHT_VERSION, '<')) {
-    $needUpgrade = true;
-}
-
-$fileContent = file_get_contents(APP_PATH . '.env');
-if ($fileContent) {
-    if (strpos($fileContent, 'CYPHT_INSTALLED_VERSION=') === false) {
-        $fileContent .= "\nCYPHT_INSTALLED_VERSION=" . CYPHT_VERSION . "\n";
-    } else {
-        $fileContent = preg_replace('/CYPHT_INSTALLED_VERSION=.*/', 'CYPHT_INSTALLED_VERSION=' . CYPHT_VERSION, $fileContent);
-    }
-    file_put_contents(APP_PATH . '.env', $fileContent);
+} else {
+    $needUpgrade = false;
 }
 
 define('CYPHT_NEED_UPGRADE', $needUpgrade);
+define('CYPHT_LATEST_VERSION', $latestRelease['version']);

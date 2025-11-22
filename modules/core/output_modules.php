@@ -2509,12 +2509,12 @@ class Hm_output_combined_message_list extends Hm_Output_Module {
 class Hm_Output_version_upgrade_checker extends Hm_Output_Module {
     protected function output()
     {
-        // if (! CYPHT_NEED_UPGRADE) return '';
+        if (! CYPHT_NEED_UPGRADE) return '';
 
         return '
         <div class="alert alert-info alert-dismissible fade show d-flex align-items-center" role="alert">
             <i class="bi bi-info-circle-fill me-2"></i>
-            You are currently running Cypht version '.CYPHT_VERSION.'. A higher version is available. Please visit <a href="https://github.com/cypht-org/cypht/releases" target="_blank" class="ms-1 me-1">GitHub Releases</a> for the full list of available versions.
+            You are currently running Cypht version '.CYPHT_VERSION.'. A higher version (<b>'.CYPHT_LATEST_VERSION.'</b>) is available.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         ';
