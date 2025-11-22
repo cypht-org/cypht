@@ -93,6 +93,21 @@ function applySearchPageHandlers(routeParams) {
     $('.search_reset').on("click", Hm_Utils.reset_search_form);
     $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
 
+    // Add explicit handler for search form submission to fix double-click issue
+    $('.search_update').on("click", function(e) {
+        e.preventDefault();
+        const form = $(this).closest('form');
+        if (form.length) {
+            const formData = new FormData(form[0]);
+            const params = new URLSearchParams();
+            for (let [key, value] of formData.entries()) {
+                params.append(key, value);
+            }
+            const newUrl = window.location.pathname + '?' + params.toString();
+            window.location.href = newUrl;
+        }
+    });
+
     performSearch(routeParams);
 
     if (window.inlineMessageMessageListAndSearchPageHandler) inlineMessageMessageListAndSearchPageHandler(routeParams);
