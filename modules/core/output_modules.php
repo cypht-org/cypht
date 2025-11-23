@@ -2512,7 +2512,7 @@ class Hm_Output_version_upgrade_checker extends Hm_Output_Module {
         if (! CYPHT_NEED_UPGRADE) return '';
 
         return '
-        <div class="alert alert-info alert-dismissible fade show d-flex align-items-center" role="alert">
+        <div class="alert alert-info alert-dismissible fade d-flex align-items-center" role="alert" id="cypht-upgrade-alert">
             <i class="bi bi-info-circle-fill me-2"></i>
             You are currently running Cypht version '.CYPHT_VERSION.'. A higher version (<b>'.CYPHT_LATEST_VERSION.'</b>) is available.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
