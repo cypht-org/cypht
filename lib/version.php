@@ -1,6 +1,6 @@
 <?php
 
-define('CYPHT_VERSION', '2.5.0');
+define('CYPHT_VERSION', '2.5.2');
 
 $releases = json_decode(file_get_contents('https://github.com/cypht-org/cypht/blob/master/releases.json?raw=true'), true);
 $latestRelease = end($releases['release']);
