@@ -10,6 +10,7 @@
 /.env
 /.env.*
 !.env.example
+!.env.test.example
 apigen4.sh
 testuser.txt
 website/docs
