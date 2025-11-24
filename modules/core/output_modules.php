@@ -2316,6 +2316,70 @@ class Hm_Output_drafts_since_setting extends Hm_Output_Module {
 }
 
 /**
+ * Starts the Report Spam section on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_report_spam_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control spam reporting features
+     */
+    protected function output() {
+        return '<tr><td data-target=".report_spam_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
+            '<i class="bi bi-shield-exclamation fs-5 me-2"></i>'.
+            $this->trans('Report Spam').'</td></tr>';
+    }
+}
+
+/**
+ * Option to enable/disable SpamCop reporting
+ * @subpackage core/output
+ */
+class Hm_Output_spamcop_enabled_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enabled = get_setting_value($settings, 'spamcop_enabled', false);
+        $checked = $enabled ? ' checked="checked"' : '';
+        $reset = $enabled ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>' : '';
+        
+        return '<tr class="report_spam_setting"><td><label class="form-check-label" for="spamcop_enabled">'.
+            $this->trans('Enable SpamCop reporting').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="spamcop_enabled" name="spamcop_settings[enabled]" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option for SpamCop submission email address
+ * @subpackage core/output
+ */
+class Hm_Output_spamcop_submission_email_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $email = get_setting_value($settings, 'spamcop_submission_email', '');
+        $reset = !empty($email) ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>' : '';
+        
+        return '<tr class="report_spam_setting"><td><label for="spamcop_submission_email">'.
+            $this->trans('SpamCop submission email').'</label></td>'.
+            '<td class="d-flex"><input class="form-control form-control-sm" type="email" id="spamcop_submission_email" name="spamcop_settings[submission_email]" value="'.$this->html_safe($email).'" placeholder="submit.xxxxx@spam.spamcop.net" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option for SpamCop from email address
+ * @subpackage core/output
+ */
+class Hm_Output_spamcop_from_email_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $email = get_setting_value($settings, 'spamcop_from_email', '');
+        $reset = !empty($email) ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>' : '';
+        
+        return '<tr class="report_spam_setting"><td><label for="spamcop_from_email">'.
+            $this->trans('From email address (optional)').'</label></td>'.
+            '<td class="d-flex"><input class="form-control form-control-sm" type="email" id="spamcop_from_email" name="spamcop_settings[from_email]" value="'.$this->html_safe($email).'" placeholder="'.$this->trans('Uses your IMAP email if not set').'" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
  * Option to warn user when he has unsaved changes.
  * @subpackage imap/output
  */

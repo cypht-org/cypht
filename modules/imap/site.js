@@ -1306,21 +1306,49 @@ $(function() {
         var reasons = selectedReasons.map(function(reason) {
             return reason === 'other' ? $('#spam_reason_other_text').val().trim() : reason;
         });
-        
-        // TODO: Implement the actual spam reporting functionality
-        console.log('Reporting spam:', {
-            uid: uid,
-            detail: detail,
-            reasons: reasons
-        });
 
-        var modal = bootstrap.Modal.getInstance(document.getElementById('reportSpamModal'));
-        modal.hide();
-        $('#reportSpamForm')[0].reset();
-        $('#spam_reason_other_input').hide();
-        $('#spam_reason_other_text').prop('required', false).val('');
+        var selectedMessages = $('#reportSpamModal').data('selected-messages');
+        var isBulkAction = selectedMessages && selectedMessages.length > 0;
+        var messageIds = '';
 
-        alert(hm_trans('Report submitted successfully'));
+        if (isBulkAction) {
+            messageIds = selectedMessages.join(',');
+        } else {
+            if (uid && detail && detail.server_id && detail.folder) {
+                messageIds = 'imap_' + detail.server_id + '_' + uid + '_' + detail.folder;
+            } else {
+                alert(hm_trans('Unable to determine message details.'));
+                return false;
+            }
+        }
+
+        // AJAX call to report spam
+        Hm_Ajax.request(
+            [
+                {'name': 'hm_ajax_hook', 'value': 'ajax_imap_report_spam'},
+                {'name': 'message_ids', 'value': messageIds},
+                {'name': 'spam_reasons', 'value': reasons}
+            ],
+            function(res) {
+                var modal = bootstrap.Modal.getInstance(document.getElementById('reportSpamModal'));
+                modal.hide();
+                $('#reportSpamForm')[0].reset();
+                $('#spam_reason_other_input').hide();
+                $('#spam_reason_other_text').prop('required', false).val('');
+                $('#reportSpamModal').removeData('selected-messages');
+
+                if (res && res.spam_report_error && (!res.router_user_msgs || Object.keys(res.router_user_msgs).length === 0)) {
+                    Hm_Notices.show(res.spam_report_message || hm_trans('Failed to report spam.'), 'danger');
+                } else if (res && !res.spam_report_error && (!res.router_user_msgs || Object.keys(res.router_user_msgs).length === 0)) {
+                    var message = res && res.spam_report_message ? res.spam_report_message : hm_trans('Report submitted successfully');
+                    Hm_Notices.show(message, 'success');
+                }
+            },
+            [],
+            false,
+            false,
+            true
+        );
 
         return false;
     });

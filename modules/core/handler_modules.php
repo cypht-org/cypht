@@ -1011,6 +1011,32 @@ class Hm_Handler_process_drafts_since_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process SpamCop reporting settings from the Report Spam section
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('save_settings'));
+        if (!$success || !array_key_exists('spamcop_settings', $this->request->post)) {
+            return;
+        }
+
+        $new_settings = $this->get('new_user_settings', array());
+        $spamcop = $this->request->post['spamcop_settings'];
+
+        $set_email_setting = function($key, $value) use (&$new_settings) {
+            $new_settings[$key] = (!empty($value) && filter_var($value, FILTER_VALIDATE_EMAIL)) ? $value : '';
+        };
+
+        $new_settings['spamcop_enabled_setting'] = isset($spamcop['enabled']);
+        $set_email_setting('spamcop_submission_email_setting', $spamcop['submission_email'] ?? '');
+        $set_email_setting('spamcop_from_email_setting', $spamcop['from_email'] ?? '');
+        
+        $this->out('new_user_settings', $new_settings, false);
+    }
+}
+
+/**
  * Process warn for unsaved changes in the settings page
  * @subpackage core/handler
  */

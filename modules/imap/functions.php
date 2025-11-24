@@ -1673,3 +1673,133 @@ function is_imap_archive_folder($server_id, $user_config, $current_folder) {
     
     return false;
 }}
+
+/**
+ * Error messages from spam reporting services
+ * @subpackage imap/functions
+ * @param string $error_msg Raw error message from service
+ * @return string User-friendly error message
+ */
+if (!hm_exists('normalize_spam_report_error')) {
+function normalize_spam_report_error($error_msg) {
+    $error_mappings = array(
+        'not enabled' => 'SpamCop reporting is not enabled. Please enable it in Settings.',
+        'not configured' => 'SpamCop submission email is not configured. Please configure it in Settings.',
+        'submission email' => 'SpamCop submission email is not configured. Please configure it in Settings.',
+        'sender email' => 'No sender email address configured. Please configure it in Settings.',
+        'No sender' => 'No sender email address configured. Please configure it in Settings.',
+        'Failed to send email' => 'Failed to send email to SpamCop. Please check your server mail configuration.',
+        'send email' => 'Failed to send email to SpamCop. Please check your server mail configuration.'
+    );
+    
+    foreach ($error_mappings as $key => $message) {
+        if (strpos($error_msg, $key) !== false) {
+            return $message;
+        }
+    }
+    
+    return $error_msg;
+}}
+
+/**
+ * Report spam message to SpamCop
+ */
+if (!hm_exists('report_spam_to_spamcop')) {
+function report_spam_to_spamcop($message_source, $reasons, $user_config) {
+    $spamcop_enabled = $user_config->get('spamcop_enabled_setting', false);
+    if (!$spamcop_enabled) {
+        return array('success' => false, 'error' => 'SpamCop reporting is not enabled');
+    }
+
+    $spamcop_email = $user_config->get('spamcop_submission_email_setting', '');
+    if (empty($spamcop_email)) {
+        return array('success' => false, 'error' => 'SpamCop submission email not configured');
+    }
+
+    $sanitized_message = sanitize_message_for_spam_report($message_source, $user_config);
+
+    $from_email = $user_config->get('spamcop_from_email_setting', '');
+    if (empty($from_email)) {
+        // Try to get from IMAP servers
+        $imap_servers = $user_config->get('imap_servers', array());
+        if (!empty($imap_servers)) {
+            $first_server = reset($imap_servers);
+            $from_email = isset($first_server['user']) ? $first_server['user'] : '';
+        }
+    }
+
+    if (empty($from_email)) {
+        return array('success' => false, 'error' => 'No sender email address configured');
+    }
+
+    $reasons_text = implode(', ', $reasons);
+    
+    $subject = 'Spam Report: ' . $reasons_text;
+    
+    $body = "This email is being reported as spam for the following reasons:\n\n";
+    $body .= $reasons_text . "\n\n";
+    $body .= "--- Original Message ---\n\n";
+    $body .= $sanitized_message;
+
+    $timeout = 10; //dont foget to add it to UI
+    $old_timeout = ini_get('default_socket_timeout');
+    ini_set('default_socket_timeout', $timeout);
+
+    try {
+        $headers = array();
+        $headers[] = 'From: ' . $from_email;
+        $headers[] = 'Reply-To: ' . $from_email;
+        $headers[] = 'X-Mailer: Cypht Spam Reporter';
+        $headers[] = 'Content-Type: message/rfc822';
+        
+        $mail_sent = @mail($spamcop_email, $subject, $body, implode("\r\n", $headers));
+        
+        ini_set('default_socket_timeout', $old_timeout);
+        
+        if ($mail_sent) {
+            return array('success' => true);
+        } else {
+            return array('success' => false, 'error' => 'Failed to send email to SpamCop');
+        }
+    } catch (Exception $e) {
+        ini_set('default_socket_timeout', $old_timeout);
+        return array('success' => false, 'error' => $e->getMessage());
+    }
+}}
+
+/**
+ * Sanitize message source for spam reporting
+ */
+if (!hm_exists('sanitize_message_for_spam_report')) {
+function sanitize_message_for_spam_report($message_source, $user_config) {
+    $user_emails = array();
+    $imap_servers = $user_config->get('imap_servers', array());
+    foreach ($imap_servers as $server) {
+        if (isset($server['user'])) {
+            $user_emails[] = strtolower($server['user']);
+        }
+    }
+
+    // Split message into headers and body
+    $parts = explode("\r\n\r\n", $message_source, 2);
+    $headers = isset($parts[0]) ? $parts[0] : '';
+    $body = isset($parts[1]) ? $parts[1] : '';
+
+    if (!empty($user_emails)) {
+        foreach ($user_emails as $email) {
+            // Remove email from various headers
+            $headers = preg_replace('/\b' . preg_quote($email, '/') . '\b/i', '[REDACTED]', $headers);
+        }
+    }
+
+    // Remove sensitive headers
+    $sensitive_headers = array('X-Original-From', 'X-Forwarded-For', 'X-Real-IP');
+    foreach ($sensitive_headers as $header) {
+        $headers = preg_replace('/^' . preg_quote($header, '/') . ':.*$/mi', '', $headers);
+    }
+
+    // Clean up multiple blank lines
+    $headers = preg_replace('/\r\n\r\n+/', "\r\n\r\n", $headers);
+
+    return $headers . "\r\n\r\n" . $body;
+}}

@@ -2215,3 +2215,98 @@ class Hm_Handler_process_setting_ceo_detection_fraud extends Hm_Handler_Module {
         process_site_setting('ceo_rate_limit', $this, 'process_ceo_amount_limit_callback');
     }
 }
+
+/**
+ * Report spam messages to external services
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('message_ids', 'spam_reasons'));
+        if (!$success) {
+            Hm_Msgs::add('Missing required parameters for spam reporting', 'warning');
+            $this->out('spam_report_error', true);
+            $this->out('spam_report_message', 'Missing required parameters');
+            return;
+        }
+
+        $message_ids = $form['message_ids'];
+        $reasons = is_array($form['spam_reasons']) ? $form['spam_reasons'] : array($form['spam_reasons']);
+
+        $spamcop_enabled = $this->user_config->get('spamcop_enabled_setting', false);
+        if (!$spamcop_enabled) {
+            Hm_Msgs::add('SpamCop reporting is not enabled. Please enable it in Settings.', 'warning');
+            $this->out('spam_report_error', true);
+            $this->out('spam_report_message', 'SpamCop reporting is not enabled');
+            return;
+        }
+
+        $ids = process_imap_message_ids($message_ids);
+        $reported_count = 0;
+        $error_count = 0;
+        $errors = array();
+
+        foreach ($ids as $server_id => $folders) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
+            if (!$mailbox || !$mailbox->authed()) {
+                $error_msg = sprintf('Could not connect to server %s', $server_id);
+                $errors[] = $error_msg;
+                $error_count++;
+                continue;
+            }
+
+            foreach ($folders as $folder => $uids) {
+                $folder_name = hex2bin($folder);
+                foreach ($uids as $uid) {
+                    // Get full message source
+                    $msg_source = $mailbox->get_message_content($folder_name, $uid);
+                    if (!$msg_source) {
+                        $error_msg = sprintf('Could not retrieve message %s from folder %s', $uid, $folder_name);
+                        $errors[] = $error_msg;
+                        $error_count++;
+                        continue;
+                    }
+
+                    // Report to SpamCop
+                    $result = report_spam_to_spamcop($msg_source, $reasons, $this->user_config);
+                    if ($result['success']) {
+                        $reported_count++;
+                    } else {
+                        $error_msg = normalize_spam_report_error($result['error']);
+                        $errors[] = sprintf('Failed to report message %s: %s', $uid, $error_msg);
+                        $error_count++;
+                    }
+                }
+            }
+        }
+
+        $build_error_summary = function($errors, $max_show) {
+            $summary = implode('; ', array_slice($errors, 0, $max_show));
+            $remaining = count($errors) - $max_show;
+            if ($remaining > 0) {
+                $summary .= sprintf(' (%d more errors)', $remaining);
+            }
+            return $summary;
+        };
+
+        if ($error_count > 0 && $reported_count == 0) {
+            $error_summary = $build_error_summary($errors, 3);
+            $msg = sprintf('Failed to report %d message(s) as spam. %s', $error_count, $error_summary);
+            Hm_Msgs::add($msg, 'danger');
+            $this->out('spam_report_error', true);
+            $this->out('spam_report_message', sprintf('Failed to report %d message(s)', $error_count));
+        } elseif ($error_count > 0) {
+            $error_summary = $build_error_summary($errors, 2);
+            $msg = sprintf('Reported %d message(s) successfully. %d failed: %s', $reported_count, $error_count, $error_summary);
+            Hm_Msgs::add($msg, 'warning');
+            $this->out('spam_report_error', false);
+            $this->out('spam_report_message', sprintf('Reported %d message(s) successfully. %d failed.', $reported_count, $error_count));
+        } else {
+            $msg = sprintf('Successfully reported %d message(s) as spam to SpamCop.', $reported_count);
+            Hm_Msgs::add($msg, 'success');
+            $this->out('spam_report_error', false);
+            $this->out('spam_report_message', sprintf('Successfully reported %d message(s) as spam.', $reported_count));
+        }
+        $this->out('spam_report_count', $reported_count);
+    }
+}
