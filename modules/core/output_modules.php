@@ -2380,6 +2380,56 @@ class Hm_Output_spamcop_from_email_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option to enable/disable AbuseIPDB reporting
+ * @subpackage core/output
+ */
+class Hm_Output_abuseipdb_enabled_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enabled = get_setting_value($settings, 'abuseipdb_enabled', false);
+        $checked = $enabled ? ' checked="checked"' : '';
+        $reset = $enabled ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>' : '';
+        
+        return '<tr class="report_spam_setting"><td><label class="form-check-label" for="abuseipdb_enabled">'.
+            $this->trans('Enable AbuseIPDB reporting').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="abuseipdb_enabled" name="abuseipdb_settings[enabled]" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option for AbuseIPDB API key
+ * @subpackage core/output
+ */
+class Hm_Output_abuseipdb_api_key_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $api_key = get_setting_value($settings, 'abuseipdb_api_key', '');
+        
+        // Mask API key if it exists - show empty field with indicator
+        // The handler will preserve the original key if empty value is submitted
+        $display_value = '';
+        $placeholder = $this->trans('Your AbuseIPDB API key');
+        
+        if (!empty($api_key)) {
+            // Show empty field but indicate key is set via placeholder
+            // User must enter new value to change it, or leave empty to keep current
+            $placeholder = $this->trans('API key is set (••••••••) - enter new value to change');
+        }
+        
+        $reset = !empty($api_key) ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>' : '';
+        
+        // Add a hidden field to track if API key was originally set
+        // This helps the handler know to preserve the key if field is left empty
+        $hidden_field = !empty($api_key) ? '<input type="hidden" name="abuseipdb_settings[api_key_set]" value="1" />' : '';
+        
+        return '<tr class="report_spam_setting"><td><label for="abuseipdb_api_key">'.
+            $this->trans('AbuseIPDB API Key').'</label></td>'.
+            '<td class="d-flex">'.$hidden_field.
+            '<input class="form-control form-control-sm" type="password" id="abuseipdb_api_key" name="abuseipdb_settings[api_key]" value="'.$this->html_safe($display_value).'" placeholder="'.$placeholder.'" autocomplete="off" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
  * Option to warn user when he has unsaved changes.
  * @subpackage imap/output
  */

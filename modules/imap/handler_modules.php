@@ -2233,25 +2233,59 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
         $message_ids = $form['message_ids'];
         $reasons = is_array($form['spam_reasons']) ? $form['spam_reasons'] : array($form['spam_reasons']);
 
-        $spamcop_enabled = $this->user_config->get('spamcop_enabled_setting', false);
-        if (!$spamcop_enabled) {
-            Hm_Msgs::add('SpamCop reporting is not enabled. Please enable it in Settings.', 'warning');
+        // Check which services are enabled
+        $services_to_report = array();
+        $service_names = array(
+            'spamcop' => 'SpamCop',
+            'abuseipdb' => 'AbuseIPDB'
+        );
+
+        if ($this->user_config->get('spamcop_enabled_setting', false)) {
+            $services_to_report[] = 'spamcop';
+        }
+
+        if ($this->user_config->get('abuseipdb_enabled_setting', false)) {
+            $services_to_report[] = 'abuseipdb';
+        }
+
+        // If no services are enabled, return early
+        if (empty($services_to_report)) {
+            Hm_Msgs::add('No spam reporting services are enabled. Please enable at least one service in Settings.', 'warning');
             $this->out('spam_report_error', true);
-            $this->out('spam_report_message', 'SpamCop reporting is not enabled');
+            $this->out('spam_report_message', 'No spam reporting services are enabled');
             return;
         }
 
         $ids = process_imap_message_ids($message_ids);
-        $reported_count = 0;
-        $error_count = 0;
-        $errors = array();
+        
+        // Count total messages to process
+        $total_messages = 0;
+        foreach ($ids as $server_id => $folders) {
+            foreach ($folders as $folder => $uids) {
+                $total_messages += count($uids);
+            }
+        }
+        
+        // Track results per service and overall
+        $service_results = array();
+        foreach ($services_to_report as $service) {
+            $service_results[$service] = array(
+                'success_count' => 0,
+                'error_count' => 0,
+                'errors' => array()
+            );
+        }
+        
+        $total_reported = 0;
+        $total_errors = 0;
+        $all_errors = array();
 
         foreach ($ids as $server_id => $folders) {
             $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
             if (!$mailbox || !$mailbox->authed()) {
                 $error_msg = sprintf('Could not connect to server %s', $server_id);
-                $errors[] = $error_msg;
-                $error_count++;
+                $all_errors[] = $error_msg;
+                $total_errors++;
                 continue;
             }
 
@@ -2262,24 +2296,55 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
                     $msg_source = $mailbox->get_message_content($folder_name, $uid);
                     if (!$msg_source) {
                         $error_msg = sprintf('Could not retrieve message %s from folder %s', $uid, $folder_name);
-                        $errors[] = $error_msg;
-                        $error_count++;
+                        $all_errors[] = $error_msg;
+                        $total_errors++;
                         continue;
                     }
 
-                    // Report to SpamCop
-                    $result = report_spam_to_spamcop($msg_source, $reasons, $this->user_config);
-                    if ($result['success']) {
-                        $reported_count++;
-                    } else {
-                        $error_msg = normalize_spam_report_error($result['error']);
-                        $errors[] = sprintf('Failed to report message %s: %s', $uid, $error_msg);
-                        $error_count++;
+                    // Report to each enabled service
+                    $message_success_count = 0;
+                    $message_error_count = 0;
+                    $message_errors = array();
+
+                    foreach ($services_to_report as $service) {
+                        $function_name = 'report_spam_to_' . $service;
+                        if (!function_exists($function_name)) {
+                            $error_msg = sprintf('Reporting function for %s not found', $service_names[$service]);
+                            $service_results[$service]['errors'][] = $error_msg;
+                            $service_results[$service]['error_count']++;
+                            $message_errors[] = sprintf('%s: %s', $service_names[$service], $error_msg);
+                            $message_error_count++;
+                            continue;
+                        }
+
+                        $result = call_user_func($function_name, $msg_source, $reasons, $this->user_config);
+                        if ($result['success']) {
+                            $service_results[$service]['success_count']++;
+                            $message_success_count++;
+                        } else {
+                            $error_msg = normalize_spam_report_error($result['error']);
+                            $service_results[$service]['errors'][] = sprintf('Message %s: %s', $uid, $error_msg);
+                            $service_results[$service]['error_count']++;
+                            $message_errors[] = sprintf('%s: %s', $service_names[$service], $error_msg);
+                            $message_error_count++;
+                        }
+                    }
+
+                    // Track overall results for this message
+                    if ($message_success_count > 0) {
+                        $total_reported++;
+                    }
+                    if ($message_error_count > 0) {
+                        $total_errors++;
+                        if (!empty($message_errors)) {
+                            $all_errors[] = sprintf('Message %s: %s', $uid, implode('; ', $message_errors));
+                        }
                     }
                 }
             }
         }
 
+        // Build user-friendly messages
         $build_error_summary = function($errors, $max_show) {
             $summary = implode('; ', array_slice($errors, 0, $max_show));
             $remaining = count($errors) - $max_show;
@@ -2289,24 +2354,58 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
             return $summary;
         };
 
-        if ($error_count > 0 && $reported_count == 0) {
-            $error_summary = $build_error_summary($errors, 3);
-            $msg = sprintf('Failed to report %d message(s) as spam. %s', $error_count, $error_summary);
+        // Build service status summary
+        $successful_services = array();
+        $failed_services = array();
+        foreach ($services_to_report as $service) {
+            $service_name = $service_names[$service];
+            if ($service_results[$service]['success_count'] > 0) {
+                $successful_services[] = $service_name;
+            }
+            if ($service_results[$service]['error_count'] > 0) {
+                $failed_services[$service_name] = $service_results[$service]['errors'];
+            }
+        }
+
+        // Generate appropriate message based on results
+        if ($total_errors > 0 && $total_reported == 0) {
+            // All failed
+            $error_summary = $build_error_summary($all_errors, 3);
+            $msg = sprintf('Failed to report %d message(s) as spam. %s', $total_messages, $error_summary);
             Hm_Msgs::add($msg, 'danger');
             $this->out('spam_report_error', true);
-            $this->out('spam_report_message', sprintf('Failed to report %d message(s)', $error_count));
-        } elseif ($error_count > 0) {
-            $error_summary = $build_error_summary($errors, 2);
-            $msg = sprintf('Reported %d message(s) successfully. %d failed: %s', $reported_count, $error_count, $error_summary);
+            $this->out('spam_report_message', sprintf('Failed to report %d message(s)', $total_messages));
+        } elseif ($total_errors > 0) {
+            // Partial success - build service status message
+            $error_summary = $build_error_summary($all_errors, 2);
+            $service_status_parts = array();
+            
+            if (!empty($successful_services)) {
+                $service_status_parts[] = implode(' and ', $successful_services);
+            }
+            
+            if (!empty($failed_services)) {
+                $failed_list = array_keys($failed_services);
+                if (!empty($successful_services)) {
+                    $service_status_parts[] = 'but ' . implode(' and ', $failed_list) . ' failed';
+                } else {
+                    $service_status_parts[] = implode(' and ', $failed_list) . ' failed';
+                }
+            }
+            
+            $service_status = implode(', ', $service_status_parts);
+            $msg = sprintf('Reported %d message(s) successfully to %s. %s', $total_reported, $service_status, $error_summary);
             Hm_Msgs::add($msg, 'warning');
             $this->out('spam_report_error', false);
-            $this->out('spam_report_message', sprintf('Reported %d message(s) successfully. %d failed.', $reported_count, $error_count));
+            $this->out('spam_report_message', sprintf('Reported %d message(s) successfully. %d failed.', $total_reported, $total_errors));
         } else {
-            $msg = sprintf('Successfully reported %d message(s) as spam to SpamCop.', $reported_count);
+            // All successful
+            $services_list = implode(' and ', array_map(function($s) use ($service_names) { return $service_names[$s]; }, $services_to_report));
+            $msg = sprintf('Successfully reported %d message(s) as spam to %s.', $total_reported, $services_list);
             Hm_Msgs::add($msg, 'success');
             $this->out('spam_report_error', false);
-            $this->out('spam_report_message', sprintf('Successfully reported %d message(s) as spam.', $reported_count));
+            $this->out('spam_report_message', sprintf('Successfully reported %d message(s) as spam.', $total_reported));
         }
-        $this->out('spam_report_count', $reported_count);
+        $this->out('spam_report_count', $total_reported);
     }
 }

@@ -1683,13 +1683,29 @@ function is_imap_archive_folder($server_id, $user_config, $current_folder) {
 if (!hm_exists('normalize_spam_report_error')) {
 function normalize_spam_report_error($error_msg) {
     $error_mappings = array(
+        // SpamCop error mappings
         'not enabled' => 'SpamCop reporting is not enabled. Please enable it in Settings.',
         'not configured' => 'SpamCop submission email is not configured. Please configure it in Settings.',
         'submission email' => 'SpamCop submission email is not configured. Please configure it in Settings.',
         'sender email' => 'No sender email address configured. Please configure it in Settings.',
         'No sender' => 'No sender email address configured. Please configure it in Settings.',
         'Failed to send email' => 'Failed to send email to SpamCop. Please check your server mail configuration.',
-        'send email' => 'Failed to send email to SpamCop. Please check your server mail configuration.'
+        'send email' => 'Failed to send email to SpamCop. Please check your server mail configuration.',
+        
+        // AbuseIPDB error mappings
+        'AbuseIPDB reporting is not enabled' => 'AbuseIPDB reporting is not enabled. Please enable it in Settings.',
+        'AbuseIPDB API key not configured' => 'AbuseIPDB API key is not configured. Please configure it in Settings.',
+        'AbuseIPDB API key' => 'AbuseIPDB API key is not configured. Please configure it in Settings.',
+        'AbuseIPDB API key is invalid' => 'AbuseIPDB API key is invalid. Please check your API key in Settings.',
+        'Could not extract IP address' => 'Could not extract IP address from message. The email may not contain valid IP information.',
+        'Could not extract IP address from message' => 'Could not extract IP address from message. The email may not contain valid IP information.',
+        'Failed to connect to AbuseIPDB' => 'Failed to connect to AbuseIPDB. Please check your internet connection.',
+        'AbuseIPDB rate limit exceeded' => 'AbuseIPDB rate limit exceeded. Please try again later.',
+        'AbuseIPDB rate limit cooldown active' => 'AbuseIPDB rate limit cooldown active. Please wait before trying again.',
+        'AbuseIPDB validation error' => 'AbuseIPDB validation error. Please check your API key and configuration.',
+        'AbuseIPDB error' => 'An error occurred while reporting to AbuseIPDB. Please try again later.',
+        'Invalid response from AbuseIPDB' => 'Invalid response from AbuseIPDB. Please try again later.',
+        'cURL error' => 'Failed to connect to AbuseIPDB. Please check your internet connection.'
     );
     
     foreach ($error_mappings as $key => $message) {
@@ -1802,4 +1818,234 @@ function sanitize_message_for_spam_report($message_source, $user_config) {
     $headers = preg_replace('/\r\n\r\n+/', "\r\n\r\n", $headers);
 
     return $headers . "\r\n\r\n" . $body;
-}}
+}
+}
+
+/**
+ * Extract IP address from email message headers
+ * @param string $message_source Full email message source
+ * @return string|false IP address (IPv4 or IPv6) or false if not found
+ */
+if (!hm_exists('extract_ip_from_message')) {
+function extract_ip_from_message($message_source) {
+    // Split message into headers and body
+    $parts = explode("\r\n\r\n", $message_source, 2);
+    $headers = isset($parts[0]) ? $parts[0] : '';
+    
+    if (empty($headers)) {
+        return false;
+    }
+    
+    // Parse headers into array, handling continuation lines
+    $header_lines = explode("\r\n", $headers);
+    $received_headers = array();
+    $current_header = '';
+    
+    // Collect all Received headers (handling multi-line headers)
+    foreach ($header_lines as $line) {
+        if (preg_match('/^Received:/i', $line)) {
+            if (!empty($current_header)) {
+                $received_headers[] = $current_header;
+            }
+            $current_header = $line;
+        } elseif (!empty($current_header) && preg_match('/^\s+/', $line)) {
+            // Continuation line - append to current header
+            $current_header .= ' ' . trim($line);
+        } elseif (!empty($current_header)) {
+            // New header line - save current and reset
+            $received_headers[] = $current_header;
+            $current_header = '';
+        }
+    }
+    // Don't forget the last header
+    if (!empty($current_header)) {
+        $received_headers[] = $current_header;
+    }
+    
+    // Collect all valid public IPs from Received headers
+    // Check in reverse order (last header = original sender, first header = last hop)
+    $valid_ips = array();
+    
+    foreach (array_reverse($received_headers) as $received) {
+        // Pattern 1: from [IP] or from hostname [IP] (most common)
+        // Matches: "from [192.168.1.1]" or "from mail.example.com [192.168.1.1]"
+        if (preg_match('/from\s+(?:[^\s]+\s+)?\[?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\]?/i', $received, $matches)) {
+            $candidate = $matches[1];
+            if (filter_var($candidate, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                $valid_ips[] = $candidate;
+            }
+        }
+        
+        // Pattern 2: by hostname ([IP])
+        // Matches: "by mail.example.com ([192.168.1.1])"
+        if (preg_match('/by\s+[^\s]+\s+\(\[?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\]?\)/i', $received, $matches)) {
+            $candidate = $matches[1];
+            if (filter_var($candidate, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                $valid_ips[] = $candidate;
+            }
+        }
+        
+        // Pattern 3: IPv6 addresses
+        // Matches: "from [2001:db8::1]" or "from [::1]"
+        if (preg_match('/from\s+(?:[^\s]+\s+)?\[?([0-9a-f:]+)\]?/i', $received, $matches)) {
+            $candidate = trim($matches[1], '[]');
+            if (filter_var($candidate, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                $valid_ips[] = $candidate;
+            }
+        }
+        
+        // Pattern 4: Generic IP pattern (fallback for edge cases)
+        // Matches any valid-looking IP in the header
+        if (preg_match('/\b(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\b/', $received, $matches)) {
+            $candidate = $matches[1];
+            if (filter_var($candidate, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                // Avoid duplicates
+                if (!in_array($candidate, $valid_ips)) {
+                    $valid_ips[] = $candidate;
+                }
+            }
+        }
+    }
+    
+    // Return first valid IP found (original sender, since we checked in reverse)
+    if (!empty($valid_ips)) {
+        return $valid_ips[0];
+    }
+    
+    // Fallback: Check X-Originating-IP, X-Forwarded-For, X-Real-IP headers
+    $fallback_headers = array('X-Originating-IP', 'X-Forwarded-For', 'X-Real-IP');
+    foreach ($fallback_headers as $header_name) {
+        if (preg_match('/^' . preg_quote($header_name, '/') . ':\s*(.+)$/mi', $headers, $matches)) {
+            $ip = trim($matches[1]);
+            // Handle comma-separated IPs (take first)
+            if (strpos($ip, ',') !== false) {
+                $ip = trim(explode(',', $ip)[0]);
+            }
+            // Remove port if present (e.g., "192.168.1.1:8080")
+            if (strpos($ip, ':') !== false && !preg_match('/^\[.*\]$/', $ip)) {
+                $ip_parts = explode(':', $ip);
+                $ip = $ip_parts[0];
+            }
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                return $ip;
+            }
+        }
+    }
+    
+    return false;
+}
+}
+
+/**
+ * Report spam message to AbuseIPDB
+ * @param string $message_source Full email message source
+ * @param array $reasons Array of spam reasons selected by user
+ * @param object $user_config User configuration object
+ * @return array Result array with 'success' (bool) and 'error' (string) keys
+ */
+if (!hm_exists('report_spam_to_abuseipdb')) {
+function report_spam_to_abuseipdb($message_source, $reasons, $user_config) {
+    $enabled = $user_config->get('abuseipdb_enabled_setting', false);
+    if (!$enabled) {
+        return array('success' => false, 'error' => 'AbuseIPDB reporting is not enabled');
+    }
+
+    $api_key = $user_config->get('abuseipdb_api_key_setting', '');
+    if (empty($api_key)) {
+        return array('success' => false, 'error' => 'AbuseIPDB API key not configured');
+    }
+
+    $rate_limit_key = 'abuseipdb_rate_limit_timestamp';
+    $rate_limit_timestamp = $user_config->get($rate_limit_key, 0);
+    $rate_limit_cooldown = 15 * 60;
+    if ($rate_limit_timestamp > 0 && (time() - $rate_limit_timestamp) < $rate_limit_cooldown) {
+        $remaining_minutes = ceil(($rate_limit_cooldown - (time() - $rate_limit_timestamp)) / 60);
+        return array('success' => false, 'error' => sprintf('AbuseIPDB rate limit cooldown active. Please wait %d more minute(s) before trying again.', $remaining_minutes));
+    }
+
+    $ip = extract_ip_from_message($message_source);
+    if (!$ip) {
+        return array('success' => false, 'error' => 'Could not extract IP address from message');
+    }
+
+    $comment = implode(', ', $reasons);
+    if (empty($comment)) {
+        $comment = 'Spam email reported via Cypht';
+    }
+    
+    $data = array(
+        'ip' => $ip,
+        'categories' => '11', // Category 11 = Email Spam (spam email content, infected attachments, and phishing emails)
+        'comment' => $comment
+    );
+
+    $ch = curl_init('https://api.abuseipdb.com/api/v2/report');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        'Accept: application/json',
+        'Key: ' . $api_key
+    ));
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+    
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curl_error = curl_error($ch);
+    $curl_errno = curl_errno($ch);
+    curl_close($ch);
+
+    if ($curl_error || $curl_errno !== 0) {
+        // Include HTTP code if available, otherwise just cURL error
+        $error_msg = 'Failed to connect to AbuseIPDB';
+        if ($http_code > 0) {
+            $error_msg .= sprintf(' (HTTP %d)', $http_code);
+        }
+        if ($curl_error) {
+            $error_msg .= ': ' . $curl_error;
+        } elseif ($curl_errno !== 0) {
+            $error_msg .= sprintf(' (cURL error %d)', $curl_errno);
+        }
+        return array('success' => false, 'error' => $error_msg);
+    }
+    
+    if ($http_code === 200) {
+        $result = json_decode($response, true);
+        if (isset($result['data']['ipAddress'])) {
+            // Clear rate limit timestamp on success
+            $user_config->set($rate_limit_key, 0);
+            return array('success' => true);
+        } else {
+            return array('success' => false, 'error' => 'Invalid response from AbuseIPDB');
+        }
+    } elseif ($http_code === 429) {
+        // Rate limit exceeded - store timestamp to prevent immediate re-attempts
+        $user_config->set($rate_limit_key, time());
+        
+        return array('success' => false, 'error' => 'AbuseIPDB rate limit exceeded. Please try again later.');
+    } elseif ($http_code === 422) {
+        $result = json_decode($response, true);
+        $error_detail = 'Invalid request to AbuseIPDB';
+        if (isset($result['errors'][0]['detail'])) {
+            $error_detail = $result['errors'][0]['detail'];
+        } elseif (isset($result['errors'][0]['title'])) {
+            $error_detail = $result['errors'][0]['title'];
+        }
+        return array('success' => false, 'error' => 'AbuseIPDB validation error: ' . $error_detail);
+    } elseif ($http_code === 401) {
+        return array('success' => false, 'error' => 'AbuseIPDB API key is invalid. Please check your API key in Settings.');
+    } else {
+        $result = json_decode($response, true);
+        $error_detail = sprintf('Failed to report to AbuseIPDB (HTTP %d)', $http_code);
+        if (isset($result['errors'][0]['detail'])) {
+            $error_detail = $result['errors'][0]['detail'];
+        } elseif (isset($result['errors'][0]['title'])) {
+            $error_detail = $result['errors'][0]['title'];
+        }
+        return array('success' => false, 'error' => 'AbuseIPDB error: ' . $error_detail);
+    }
+}
+}

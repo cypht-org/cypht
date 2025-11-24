@@ -1017,20 +1017,58 @@ class Hm_Handler_process_drafts_since_setting extends Hm_Handler_Module {
 class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('save_settings'));
-        if (!$success || !array_key_exists('spamcop_settings', $this->request->post)) {
+        if (!$success) {
             return;
         }
 
         $new_settings = $this->get('new_user_settings', array());
-        $spamcop = $this->request->post['spamcop_settings'];
 
-        $set_email_setting = function($key, $value) use (&$new_settings) {
-            $new_settings[$key] = (!empty($value) && filter_var($value, FILTER_VALIDATE_EMAIL)) ? $value : '';
+        // Helper function for validation
+        $set_setting = function($key, $value, $validator = null) use (&$new_settings) {
+            if ($validator && !$validator($value)) {
+                $new_settings[$key] = '';
+            } else {
+                $new_settings[$key] = $value;
+            }
         };
 
-        $new_settings['spamcop_enabled_setting'] = isset($spamcop['enabled']);
-        $set_email_setting('spamcop_submission_email_setting', $spamcop['submission_email'] ?? '');
-        $set_email_setting('spamcop_from_email_setting', $spamcop['from_email'] ?? '');
+        // Process SpamCop settings
+        if (array_key_exists('spamcop_settings', $this->request->post)) {
+            $spamcop = $this->request->post['spamcop_settings'];
+            $new_settings['spamcop_enabled_setting'] = isset($spamcop['enabled']);
+            $set_setting('spamcop_submission_email_setting', $spamcop['submission_email'] ?? '', function($v) {
+                return filter_var($v, FILTER_VALIDATE_EMAIL);
+            });
+            $set_setting('spamcop_from_email_setting', $spamcop['from_email'] ?? '', function($v) {
+                return filter_var($v, FILTER_VALIDATE_EMAIL);
+            });
+        }
+
+        // Process AbuseIPDB settings
+        if (array_key_exists('abuseipdb_settings', $this->request->post)) {
+            $abuseipdb = $this->request->post['abuseipdb_settings'];
+            $new_settings['abuseipdb_enabled_setting'] = isset($abuseipdb['enabled']);
+            
+            // Handle API key: if field is empty but api_key_set flag is present, preserve original key
+            $api_key = $abuseipdb['api_key'] ?? '';
+            $api_key_was_set = isset($abuseipdb['api_key_set']) && $abuseipdb['api_key_set'] == '1';
+            
+            if (empty($api_key) && $api_key_was_set) {
+                // User left field empty but key was originally set - preserve the original key
+                $original_key = $this->user_config->get('abuseipdb_api_key_setting', '');
+                if (!empty($original_key)) {
+                    $new_settings['abuseipdb_api_key_setting'] = $original_key;
+                } else {
+                    $new_settings['abuseipdb_api_key_setting'] = '';
+                }
+            } else {
+                // User entered a new value (or cleared it) - validate and set it
+                $set_setting('abuseipdb_api_key_setting', $api_key, function($v) {
+                    // API key validation: non-empty string, reasonable length (10-200 chars)
+                    return !empty($v) && strlen($v) >= 10 && strlen($v) <= 200;
+                });
+            }
+        }
         
         $this->out('new_user_settings', $new_settings, false);
     }
