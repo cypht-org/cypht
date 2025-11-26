@@ -2518,12 +2518,14 @@ class Hm_output_combined_message_list extends Hm_Output_Module {
 class Hm_Output_version_upgrade_checker extends Hm_Output_Module {
     protected function output()
     {
-        if (! CYPHT_NEED_UPGRADE) return '';
+        if (! $this->get('need_upgrade')) return '';
+
+        $latestVersion = $this->get('latest_version');
 
         return '
         <div class="alert alert-info alert-dismissible fade align-items-center" role="alert" id="cypht-upgrade-alert">
             <i class="bi bi-info-circle-fill me-2"></i>
-            You are currently running Cypht version '.CYPHT_VERSION.'. A higher version (<b>'.CYPHT_LATEST_VERSION.'</b>) is available.
+            You are currently running Cypht version '.CYPHT_VERSION.'. A higher version (<b>'. $latestVersion .'</b>) is available.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         ';

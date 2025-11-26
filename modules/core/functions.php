@@ -425,6 +425,7 @@ function setup_base_page($name, $source=false, $use_layout=true) {
     add_handler($name, 'save_user_data', true, $source);
     add_handler($name, 'logout', true, $source);
     add_handler($name, 'http_headers', true, $source);
+    add_handler($name, 'version_upgrade_checker', true, $source);
 
     add_output($name, 'header_start', false, $source);
     add_output($name, 'header_css', false, $source);
