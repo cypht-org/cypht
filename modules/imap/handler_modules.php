@@ -2233,7 +2233,6 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
         $message_ids = $form['message_ids'];
         $reasons = is_array($form['spam_reasons']) ? $form['spam_reasons'] : array($form['spam_reasons']);
 
-        // Check which services are enabled
         $services_to_report = array();
         $service_names = array(
             'spamcop' => 'SpamCop',
@@ -2248,7 +2247,6 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
             $services_to_report[] = 'abuseipdb';
         }
 
-        // If no services are enabled, return early
         if (empty($services_to_report)) {
             Hm_Msgs::add('No spam reporting services are enabled. Please enable at least one service in Settings.', 'warning');
             $this->out('spam_report_error', true);
@@ -2258,7 +2256,6 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
 
         $ids = process_imap_message_ids($message_ids);
         
-        // Count total messages to process
         $total_messages = 0;
         foreach ($ids as $server_id => $folders) {
             foreach ($folders as $folder => $uids) {
@@ -2266,7 +2263,6 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
             }
         }
         
-        // Track results per service and overall
         $service_results = array();
         foreach ($services_to_report as $service) {
             $service_results[$service] = array(
@@ -2292,7 +2288,6 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
             foreach ($folders as $folder => $uids) {
                 $folder_name = hex2bin($folder);
                 foreach ($uids as $uid) {
-                    // Get full message source
                     $msg_source = $mailbox->get_message_content($folder_name, $uid);
                     if (!$msg_source) {
                         $error_msg = sprintf('Could not retrieve message %s from folder %s', $uid, $folder_name);
@@ -2317,7 +2312,13 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
                             continue;
                         }
 
-                        $result = call_user_func($function_name, $msg_source, $reasons, $this->user_config);
+                        $imap_server_email = '';
+                        $imap_server_details = Hm_IMAP_List::dump($server_id, true);
+                        if ($imap_server_details && isset($imap_server_details['user'])) {
+                            $imap_server_email = $imap_server_details['user'];
+                        }
+
+                        $result = call_user_func($function_name, $msg_source, $reasons, $this->user_config, $this->session, $imap_server_email);
                         if ($result['success']) {
                             $service_results[$service]['success_count']++;
                             $message_success_count++;
@@ -2330,7 +2331,6 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
                         }
                     }
 
-                    // Track overall results for this message
                     if ($message_success_count > 0) {
                         $total_reported++;
                     }
@@ -2344,7 +2344,6 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
             }
         }
 
-        // Build user-friendly messages
         $build_error_summary = function($errors, $max_show) {
             $summary = implode('; ', array_slice($errors, 0, $max_show));
             $remaining = count($errors) - $max_show;
@@ -2402,6 +2401,12 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
             // All successful
             $services_list = implode(' and ', array_map(function($s) use ($service_names) { return $service_names[$s]; }, $services_to_report));
             $msg = sprintf('Successfully reported %d message(s) as spam to %s.', $total_reported, $services_list);
+            
+            //SpamCop-specific verification reminder
+            if (in_array('spamcop', $services_to_report)) {
+                $msg .= ' Please check your email for a SpamCop verification link and click it to complete the submission.';
+            }
+            
             Hm_Msgs::add($msg, 'success');
             $this->out('spam_report_error', false);
             $this->out('spam_report_message', sprintf('Successfully reported %d message(s) as spam.', $total_reported));

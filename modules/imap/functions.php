@@ -1719,9 +1719,11 @@ function normalize_spam_report_error($error_msg) {
 
 /**
  * Report spam message to SpamCop
+ * Uses authenticated SMTP to ensure proper SPF/DKIM validation
+ * Must use the exact email address from the IMAP server where the message is located
  */
 if (!hm_exists('report_spam_to_spamcop')) {
-function report_spam_to_spamcop($message_source, $reasons, $user_config) {
+function report_spam_to_spamcop($message_source, $reasons, $user_config, $session = null, $imap_server_email = '') {
     $spamcop_enabled = $user_config->get('spamcop_enabled_setting', false);
     if (!$spamcop_enabled) {
         return array('success' => false, 'error' => 'SpamCop reporting is not enabled');
@@ -1734,13 +1736,20 @@ function report_spam_to_spamcop($message_source, $reasons, $user_config) {
 
     $sanitized_message = sanitize_message_for_spam_report($message_source, $user_config);
 
-    $from_email = $user_config->get('spamcop_from_email_setting', '');
-    if (empty($from_email)) {
-        // Try to get from IMAP servers
-        $imap_servers = $user_config->get('imap_servers', array());
-        if (!empty($imap_servers)) {
-            $first_server = reset($imap_servers);
-            $from_email = isset($first_server['user']) ? $first_server['user'] : '';
+    // SpamCop requires the exact email address associated with the account
+    $from_email = '';
+    if (!empty($imap_server_email)) {
+        $from_email = $imap_server_email;
+    } else {
+        // Fallback: try to get from spamcop_from_email_setting
+        $from_email = $user_config->get('spamcop_from_email_setting', '');
+        if (empty($from_email)) {
+            // or else get from the first IMAP server
+            $imap_servers = $user_config->get('imap_servers', array());
+            if (!empty($imap_servers)) {
+                $first_server = reset($imap_servers);
+                $from_email = isset($first_server['user']) ? $first_server['user'] : '';
+            }
         }
     }
 
@@ -1748,37 +1757,187 @@ function report_spam_to_spamcop($message_source, $reasons, $user_config) {
         return array('success' => false, 'error' => 'No sender email address configured');
     }
 
-    $reasons_text = implode(', ', $reasons);
-    
-    $subject = 'Spam Report: ' . $reasons_text;
-    
-    $body = "This email is being reported as spam for the following reasons:\n\n";
-    $body .= $reasons_text . "\n\n";
-    $body .= "--- Original Message ---\n\n";
-    $body .= $sanitized_message;
+    $subject = 'Spam report';
 
-    $timeout = 10; //dont foget to add it to UI
+    if (!class_exists('Hm_MIME_Msg')) {
+        $mime_file = (defined('APP_PATH') ? APP_PATH : dirname(__FILE__) . '/../') . 'modules/smtp/hm-mime-message.php';
+        if (file_exists($mime_file)) {
+            require_once $mime_file;
+        } else {
+            return array('success' => false, 'error' => 'SMTP module required for SpamCop reporting. Please enable the SMTP module.');
+        }
+    }
+    
+    // Create temporary file for the spam message attachment
+    $file_dir = $user_config->get('attachment_dir', sys_get_temp_dir());
+    if (!is_dir($file_dir)) {
+        $file_dir = sys_get_temp_dir();
+    }
+    // Create subdirectory for user if using attachment_dir
+    if ($file_dir !== sys_get_temp_dir() && $session) {
+        $user_dir = $file_dir . DIRECTORY_SEPARATOR . md5($session->get('username', 'default'));
+        if (!is_dir($user_dir)) {
+            @mkdir($user_dir, 0755, true);
+        }
+        $file_dir = $user_dir;
+    }
+    $temp_file = tempnam($file_dir, 'spamcop_');
+    
+    // format it like forward as attachment does
+    if (class_exists('Hm_Crypt') && class_exists('Hm_Request_Key')) {
+        $encrypted_content = Hm_Crypt::ciphertext($sanitized_message, Hm_Request_Key::generate());
+        file_put_contents($temp_file, $encrypted_content);
+    } else {
+        file_put_contents($temp_file, $sanitized_message);
+    }
+    
+    // Build MIME message
+    $body = '';
+    $mime = new Hm_MIME_Msg($spamcop_email, $subject, $body, $from_email, false, '', '', '', '', $from_email);
+    
+    $attachment = array(
+        'name' => 'spam.eml',
+        'type' => 'message/rfc822',
+        'size' => strlen($sanitized_message),
+        'filename' => $temp_file
+    );
+    
+    $mime->add_attachments(array($attachment));
+
+    $mime_message = $mime->get_mime_msg();
+    
+    // SpamCop rejects automated submissions, so removed X-Mailer headers
+    $mime_message = preg_replace('/^X-Mailer:.*$/mi', '', $mime_message);
+    $mime_message = preg_replace('/\r\n\r\n+/', "\r\n\r\n", $mime_message); // Clean up extra blank lines
+    
+    // Extract boundary and fix encoding (Hm_MIME_Msg uses 7bit for message/rfc822, SpamCop requires base64)
+    $parts = explode("\r\n\r\n", $mime_message, 2);
+    $mime_body = isset($parts[1]) ? $parts[1] : '';
+    
+    // Extract boundary from body (Hm_MIME_Msg creates its own boundary)
+    $boundary = '';
+    if (preg_match('/^--([A-Za-z0-9]+)/m', $mime_body, $boundary_match)) {
+        $boundary = $boundary_match[1];
+    }
+    
+    // Fix encoding from 7bit to base64 for message/rfc822 attachment
+    if (!empty($boundary)) {
+        $pattern = '/(--' . preg_quote($boundary, '/') . '\r\nContent-Type: message\/rfc822[^\r\n]*\r\n(?:[^\r\n]*\r\n)*?Content-Transfer-Encoding: )7bit(\r\n\r\n)(.*?)(\r\n--' . preg_quote($boundary, '/') . '(?:--)?)/s';
+        
+        if (preg_match($pattern, $mime_message, $matches)) {
+            $attachment_content = rtrim($matches[3], "\r\n");
+            $encoded_content = chunk_split(base64_encode($attachment_content));
+            $mime_message = preg_replace($pattern, '$1base64$2' . $encoded_content . '$4', $mime_message);
+        } elseif (defined('DEBUG_MODE') && DEBUG_MODE) {
+            Hm_Debug::add('SpamCop: Warning - Could not fix encoding from 7bit to base64', 'warning');
+        }
+    }
+    
+    @unlink($temp_file);
+    
+    $parts = explode("\r\n\r\n", $mime_message, 2);
+    $all_headers = isset($parts[0]) ? $parts[0] : '';
+    $mime_body = isset($parts[1]) ? $parts[1] : '';
+    
+    // Extract boundary again if needed (after encoding fix)
+    if (empty($boundary) && preg_match('/^--([A-Za-z0-9]+)/m', $mime_body, $boundary_match)) {
+        $boundary = $boundary_match[1];
+    }
+
+    $headers = array();
+    $header_lines = explode("\r\n", $all_headers);
+    foreach ($header_lines as $line) {
+        if (preg_match('/^(From|Reply-To|MIME-Version|Content-Type):/i', $line)) {
+            if (preg_match('/^Content-Type:/i', $line) && !empty($boundary)) {
+                $headers[] = 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
+            } else {
+                $headers[] = $line;
+            }
+        }
+    }
+
+    if (!class_exists('Hm_SMTP_List')) {
+        $smtp_file = (defined('APP_PATH') ? APP_PATH : dirname(__FILE__) . '/../') . 'modules/smtp/hm-smtp.php';
+        if (file_exists($smtp_file)) {
+            require_once $smtp_file;
+        }
+    }
+    
+    if ($session !== null && class_exists('Hm_SMTP_List')) {
+        try {
+            Hm_SMTP_List::init($user_config, $session);
+            $smtp_servers = Hm_SMTP_List::dump();
+            $smtp_id = false;
+            foreach ($smtp_servers as $id => $server) {
+                if (isset($server['user']) && strtolower(trim($server['user'])) === strtolower(trim($from_email))) {
+                    $smtp_id = $id;
+                    break;
+                }
+            }
+
+            // if ($smtp_id === false && !empty($smtp_servers)) {
+            //     $smtp_id = key($smtp_servers);
+            // }
+            
+            if ($smtp_id !== false) {
+                $mailbox = Hm_SMTP_List::connect($smtp_id, false);
+                if ($mailbox && $mailbox->authed()) {
+                    $smtp_headers = array();
+                    $smtp_headers[] = 'From: ' . $from_email;
+                    $smtp_headers[] = 'Reply-To: ' . $from_email;
+                    $smtp_headers[] = 'To: ' . $spamcop_email;
+                    $smtp_headers[] = 'Subject: ' . $subject;
+                    $smtp_headers[] = 'MIME-Version: 1.0';
+                    if (!empty($boundary)) {
+                        $smtp_headers[] = 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
+                    }
+                    $smtp_headers[] = 'Date: ' . date('r');
+                    $smtp_headers[] = 'Message-ID: <' . md5(uniqid(rand(), true)) . '@' . php_uname('n') . '>';
+                    
+                    $smtp_message = implode("\r\n", $smtp_headers) . "\r\n\r\n" . $mime_body;
+                    
+                    $err_msg = $mailbox->send_message($from_email, array($spamcop_email), $smtp_message);
+                    
+                    if ($err_msg === false) {
+                        return array('success' => true);
+                    } elseif (defined('DEBUG_MODE') && DEBUG_MODE) {
+                        Hm_Debug::add(sprintf('SpamCop: SMTP send failed: %s', $err_msg), 'warning');
+                    }
+                } elseif (defined('DEBUG_MODE') && DEBUG_MODE) {
+                    Hm_Debug::add(sprintf('SpamCop: SMTP connection failed for server ID %s', $smtp_id), 'warning');
+                }
+            }
+        } catch (Exception $e) {
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                Hm_Debug::add(sprintf('SpamCop: SMTP exception: %s', $e->getMessage()), 'error');
+            }
+        }
+    }
+    
+    // Fallback to mail() if SMTP is not available
+    $timeout = 10;
     $old_timeout = ini_get('default_socket_timeout');
     ini_set('default_socket_timeout', $timeout);
 
     try {
-        $headers = array();
-        $headers[] = 'From: ' . $from_email;
-        $headers[] = 'Reply-To: ' . $from_email;
-        $headers[] = 'X-Mailer: Cypht Spam Reporter';
-        $headers[] = 'Content-Type: message/rfc822';
-        
-        $mail_sent = @mail($spamcop_email, $subject, $body, implode("\r\n", $headers));
+        $mail_sent = @mail($spamcop_email, $subject, $mime_body, implode("\r\n", $headers));
         
         ini_set('default_socket_timeout', $old_timeout);
         
         if ($mail_sent) {
             return array('success' => true);
         } else {
-            return array('success' => false, 'error' => 'Failed to send email to SpamCop');
+            $error = 'Failed to send email to SpamCop. Please ensure your server has valid SPF/DKIM records or configure an SMTP server.';
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                Hm_Debug::add('SpamCop: mail() function failed', 'error');
+            }
+            return array('success' => false, 'error' => $error);
         }
     } catch (Exception $e) {
         ini_set('default_socket_timeout', $old_timeout);
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            Hm_Debug::add(sprintf('SpamCop: Exception in mail(): %s', $e->getMessage()), 'error');
+        }
         return array('success' => false, 'error' => $e->getMessage());
     }
 }}
@@ -1796,7 +1955,6 @@ function sanitize_message_for_spam_report($message_source, $user_config) {
         }
     }
 
-    // Split message into headers and body
     $parts = explode("\r\n\r\n", $message_source, 2);
     $headers = isset($parts[0]) ? $parts[0] : '';
     $body = isset($parts[1]) ? $parts[1] : '';
@@ -1808,13 +1966,12 @@ function sanitize_message_for_spam_report($message_source, $user_config) {
         }
     }
 
-    // Remove sensitive headers
     $sensitive_headers = array('X-Original-From', 'X-Forwarded-For', 'X-Real-IP');
     foreach ($sensitive_headers as $header) {
         $headers = preg_replace('/^' . preg_quote($header, '/') . ':.*$/mi', '', $headers);
     }
 
-    // Clean up multiple blank lines
+    // Clean blank lines
     $headers = preg_replace('/\r\n\r\n+/', "\r\n\r\n", $headers);
 
     return $headers . "\r\n\r\n" . $body;
@@ -1828,20 +1985,17 @@ function sanitize_message_for_spam_report($message_source, $user_config) {
  */
 if (!hm_exists('extract_ip_from_message')) {
 function extract_ip_from_message($message_source) {
-    // Split message into headers and body
     $parts = explode("\r\n\r\n", $message_source, 2);
     $headers = isset($parts[0]) ? $parts[0] : '';
     
     if (empty($headers)) {
         return false;
     }
-    
-    // Parse headers into array, handling continuation lines
+
     $header_lines = explode("\r\n", $headers);
     $received_headers = array();
     $current_header = '';
     
-    // Collect all Received headers (handling multi-line headers)
     foreach ($header_lines as $line) {
         if (preg_match('/^Received:/i', $line)) {
             if (!empty($current_header)) {
@@ -1849,21 +2003,16 @@ function extract_ip_from_message($message_source) {
             }
             $current_header = $line;
         } elseif (!empty($current_header) && preg_match('/^\s+/', $line)) {
-            // Continuation line - append to current header
             $current_header .= ' ' . trim($line);
         } elseif (!empty($current_header)) {
-            // New header line - save current and reset
             $received_headers[] = $current_header;
             $current_header = '';
         }
     }
-    // Don't forget the last header
     if (!empty($current_header)) {
         $received_headers[] = $current_header;
     }
-    
-    // Collect all valid public IPs from Received headers
-    // Check in reverse order (last header = original sender, first header = last hop)
+
     $valid_ips = array();
     
     foreach (array_reverse($received_headers) as $received) {
@@ -1907,21 +2056,19 @@ function extract_ip_from_message($message_source) {
         }
     }
     
-    // Return first valid IP found (original sender, since we checked in reverse)
+    // THe original sender, will be the first valid founded since we checked in reverse
     if (!empty($valid_ips)) {
         return $valid_ips[0];
     }
-    
-    // Fallback: Check X-Originating-IP, X-Forwarded-For, X-Real-IP headers
+
     $fallback_headers = array('X-Originating-IP', 'X-Forwarded-For', 'X-Real-IP');
     foreach ($fallback_headers as $header_name) {
         if (preg_match('/^' . preg_quote($header_name, '/') . ':\s*(.+)$/mi', $headers, $matches)) {
             $ip = trim($matches[1]);
-            // Handle comma-separated IPs (take first)
             if (strpos($ip, ',') !== false) {
                 $ip = trim(explode(',', $ip)[0]);
             }
-            // Remove port if present (e.g., "192.168.1.1:8080")
+            // Remove port if present
             if (strpos($ip, ':') !== false && !preg_match('/^\[.*\]$/', $ip)) {
                 $ip_parts = explode(':', $ip);
                 $ip = $ip_parts[0];
@@ -2015,7 +2162,6 @@ function report_spam_to_abuseipdb($message_source, $reasons, $user_config) {
     if ($http_code === 200) {
         $result = json_decode($response, true);
         if (isset($result['data']['ipAddress'])) {
-            // Clear rate limit timestamp on success
             $user_config->set($rate_limit_key, 0);
             return array('success' => true);
         } else {

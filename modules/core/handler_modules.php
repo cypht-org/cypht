@@ -1023,7 +1023,6 @@ class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
 
         $new_settings = $this->get('new_user_settings', array());
 
-        // Helper function for validation
         $set_setting = function($key, $value, $validator = null) use (&$new_settings) {
             if ($validator && !$validator($value)) {
                 $new_settings[$key] = '';
@@ -1049,12 +1048,11 @@ class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
             $abuseipdb = $this->request->post['abuseipdb_settings'];
             $new_settings['abuseipdb_enabled_setting'] = isset($abuseipdb['enabled']);
             
-            // Handle API key: if field is empty but api_key_set flag is present, preserve original key
+            // Handle API key
             $api_key = $abuseipdb['api_key'] ?? '';
             $api_key_was_set = isset($abuseipdb['api_key_set']) && $abuseipdb['api_key_set'] == '1';
             
             if (empty($api_key) && $api_key_was_set) {
-                // User left field empty but key was originally set - preserve the original key
                 $original_key = $this->user_config->get('abuseipdb_api_key_setting', '');
                 if (!empty($original_key)) {
                     $new_settings['abuseipdb_api_key_setting'] = $original_key;
@@ -1062,9 +1060,7 @@ class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
                     $new_settings['abuseipdb_api_key_setting'] = '';
                 }
             } else {
-                // User entered a new value (or cleared it) - validate and set it
                 $set_setting('abuseipdb_api_key_setting', $api_key, function($v) {
-                    // API key validation: non-empty string, reasonable length (10-200 chars)
                     return !empty($v) && strlen($v) >= 10 && strlen($v) <= 200;
                 });
             }

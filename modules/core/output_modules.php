@@ -2411,8 +2411,6 @@ class Hm_Output_abuseipdb_api_key_setting extends Hm_Output_Module {
         $placeholder = $this->trans('Your AbuseIPDB API key');
         
         if (!empty($api_key)) {
-            // Show empty field but indicate key is set via placeholder
-            // User must enter new value to change it, or leave empty to keep current
             $placeholder = $this->trans('API key is set (••••••••) - enter new value to change');
         }
         
