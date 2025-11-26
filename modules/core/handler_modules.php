@@ -1043,6 +1043,15 @@ class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
             });
         }
 
+        // Process APWG settings
+        if (array_key_exists('apwg_settings', $this->request->post)) {
+            $apwg = $this->request->post['apwg_settings'];
+            $new_settings['apwg_enabled_setting'] = isset($apwg['enabled']);
+            $set_setting('apwg_from_email_setting', $apwg['from_email'] ?? '', function($v) {
+                return filter_var($v, FILTER_VALIDATE_EMAIL);
+            });
+        }
+
         // Process AbuseIPDB settings
         if (array_key_exists('abuseipdb_settings', $this->request->post)) {
             $abuseipdb = $this->request->post['abuseipdb_settings'];

@@ -1705,7 +1705,24 @@ function normalize_spam_report_error($error_msg) {
         'AbuseIPDB validation error' => 'AbuseIPDB validation error. Please check your API key and configuration.',
         'AbuseIPDB error' => 'An error occurred while reporting to AbuseIPDB. Please try again later.',
         'Invalid response from AbuseIPDB' => 'Invalid response from AbuseIPDB. Please try again later.',
-        'cURL error' => 'Failed to connect to AbuseIPDB. Please check your internet connection.'
+        'cURL error' => 'Failed to connect to AbuseIPDB. Please check your internet connection.',
+        
+        // APWG error mappings
+        'APWG reporting is not enabled' => 'APWG reporting is not enabled. Please enable it in Settings.',
+        'No sender email address configured' => 'No sender email address configured. Please configure it in Settings.',
+        'Failed to send email to APWG' => 'Failed to send email to APWG. Please check your server mail configuration.',
+        'send email to APWG' => 'Failed to send email to APWG. Please check your server mail configuration.',
+        'SMTP error' => 'Failed to send email to APWG. The SMTP server did not accept the message. Please check your SMTP configuration.',
+        'SMTP server did not confirm delivery' => 'Failed to send email to APWG. The SMTP server did not confirm delivery (expected 250 OK response). Please try again later.',
+        'SMTP server did not accept' => 'Failed to send email to APWG. The SMTP server did not accept the message for delivery. Please check your SMTP configuration.',
+        'RCPT command failed' => 'Failed to send email to APWG. The recipient address may be invalid or rejected by the SMTP server.',
+        'DATA command failed' => 'Failed to send email to APWG. The SMTP server did not accept the message data. Please try again later.',
+        '250' => 'Email was successfully sent to APWG (250 OK response received).',
+        '550' => 'Failed to send email to APWG. The recipient address was rejected by the mail server (550 error).',
+        '551' => 'Failed to send email to APWG. The recipient address does not exist (551 error).',
+        '552' => 'Failed to send email to APWG. The mail server rejected the message due to size limits (552 error).',
+        '553' => 'Failed to send email to APWG. The recipient address format is invalid (553 error).',
+        '554' => 'Failed to send email to APWG. The mail server rejected the message (554 error).'
     );
     
     foreach ($error_mappings as $key => $message) {
@@ -1937,6 +1954,223 @@ function report_spam_to_spamcop($message_source, $reasons, $user_config, $sessio
         ini_set('default_socket_timeout', $old_timeout);
         if (defined('DEBUG_MODE') && DEBUG_MODE) {
             Hm_Debug::add(sprintf('SpamCop: Exception in mail(): %s', $e->getMessage()), 'error');
+        }
+        return array('success' => false, 'error' => $e->getMessage());
+    }
+}}
+
+/**
+ * Report phishing message to APWG (Anti-Phishing Working Group)
+ * Uses authenticated SMTP to ensure proper SPF/DKIM validation
+ * Must use the exact email address from the IMAP server where the message is located
+ */
+if (!hm_exists('report_spam_to_apwg')) {
+function report_spam_to_apwg($message_source, $reasons, $user_config, $session = null, $imap_server_email = '') {
+    $apwg_enabled = $user_config->get('apwg_enabled_setting', false);
+    if (!$apwg_enabled) {
+        return array('success' => false, 'error' => 'APWG reporting is not enabled');
+    }
+
+    $apwg_email = 'reportphishing@apwg.org';
+
+    $sanitized_message = sanitize_message_for_spam_report($message_source, $user_config);
+
+    $from_email = $user_config->get('apwg_from_email_setting', '');
+    if (empty($from_email)) {
+        $from_email = $imap_server_email;
+    }
+
+    if (empty($from_email)) {
+        return array('success' => false, 'error' => 'No sender email address configured');
+    }
+
+    $subject = 'Phishing Report';
+
+    if (!class_exists('Hm_MIME_Msg')) {
+        $mime_file = (defined('APP_PATH') ? APP_PATH : dirname(__FILE__) . '/../') . 'modules/smtp/hm-mime-message.php';
+        if (file_exists($mime_file)) {
+            require_once $mime_file;
+        } else {
+            return array('success' => false, 'error' => 'SMTP module required for APWG reporting. Please enable the SMTP module.');
+        }
+    }
+
+    $file_dir = $user_config->get('attachment_dir', sys_get_temp_dir());
+    if (!is_dir($file_dir)) {
+        $file_dir = sys_get_temp_dir();
+    }
+
+    if ($file_dir !== sys_get_temp_dir() && $session) {
+        $user_dir = $file_dir . DIRECTORY_SEPARATOR . md5($session->get('username', 'default'));
+        if (!is_dir($user_dir)) {
+            @mkdir($user_dir, 0755, true);
+        }
+        $file_dir = $user_dir;
+    }
+    $temp_file = tempnam($file_dir, 'apwg_');
+    
+    if (class_exists('Hm_Crypt') && class_exists('Hm_Request_Key')) {
+        $encrypted_content = Hm_Crypt::ciphertext($sanitized_message, Hm_Request_Key::generate());
+        file_put_contents($temp_file, $encrypted_content);
+    } else {
+        file_put_contents($temp_file, $sanitized_message);
+    }
+    
+    $body = '';
+    $mime = new Hm_MIME_Msg($apwg_email, $subject, $body, $from_email, false, '', '', '', '', $from_email);
+    
+    $attachment = array(
+        'name' => 'phishing.eml',
+        'type' => 'message/rfc822',
+        'size' => strlen($sanitized_message),
+        'filename' => $temp_file
+    );
+    
+    $mime->add_attachments(array($attachment));
+
+    $mime_message = $mime->get_mime_msg();
+    
+    $mime_message = preg_replace('/\r\n\r\n+/', "\r\n\r\n", $mime_message);
+    
+    $parts = explode("\r\n\r\n", $mime_message, 2);
+    $mime_body = isset($parts[1]) ? $parts[1] : '';
+    
+    $boundary = '';
+    if (preg_match('/^--([A-Za-z0-9]+)/m', $mime_body, $boundary_match)) {
+        $boundary = $boundary_match[1];
+    }
+    
+    if (!empty($boundary)) {
+        $pattern = '/(--' . preg_quote($boundary, '/') . '\r\nContent-Type: message\/rfc822[^\r\n]*\r\n(?:[^\r\n]*\r\n)*?Content-Transfer-Encoding: )7bit(\r\n\r\n)(.*?)(\r\n--' . preg_quote($boundary, '/') . '(?:--)?)/s';
+        
+        if (preg_match($pattern, $mime_message, $matches)) {
+            $attachment_content = rtrim($matches[3], "\r\n");
+            $encoded_content = chunk_split(base64_encode($attachment_content));
+            $mime_message = preg_replace($pattern, '$1base64$2' . $encoded_content . '$4', $mime_message);
+        } elseif (defined('DEBUG_MODE') && DEBUG_MODE) {
+            Hm_Debug::add('APWG: Warning - Could not fix encoding from 7bit to base64', 'warning');
+        }
+    }
+    
+    @unlink($temp_file);
+    
+    $parts = explode("\r\n\r\n", $mime_message, 2);
+    $all_headers = isset($parts[0]) ? $parts[0] : '';
+    $mime_body = isset($parts[1]) ? $parts[1] : '';
+    
+    if (empty($boundary) && preg_match('/^--([A-Za-z0-9]+)/m', $mime_body, $boundary_match)) {
+        $boundary = $boundary_match[1];
+    }
+    
+    $headers = array();
+    $header_lines = explode("\r\n", $all_headers);
+    foreach ($header_lines as $line) {
+        if (preg_match('/^(From|Reply-To|MIME-Version|Content-Type):/i', $line)) {
+            if (preg_match('/^Content-Type:/i', $line) && !empty($boundary)) {
+                $headers[] = 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
+            } else {
+                $headers[] = $line;
+            }
+        }
+    }
+    
+    if (!class_exists('Hm_SMTP_List')) {
+        $smtp_file = (defined('APP_PATH') ? APP_PATH : dirname(__FILE__) . '/../') . 'modules/smtp/hm-smtp.php';
+        if (file_exists($smtp_file)) {
+            require_once $smtp_file;
+        }
+    }
+    
+    if ($session !== null && class_exists('Hm_SMTP_List')) {
+        try {
+            Hm_SMTP_List::init($user_config, $session);
+            
+            $smtp_servers = Hm_SMTP_List::dump();
+            $smtp_id = false;
+            foreach ($smtp_servers as $id => $server) {
+                if (isset($server['user']) && strtolower(trim($server['user'])) === strtolower(trim($from_email))) {
+                    $smtp_id = $id;
+                    break;
+                }
+            }
+            
+            if ($smtp_id === false && !empty($smtp_servers)) {
+                $smtp_id = key($smtp_servers);
+            }
+            
+            if ($smtp_id !== false) {
+                $mailbox = Hm_SMTP_List::connect($smtp_id, false);
+                if ($mailbox && $mailbox->authed()) {
+                    $smtp_headers = array();
+                    $smtp_headers[] = 'From: ' . $from_email;
+                    $smtp_headers[] = 'Reply-To: ' . $from_email;
+                    $smtp_headers[] = 'To: ' . $apwg_email;
+                    $smtp_headers[] = 'Subject: ' . $subject;
+                    $smtp_headers[] = 'MIME-Version: 1.0';
+                    if (!empty($boundary)) {
+                        $smtp_headers[] = 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
+                    }
+                    $smtp_headers[] = 'Date: ' . date('r');
+                    $smtp_headers[] = 'Message-ID: <' . md5(uniqid(rand(), true)) . '@' . php_uname('n') . '>';
+                    
+                    $smtp_message = implode("\r\n", $smtp_headers) . "\r\n\r\n" . $mime_body;
+                    
+                    $err_msg = $mailbox->send_message($from_email, array($apwg_email), $smtp_message);
+                    
+                    if ($err_msg === false) {
+                        // 250 OK response - APWG mail server accepted the email for delivery
+                        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                            Hm_Debug::add('APWG: Email accepted by SMTP server (250 OK)', 'info');
+                        }
+                        return array('success' => true);
+                    } else {
+                        // SMTP error - log the response for debugging
+                        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                            Hm_Debug::add(sprintf('APWG: SMTP send failed: %s', $err_msg), 'warning');
+                        }
+                        // Return error with SMTP response details
+                        return array('success' => false, 'error' => sprintf('Failed to send email to APWG. SMTP error: %s', $err_msg));
+                    }
+                } elseif (defined('DEBUG_MODE') && DEBUG_MODE) {
+                    Hm_Debug::add(sprintf('APWG: SMTP connection failed for server ID %s', $smtp_id), 'warning');
+                }
+            }
+        } catch (Exception $e) {
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                Hm_Debug::add(sprintf('APWG: SMTP exception: %s', $e->getMessage()), 'error');
+            }
+        }
+    }
+    
+    $timeout = 10;
+    $old_timeout = ini_get('default_socket_timeout');
+    ini_set('default_socket_timeout', $timeout);
+
+    try {
+        $mail_sent = @mail($apwg_email, $subject, $mime_body, implode("\r\n", $headers));
+        
+        ini_set('default_socket_timeout', $old_timeout);
+        
+        if ($mail_sent) {
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                Hm_Debug::add('APWG: mail() function returned true (delivery status unknown - no SMTP response available)', 'info');
+            }
+            return array('success' => true);
+        } else {
+            $error = 'Failed to send email to APWG. Please ensure your server has valid SPF/DKIM records or configure an SMTP server.';
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                Hm_Debug::add('APWG: mail() function returned false', 'error');
+                $last_error = error_get_last();
+                if ($last_error) {
+                    Hm_Debug::add(sprintf('APWG: PHP error: %s', $last_error['message']), 'error');
+                }
+            }
+            return array('success' => false, 'error' => $error);
+        }
+    } catch (Exception $e) {
+        ini_set('default_socket_timeout', $old_timeout);
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            Hm_Debug::add(sprintf('APWG: Exception in mail(): %s', $e->getMessage()), 'error');
         }
         return array('success' => false, 'error' => $e->getMessage());
     }

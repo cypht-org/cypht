@@ -2397,6 +2397,39 @@ class Hm_Output_abuseipdb_enabled_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option to enable/disable APWG phishing reporting
+ * @subpackage core/output
+ */
+class Hm_Output_apwg_enabled_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enabled = get_setting_value($settings, 'apwg_enabled', false);
+        $checked = $enabled ? ' checked="checked"' : '';
+        $reset = $enabled ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>' : '';
+        
+        return '<tr class="report_spam_setting"><td><label class="form-check-label" for="apwg_enabled">'.
+            $this->trans('Enable APWG phishing reporting').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="apwg_enabled" name="apwg_settings[enabled]" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option for APWG from email address
+ * @subpackage core/output
+ */
+class Hm_Output_apwg_from_email_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $email = get_setting_value($settings, 'apwg_from_email', '');
+        $reset = !empty($email) ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>' : '';
+        
+        return '<tr class="report_spam_setting"><td><label for="apwg_from_email">'.
+            $this->trans('From email address (optional)').'</label></td>'.
+            '<td class="d-flex"><input class="form-control form-control-sm" type="email" id="apwg_from_email" name="apwg_settings[from_email]" value="'.$this->html_safe($email).'" placeholder="'.$this->trans('Uses your IMAP email if not set').'" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
  * Option for AbuseIPDB API key
  * @subpackage core/output
  */

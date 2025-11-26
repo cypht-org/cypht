@@ -106,7 +106,9 @@ add_output('settings', 'start_report_spam_settings', true, 'core', 'drafts_sourc
 add_output('settings', 'spamcop_enabled_setting', true, 'core', 'start_report_spam_settings', 'after');
 add_output('settings', 'spamcop_submission_email_setting', true, 'core', 'spamcop_enabled_setting', 'after');
 add_output('settings', 'spamcop_from_email_setting', true, 'core', 'spamcop_submission_email_setting', 'after');
-add_output('settings', 'abuseipdb_enabled_setting', true, 'core', 'spamcop_from_email_setting', 'after');
+add_output('settings', 'apwg_enabled_setting', true, 'core', 'spamcop_from_email_setting', 'after');
+add_output('settings', 'apwg_from_email_setting', true, 'core', 'apwg_enabled_setting', 'after');
+add_output('settings', 'abuseipdb_enabled_setting', true, 'core', 'apwg_from_email_setting', 'after');
 add_output('settings', 'abuseipdb_api_key_setting', true, 'core', 'abuseipdb_enabled_setting', 'after');
 add_output('settings', 'start_everything_settings', true, 'core', 'abuseipdb_api_key_setting', 'after');
 add_output('settings', 'all_since_setting', true, 'core', 'start_everything_settings', 'after');
@@ -368,6 +370,7 @@ return array(
         'images_whitelist' => FILTER_UNSAFE_RAW,
         'update' => FILTER_VALIDATE_BOOLEAN,
         'spamcop_settings' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FORCE_ARRAY),
+        'apwg_settings' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FORCE_ARRAY),
         'abuseipdb_settings' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FORCE_ARRAY),
     )
 );

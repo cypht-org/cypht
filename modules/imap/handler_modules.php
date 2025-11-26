@@ -2236,11 +2236,16 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
         $services_to_report = array();
         $service_names = array(
             'spamcop' => 'SpamCop',
+            'apwg' => 'APWG',
             'abuseipdb' => 'AbuseIPDB'
         );
 
         if ($this->user_config->get('spamcop_enabled_setting', false)) {
             $services_to_report[] = 'spamcop';
+        }
+
+        if ($this->user_config->get('apwg_enabled_setting', false)) {
+            $services_to_report[] = 'apwg';
         }
 
         if ($this->user_config->get('abuseipdb_enabled_setting', false)) {
