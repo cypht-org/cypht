@@ -1207,3 +1207,31 @@ class Hm_Handler_privacy_settings extends Hm_Handler_Module {
         }
     }
 }
+
+class Hm_Handler_version_upgrade_checker extends Hm_Handler_Module {
+
+    public function process()
+    {
+        if ($this->session->get('latest_version')) {
+            $latestVersion = $this->session->get('latest_version');
+        } else {
+            $api = new Hm_API_Curl();
+            $data = $api->command('https://api.github.com/repos/cypht-org/cypht/releases');
+
+            if ($api->last_status == 200) {
+                $latestRelease = reset($data);
+                $latestVersion = substr($latestRelease['tag_name'], 1);
+
+                $this->session->set('latest_version', $latestVersion);
+            }
+        }
+
+        if (version_compare(CYPHT_VERSION, $latestVersion, '<')) {
+            $needUpgrade = true;
+        } else {
+            $needUpgrade = false;
+        }
+        $this->out('need_upgrade', $needUpgrade);
+        $this->out('latest_version', $latestVersion);
+    }
+}

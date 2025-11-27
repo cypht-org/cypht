@@ -8,7 +8,7 @@ output_source('keyboard_shortcuts');
 setup_base_page('shortcuts', 'core');
 add_handler('shortcuts', 'load_edit_id', true, 'keyboard_shortcuts', 'load_keyboard_shortcuts', 'after');
 add_handler('shortcuts', 'process_edit_shortcut', true, 'keyboard_shortcuts', 'load_edit_id', 'after');
-add_output('shortcuts', 'start_shortcuts_page', true, 'keyboard_shortcuts', 'content_section_start', 'after');
+add_output('shortcuts', 'start_shortcuts_page', true, 'keyboard_shortcuts', 'version_upgrade_checker', 'after');
 add_output('shortcuts', 'shortcut_edit_form', true, 'keyboard_shortcuts', 'start_shortcuts_page', 'after');
 add_output('shortcuts', 'shortcuts_content', true, 'keyboard_shortcuts', 'shortcut_edit_form', 'after');
 
