@@ -616,7 +616,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         $enable_snooze = $settings['enable_snooze'] ?? DEFAULT_ENABLE_SNOOZE;
         $enable_collect_address_on_send = $settings['enable_collect_address_on_send_setting'] ?? DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND;
-        $specialFolders = $settings['special_imap_folders'];
+        $specialFolders = $settings['special_imap_folders'] ?? array();
         $formattedSpecialFolders = [];
         foreach ($specialFolders as $serverId => $folders) {
             $formattedSpecialFolders[$serverId] = [];
