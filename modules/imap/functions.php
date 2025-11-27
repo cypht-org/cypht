@@ -1735,6 +1735,252 @@ function normalize_spam_report_error($error_msg) {
 }}
 
 /**
+ * Create temporary file for spam report attachment
+ * @param string $sanitized_message The sanitized message content
+ * @param object $user_config User configuration object
+ * @param object $session Session object
+ * @param string $prefix File prefix (e.g., 'spamcop_' or 'apwg_')
+ * @return string Path to temporary file
+ */
+if (!hm_exists('create_spam_report_temp_file')) {
+function create_spam_report_temp_file($sanitized_message, $user_config, $session, $prefix) {
+    $file_dir = $user_config->get('attachment_dir', sys_get_temp_dir());
+    if (!is_dir($file_dir)) {
+        $file_dir = sys_get_temp_dir();
+    }
+
+    if ($file_dir !== sys_get_temp_dir() && $session) {
+        $user_dir = $file_dir . DIRECTORY_SEPARATOR . md5($session->get('username', 'default'));
+        if (!is_dir($user_dir)) {
+            @mkdir($user_dir, 0755, true);
+        }
+        $file_dir = $user_dir;
+    }
+    $temp_file = tempnam($file_dir, $prefix);
+    
+    if (class_exists('Hm_Crypt') && class_exists('Hm_Request_Key')) {
+        $encrypted_content = Hm_Crypt::ciphertext($sanitized_message, Hm_Request_Key::generate());
+        file_put_contents($temp_file, $encrypted_content);
+    } else {
+        file_put_contents($temp_file, $sanitized_message);
+    }
+    
+    return $temp_file;
+}}
+
+/**
+ * Fix encoding from 7bit to base64 for message/rfc822 attachment and extract boundary
+ * @param string $mime_message The MIME message
+ * @param string $service_name Service name for debug messages (e.g., 'SpamCop' or 'APWG')
+ * @return array Array with 'mime_message', 'mime_body', and 'boundary'
+ */
+if (!hm_exists('fix_spam_report_encoding')) {
+function fix_spam_report_encoding($mime_message, $service_name) {
+    // Extract boundary and fix encoding (Hm_MIME_Msg uses 7bit for message/rfc822, requires base64)
+    $parts = explode("\r\n\r\n", $mime_message, 2);
+    $mime_body = isset($parts[1]) ? $parts[1] : '';
+    
+    // Extract boundary from body (Hm_MIME_Msg creates its own boundary)
+    $boundary = '';
+    if (preg_match('/^--([A-Za-z0-9]+)/m', $mime_body, $boundary_match)) {
+        $boundary = $boundary_match[1];
+    }
+    
+    // Fix encoding from 7bit to base64 for message/rfc822 attachment
+    if (!empty($boundary)) {
+        $pattern = '/(--' . preg_quote($boundary, '/') . '\r\nContent-Type: message\/rfc822[^\r\n]*\r\n(?:[^\r\n]*\r\n)*?Content-Transfer-Encoding: )7bit(\r\n\r\n)(.*?)(\r\n--' . preg_quote($boundary, '/') . '(?:--)?)/s';
+        
+        if (preg_match($pattern, $mime_message, $matches)) {
+            $attachment_content = rtrim($matches[3], "\r\n");
+            $encoded_content = chunk_split(base64_encode($attachment_content));
+            $mime_message = preg_replace($pattern, '$1base64$2' . $encoded_content . '$4', $mime_message);
+        } elseif (defined('DEBUG_MODE') && DEBUG_MODE) {
+            Hm_Debug::add(sprintf('%s: Warning - Could not fix encoding from 7bit to base64', $service_name), 'warning');
+        }
+    }
+    
+    // Extract headers and body after encoding fix
+    $parts = explode("\r\n\r\n", $mime_message, 2);
+    $mime_body = isset($parts[1]) ? $parts[1] : '';
+    
+    // Extract boundary again if needed (after encoding fix)
+    if (empty($boundary) && preg_match('/^--([A-Za-z0-9]+)/m', $mime_body, $boundary_match)) {
+        $boundary = $boundary_match[1];
+    }
+    
+    return array(
+        'mime_message' => $mime_message,
+        'mime_body' => $mime_body,
+        'boundary' => $boundary
+    );
+}}
+
+/**
+ * Extract headers array from MIME message for mail() function
+ * @param string $mime_message The complete MIME message
+ * @param string $boundary The MIME boundary
+ * @return array Headers array for mail() function
+ */
+if (!hm_exists('extract_spam_report_headers')) {
+function extract_spam_report_headers($mime_message, $boundary) {
+    $parts = explode("\r\n\r\n", $mime_message, 2);
+    $all_headers = isset($parts[0]) ? $parts[0] : '';
+    
+    $headers = array();
+    $header_lines = explode("\r\n", $all_headers);
+    foreach ($header_lines as $line) {
+        if (preg_match('/^(From|Reply-To|MIME-Version|Content-Type):/i', $line)) {
+            // Update Content-Type with correct boundary if we have it
+            if (preg_match('/^Content-Type:/i', $line) && !empty($boundary)) {
+                $headers[] = 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
+            } else {
+                $headers[] = $line;
+            }
+        }
+    }
+    
+    return $headers;
+}}
+
+/**
+ * Send spam report via authenticated SMTP
+ * @param string $from_email Sender email address
+ * @param string $to_email Recipient email address
+ * @param string $subject Email subject
+ * @param string $mime_body MIME message body
+ * @param string $boundary MIME boundary
+ * @param object $user_config User configuration object
+ * @param object $session Session object
+ * @param string $service_name Service name for logging (e.g., 'SpamCop' or 'APWG')
+ * @param bool $use_fallback_smtp Whether to use fallback SMTP server if exact match not found
+ * @return array|false Array with 'success' and optional 'error', or false if SMTP not available
+ */
+if (!hm_exists('send_spam_report_via_smtp')) {
+function send_spam_report_via_smtp($from_email, $to_email, $subject, $mime_body, $boundary, $user_config, $session, $service_name, $use_fallback_smtp = false) {
+    if (!class_exists('Hm_SMTP_List')) {
+        $smtp_file = (defined('APP_PATH') ? APP_PATH : dirname(__FILE__) . '/../') . 'modules/smtp/hm-smtp.php';
+        if (file_exists($smtp_file)) {
+            require_once $smtp_file;
+        } else {
+            return false;
+        }
+    }
+    
+    if ($session === null || !class_exists('Hm_SMTP_List')) {
+        return false;
+    }
+    
+    try {
+        Hm_SMTP_List::init($user_config, $session);
+        $smtp_servers = Hm_SMTP_List::dump();
+        $smtp_id = false;
+        foreach ($smtp_servers as $id => $server) {
+            if (isset($server['user']) && strtolower(trim($server['user'])) === strtolower(trim($from_email))) {
+                $smtp_id = $id;
+                break;
+            }
+        }
+        
+        if ($use_fallback_smtp && $smtp_id === false && !empty($smtp_servers)) {
+            $smtp_id = key($smtp_servers);
+        }
+        
+        if ($smtp_id !== false) {
+            $mailbox = Hm_SMTP_List::connect($smtp_id, false);
+            if ($mailbox && $mailbox->authed()) {
+                $smtp_headers = array();
+                $smtp_headers[] = 'From: ' . $from_email;
+                $smtp_headers[] = 'Reply-To: ' . $from_email;
+                $smtp_headers[] = 'To: ' . $to_email;
+                $smtp_headers[] = 'Subject: ' . $subject;
+                $smtp_headers[] = 'MIME-Version: 1.0';
+                if (!empty($boundary)) {
+                    $smtp_headers[] = 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
+                }
+                $smtp_headers[] = 'Date: ' . date('r');
+                $smtp_headers[] = 'Message-ID: <' . md5(uniqid(rand(), true)) . '@' . php_uname('n') . '>';
+                
+                $smtp_message = implode("\r\n", $smtp_headers) . "\r\n\r\n" . $mime_body;
+                
+                $err_msg = $mailbox->send_message($from_email, array($to_email), $smtp_message);
+                
+                if ($err_msg === false) {
+                    // 250 OK response - mail server accepted the email for delivery
+                    if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                        if ($service_name === 'APWG') {
+                            Hm_Debug::add(sprintf('%s: Email accepted by SMTP server (250 OK)', $service_name), 'info');
+                        }
+                    }
+                    return array('success' => true);
+                } else {
+                    if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                        Hm_Debug::add(sprintf('%s: SMTP send failed: %s', $service_name, $err_msg), 'warning');
+                    }
+                    return false;
+                }
+            } elseif (defined('DEBUG_MODE') && DEBUG_MODE) {
+                Hm_Debug::add(sprintf('%s: SMTP connection failed for server ID %s', $service_name, $smtp_id), 'warning');
+            }
+        }
+    } catch (Exception $e) {
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            Hm_Debug::add(sprintf('%s: SMTP exception: %s', $service_name, $e->getMessage()), 'error');
+        }
+    }
+    
+    return false;
+}}
+
+/**
+ * Send spam report via PHP mail() function (fallback)
+ * @param string $to_email Recipient email address
+ * @param string $subject Email subject
+ * @param string $mime_body MIME message body
+ * @param array $headers Headers array for mail() function
+ * @param string $service_name Service name for logging (e.g., 'SpamCop' or 'APWG')
+ * @return array Array with 'success' and optional 'error'
+ */
+if (!hm_exists('send_spam_report_via_mail')) {
+function send_spam_report_via_mail($to_email, $subject, $mime_body, $headers, $service_name) {
+    $timeout = 10;
+    $old_timeout = ini_get('default_socket_timeout');
+    ini_set('default_socket_timeout', $timeout);
+    
+    try {
+        $mail_sent = @mail($to_email, $subject, $mime_body, implode("\r\n", $headers));
+        
+        ini_set('default_socket_timeout', $old_timeout);
+        
+        if ($mail_sent) {
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                if ($service_name === 'APWG') {
+                    Hm_Debug::add(sprintf('%s: mail() function returned true (delivery status unknown - no SMTP response available)', $service_name), 'info');
+                }
+            }
+            return array('success' => true);
+        } else {
+            $error = sprintf('Failed to send email to %s. Please ensure your server has valid SPF/DKIM records or configure an SMTP server.', $service_name);
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                Hm_Debug::add(sprintf('%s: mail() function failed', $service_name), 'error');
+                if ($service_name === 'APWG') {
+                    $last_error = error_get_last();
+                    if ($last_error) {
+                        Hm_Debug::add(sprintf('%s: PHP error: %s', $service_name, $last_error['message']), 'error');
+                    }
+                }
+            }
+            return array('success' => false, 'error' => $error);
+        }
+    } catch (Exception $e) {
+        ini_set('default_socket_timeout', $old_timeout);
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            Hm_Debug::add(sprintf('%s: Exception in mail(): %s', $service_name, $e->getMessage()), 'error');
+        }
+        return array('success' => false, 'error' => $e->getMessage());
+    }
+}}
+
+/**
  * Report spam message to SpamCop
  * Uses authenticated SMTP to ensure proper SPF/DKIM validation
  * Must use the exact email address from the IMAP server where the message is located
@@ -1758,10 +2004,8 @@ function report_spam_to_spamcop($message_source, $reasons, $user_config, $sessio
     if (!empty($imap_server_email)) {
         $from_email = $imap_server_email;
     } else {
-        // Fallback: try to get from spamcop_from_email_setting
         $from_email = $user_config->get('spamcop_from_email_setting', '');
         if (empty($from_email)) {
-            // or else get from the first IMAP server
             $imap_servers = $user_config->get('imap_servers', array());
             if (!empty($imap_servers)) {
                 $first_server = reset($imap_servers);
@@ -1785,30 +2029,9 @@ function report_spam_to_spamcop($message_source, $reasons, $user_config, $sessio
         }
     }
     
-    // Create temporary file for the spam message attachment
-    $file_dir = $user_config->get('attachment_dir', sys_get_temp_dir());
-    if (!is_dir($file_dir)) {
-        $file_dir = sys_get_temp_dir();
-    }
-    // Create subdirectory for user if using attachment_dir
-    if ($file_dir !== sys_get_temp_dir() && $session) {
-        $user_dir = $file_dir . DIRECTORY_SEPARATOR . md5($session->get('username', 'default'));
-        if (!is_dir($user_dir)) {
-            @mkdir($user_dir, 0755, true);
-        }
-        $file_dir = $user_dir;
-    }
-    $temp_file = tempnam($file_dir, 'spamcop_');
+    // temporary file for the spam message attachment
+    $temp_file = create_spam_report_temp_file($sanitized_message, $user_config, $session, 'spamcop_');
     
-    // format it like forward as attachment does
-    if (class_exists('Hm_Crypt') && class_exists('Hm_Request_Key')) {
-        $encrypted_content = Hm_Crypt::ciphertext($sanitized_message, Hm_Request_Key::generate());
-        file_put_contents($temp_file, $encrypted_content);
-    } else {
-        file_put_contents($temp_file, $sanitized_message);
-    }
-    
-    // Build MIME message
     $body = '';
     $mime = new Hm_MIME_Msg($spamcop_email, $subject, $body, $from_email, false, '', '', '', '', $from_email);
     
@@ -1827,136 +2050,21 @@ function report_spam_to_spamcop($message_source, $reasons, $user_config, $sessio
     $mime_message = preg_replace('/^X-Mailer:.*$/mi', '', $mime_message);
     $mime_message = preg_replace('/\r\n\r\n+/', "\r\n\r\n", $mime_message); // Clean up extra blank lines
     
-    // Extract boundary and fix encoding (Hm_MIME_Msg uses 7bit for message/rfc822, SpamCop requires base64)
-    $parts = explode("\r\n\r\n", $mime_message, 2);
-    $mime_body = isset($parts[1]) ? $parts[1] : '';
-    
-    // Extract boundary from body (Hm_MIME_Msg creates its own boundary)
-    $boundary = '';
-    if (preg_match('/^--([A-Za-z0-9]+)/m', $mime_body, $boundary_match)) {
-        $boundary = $boundary_match[1];
-    }
-    
-    // Fix encoding from 7bit to base64 for message/rfc822 attachment
-    if (!empty($boundary)) {
-        $pattern = '/(--' . preg_quote($boundary, '/') . '\r\nContent-Type: message\/rfc822[^\r\n]*\r\n(?:[^\r\n]*\r\n)*?Content-Transfer-Encoding: )7bit(\r\n\r\n)(.*?)(\r\n--' . preg_quote($boundary, '/') . '(?:--)?)/s';
-        
-        if (preg_match($pattern, $mime_message, $matches)) {
-            $attachment_content = rtrim($matches[3], "\r\n");
-            $encoded_content = chunk_split(base64_encode($attachment_content));
-            $mime_message = preg_replace($pattern, '$1base64$2' . $encoded_content . '$4', $mime_message);
-        } elseif (defined('DEBUG_MODE') && DEBUG_MODE) {
-            Hm_Debug::add('SpamCop: Warning - Could not fix encoding from 7bit to base64', 'warning');
-        }
-    }
+    $encoding_result = fix_spam_report_encoding($mime_message, 'SpamCop');
+    $mime_message = $encoding_result['mime_message'];
+    $mime_body = $encoding_result['mime_body'];
+    $boundary = $encoding_result['boundary'];
     
     @unlink($temp_file);
     
-    $parts = explode("\r\n\r\n", $mime_message, 2);
-    $all_headers = isset($parts[0]) ? $parts[0] : '';
-    $mime_body = isset($parts[1]) ? $parts[1] : '';
-    
-    // Extract boundary again if needed (after encoding fix)
-    if (empty($boundary) && preg_match('/^--([A-Za-z0-9]+)/m', $mime_body, $boundary_match)) {
-        $boundary = $boundary_match[1];
-    }
-
-    $headers = array();
-    $header_lines = explode("\r\n", $all_headers);
-    foreach ($header_lines as $line) {
-        if (preg_match('/^(From|Reply-To|MIME-Version|Content-Type):/i', $line)) {
-            if (preg_match('/^Content-Type:/i', $line) && !empty($boundary)) {
-                $headers[] = 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
-            } else {
-                $headers[] = $line;
-            }
-        }
-    }
-
-    if (!class_exists('Hm_SMTP_List')) {
-        $smtp_file = (defined('APP_PATH') ? APP_PATH : dirname(__FILE__) . '/../') . 'modules/smtp/hm-smtp.php';
-        if (file_exists($smtp_file)) {
-            require_once $smtp_file;
-        }
+    $headers = extract_spam_report_headers($mime_message, $boundary);
+  
+    $smtp_result = send_spam_report_via_smtp($from_email, $spamcop_email, $subject, $mime_body, $boundary, $user_config, $session, 'SpamCop', false);
+    if ($smtp_result !== false) {
+        return $smtp_result;
     }
     
-    if ($session !== null && class_exists('Hm_SMTP_List')) {
-        try {
-            Hm_SMTP_List::init($user_config, $session);
-            $smtp_servers = Hm_SMTP_List::dump();
-            $smtp_id = false;
-            foreach ($smtp_servers as $id => $server) {
-                if (isset($server['user']) && strtolower(trim($server['user'])) === strtolower(trim($from_email))) {
-                    $smtp_id = $id;
-                    break;
-                }
-            }
-
-            // if ($smtp_id === false && !empty($smtp_servers)) {
-            //     $smtp_id = key($smtp_servers);
-            // }
-            
-            if ($smtp_id !== false) {
-                $mailbox = Hm_SMTP_List::connect($smtp_id, false);
-                if ($mailbox && $mailbox->authed()) {
-                    $smtp_headers = array();
-                    $smtp_headers[] = 'From: ' . $from_email;
-                    $smtp_headers[] = 'Reply-To: ' . $from_email;
-                    $smtp_headers[] = 'To: ' . $spamcop_email;
-                    $smtp_headers[] = 'Subject: ' . $subject;
-                    $smtp_headers[] = 'MIME-Version: 1.0';
-                    if (!empty($boundary)) {
-                        $smtp_headers[] = 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
-                    }
-                    $smtp_headers[] = 'Date: ' . date('r');
-                    $smtp_headers[] = 'Message-ID: <' . md5(uniqid(rand(), true)) . '@' . php_uname('n') . '>';
-                    
-                    $smtp_message = implode("\r\n", $smtp_headers) . "\r\n\r\n" . $mime_body;
-                    
-                    $err_msg = $mailbox->send_message($from_email, array($spamcop_email), $smtp_message);
-                    
-                    if ($err_msg === false) {
-                        return array('success' => true);
-                    } elseif (defined('DEBUG_MODE') && DEBUG_MODE) {
-                        Hm_Debug::add(sprintf('SpamCop: SMTP send failed: %s', $err_msg), 'warning');
-                    }
-                } elseif (defined('DEBUG_MODE') && DEBUG_MODE) {
-                    Hm_Debug::add(sprintf('SpamCop: SMTP connection failed for server ID %s', $smtp_id), 'warning');
-                }
-            }
-        } catch (Exception $e) {
-            if (defined('DEBUG_MODE') && DEBUG_MODE) {
-                Hm_Debug::add(sprintf('SpamCop: SMTP exception: %s', $e->getMessage()), 'error');
-            }
-        }
-    }
-    
-    // Fallback to mail() if SMTP is not available
-    $timeout = 10;
-    $old_timeout = ini_get('default_socket_timeout');
-    ini_set('default_socket_timeout', $timeout);
-
-    try {
-        $mail_sent = @mail($spamcop_email, $subject, $mime_body, implode("\r\n", $headers));
-        
-        ini_set('default_socket_timeout', $old_timeout);
-        
-        if ($mail_sent) {
-            return array('success' => true);
-        } else {
-            $error = 'Failed to send email to SpamCop. Please ensure your server has valid SPF/DKIM records or configure an SMTP server.';
-            if (defined('DEBUG_MODE') && DEBUG_MODE) {
-                Hm_Debug::add('SpamCop: mail() function failed', 'error');
-            }
-            return array('success' => false, 'error' => $error);
-        }
-    } catch (Exception $e) {
-        ini_set('default_socket_timeout', $old_timeout);
-        if (defined('DEBUG_MODE') && DEBUG_MODE) {
-            Hm_Debug::add(sprintf('SpamCop: Exception in mail(): %s', $e->getMessage()), 'error');
-        }
-        return array('success' => false, 'error' => $e->getMessage());
-    }
+    return send_spam_report_via_mail($spamcop_email, $subject, $mime_body, $headers, 'SpamCop');
 }}
 
 /**
@@ -1995,26 +2103,7 @@ function report_spam_to_apwg($message_source, $reasons, $user_config, $session =
         }
     }
 
-    $file_dir = $user_config->get('attachment_dir', sys_get_temp_dir());
-    if (!is_dir($file_dir)) {
-        $file_dir = sys_get_temp_dir();
-    }
-
-    if ($file_dir !== sys_get_temp_dir() && $session) {
-        $user_dir = $file_dir . DIRECTORY_SEPARATOR . md5($session->get('username', 'default'));
-        if (!is_dir($user_dir)) {
-            @mkdir($user_dir, 0755, true);
-        }
-        $file_dir = $user_dir;
-    }
-    $temp_file = tempnam($file_dir, 'apwg_');
-    
-    if (class_exists('Hm_Crypt') && class_exists('Hm_Request_Key')) {
-        $encrypted_content = Hm_Crypt::ciphertext($sanitized_message, Hm_Request_Key::generate());
-        file_put_contents($temp_file, $encrypted_content);
-    } else {
-        file_put_contents($temp_file, $sanitized_message);
-    }
+    $temp_file = create_spam_report_temp_file($sanitized_message, $user_config, $session, 'apwg_');
     
     $body = '';
     $mime = new Hm_MIME_Msg($apwg_email, $subject, $body, $from_email, false, '', '', '', '', $from_email);
@@ -2030,150 +2119,24 @@ function report_spam_to_apwg($message_source, $reasons, $user_config, $session =
 
     $mime_message = $mime->get_mime_msg();
     
+    // Clean up extra blank lines
     $mime_message = preg_replace('/\r\n\r\n+/', "\r\n\r\n", $mime_message);
-    
-    $parts = explode("\r\n\r\n", $mime_message, 2);
-    $mime_body = isset($parts[1]) ? $parts[1] : '';
-    
-    $boundary = '';
-    if (preg_match('/^--([A-Za-z0-9]+)/m', $mime_body, $boundary_match)) {
-        $boundary = $boundary_match[1];
-    }
-    
-    if (!empty($boundary)) {
-        $pattern = '/(--' . preg_quote($boundary, '/') . '\r\nContent-Type: message\/rfc822[^\r\n]*\r\n(?:[^\r\n]*\r\n)*?Content-Transfer-Encoding: )7bit(\r\n\r\n)(.*?)(\r\n--' . preg_quote($boundary, '/') . '(?:--)?)/s';
-        
-        if (preg_match($pattern, $mime_message, $matches)) {
-            $attachment_content = rtrim($matches[3], "\r\n");
-            $encoded_content = chunk_split(base64_encode($attachment_content));
-            $mime_message = preg_replace($pattern, '$1base64$2' . $encoded_content . '$4', $mime_message);
-        } elseif (defined('DEBUG_MODE') && DEBUG_MODE) {
-            Hm_Debug::add('APWG: Warning - Could not fix encoding from 7bit to base64', 'warning');
-        }
-    }
-    
+
+    $encoding_result = fix_spam_report_encoding($mime_message, 'APWG');
+    $mime_message = $encoding_result['mime_message'];
+    $mime_body = $encoding_result['mime_body'];
+    $boundary = $encoding_result['boundary'];
+
     @unlink($temp_file);
     
-    $parts = explode("\r\n\r\n", $mime_message, 2);
-    $all_headers = isset($parts[0]) ? $parts[0] : '';
-    $mime_body = isset($parts[1]) ? $parts[1] : '';
+    $headers = extract_spam_report_headers($mime_message, $boundary);
     
-    if (empty($boundary) && preg_match('/^--([A-Za-z0-9]+)/m', $mime_body, $boundary_match)) {
-        $boundary = $boundary_match[1];
+    $smtp_result = send_spam_report_via_smtp($from_email, $apwg_email, $subject, $mime_body, $boundary, $user_config, $session, 'APWG', true);
+    if ($smtp_result !== false) {
+        return $smtp_result;
     }
-    
-    $headers = array();
-    $header_lines = explode("\r\n", $all_headers);
-    foreach ($header_lines as $line) {
-        if (preg_match('/^(From|Reply-To|MIME-Version|Content-Type):/i', $line)) {
-            if (preg_match('/^Content-Type:/i', $line) && !empty($boundary)) {
-                $headers[] = 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
-            } else {
-                $headers[] = $line;
-            }
-        }
-    }
-    
-    if (!class_exists('Hm_SMTP_List')) {
-        $smtp_file = (defined('APP_PATH') ? APP_PATH : dirname(__FILE__) . '/../') . 'modules/smtp/hm-smtp.php';
-        if (file_exists($smtp_file)) {
-            require_once $smtp_file;
-        }
-    }
-    
-    if ($session !== null && class_exists('Hm_SMTP_List')) {
-        try {
-            Hm_SMTP_List::init($user_config, $session);
-            
-            $smtp_servers = Hm_SMTP_List::dump();
-            $smtp_id = false;
-            foreach ($smtp_servers as $id => $server) {
-                if (isset($server['user']) && strtolower(trim($server['user'])) === strtolower(trim($from_email))) {
-                    $smtp_id = $id;
-                    break;
-                }
-            }
-            
-            if ($smtp_id === false && !empty($smtp_servers)) {
-                $smtp_id = key($smtp_servers);
-            }
-            
-            if ($smtp_id !== false) {
-                $mailbox = Hm_SMTP_List::connect($smtp_id, false);
-                if ($mailbox && $mailbox->authed()) {
-                    $smtp_headers = array();
-                    $smtp_headers[] = 'From: ' . $from_email;
-                    $smtp_headers[] = 'Reply-To: ' . $from_email;
-                    $smtp_headers[] = 'To: ' . $apwg_email;
-                    $smtp_headers[] = 'Subject: ' . $subject;
-                    $smtp_headers[] = 'MIME-Version: 1.0';
-                    if (!empty($boundary)) {
-                        $smtp_headers[] = 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
-                    }
-                    $smtp_headers[] = 'Date: ' . date('r');
-                    $smtp_headers[] = 'Message-ID: <' . md5(uniqid(rand(), true)) . '@' . php_uname('n') . '>';
-                    
-                    $smtp_message = implode("\r\n", $smtp_headers) . "\r\n\r\n" . $mime_body;
-                    
-                    $err_msg = $mailbox->send_message($from_email, array($apwg_email), $smtp_message);
-                    
-                    if ($err_msg === false) {
-                        // 250 OK response - APWG mail server accepted the email for delivery
-                        if (defined('DEBUG_MODE') && DEBUG_MODE) {
-                            Hm_Debug::add('APWG: Email accepted by SMTP server (250 OK)', 'info');
-                        }
-                        return array('success' => true);
-                    } else {
-                        // SMTP error - log the response for debugging
-                        if (defined('DEBUG_MODE') && DEBUG_MODE) {
-                            Hm_Debug::add(sprintf('APWG: SMTP send failed: %s', $err_msg), 'warning');
-                        }
-                        // Return error with SMTP response details
-                        return array('success' => false, 'error' => sprintf('Failed to send email to APWG. SMTP error: %s', $err_msg));
-                    }
-                } elseif (defined('DEBUG_MODE') && DEBUG_MODE) {
-                    Hm_Debug::add(sprintf('APWG: SMTP connection failed for server ID %s', $smtp_id), 'warning');
-                }
-            }
-        } catch (Exception $e) {
-            if (defined('DEBUG_MODE') && DEBUG_MODE) {
-                Hm_Debug::add(sprintf('APWG: SMTP exception: %s', $e->getMessage()), 'error');
-            }
-        }
-    }
-    
-    $timeout = 10;
-    $old_timeout = ini_get('default_socket_timeout');
-    ini_set('default_socket_timeout', $timeout);
 
-    try {
-        $mail_sent = @mail($apwg_email, $subject, $mime_body, implode("\r\n", $headers));
-        
-        ini_set('default_socket_timeout', $old_timeout);
-        
-        if ($mail_sent) {
-            if (defined('DEBUG_MODE') && DEBUG_MODE) {
-                Hm_Debug::add('APWG: mail() function returned true (delivery status unknown - no SMTP response available)', 'info');
-            }
-            return array('success' => true);
-        } else {
-            $error = 'Failed to send email to APWG. Please ensure your server has valid SPF/DKIM records or configure an SMTP server.';
-            if (defined('DEBUG_MODE') && DEBUG_MODE) {
-                Hm_Debug::add('APWG: mail() function returned false', 'error');
-                $last_error = error_get_last();
-                if ($last_error) {
-                    Hm_Debug::add(sprintf('APWG: PHP error: %s', $last_error['message']), 'error');
-                }
-            }
-            return array('success' => false, 'error' => $error);
-        }
-    } catch (Exception $e) {
-        ini_set('default_socket_timeout', $old_timeout);
-        if (defined('DEBUG_MODE') && DEBUG_MODE) {
-            Hm_Debug::add(sprintf('APWG: Exception in mail(): %s', $e->getMessage()), 'error');
-        }
-        return array('success' => false, 'error' => $e->getMessage());
-    }
+    return send_spam_report_via_mail($apwg_email, $subject, $mime_body, $headers, 'APWG');
 }}
 
 /**
