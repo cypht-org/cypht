@@ -2342,7 +2342,7 @@ class Hm_Output_spamcop_enabled_setting extends Hm_Output_Module {
         $reset = $enabled ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>' : '';
         
         return '<tr class="report_spam_setting"><td><label class="form-check-label" for="spamcop_enabled">'.
-            $this->trans('Enable SpamCop reporting').'</label></td>'.
+            '<strong>'.$this->trans('Enable SpamCop reporting').'</strong></label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.' id="spamcop_enabled" name="spamcop_settings[enabled]" data-default-value="false" value="1" />'.$reset.'</td></tr>';
     }
 }
@@ -2391,7 +2391,7 @@ class Hm_Output_abuseipdb_enabled_setting extends Hm_Output_Module {
         $reset = $enabled ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>' : '';
         
         return '<tr class="report_spam_setting"><td><label class="form-check-label" for="abuseipdb_enabled">'.
-            $this->trans('Enable AbuseIPDB reporting').'</label></td>'.
+            '<strong>'.$this->trans('Enable AbuseIPDB reporting').'</strong></label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.' id="abuseipdb_enabled" name="abuseipdb_settings[enabled]" data-default-value="false" value="1" />'.$reset.'</td></tr>';
     }
 }
@@ -2408,7 +2408,7 @@ class Hm_Output_apwg_enabled_setting extends Hm_Output_Module {
         $reset = $enabled ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>' : '';
         
         return '<tr class="report_spam_setting"><td><label class="form-check-label" for="apwg_enabled">'.
-            $this->trans('Enable APWG phishing reporting').'</label></td>'.
+            '<strong>'.$this->trans('Enable APWG phishing reporting').'</strong></label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.' id="apwg_enabled" name="apwg_settings[enabled]" data-default-value="false" value="1" />'.$reset.'</td></tr>';
     }
 }

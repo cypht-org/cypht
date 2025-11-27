@@ -422,7 +422,7 @@ function icon_callback($vals, $style, $output_mod) {
 if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
     $txt = '';
-    $controls = ['read', 'unread', 'flag', 'unflag', 'delete', 'archive', 'junk', 'report_spam'];
+    $controls = ['read', 'unread', 'flag', 'unflag', 'delete', 'archive', 'junk']; // 'report_spam'
     $controls = array_filter($controls, function($val) use ($output_mod) {
         if (in_array($val, [$output_mod->get('list_path', ''), strtolower($output_mod->get('core_msg_control_folder', ''))])) {
             return false;
