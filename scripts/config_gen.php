@@ -257,6 +257,7 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
     $css_hash = '';
     if ($css) {
         $css_out = file_get_contents(VENDOR_PATH . "twbs/bootstrap-icons/font/bootstrap-icons.css");
+        $css_out = preg_replace('/url\("\.\/fonts\//', 'url("site/fonts/', $css_out);
         $css_out .= compress($css, $css_compress);
         $css_hash = build_integrity_hash($css_out);
         file_put_contents('site.css', $css_out);
