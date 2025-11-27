@@ -706,7 +706,8 @@ button {
 .snoozed_setting,
 .trash_setting,
 .drafts_setting,
-.privacy_setting {
+.privacy_setting,
+.report_spam_setting {
   display: none;
 }
 .update_search_label_field {

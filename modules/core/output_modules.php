@@ -1775,7 +1775,45 @@ class Hm_Output_modals extends Hm_Output_Module {
         $share_folder_modal .= '</div>';
         $share_folder_modal .= '</div>';
 
-        return $share_folder_modal;
+        // Report Spam Modal
+        $report_spam_modal = '<div class="modal fade" id="reportSpamModal" tabindex="-1" aria-labelledby="reportSpamModalLabel" aria-hidden="true">';
+        $report_spam_modal .= '<div class="modal-dialog">';
+        $report_spam_modal .= '<div class="modal-content">';
+        $report_spam_modal .= '<div class="modal-header">';
+        $report_spam_modal .= '<h5 class="modal-title" id="reportSpamModalLabel">'.$this->trans('Report Spam').'</h5>';
+        $report_spam_modal .= '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '<div class="modal-body">';
+        $report_spam_modal .= '<p>'.$this->trans('Please tell us why you\'re reporting this email:').'</p>';
+        $report_spam_modal .= '<form id="reportSpamForm">';
+        $report_spam_modal .= '<div class="mb-3">';
+        $report_spam_modal .= '<label for="spam_reason_select" class="form-label">'.$this->trans('Select one or more reasons:').'</label>';
+        $report_spam_modal .= '<select class="form-select" id="spam_reason_select" name="spam_reason[]" multiple size="7">';
+        $report_spam_modal .= '<option value="unsolicited">'.$this->trans('Unsolicited / Spam').'</option>';
+        $report_spam_modal .= '<option value="phishing">'.$this->trans('Phishing or scam attempt').'</option>';
+        $report_spam_modal .= '<option value="malicious">'.$this->trans('Malicious or harmful content').'</option>';
+        $report_spam_modal .= '<option value="advertising">'.$this->trans('Advertising / Promotional').'</option>';
+        $report_spam_modal .= '<option value="offensive">'.$this->trans('Offensive or inappropriate').'</option>';
+        $report_spam_modal .= '<option value="wrong_recipient">'.$this->trans('Sent to the wrong recipient').'</option>';
+        $report_spam_modal .= '<option value="other">'.$this->trans('Other – please specify').'</option>';
+        $report_spam_modal .= '</select>';
+        $report_spam_modal .= '<small class="form-text text-muted">'.$this->trans('Hold Ctrl (or Cmd on Mac) to select multiple options.').'</small>';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '<div class="mb-3" id="spam_reason_other_input" style="display: none;">';
+        $report_spam_modal .= '<label for="spam_reason_other_text" class="form-label">'.$this->trans('Please specify:').'</label>';
+        $report_spam_modal .= '<input type="text" class="form-control" id="spam_reason_other_text" placeholder="'.$this->trans('Please specify').'">';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '</form>';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '<div class="modal-footer">';
+        $report_spam_modal .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$this->trans('Cancel').'</button>';
+        $report_spam_modal .= '<button type="button" class="btn btn-warning" id="confirm_report_spam">'.$this->trans('Report as Spam').'</button>';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '</div>';
+
+        return $share_folder_modal . $report_spam_modal;
     }
 }
 
@@ -2274,6 +2312,151 @@ class Hm_Output_drafts_since_setting extends Hm_Output_Module {
         return '<tr class="drafts_setting"><td><label for="drafts_since">'.
             $this->trans('Show draft messages since').'</label></td>'.
             '<td>'.message_since_dropdown($since, 'drafts_since', $this, DEFAULT_DRAFT_SINCE).'</td></tr>';
+    }
+}
+
+/**
+ * Starts the Report Spam section on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_report_spam_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control spam reporting features
+     */
+    protected function output() {
+        return '<tr><td data-target=".report_spam_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
+            '<i class="bi bi-shield-exclamation fs-5 me-2"></i>'.
+            $this->trans('Report Spam').'</td></tr>';
+    }
+}
+
+/**
+ * Option to enable/disable SpamCop reporting
+ * @subpackage core/output
+ */
+class Hm_Output_spamcop_enabled_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enabled = get_setting_value($settings, 'spamcop_enabled', false);
+        $checked = $enabled ? ' checked="checked"' : '';
+        $reset = $enabled ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>' : '';
+        
+        return '<tr class="report_spam_setting"><td><label class="form-check-label" for="spamcop_enabled">'.
+            '<strong>'.$this->trans('Enable SpamCop reporting').'</strong></label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="spamcop_enabled" name="spamcop_settings[enabled]" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option for SpamCop submission email address
+ * @subpackage core/output
+ */
+class Hm_Output_spamcop_submission_email_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $email = get_setting_value($settings, 'spamcop_submission_email', '');
+        $reset = !empty($email) ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>' : '';
+        
+        return '<tr class="report_spam_setting"><td><label for="spamcop_submission_email">'.
+            $this->trans('SpamCop submission email').'</label></td>'.
+            '<td class="d-flex"><input class="form-control form-control-sm" type="email" id="spamcop_submission_email" name="spamcop_settings[submission_email]" value="'.$this->html_safe($email).'" placeholder="submit.xxxxx@spam.spamcop.net" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option for SpamCop from email address
+ * @subpackage core/output
+ */
+class Hm_Output_spamcop_from_email_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $email = get_setting_value($settings, 'spamcop_from_email', '');
+        $reset = !empty($email) ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>' : '';
+        
+        return '<tr class="report_spam_setting"><td><label for="spamcop_from_email">'.
+            $this->trans('From email address (optional)').'</label></td>'.
+            '<td class="d-flex"><input class="form-control form-control-sm" type="email" id="spamcop_from_email" name="spamcop_settings[from_email]" value="'.$this->html_safe($email).'" placeholder="'.$this->trans('Uses your IMAP email if not set').'" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option to enable/disable AbuseIPDB reporting
+ * @subpackage core/output
+ */
+class Hm_Output_abuseipdb_enabled_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enabled = get_setting_value($settings, 'abuseipdb_enabled', false);
+        $checked = $enabled ? ' checked="checked"' : '';
+        $reset = $enabled ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>' : '';
+        
+        return '<tr class="report_spam_setting"><td><label class="form-check-label" for="abuseipdb_enabled">'.
+            '<strong>'.$this->trans('Enable AbuseIPDB reporting').'</strong></label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="abuseipdb_enabled" name="abuseipdb_settings[enabled]" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option to enable/disable APWG phishing reporting
+ * @subpackage core/output
+ */
+class Hm_Output_apwg_enabled_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enabled = get_setting_value($settings, 'apwg_enabled', false);
+        $checked = $enabled ? ' checked="checked"' : '';
+        $reset = $enabled ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>' : '';
+        
+        return '<tr class="report_spam_setting"><td><label class="form-check-label" for="apwg_enabled">'.
+            '<strong>'.$this->trans('Enable APWG phishing reporting').'</strong></label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="apwg_enabled" name="apwg_settings[enabled]" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option for APWG from email address
+ * @subpackage core/output
+ */
+class Hm_Output_apwg_from_email_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $email = get_setting_value($settings, 'apwg_from_email', '');
+        $reset = !empty($email) ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>' : '';
+        
+        return '<tr class="report_spam_setting"><td><label for="apwg_from_email">'.
+            $this->trans('From email address (optional)').'</label></td>'.
+            '<td class="d-flex"><input class="form-control form-control-sm" type="email" id="apwg_from_email" name="apwg_settings[from_email]" value="'.$this->html_safe($email).'" placeholder="'.$this->trans('Uses your IMAP email if not set').'" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option for AbuseIPDB API key
+ * @subpackage core/output
+ */
+class Hm_Output_abuseipdb_api_key_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $api_key = get_setting_value($settings, 'abuseipdb_api_key', '');
+        
+        // Mask API key if it exists - show empty field with indicator
+        // The handler will preserve the original key if empty value is submitted
+        $display_value = '';
+        $placeholder = $this->trans('Your AbuseIPDB API key');
+        
+        if (!empty($api_key)) {
+            $placeholder = $this->trans('API key is set (••••••••) - enter new value to change');
+        }
+        
+        $reset = !empty($api_key) ? '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>' : '';
+        
+        // Add a hidden field to track if API key was originally set
+        // This helps the handler know to preserve the key if field is left empty
+        $hidden_field = !empty($api_key) ? '<input type="hidden" name="abuseipdb_settings[api_key_set]" value="1" />' : '';
+        
+        return '<tr class="report_spam_setting"><td><label for="abuseipdb_api_key">'.
+            $this->trans('AbuseIPDB API Key').'</label></td>'.
+            '<td class="d-flex">'.$hidden_field.
+            '<input class="form-control form-control-sm" type="password" id="abuseipdb_api_key" name="abuseipdb_settings[api_key]" value="'.$this->html_safe($display_value).'" placeholder="'.$placeholder.'" autocomplete="off" />'.$reset.'</td></tr>';
     }
 }
 
