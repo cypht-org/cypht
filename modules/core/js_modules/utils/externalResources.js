@@ -51,9 +51,15 @@ const handleExternalResources = (inline) => {
     externalNoticesAccordion.innerHTML = '<div class="external_notices accordion-collapse collapse"></div>';
 
     const senderEmail = document.querySelector('#contact_info')?.textContent.match(EMAIL_REGEX)[0];
+
+    if (handleBlockedStatus(inline, senderEmail)) {
+        return;
+    }
+
     const sender = senderEmail + '_external_resources_allowed';
     const elements = messageContainer.querySelectorAll('[data-src]');
     const blockedResources = [];
+
     elements.forEach(function (element) {
 
         const dataSrc = element.dataset.src;
@@ -121,14 +127,7 @@ const handleExternalResources = (inline) => {
 
         button.addEventListener('click', function (e) {
             e.preventDefault();
-            addSenderToImagesWhitelist(senderEmail).then(() => {
-                $('.msg_text_inner').remove();
-                if (inline) {
-                    inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
-                } else {
-                    get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), getParam('list_parent'), false, false, false)
-                }
-            }).finally(() => {
+            addSenderToImagesWhitelist(senderEmail).then(refreshMessageContent.bind(null, inline)).finally(() => {
                 popover.dispose();
             })
         });
@@ -139,15 +138,7 @@ const handleExternalResources = (inline) => {
 
         alwaysBlockButton.on('click', function (e) {
             e.preventDefault();
-            addSenderToImagesBlackList(senderEmail).then(() => {
-                $("#externalNoticesAccordion").remove();
-                $("img[data-src]").each(function () {
-                    if (! this.src) {
-                        this.remove();
-                    }
-                });
-                Hm_Utils.remove_from_local_storage(getMessageStorageKey(getMessageUidParam() || window.inline_msg_uid));
-            }).finally(() => {
+            addSenderToImagesBlackList(senderEmail).then(refreshMessageContent.bind(null, inline)).finally(() => {
                 blockPopover.dispose();
             })
         });
@@ -157,6 +148,38 @@ const handleExternalResources = (inline) => {
 
     document.querySelector('.external_notices').insertAdjacentElement('beforebegin', noticesElement);
 };
+
+function handleBlockedStatus(inline, senderEmail) {
+    if ($('[data-external-resources-blocked="1"]').length) {
+        const infoElement = $('<div class="fw-bold">External resources from this sender are blocked.</div>');
+        const button = $('<a href="#" class="btn btn-light btn-sm ms-2"><i class="bi bi-unlock"></i> Reset permissions</a>');
+
+        $(infoElement).append(button);
+        $('#externalNoticesAccordion').append(infoElement);
+
+        const popover = sessionAvailableOnlyActionInfo(button[0]);
+
+        button.on('click', function (e) {
+            e.preventDefault();
+            removeSenderFromImagesBlackList(senderEmail).then(refreshMessageContent.bind(null, inline)).finally(() => {
+                popover.dispose()
+            });
+        });
+
+        return true;
+    }
+
+    return false;
+}
+
+function refreshMessageContent(inline) {
+    $('.msg_text_inner').remove();
+    if (inline) {
+        inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
+    } else {
+        get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), getParam('list_parent'), false, false, false)
+    }
+}
 
 const observeMessageTextMutationAndHandleExternalResources = (inline) => {
     const message = document.querySelector('.msg_text');
