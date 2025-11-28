@@ -1975,6 +1975,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
 
             $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
             $this->out('images_whitelist', explode(',', $this->user_config->get('images_whitelist_setting')));
+            $this->out('images_blacklist', explode(',', $this->user_config->get('images_blacklist_setting')));
 
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {

@@ -632,15 +632,25 @@ function privacy_setting_callback($val, $key, $mod) {
     $key .= '_setting';
     $user_setting = $mod->user_config->get($key);
     $update = $mod->request->post['update'];
+    $pop = $mod->request->post['pop'];
 
     if ($update) {
-        $val = implode($setting['separator'], array_filter(array_merge(explode($setting['separator'], $user_setting), [$val])));
-        $mod->user_config->set($key, $val);
+        if ($pop) {
+            $new_value = implode($setting['separator'], array_filter(explode($setting['separator'], $user_setting), function($item) use ($val) {
+                return $item != $val;
+            }));
+        } else {
+            $new_value = implode($setting['separator'], array_filter(array_merge(explode($setting['separator'], $user_setting), [$val])));
+        }
+        
+        $mod->user_config->set($key, $new_value);
 
         $user_data = $mod->session->get('user_data', array());
-        $user_data[$key] = $val;
+        $user_data[$key] = $new_value;
         $mod->session->set('user_data', $user_data);
         $mod->session->record_unsaved('Privacy settings updated');
+
+        return $new_value;
     }
     return $val;
 }

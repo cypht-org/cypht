@@ -2492,7 +2492,13 @@ class Hm_Output_privacy_settings extends Hm_Output_Module {
             'label' => 'External images whitelist',
             'description' => 'Cypht automatically prevents untrusted external images from loading in messages. Add senders from whom you want to allow images to load.',
             'separator' => ','
-        ]
+        ],
+        'images_blacklist' => [
+            'type' => 'text',
+            'label' => 'External images blacklist',
+            'description' => 'Add senders from whom you never want to allow external images to load.',
+            'separator' => ','
+        ],
     ];
 
     protected function output()

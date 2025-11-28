@@ -360,5 +360,7 @@ return array(
         'srv_setup_stepper_imap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
         'images_whitelist' => FILTER_UNSAFE_RAW,
         'update' => FILTER_VALIDATE_BOOLEAN,
+        'images_blacklist' => FILTER_UNSAFE_RAW,
+        'pop' => FILTER_VALIDATE_BOOLEAN,
     )
 );

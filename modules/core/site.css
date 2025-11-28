@@ -1689,4 +1689,7 @@ pre.msg_source {
   .mobile .msg_text .small_header .col-md-2 { width: 20%; }
   .mobile .msg_text .small_header > div + div { width: 80%; }
   .mobile .msg_text .small_header > div.d-none + div { width: 100%; }
+  .notices .definitive_actions {
+    margin-left: 0 !important;
+  }
 }
