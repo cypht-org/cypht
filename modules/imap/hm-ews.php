@@ -42,7 +42,12 @@ class Hm_EWS {
 
     public function connect(array $config) {
         try {
-            $this->ews = ExchangeWebServices::fromUsernameAndPassword($config['server'], $config['username'], $config['password'], ['version' => ExchangeWebServices::VERSION_2016, 'trace' => 1]);
+            $password = $config['password'] ?? '';
+            $username = isset($config['username']) ? $config['username'] : '';
+            if (!$username && isset($config['user'])) {
+                $username = $config['user'];
+            }
+            $this->ews = ExchangeWebServices::fromUsernameAndPassword($config['server'], $username, $password, ['version' => ExchangeWebServices::VERSION_2016, 'trace' => 1]);
             $this->api = new MailAPI($this->ews);
             $this->api->getFolderByDistinguishedId(Enumeration\DistinguishedFolderIdNameType::INBOX);
             $this->authed = true;
