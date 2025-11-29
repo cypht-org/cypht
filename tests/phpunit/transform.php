@@ -3,9 +3,6 @@
 use PHPUnit\Framework\TestCase;
 
 class Hm_Test_Transform extends TestCase {
-    public function setUp(): void {
-        require 'bootstrap.php';
-    }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess

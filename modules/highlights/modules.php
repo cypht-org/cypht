@@ -229,7 +229,7 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
         $res .= '</table></div>';
 
         $res .= '<div class="settings_subtitle mt-3 px-3"><b>'.$this->trans('Add a new rule').'</b></div>';
-        $res .= '<div class="col-12 col-lg-5 mt-2 px-3">';
+        $res .= '<div class="col-12 col-lg-5 mt-2 px-3 pb-3">';
         $res .= '<form method="POST">';
 
         // Source Type
@@ -333,7 +333,7 @@ class Hm_Output_highlight_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_highlights"><a class="unread_link" href="?page=highlights">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-highlighter fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-highlighter me-2"></i>';
         }
         $res .= $this->trans('Highlights').'</a></li>';
         if ($this->format == 'HTML5') {

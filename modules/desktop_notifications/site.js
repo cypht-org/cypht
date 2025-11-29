@@ -1,6 +1,10 @@
 'use strict';
 
 $(function() {
+    if (!window.inAppContext) {
+        return;
+    }
+    
     window.addEventListener('new-message', (event) => {
         const row = event.detail.row;
         const content = $(row).find('.from').text() + ' - ' + $(row).find('.subject').text();

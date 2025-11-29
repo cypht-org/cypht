@@ -30,6 +30,9 @@ return array(
         'advanced_search',
         'ajax_adv_search'
     ),
+    'allowed_get' => array(
+        'search_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    ),
     'allowed_post' => array(
         'adv_source' => FILTER_UNSAFE_RAW,
         'adv_start' => FILTER_UNSAFE_RAW,
@@ -40,7 +43,6 @@ return array(
         'adv_terms' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
         'adv_targets' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
         'all_folders' => FILTER_VALIDATE_BOOLEAN,
-        'all_special_folders' => FILTER_VALIDATE_BOOLEAN,
         'include_subfolders' => FILTER_VALIDATE_BOOLEAN,
     )
 );

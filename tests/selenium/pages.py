@@ -3,6 +3,7 @@
 from base import WebTest, USER, PASS
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from runner import test_runner
 
 class PageTests(WebTest):
@@ -20,8 +21,10 @@ class PageTests(WebTest):
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
         # More flexible text matching for search page
+        self.wait_on_class('content_title')
         content_title = self.by_class('content_title')
         title_text = content_title.text.strip()
+        print(f"MESSAGES FOUND: '{title_text}'")
         assert 'Search' in title_text or 'search' in title_text.lower(), f"Expected 'Search' in title, got: '{title_text}'"
 
     def sent(self):
@@ -87,16 +90,9 @@ class PageTests(WebTest):
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
-        # Look for mailbox_list_title inside content_title
-        try:
-            mailbox_title = self.by_class('mailbox_list_title')
-            title_text = mailbox_title.text.strip()
-            assert 'Flagged' in title_text, f"Expected 'Flagged' in mailbox title, got: '{title_text}'"
-        except:
-            # Fallback: check content_title for flagged-related text
-            content_title = self.by_class('content_title')
-            title_text = content_title.text.strip()
-            assert 'Flagged' in title_text, f"Expected 'Flagged' in content title, got: '{title_text}'"
+        mailbox_title = self.by_class('mailbox_list_title')
+        title_text = mailbox_title.text.strip()
+        assert 'Flagged' in title_text, f"Expected 'Flagged' in mailbox title, got: '{title_text}'"
 
     def contacts(self):
         if not self.mod_active('contacts'):
@@ -135,16 +131,7 @@ class PageTests(WebTest):
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
-        # Try calendar_content_title first, then fallback to content_title
-        try:
-            calendar_title = self.by_class('calendar_content_title')
-            title_text = calendar_title.text.strip()
-            assert 'Calendar' in title_text, f"Expected 'Calendar' in calendar title, got: '{title_text}'"
-        except:
-            # Fallback: check content_title for calendar-related text
-            content_title = self.by_class('content_title')
-            title_text = content_title.text.strip()
-            assert 'Calendar' in title_text, f"Expected 'Calendar' in content title, got: '{title_text}'"
+        assert self.by_class('calendar_content_title').text == 'Calendar'
 
     def history(self):
         if not self.mod_active('history'):
@@ -155,10 +142,7 @@ class PageTests(WebTest):
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
-        # More flexible text matching for history page
-        content_title = self.by_class('content_title')
-        title_text = content_title.text.strip()
-        assert 'Message history' in title_text or 'History' in title_text, f"Expected 'Message history' or 'History' in title, got: '{title_text}'"
+        assert 'Message history' in self.by_class('content_title').text
 
     def home(self):
         list_item = self.by_class('menu_home')
@@ -173,18 +157,11 @@ class PageTests(WebTest):
         try:
             # Try to expand settings menu first
             self.wait_for_settings_to_expand()
-            
+
             # Add a small delay to ensure the menu is fully expanded
-            import time
-            time.sleep(0.5)
-            
             list_item = self.by_class('menu_servers')
             link = list_item.find_element(By.TAG_NAME, 'a')
-            
-            # Try to scroll the element into view and wait a bit more
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", link)
-            time.sleep(0.5)
-            
+
             self.click_when_clickable(link)
             self.wait_with_folder_list()
             self.safari_workaround()
@@ -204,18 +181,10 @@ class PageTests(WebTest):
         try:
             # Try to expand settings menu first
             self.wait_for_settings_to_expand()
-            
-            # Add a small delay to ensure the menu is fully expanded
-            import time
-            time.sleep(0.5)
-            
-            list_item = self.by_class('menu_site')
+
+            list_item = self.by_class('menu_settings')
             link = list_item.find_element(By.TAG_NAME, 'a')
-            
-            # Try to scroll the element into view and wait a bit more
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", link)
-            time.sleep(0.5)
-            
+
             self.click_when_clickable(link)
             self.wait_with_folder_list()
             self.safari_workaround()
@@ -224,8 +193,8 @@ class PageTests(WebTest):
         except Exception as e:
             print(f" - site test failed: {e}")
             # Check if the element exists
-            if not self.element_exists('menu_site'):
-                print(" - menu_site element not found")
+            if not self.element_exists('menu_settings'):
+                print(" - menu_settings element not found")
                 return
             raise e
 
@@ -245,13 +214,6 @@ class PageTests(WebTest):
             if not link.is_enabled():
                 print(" - menu_folders link is not enabled")
                 return
-
-            # Try to scroll the element into view first
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", link)
-
-            # Wait a moment for any animations
-            import time
-            time.sleep(0.5)
 
             # Try clicking with JavaScript as a fallback
             try:
@@ -279,18 +241,10 @@ class PageTests(WebTest):
         try:
             # Try to expand settings menu first
             self.wait_for_settings_to_expand()
-            
-            # Add a small delay to ensure the menu is fully expanded
-            import time
-            time.sleep(0.5)
-            
+
             list_item = self.by_class('menu_save')
             link = list_item.find_element(By.TAG_NAME, 'a')
-            
-            # Try to scroll the element into view and wait a bit more
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", link)
-            time.sleep(0.5)
-            
+
             self.click_when_clickable(link)
             self.wait_with_folder_list()
             self.safari_workaround()
@@ -310,18 +264,10 @@ class PageTests(WebTest):
         try:
             # Try to expand settings menu first
             self.wait_for_settings_to_expand()
-            
-            # Add a small delay to ensure the menu is fully expanded
-            import time
-            time.sleep(0.5)
-            
+
             list_item = self.by_class('menu_change_password')
             link = list_item.find_element(By.TAG_NAME, 'a')
-            
-            # Try to scroll the element into view and wait a bit more
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", link)
-            time.sleep(0.5)
-            
+
             self.click_when_clickable(link)
             self.wait_with_folder_list()
             self.safari_workaround()
@@ -341,18 +287,10 @@ class PageTests(WebTest):
         try:
             # Try to expand settings menu first
             self.wait_for_settings_to_expand()
-            
-            # Add a small delay to ensure the menu is fully expanded
-            import time
-            time.sleep(0.5)
-            
+
             list_item = self.by_class('menu_profiles')
             link = list_item.find_element(By.TAG_NAME, 'a')
-            
-            # Try to scroll the element into view and wait a bit more
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", link)
-            time.sleep(0.5)
-            
+
             self.click_when_clickable(link)
             self.wait_with_folder_list()
             self.safari_workaround()
@@ -367,4 +305,5 @@ class PageTests(WebTest):
             raise e
 
 if __name__ == '__main__':
+    print("PAGES TEST")
     test_runner(PageTests)

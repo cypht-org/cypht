@@ -1,0 +1,83 @@
+name: Coverage Report
+
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    name: Generate Coverage Report
+    runs-on: ubuntu-latest
+
+    env:
+      PHP_V: '8.1'
+      DB: 'sqlite'
+
+    steps:
+      - name: "System Install Dependencies"
+        run: sudo apt-get install -y sqlite3 libsodium-dev
+
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Set up PHP"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: pdo, sodium, sqlite, pdo_mysql, pdo_pgsql, memcached, redis, gd, gnupg, xdebug
+          tools: phpunit, composer
+          ini-values: cgi.fix_pathinfo=1, xdebug.mode=coverage
+        env:
+          update: true
+          fail-fast: true
+
+      - name: "Composer Install Dependencies"
+        run: |
+          composer install
+          composer require --dev php-coveralls/php-coveralls
+
+      - name: "Setup Database for Coverage"
+        run: |
+          FILE=/tmp/test.db
+          cat tests/phpunit/data/schema_sqlite.sql | sqlite3 ${FILE}
+          cat tests/phpunit/data/seed_sqlite.sql | sqlite3 ${FILE}
+        env:
+          DB_DRIVER: sqlite
+          DB_NAME: cypht_test
+          DB_CONNECTION_TYPE: socket
+          DB_SOCKET: /tmp/test.db
+
+      - name: "Generate Coverage Report"
+        run: |
+          mkdir -p build/logs
+          phpunit --configuration tests/phpunit/phpunit.xml \
+                  --coverage-clover build/logs/clover.xml \
+                  --testdox
+        env:
+          DB_DRIVER: sqlite
+          DB_NAME: cypht_test
+          DB_CONNECTION_TYPE: socket
+          DB_SOCKET: /tmp/test.db
+
+      - name: "Upload Coverage to Coveralls"
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          file: build/logs/clover.xml
+          format: clover
+          fail-on-error: false
+
+      - name: "Upload Coverage Artifacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: build/logs/
+          retention-days: 7

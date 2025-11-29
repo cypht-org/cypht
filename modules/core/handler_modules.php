@@ -230,8 +230,7 @@ class Hm_Handler_default_sort_order_setting extends Hm_Handler_Module {
      */
     public function process() {
         $this->out('default_sort_order', $this->user_config->get('default_sort_order_setting', 'arrival'));
-        $this->out('sort', $this->request->get['sort'] ?? null);
-        $this->out('list_sort', $this->request->get['list_sort'] ?? null);
+        $this->out('list_sort', $this->request->get['sort'] ?? null);
     }
 }
 
@@ -1180,7 +1179,11 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     $this->out('imap_service_name', $provider);
                 }
                 $this->out('just_saved_credentials', true);
-                Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                if (isPageConfigured('save')) {
+                    Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                } else {
+                    Hm_Msgs::add("Server saved.");
+                }
             }
 
             if ($createProfile && $this->smtp_server_id && ($this->imap_server_id || $this->jmap_server_id)) {

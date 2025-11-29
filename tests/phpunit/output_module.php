@@ -9,7 +9,6 @@ class Hm_Test_Output_Module extends TestCase {
 
     public $output_mod;
     public function setUp(): void {
-        require 'bootstrap.php';
         $this->output_mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
     }
     /**

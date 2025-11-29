@@ -617,7 +617,7 @@ class Hm_JMAP {
     /**
      * Get a message part or the raw message if the part is 0
      * @param string $uid message uid
-     * @param string $message_part the IMAP messge part "number"
+     * @param string $message_part the IMAP message part "number"
      * @param int $max max size to return (ignored)
      * @param array $struct message structure (ignored)
      * @return string

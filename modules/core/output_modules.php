@@ -424,6 +424,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
         $res = '<body class="'.($this->get('is_mobile', false) ? 'mobile' : '').'"><noscript class="noscript">'.
             sprintf($this->trans('You need to have Javascript enabled to use %s, sorry about that!'),
                 $this->html_safe($this->get('router_app_name'))).'</noscript>';
+        $res .= '<script type="text/javascript">window.inAppContext = true;</script>';
         if (!$this->get('router_login_state')) {
             $res .= '<script type="text/javascript">sessionStorage.clear();</script>';
         }
@@ -502,10 +503,6 @@ class Hm_Output_header_css extends Hm_Output_Module {
                 if (in_array($mod, $mods, true) && is_readable(sprintf("%ssite.css", $name))) {
                     $res .= '<link href="'.WEB_ROOT.sprintf("%ssite.css", $rel_name).'" media="all" rel="stylesheet" type="text/css" />';
                 }
-            }
-            // load pcss3t.cs only if one of: ['contacts','local_contacts','ldap_contacts','gmail_contacts'] is enabled
-            if(count(array_intersect(['contacts','local_contacts','ldap_contacts','gmail_contacts'], $mods)) > 0){
-                $res .= '<link href="'.WEB_ROOT.'third_party/contact-group.css" media="all" rel="stylesheet" type="text/css" />';
             }
             $res .= '<link href="'.WEB_ROOT.'third_party/nprogress.css" media="all" rel="stylesheet" type="text/css" />';
         }
@@ -619,6 +616,14 @@ class Hm_Output_js_data extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         $enable_snooze = $settings['enable_snooze'] ?? DEFAULT_ENABLE_SNOOZE;
         $enable_collect_address_on_send = $settings['enable_collect_address_on_send_setting'] ?? DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND;
+        $specialFolders = $settings['special_imap_folders'] ?? array();
+        $formattedSpecialFolders = [];
+        foreach ($specialFolders as $serverId => $folders) {
+            $formattedSpecialFolders[$serverId] = [];
+            foreach ($folders as $type => $folder) {
+                $formattedSpecialFolders[$serverId][] = ['type' => $type, 'label' => $folder, 'id' => bin2hex($folder)];
+            }
+        }
         $res = '<script type="text/javascript" id="data-store">'.
             'var globals = {};'.
             'var hm_is_logged = function () { return '.($this->get('is_logged') ? '1' : '0').'; };'.
@@ -636,6 +641,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_web_root_path = function() { return "'.WEB_ROOT.'"; };'.
             'var hm_flag_image_src = function() { return "<i class=\"bi bi-star-half\"></i>"; };'.
             'var hm_check_dirty_flag = function() { return '.($this->get('warn_for_unsaved_changes', '') ? '1' : '0').'; };'.
+            'var hm_special_folders = function() { return '.json_encode($formattedSpecialFolders).'; };'.
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {
@@ -1900,7 +1906,6 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
             }
         }
         $res = '<div class="p-3">';
-        $res .= '<div class="cypht-spinner"><div class="spinner-border text-danger" role="status"><span class="visually-hidden">Loading...</span></div></div>';
         $res .= '<table class="message_table table">';
         if (!$this->get('no_message_list_headers')) {
             if (!empty($col_flds)) {
@@ -1966,7 +1971,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
      */
     protected function output() {
         $search_field = '';
-        $terms = $this->get('search_terms', '');
+        $terms = $this->get('list_keyword', '');
         if ($this->get('custom_list_controls', '')) {
             $config_link = $this->get('custom_list_controls');
             $source_link = '';
@@ -1982,10 +1987,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             }
             $config_link = '<a title="'.$this->trans('Configure').'" href="?page=settings#'.$path.'_setting"><i class="bi bi-gear-wide refresh_list"></i></a>';
             $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a>';
-            //$search_field = '<form method="GET">
-            //<input type="hidden" name="page" value="message_list" />
-            //<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/>
-            //<input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="imap_keyword" name="search_terms" value="'.$this->html_safe($terms).'"/></form>';
+            $search_field = '<form method="GET"><input type="hidden" name="page" value="message_list" /><input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/><input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="form-control imap_keyword" name="keyword" value="'.$this->html_safe($terms).'"/></form>';
 
         }
         else {

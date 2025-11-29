@@ -6,10 +6,6 @@ use PHPUnit\Framework\TestCase;
  * tests for the functional interface to modules
  */
 class Hm_Test_Module_Functions extends TestCase {
-
-    public function setUp(): void {
-        require 'bootstrap.php';
-    }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess

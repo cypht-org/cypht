@@ -100,7 +100,7 @@ return [
     /*
     | Attribute to use as the unique identifier for users
     */
-    'ldap_uid_attr' => env('LDAP_UID_ATTR', 'uid'),
+    'ldap_auth_uid_attr' => env('LDAP_AUTH_UID_ATTR', 'uid'),
 
     /*
     | -------------------
@@ -434,7 +434,9 @@ return [
     | 'cache_class' => env('CACHE_CLASS')
     */
 
+    'allow_session_cache' => env('ALLOW_SESSION_CACHE', false),
 
+    'cache_class' => env('CACHE_CLASS'),
     /*
     | -------------
     | Redis Support
@@ -452,7 +454,7 @@ return [
 
     'redis_pass' => env('REDIS_PASS'),
 
-    'redis_socket' => env('REDIS_SOCKET', '/var/run/redis/redis-server.sock'),
+    'redis_socket' => env('REDIS_SOCKET', ''),
 
     /*
     | -----------------
@@ -795,7 +797,7 @@ return [
     //     |
     //     | Github repository tracking.
     //     */
-        'github',
+    //     // 'github',
 
     //     /*
     //     | ---------
@@ -813,7 +815,7 @@ return [
     //     |
     //     | WordPress.com notifications.
     //     */
-        'wordpress',
+    //     // 'wordpress',
 
     //     /*
     //     | -------

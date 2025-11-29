@@ -121,22 +121,57 @@ setup_site() {
 		STATUS_ERROR
 		exit 1
 	fi
+	
 	STATUS_TITLE "Setup Nginx"
 	sudo systemctl stop nginx.service
+	
+	grep -qxF "127.0.0.1 cypht-test.org" /etc/hosts || echo "127.0.0.1 cypht-test.org" | sudo tee -a /etc/hosts
+	
 	sudo cp .github/tests/selenium/nginx/nginx-site.conf /etc/nginx/sites-available/default
-	sudo mkdir /etc/nginx/nginxconfig
+	sudo mkdir -p /etc/nginx/nginxconfig
 	sudo cp .github/tests/selenium/nginx/php_fastcgi.conf /etc/nginx/nginxconfig/php_fastcgi.conf
 	sudo sed -e "s?%VERSION%?${PHP_V}?g" --in-place /etc/nginx/sites-available/default
-	sudo ln -sf "$(pwd)" /var/www/cypht
-	sudo systemctl start nginx
-	if [ "$(curl -s -o /dev/null -w '%{http_code}' 'http://cypht-test.org')" -eq 200 ]; then
+
+	# Copy files instead of symlink to avoid permission issues
+	sudo rm -rf /var/www/cypht
+	sudo cp -r "$(pwd)" /var/www/cypht
+	
+	sudo chown -R www-data:www-data /var/www/cypht
+	sudo chmod -R 755 /var/www/cypht
+	
+	# Reconfigure Cypht for the new location
+	cd /var/www/cypht
+	sudo -u www-data cp .github/tests/.env .
+	if [ "$DB" = "sqlite" ]; then
+		sudo -u www-data sed -i 's/DB_DRIVER=mysql/DB_DRIVER=sqlite/' .env
+	fi
+	sudo -u www-data sed -i "s|ATTACHMENT_DIR=.*|ATTACHMENT_DIR=/var/www/cypht/hm3/attachments|" .env
+	sudo -u www-data php scripts/config_gen.php
+	cd - > /dev/null
+
+	sudo nginx -t
+	if [ $? -ne 0 ]; then
+		STATUS_ERROR
+		exit 1
+	fi
+
+	sudo systemctl start nginx.service
+
+	CYPHT_STATUS=$(curl -s -o /dev/null -w '%{http_code}' 'http://cypht-test.org')
+	LOCALHOST_STATUS=$(curl -s -o /dev/null -w '%{http_code}' 'http://localhost')
+	
+	if [ "$CYPHT_STATUS" -eq 200 ] || [ "$LOCALHOST_STATUS" -eq 200 ]; then
 		STATUS_DONE
 	else
 		STATUS_ERROR
 		exit 1
 	fi
+	
     STATUS_TITLE "Setup required Directories"
-    mkdir -p "$(pwd)/hm3/attachments"
+    sudo mkdir -p /var/www/cypht/hm3/attachments
+    sudo mkdir -p /var/www/cypht/hm3/users
+    sudo chown -R www-data:www-data /var/www/cypht/hm3
+    sudo chmod -R 755 /var/www/cypht/hm3
 	STATUS_DONE
 }
 

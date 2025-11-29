@@ -70,41 +70,75 @@ class Hm_MessagesStore {
         const sourcesToRemove = Object.keys(this.sources).filter(key => !this.currentlyAvailableSources().includes(key));
         sourcesToRemove.forEach(key => delete this.sources[key]);
 
-        this.fetch(hideLoadingState).forEach(async (req) => {
-            const { formatted_message_list: updatedMessages, pages, folder_status, do_not_flag_as_read_on_open, sourceId } = await req;
-            // count and pages only available in non-combined pages where there is only one ajax call, so it is safe to overwrite
-            this.count = folder_status && Object.values(folder_status)[0]?.messages;
-            this.pages = parseInt(pages);
-            this.newMessages = this.getNewMessages(updatedMessages);
+        // Batch processing for multiple requests
+        const pendingResponses = new Map();
+        let processingTimeout = null;
 
-            if (typeof do_not_flag_as_read_on_open == 'booelan') {
-                this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
-            }
+        const processPendingResponses = () => {
+            if (pendingResponses.size === 0) return;
 
-            if (this.sources[sourceId]) {
-                this.rows = this.rows.filter(row => !this.sources[sourceId].includes(row['1']));
-            }
-            this.sources[sourceId] = Object.keys(updatedMessages);
-            for (const id in updatedMessages) {
-                if (this.rows.map(row => row['1']).indexOf(id) === -1) {
-                    this.rows.push(updatedMessages[id]);
-                } else {
-                    const index = this.rows.map(row => row['1']).indexOf(id);
-                    this.rows[index] = updatedMessages[id];
+            // Process all pending responses at once
+            const responses = Array.from(pendingResponses.values());
+            pendingResponses.clear();
+
+            responses.forEach(({ formatted_message_list: updatedMessages, pages, folder_status, do_not_flag_as_read_on_open, sourceId }) => {
+                // count and pages only available in non-combined pages where there is only one ajax call, so it is safe to overwrite
+                this.count = folder_status && Object.values(folder_status)[0]?.messages;
+                this.pages = parseInt(pages);
+                this.newMessages = this.getNewMessages(updatedMessages);
+
+                if (typeof do_not_flag_as_read_on_open == 'booelan') {
+                    this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
                 }
-            }
 
+                if (this.sources[sourceId]) {
+                    this.rows = this.rows.filter(row => !this.sources[sourceId].includes(row['1']));
+                }
+                this.sources[sourceId] = Object.keys(updatedMessages);
+                for (const id in updatedMessages) {
+                    if (this.rows.map(row => row['1']).indexOf(id) === -1) {
+                        this.rows.push(updatedMessages[id]);
+                    } else {
+                        const index = this.rows.map(row => row['1']).indexOf(id);
+                        this.rows[index] = updatedMessages[id];
+                    }
+                }
+            });
+
+            // Do expensive operations only once for all responses
             if (this.path == 'unread') {
                 $('.total_unread_count').html('&#160;'+this.rows.length+'&#160;');
             }
 
-            this.sort();
-            this.saveToLocalStorage();
+                    this.sort();
+                    this.saveToLocalStorage();
 
             if (messagesReadyCB) {
                 messagesReadyCB(this);
             }
-        }, this);
+
+            responses.forEach(response => {
+                response.resolvePromise(response);
+            });
+        };
+
+        await Promise.all(this.fetch(hideLoadingState).map((req) => {
+            return new Promise((resolve) => {
+                req.then((response) => {
+                    response.resolvePromise = resolve;
+                    pendingResponses.set(response.sourceId, response);
+
+                    if (processingTimeout) {
+                        clearTimeout(processingTimeout);
+                    }
+
+                    // Process after a short delay to allow batching
+                    processingTimeout = setTimeout(processPendingResponses, 10);
+                }, (error) => {
+                    console.error('Error loading messages from source:', error);
+                });
+            });
+        }));
 
         return this;
     }
@@ -229,18 +263,15 @@ class Hm_MessagesStore {
     }
 
     fetch(hideLoadingState = false) {
-        // show my custom cypht spinner(class = cypht-spinner)
-        const spinner = document.querySelector('.cypht-spinner');
-        if (spinner) spinner.style.display = 'block';
-
         let store = this;
         return this.getRequestConfigs().map((config) => {
+            const initialConfig = Object.assign([], config);
             return new Promise((resolve, reject) => {
                 Hm_Ajax.request(
                     config,
                     (response) => {
                         if (response) {
-                            response.sourceId = store.hashObject(config);
+                            response.sourceId = store.hashObject(initialConfig); // Do not use this config object because the request appends a "hm_page_key" entry, which would change the hash
                             resolve(response);
                         }
                     },
@@ -249,9 +280,6 @@ class Hm_MessagesStore {
                     undefined,
                     reject
                 );
-            }).finally(() => {
-                // Hide the spinner
-                if (spinner) spinner.style.display = 'none';
             });
         });
     }
@@ -284,7 +312,7 @@ class Hm_MessagesStore {
         } else {
             if (this.path == 'tag') {
                 config.push({ name: "hm_ajax_hook", value: 'ajax_imap_tag_data' });
-                config.push({ name: "folder", value: getParam('tag_id') });
+                config.push({ name: "folder", value: getParam('filter') });
                 configs.push(config);
             } else {
                 let sources = hm_data_sources();

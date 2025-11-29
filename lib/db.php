@@ -80,6 +80,24 @@ class Hm_DB {
     }
 
     /**
+     * Convert any resource values in a database row to strings
+     * Ensures consistent scalar return types across different database engines
+     * @param mixed $row database row or query result
+     * @return mixed row with any resource values converted to strings
+     */
+    static private function convert_resources_to_strings($row) {
+        if (!is_array($row)) {
+            return $row;
+        }
+        foreach ($row as $key => $value) {
+            if (is_resource($value)) {
+                $row[$key] = stream_get_contents($value);
+            }
+        }
+        return $row;
+    }
+
+    /**
      * @param object|false $dbh PDO connection object
      * @param string $sql sql with placeholders to execute
      * @param array $args values to insert into the sql
@@ -103,9 +121,10 @@ class Hm_DB {
                 return $sql->rowCount();
             }
             if ($all) {
-                return $sql->fetchAll(PDO::FETCH_ASSOC);
+                $results = $sql->fetchAll(PDO::FETCH_ASSOC);
+                return array_map([self::class, 'convert_resources_to_strings'], $results);
             }
-            return $sql->fetch(PDO::FETCH_ASSOC);
+            return self::convert_resources_to_strings($sql->fetch(PDO::FETCH_ASSOC));
         } catch (PDOException $oops) {
             Hm_Msgs::add('Database error. Please try again.', 'danger');
             Hm_Debug::add($oops->getMessage());

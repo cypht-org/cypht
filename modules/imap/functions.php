@@ -127,7 +127,8 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
 
     foreach ($folders as $folder_name => $folder) {
         $folder_name = bin2hex($folder_name);
-        $results .= '<li class="'. ($folder['children'] ? 'm-has-children ' : '') .'imap_'.$id.'_'.$output_mod->html_safe($folder_name).'" data-number-children="'.$output_mod->html_safe($folder['number_of_children']).'">';
+        $childrenCount = isset($folder['number_of_children']) ? $folder['number_of_children'] : 0;
+        $results .= '<li class="'. ($folder['children'] ? 'm-has-children ' : '') .'imap_'.$id.'_'.$output_mod->html_safe($folder_name).'" data-number-children="'.$output_mod->html_safe($childrenCount).'">';
 
         if ($folder['children']) {
             $results .= '<div class="m-has-children-wrapper"><a href="#" class="imap_folder_link expand_link d-inline-flex" data-target="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"><i class="bi bi-plus-circle-fill"></i></a>';
@@ -239,8 +240,13 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
         $subject = $msg['subject'];
         $preview_msg = "";
+        $type_msg = "";
         if (isset($msg['preview_msg'])) {
             $preview_msg = $msg['preview_msg'];
+        }
+
+        if (isset($msg['type_msg'])) {
+            $type_msg = $msg['type_msg'];
         }
     
         if ($parent_list == 'sent') {
@@ -250,7 +256,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         else {
             $from = $msg['from'];
         }
-        $from = format_imap_from_fld($from);
+        $from = format_imap_from_fld(is_array($from) ? implode(', ', $from) : $from);
         $nofrom = '';
         if (!trim($from)) {
             $from = '[No From]';
@@ -335,7 +341,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
                     array('icon_callback', $flags),
-                    array('subject_callback', $subject, $url, $flags, $icon, $preview_msg),
+                    array('subject_callback', $subject, $url, $flags, $icon, $preview_msg, $type_msg),
                     array('safe_output_callback', 'source', $source),
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
                     array('date_callback', $date, $timestamp, $is_snoozed || $is_scheduled),
@@ -354,7 +360,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('checkbox_callback', $id),
                     array('safe_output_callback', 'source', $source, $icon),
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
-                    array('subject_callback', $subject, $url, $flags, null, $preview_msg),
+                    array('subject_callback', $subject, $url, $flags, null, $preview_msg, $type_msg),
                     array('date_callback', $date, $timestamp, $is_snoozed || $is_scheduled),
                     array('icon_callback', $flags),
                     array('dates_holders_callback', $msg['internal_date'], $msg['date']),
@@ -711,7 +717,10 @@ function format_attached_image_section($struct, $output_mod, $dl_link) {
     $isThereAnyImg = false;
     foreach ($struct as $id => $vals) {
         if ($vals['type'] === 'image') {
-            $res .= '<div><img class="attached_image" src="?'.$dl_link.'&amp;imap_msg_part='.$output_mod->html_safe($id).'" ></div>';
+            $res .= '<div class="col-6 col-md-3">
+                        <img class="attached_image img-fluid" 
+                             src="?' . $dl_link . '&amp;imap_msg_part=' . $output_mod->html_safe($id) . '" >
+                     </div>';
             $isThereAnyImg = true;
         }
         if (isset($vals['subs'])) {
@@ -720,7 +729,7 @@ function format_attached_image_section($struct, $output_mod, $dl_link) {
     }
 
     if ($isThereAnyImg) {
-        $res = '<div class="attached_image_box">' . $res . '</div>';
+        $res = '<div class="container-fluid"><div class="row text-center attached_image_box">' . $res . '</div></div>';
     }
 
     return $res;
@@ -797,7 +806,7 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                     }
                 }
                 if ($sent) {
-                    $msgs = $mailbox->search($folder, $search_type, $terms, null, null, true, false, true);
+                    $msgs = $mailbox->search($folder, $search_type, $terms, null, null, true, true);
                 }
                 else {
                     $msgs = $mailbox->search($folder, $search_type, $terms);
@@ -811,7 +820,7 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                     rsort($msgs);
                     $msgs = array_slice($msgs, 0, $limit);
                 }
-                foreach ($mailbox->get_message_list($folder, $msgs) as $msg) {
+                foreach ($mailbox->get_message_list($folder, $msgs, !$sent) as $msg) {
                     if (array_key_exists('content-type', $msg) && mb_stristr($msg['content-type'], 'multipart/mixed')) {
                         $msg['flags'] .= ' \Attachment';
                     }
@@ -1489,7 +1498,7 @@ function snooze_dropdown($output, $unsnooze = false) {
     $values = nexter_formats();
 
     $txt = '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-bs-auto-close="outside">'.$output->trans('Snooze').'</a>
+                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-bs-auto-close="outside">'.$output->trans('Snooze').'</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
     foreach ($values as $format) {
         $labels = get_scheduled_date($format, true);
@@ -1508,16 +1517,18 @@ function snooze_dropdown($output, $unsnooze = false) {
 }}
 
 if (!hm_exists('tags_dropdown')) {
-function tags_dropdown($context, $headers) {
+function tags_dropdown($context) {
+    $msgUid = $context->get('msg_text_uid');
+    $msgTags = Hm_Tags::getTagIdsWithMessage($msgUid);
+
     $folders = $context->get('tags', array());
     $txt = '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Tags').'</a>
+                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" href="#" aria-expanded="true">'.$context->trans('Tags').'</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuTag">';
 
-    $tags =  !empty($headers['X-Cypht-Tags']) ? explode(',', $headers['X-Cypht-Tags']) : array();
     foreach ($folders as $folder) {
         $tag = $folder['name'];
-        $is_checked = in_array($folder['id'], array_map('trim', $tags));
+        $is_checked = in_array($folder['id'], $msgTags);
         $txt .= '<li class="d-flex dropdown-item gap-2">';
         $txt .= '<input class="form-check-input me-1 label-checkbox" type="checkbox" value="" aria-label="..." data-id="'.$folder['id'].'" '.($is_checked ? 'checked' : '').'>';
         $txt .= '<span>'.$context->trans($tag).'</span>';
@@ -1534,10 +1545,10 @@ function tags_dropdown($context, $headers) {
 if (!hm_exists('forward_dropdown')) {
     function forward_dropdown($output,$reply_args) {
         $txt = '<div class="dropdown d-inline-block">
-                    <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuForward" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Forward').'</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" id="dropdownMenuForward" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Forward').'</button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuForward">';
-        $txt .= '<li><a href="?page=compose&amp;forward_as_attachment=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5" ><span>'.$output->trans('Forward as message attachment').'</a></li>';
-        $txt .= '<li><a href="?page=compose&amp;forward=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5"><span>'.$output->trans('Edit as new message').'</a></li>';
+        $txt .= '<li><a href="?page=compose&amp;forward_as_attachment=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none" ><span>'.$output->trans('Forward as message attachment').'</a></li>';
+        $txt .= '<li><a href="?page=compose&amp;forward=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none"><span>'.$output->trans('Edit as new message').'</a></li>';
         $txt .= '</ul></div>';
         return $txt;
     }
@@ -1647,4 +1658,18 @@ function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_i
         }
     }
     return [$uid, $sent_folder];
+}}
+
+if (!hm_exists('is_imap_archive_folder')) {
+function is_imap_archive_folder($server_id, $user_config, $current_folder) {
+    $special_folders = $user_config->get('special_imap_folders', array());
+    
+    if (isset($special_folders[$server_id]['archive'])) {
+        $archive_folder = $special_folders[$server_id]['archive'];
+        if (bin2hex($archive_folder) == $current_folder) {
+            return true;
+        }
+    }
+    
+    return false;
 }}

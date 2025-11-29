@@ -1,5 +1,5 @@
 :root {
-  --nav-collapsed-size: 100px;
+  --nav-collapsed-size: 130px;
   --nav-expanded-size: 320px;
   --nav-size: var(--nav-expanded-size);
 }
@@ -265,20 +265,6 @@ td {
 .placeholder {
   width: 100px !important;
 }
-.cypht-spinner {
-    position: absolute;
-    inset-inline-start: 55%;
-    top: 50%;
-    --tw-translate-x: -50%;
-    display: none;
-}
-
-/* On small screens we don't have left menu, so there add 5% to inset-inline-start */
-@media screen and (max-width: 600px) {
-  .cypht-spinner {
-    inset-inline-start: 50%;
-  }
-}
 
 .logout {
   margin: 2px;
@@ -304,6 +290,7 @@ td {
 .server_content,
 .profile_content,
 .user_settings {
+  position: relative;
   display: table;
   table-layout: fixed;
   width: 100%;
@@ -311,7 +298,7 @@ td {
   background: #fff;
   height: 100%;
   margin-right: 20px;
-  padding-bottom: 40px;
+  padding-bottom: 20px;
 }
 .user_settings table {
   table-layout: fixed;
@@ -326,12 +313,13 @@ td {
   color: var(--bs-body-color);
 }
 .reset_factory_button {
+  position: absolute;
+  bottom: 40px;
+  right: 10px;
+  margin-right: 37px;
   cursor: pointer;
   color: #666;
   font-size: 100%;
-  padding: 10px !important;
-  float: right !important;
-  margin-right: 20px;
 }
 .disabled_link {
   pointer-events: none;
@@ -426,6 +414,10 @@ button {
   position: relative;
   white-space: nowrap;
 }
+.email_folders .folders > li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .inner_list li {
   margin: 2px;
   white-space: nowrap;
@@ -503,10 +495,11 @@ button {
   margin-top: 0px;
   border-bottom: solid 1px var(--bs-secondary-bg);
   border-top: solid 1px var(--bs-secondary-bg);
-  padding-bottom: 10px;
-  padding-top: 20px;
+  padding-bottom: 15px;
+  padding-top: 15px;
   letter-spacing: -1px;
   gap: 1rem;
+  font-size: 1.25rem;
 }
 .header_subject .content_title {
   color: #555;
@@ -655,13 +648,15 @@ button {
   color: var(--bs-body-color);
 }
 .prevnext {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   margin-right: 5px;
   vertical-align: -3px;
 }
 .plink,
 .nlink {
   color: #666;
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
 }
 .plink:hover,
 .nlink:hover {
@@ -836,8 +831,7 @@ div.unseen,
   background-color: var(--bs-secondary-bg);
   bottom: 0px;
   right: 0px;
-  padding: 20px;
-  padding-left: 20px;
+  padding: 10px 20px;
   z-index: 1000;
 }
 .long_session {
@@ -974,6 +968,7 @@ div.unseen,
 }
 .mobile .mailbox_list_title {
   font-size: 95%;
+  padding-right: 25px;
 }
 .mobile .folder_cell {
   display: block;
@@ -982,23 +977,26 @@ div.unseen,
 .mobile .folder_list {
   margin-right: 0px;
   width: 100%;
+  padding-top: 0px;
 }
 .mobile .folder_list li {
   padding-top: 5px;
   padding-bottom: 5px;
 }
 .mobile .content_cell {
-  padding-top: 60px;
+  padding-top: 55px;
   display: block;
   width: 100%;
 }
 .mobile .content_title {
-  padding-top: 12px;
   display: flex;
+  padding-top: 12px;
+  padding-bottom: 12px;
   max-height: 35rem;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.5rem;
+}
+.mobile .content_title:not(.search_result_title) {
   border-top: none;
 }
 .mobile .list_meta,
@@ -1022,9 +1020,6 @@ div.unseen,
 .mobile .message_table {
   padding-left: 5px !important;
 }
-.mobile .message_list {
-  margin-top: 30px !important;
-}
 .mobile .list_settings_link {
   width: 24px;
   height: 24px;
@@ -1033,29 +1028,24 @@ div.unseen,
 .mobile .msg_text {
   white-space: nowrap !important;
   width: 100%;
-  max-width: 768px !important;
   word-break: break-all;
   word-wrap: break-word;
   font-size: 100%;
+  padding-top: 10px !important;
 }
 .mobile .msg_controls {
   z-index: 1000;
   position: fixed;
-  right: 0px;
-  height: 54px;
+  height: 50px;
   font-size: 115%;
   padding-left: 5px;
-  padding-top: 5px;
-  top: 1px;
-  left: 60px !important;
+  top: 0px;
+  left: 50px !important;
 }
 @media (orientation: landscape) {
   .mobile .msg_controls {
     top: 12px;
     height: 26px;
-  }
-  .mobile .toggle_link {
-    height: 17px !important;
   }
   .mobile .search_form {
     margin-left: -18px !important;
@@ -1081,7 +1071,6 @@ div.unseen,
   text-overflow: ellipsis;
 }
 .mobile .msg_text_inner {
-  padding-left: 10px !important;
   font-size: 120%;
   padding: 10px !important;
 }
@@ -1099,15 +1088,12 @@ div.unseen,
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.mobile .search_form {
-  margin-top: 20px !important;
-}
 .mobile .search_form select,
 .mobile .search_form button,
 .mobile .search_form input {
   margin-left: 0px !important;
   margin: 0px;
-  margin-top: 5px;
+  margin-top: 2px;
 }
 .mobile .search_form > form {
   flex-wrap: wrap;
@@ -1133,13 +1119,12 @@ div.unseen,
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100vh;
 }
 .mobile .unsaved_reminder {
   display: none;
 }
 .mobile .checkbox_cell {
-  width: 35px;
+  width: 25px;
   padding-top: 15px !important;
 }
 .mobile .checkbox_cell label {
@@ -1169,7 +1154,7 @@ div.unseen,
   height: 24px;
 }
 .mobile .toggle_link {
-  padding: 4px 6px !important;
+  padding: 0px 6px !important;
   line-height: normal !important;
   margin-left: -3px !important;
   position: relative;
@@ -1278,7 +1263,6 @@ div.unseen,
 }
 [data-title] {
   position: relative;
-  z-index: 10 !important;
 }
 
 #list_controls_menu {
@@ -1288,16 +1272,27 @@ div.unseen,
   right: 0px;
   display: none;
   padding: 0px 5px 5px 10px;
-  background-color: #fff;
+  background-color: var(--bs-body-bg);
 }
 .mobile #list_controls_menu.show {
   display: flex;
   width: 100vw;
   left: 0px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  padding-top: 5px;
+  flex-direction: row;
+  justify-content: right;
+}
+.mobile #list_controls_menu.show > a {
+  padding-right: 15px;
+}
+.mobile #list_controls_menu.show form {
+  padding-right: 15px;
 }
 .mobile .imap_sort {
   width: 100%;
+  margin-right: 0;
 }
 .delayed_date {
   color: var(--bs-primary) !important;
@@ -1320,7 +1315,7 @@ div.unseen,
   position: absolute;
   right: 0px;
   top: 54px;
-  background-color: #fafafa;
+  background-color: var(--bs-body-bg);
   font-size: 85%;
   padding: 15px 20px;
   display: none;
@@ -1362,16 +1357,6 @@ div.unseen,
 .on_mobile {
   display: none;
 }
-.mobile .no_mobile {
-  display: none !important;
-}
-.mobile .on_mobile {
-  display: block !important;
-}
-.mobile .move_to_location {
-  right: 0;
-}
-
 .server_title {
   font-size: 110%;
   margin-bottom: 0px;
@@ -1410,7 +1395,7 @@ div.unseen,
   width: 30%;
   min-height: 100vh;
   height: 100%;
-  z-index: 1000;
+  z-index: 1001;
   transform: translateX(-120%);
   transition: transform 0.3s;
   border-right: 1px solid var(--bs-secondary-bg);
@@ -1432,8 +1417,8 @@ div.unseen,
   z-index: 1000;
   text-align: left;
   top: 0;
-  padding: 15px 0 15px 20px;
-  background: #fff;
+  padding: 10px 0 10px 18px;
+  background: var(--bs-body-bg);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
 }
@@ -1479,7 +1464,8 @@ div.unseen,
   backdrop-filter: none;
   width: fit-content;
   margin-left: 0;
-  padding: 15px 20px;
+  padding: 10px 15px;
+  display: block !important;
 }
 
 .mobile .app-logo{
@@ -1576,18 +1562,13 @@ a[disabled] {
   color: var(--bs-white);
 }
 
-.mobile .search_content .p-3 {
-  flex: 1 1 auto;
-  overflow: auto;
-}
-
 .search_content .refresh_link {
   display: none;
 }
 
 /* Bootstrap-based message headers */
 .msg_text * {
-  white-space: normal !important;
+  white-space: normal;
   word-break: break-word;
   overflow-wrap: anywhere;
 }
@@ -1610,6 +1591,7 @@ a[disabled] {
 .small_header > div:nth-of-type(2) > div {
   display: flex;
   column-gap: 0.15rem;
+  flex-flow: wrap;
 }
 
 .small_header {
@@ -1624,8 +1606,42 @@ a[disabled] {
   display: none;
 }
 
+.add_contact_row {
+  background-color: white;
+}
+
+.add_contact_row #add_contact {
+  white-space: nowrap;
+}
+
+pre.msg_source {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.msg_text .col-md-2 {
+  font-weight: bold;
+}
+
+.form-check-input:checked {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.mobile .no_mobile { display: none !important; }
+.mobile .on_mobile { display: block !important; }
+.mobile .move_to_location { right: 0; }
+.mobile .search_content .p-3 { flex: 1 1 auto; overflow: auto; }
+.mobile .search_form { padding-left: 0; }
+.mobile .folders { margin-top: 1rem; margin-left: 1rem !important; }
+.mobile .server_section { overflow: hidden; }
+.mobile .add_server .txt_fld { width: 100%; }
+.mobile .user_settings table td { padding: 5px 10px; }
+.mobile .reset_factory_button { margin-right: 1rem; }
+.mobile .message_list .list_controls.on_mobile form { display: inline-block; }
+
 /* Mobile responsive overrides for Bootstrap classes */
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .small_header {
     display: flex;
     flex-direction: row;
@@ -1639,29 +1655,38 @@ a[disabled] {
     flex-wrap: wrap;
   }
 
-  .small_header .col-md-2 {
-    font-weight: bold;
-    white-space: nowrap;
-    width: fit-content !important;
-  }
-
   .long_header .col-md-2 {
     font-weight: bold;
   }
 
-  .msg_actions a {
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    background-color: #f8f9fa;
-    text-decoration: none;
-    color: #495057;
-    font-size: 0.6rem;
-    margin-right: 0;
-  }
-
+  .mobile .msg_actions a { font-size: 0.85rem; }
   .mobile nav.folder_cell { width: 50%; }
+  .mobile .news_cell .subject div { padding-bottom: 0px !important; }
+  .mobile .message_list { position: relative; }
+  .mobile .small_header .col-md-2 {
+    font-weight: bold; white-space: nowrap; width: fit-content;
+  }
+  .mobile .message_list .list_controls.on_mobile {
+    position: absolute; top: 10px; right: 15px;
+  }
+  .mobile .message_list .list_controls.on_mobile .form-control {
+    padding-top: 0.2rem; padding-bottom: 0.2rem; }
+  .mobile .content_title > .flex-wrap {
+    flex-wrap: nowrap !important; margin-bottom: 0px !important;
+  }
+  .mobile .content_title .list_meta { margin-bottom: 0px !important; }
+  .mobile .msg_text .small_header .col-md-2 { width: 16.667%; }
+  .mobile .msg_text .small_header > div + div { width: 83.333%; }
+  .mobile #list_controls_menu.show { left: auto; right: -15px; }
 }
 
-@media (max-width: 575px) {
+@media (max-width: 575.98px) {
   .mobile nav.folder_cell { width: 100%; }
+  .mobile .calendar .month_label { padding: 1rem !important; }
+  .mobile .calendar .border.m-4 { margin: 1rem !important; }
+  .mobile .content_title { gap: 0.25rem; padding-bottom: 10px !important; }
+  .mobile .small_header:nth-child(-n+3) { padding-bottom: 6px !important; }
+  .mobile .msg_text .small_header .col-md-2 { width: 20%; }
+  .mobile .msg_text .small_header > div + div { width: 80%; }
+  .mobile .msg_text .small_header > div.d-none + div { width: 100%; }
 }

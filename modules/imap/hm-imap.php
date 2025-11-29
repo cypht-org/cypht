@@ -962,9 +962,11 @@ if (!class_exists('Hm_IMAP')) {
          * @todo refactor. abstract header line continuation parsing for re-use
          * @param mixed $uids an array of uids or a valid IMAP sequence set as a string
          * @param bool $raw flag to disable decoding header values
+         * @param bool $include_content_body flag to include the first 500 bytes of the message body
+         * @param bool $exclude_auto_bcc don't include auto-bcc'ed messages
          * @return array list of headers and values for the specified uids
          */
-        public function get_message_list($uids, $raw=false, $include_content_body = false) {
+        public function get_message_list($uids, $raw=false, $include_content_body = false, $exclude_auto_bcc = true, $active_body_structure = true) {
             if (is_array($uids)) {
                 sort($uids);
                 $sorted_string = implode(',', array_filter($uids));
@@ -979,7 +981,10 @@ if (!class_exists('Hm_IMAP')) {
             if ($this->is_supported( 'X-GM-EXT-1' )) {
                 $command .= 'X-GM-MSGID X-GM-THRID X-GM-LABELS ';
             }
-            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID IN-REPLY-TO X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY)]";
+            if ($active_body_structure) {
+                $command .= "BODYSTRUCTURE ";
+            }
+            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID IN-REPLY-TO X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY X-MS-EXCHANGE-CALENDAR-SERIES-INSTANCE-ID SENDER)]";
             if ($include_content_body) {
                 $command .= " BODY.PEEK[TEXT]<0.500>";
             }
@@ -993,8 +998,10 @@ if (!class_exists('Hm_IMAP')) {
             $res = $this->get_response(false, true);
             $status = $this->check_response($res, true);
             $tags = array('X-GM-MSGID' => 'google_msg_id', 'X-GM-THRID' => 'google_thread_id', 'X-GM-LABELS' => 'google_labels', 'UID' => 'uid', 'FLAGS' => 'flags', 'RFC822.SIZE' => 'size', 'INTERNALDATE' => 'internal_date');
-            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'IN-REPLY-TO', 'REFERENCES', 'X-SNOOZED', 'X-SCHEDULE', 'X-PROFILE-ID', 'X-DELIVERY', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
-            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'in-reply-to' => 'in_reply_to', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body');
+            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'IN-REPLY-TO', 'REFERENCES', 'X-SNOOZED', 'X-SCHEDULE', 'X-PROFILE-ID', 'X-DELIVERY', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE', 'X-MS-EXCHANGE-CALENDAR-SERIES-INSTANCE-ID', 'SENDER');
+            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'in-reply-to' => 'in_reply_to', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body', 'type_msg' => 'type_msg');
+            $flds['x-ms-exchange-calendar-series-instance-id'] = "x_ms_exchange_calendar_series_instance_id";
+            $flds['sender'] = "sender";
             $headers = array();
 
             foreach ($res as $n => $vals) {
@@ -1021,10 +1028,29 @@ if (!class_exists('Hm_IMAP')) {
                     $x_schedule = '';
                     $x_profile_id = '';
                     $x_delivery = '';
+                    $x_ms_exchange_calendar_series_instance_id = '';
+                    $sender = '';
                     $count = count($vals);
                     $header_founded = false;
                     $body_founded = false;
+                    $flds['type_msg'] = '';
+                    $bodystructure_found = false;
                     for ($i=0;$i<$count;$i++) {
+                        if ($vals[$i] == 'BODYSTRUCTURE' && !$bodystructure_found) {
+                            $bodystructure_found = true;
+                            
+                            $struct = new Hm_IMAP_Struct(array_slice($vals, $i + 1), $this);
+
+                            $calendar_parts = $struct->search(array('type' => 'text', 'subtype' => 'calendar'), true);
+
+                            if (empty($calendar_parts)) {
+                                $calendar_parts = $struct->search(array('type' => 'application', 'subtype' => 'ics'), true);
+                            }
+
+                            if (!empty($calendar_parts)) {
+                                $flds['type_msg'] = "calendar";
+                            }
+                        }
                         if ($vals[$i] == 'BODY[HEADER.FIELDS' && !$header_founded) {
                             $header_founded = true;
                             $i++;
@@ -1091,12 +1117,29 @@ if (!class_exists('Hm_IMAP')) {
                                 $cset = trim(mb_strtolower(str_replace(array('"', "'"), '', $matches[1])));
                             }
                         }
+
+                        if ($exclude_auto_bcc && trim($x_auto_bcc) === 'cypht') {
+                            continue;
+                        }
+
                         $headers[(string) $uid] = array('uid' => $uid, 'flags' => $flags, 'internal_date' => $internal_date, 'size' => $size,
                                          'date' => $date, 'from' => $from, 'to' => $to, 'subject' => $subject, 'content-type' => $content_type,
                                          'timestamp' => time(), 'charset' => $cset, 'x-priority' => $x_priority, 'google_msg_id' => $google_msg_id,
                                          'google_thread_id' => $google_thread_id, 'google_labels' => $google_labels, 'list_archive' => $list_archive,
                                          'references' => $references, 'message_id' => $message_id, 'in_reply_to' => $in_reply_to, 'x_auto_bcc' => $x_auto_bcc,
-                                         'x_snoozed'  => $x_snoozed, 'x_schedule' => $x_schedule, 'x_profile_id' => $x_profile_id, 'x_delivery' => $x_delivery);
+                                         'x_snoozed'  => $x_snoozed, 'x_schedule' => $x_schedule, 'x_profile_id' => $x_profile_id, 'x_delivery' => $x_delivery, 'x_ms_exchange_calendar_series_instance_id' => $x_ms_exchange_calendar_series_instance_id, 'sender' => $sender);
+
+                        $headers[$uid]['type_msg'] = $flds['type_msg'] != "type_msg" ? $flds['type_msg'] :  "";
+                        if ($headers[$uid]['type_msg'] != "calendar") {
+                            if ($headers[$uid]['x_ms_exchange_calendar_series_instance_id'] || $headers[$uid]['sender']) {
+                                if (strpos($headers[$uid]['sender'], 'Google Calendar <calendar-')) {
+                                    $headers[$uid]['type_msg'] = "calendar";
+                                }
+                                if (! empty(trim($headers[$uid]['x_ms_exchange_calendar_series_instance_id']))) {
+                                    $headers[$uid]['type_msg'] = "calendar";
+                                }
+                            }
+                        }
                         $headers[$uid]['preview_msg'] = $flds['body'] != "content_body" ? $flds['body'] :  "";
 
                         if ($raw) {
@@ -1110,6 +1153,7 @@ if (!class_exists('Hm_IMAP')) {
                     }
                 }
             }
+
             if ($status) {
                 return $this->cache_return_val($headers, $cache_command);
             }
@@ -1310,11 +1354,10 @@ if (!class_exists('Hm_IMAP')) {
          * @param string $fld optional field to search
          * @param string $term optional search term
          * @param bool $exclude_deleted extra argument to exclude messages with the deleted flag
-         * @param bool $exclude_auto_bcc don't include auto-bcc'ed messages
          * @param bool $only_auto_bcc only include auto-bcc'ed messages
          * @return array list of IMAP message UIDs that match the search
          */
-        public function search($target='ALL', $uids=false, $terms=array(), $esearch=array(), $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
+        public function search($target='ALL', $uids=false, $terms=array(), $esearch=array(), $exclude_deleted=true, $only_auto_bcc=false) {
             if (!$this->is_clean($this->search_charset, 'charset')) {
                 return array();
             }
@@ -1375,9 +1418,6 @@ if (!class_exists('Hm_IMAP')) {
             }
             if ($only_auto_bcc) {
                $fld .= ' HEADER X-Auto-Bcc cypht';
-            }
-            if ($exclude_auto_bcc && !mb_strstr($this->server, 'yahoo') && $this->server_supports_custom_headers()) {
-               $fld .= ' NOT HEADER X-Auto-Bcc cypht';
             }
             $esearch_enabled = false;
             $command = 'UID SEARCH ';
@@ -2314,7 +2354,7 @@ if (!class_exists('Hm_IMAP')) {
          * @param string $filter can be one of ALL, SEEN, UNSEEN, ANSWERED, UNANSWERED, DELETED, UNDELETED, FLAGGED, or UNFLAGGED
          * @return array list of IMAP message UIDs
          */
-        public function get_message_sort_order($sort='ARRIVAL', $reverse=true, $filter='ALL', $terms=array(), $exclude_deleted=true, $exclude_auto_bcc=false, $only_auto_bcc=false) {
+        public function get_message_sort_order($sort='ARRIVAL', $reverse=true, $filter='ALL', $terms=array(), $exclude_deleted=true, $only_auto_bcc=false) {
             if (!$this->is_clean($sort, 'keyword') || !$this->is_clean($filter, 'keyword') || !$this->is_supported('SORT')) {
                 return [];
             }
@@ -2351,9 +2391,6 @@ if (!class_exists('Hm_IMAP')) {
             }
             if ($only_auto_bcc) {
                $fld .= ' HEADER X-Auto-Bcc cypht';
-            }
-            if ($exclude_auto_bcc && !mb_strstr($this->server, 'yahoo') && $this->server_supports_custom_headers()) {
-               $fld .= ' NOT HEADER X-Auto-Bcc cypht';
             }
             if ($filter == 'ALL') {
                 $filter = '';
@@ -2493,7 +2530,7 @@ if (!class_exists('Hm_IMAP')) {
          * @return array list of headers
          */
 
-        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=array(), $include_preview = false) {
+        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=array(), $include_preview = false, $active_body_structure = true) {
             $result = array();
 
             /* select the mailbox if need be */
@@ -2533,7 +2570,7 @@ if (!class_exists('Hm_IMAP')) {
 
             /* get the headers and build a result array by UID */
             if (!empty($uids)) {
-                $headers = $this->get_message_list($uids, false, $include_preview);
+                $headers = $this->get_message_list($uids, false, $include_preview, true, $active_body_structure);
                 foreach($uids as $uid) {
                     if (isset($headers[$uid])) {
                         $result[$uid] = $headers[$uid];
@@ -2587,54 +2624,6 @@ if (!class_exists('Hm_IMAP')) {
             return $result;
         }
 
-        /**
-         * Test if the server supports searching by custom headers.
-         * 
-         * This function sends a test search command to check if the server supports 
-         * searching by custom headers (e.g., X-Auto-Bcc). If the server does not support 
-         * this feature, it will return false.
-         *
-         * Reference: Stalwart's current limitation on searching by custom headers 
-         * discussed in the following GitHub thread:
-         * https://github.com/stalwartlabs/mail-server/discussions/477
-         * 
-         * Note: This function should be removed once Stalwart starts supporting custom headers.
-         *
-         * @return boolean true if the server supports searching by custom headers.
-         */
-        protected function server_supports_custom_headers() {
-            $test_command = 'UID SEARCH HEADER "X-NonExistent-Header" "test"'."\r\n";
-            $this->send_command($test_command);
-            $response = $this->get_response(false, true);
-            $status = $this->check_response($response, true);
-
-            // Keywords that indicate the header search is not supported
-            $keywords = ['is', 'not', 'supported.'];
-
-            if (!$status) {
-                return false;
-            }
-
-            // Flatten the response array to a single array of strings
-            $flattened_response = array_reduce($response, 'array_merge', []);
-
-            // Check if all keywords are present in the flattened response
-            $sequence_match = true;
-            foreach ($keywords as $keyword) {
-                if (!in_array($keyword, $flattened_response)) {
-                    $sequence_match = false;
-                    break;
-                }
-            }
-
-            // If all keywords are found, the header search is not supported
-            if ($sequence_match) {
-                return false;
-            }
-
-            return true;
-        }
-
         public function server_support_children_capability() {
             $test_command = 'CAPABILITY'."\r\n";
             $this->send_command($test_command);
@@ -2667,5 +2656,7 @@ if (!class_exists('Hm_IMAP')) {
 
             return false;
         }
+
+
     }
 }

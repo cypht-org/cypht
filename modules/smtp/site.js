@@ -1,14 +1,16 @@
 'use strict';
 
-var get_smtp_profile = function(profile_value) {
+var get_smtp_profile = function(profile_value, callback) {
     if (typeof profile_value === "undefined" || profile_value == "0" || profile_value == "") {
         Hm_Notices.show('Please create a profile for saving sent messages option', 'warning');
     }
     else {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_profiles_status'},
-            {'name': 'profile_value', 'value': profile_value}],
+            {'name': 'profile_value', 'value': profile_value},
+            {'name': 'compose_smtp_id', 'value': profile_value}],
             function(res) {
+                callback(res);
             }
         );
     }
@@ -391,7 +393,7 @@ function smtpSettingsPageHandler() {
 }
 
 $(function() {
-    if (hm_is_logged()) {
+    if (hm_is_logged() && window.inAppContext) {
         let scheduled_msg_count = 0;
         let sendScheduledMessages = function() { 
             Hm_Ajax.request(

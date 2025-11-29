@@ -5,6 +5,16 @@
 set -e
 
 SCRIPT_DIR=$(dirname $(realpath "$0"))
+PROJECT_ROOT=$(dirname $(dirname "$SCRIPT_DIR"))
+
+# Change to project root to ensure correct paths work
+cd "$PROJECT_ROOT"
+
+# Create .env.test if it doesn't exist (for CI environments)
+if [ ! -f .env.test ]; then
+    echo "Creating .env.test from .env.test.example"
+    cp .env.test.example .env.test
+fi
 
 DB="${DB:-sqlite}"
 
@@ -21,7 +31,7 @@ if [ "$DB" = "sqlite" ]; then
     export DB_SOCKET=${FILE}
 
     cat ${SCRIPT_DIR}/data/schema_sqlite.sql | sqlite3 ${FILE}
-    cat ${SCRIPT_DIR}/data/seed.sql | sqlite3 ${FILE}
+    cat ${SCRIPT_DIR}/data/seed_sqlite.sql | sqlite3 ${FILE}
 
 elif [ "$DB" = "mysql" ]; then
     # Load schema.sql
@@ -42,4 +52,4 @@ else
     exit 1
 fi
 
-phpunit --bootstrap vendor/autoload.php --configuration ${SCRIPT_DIR}/phpunit.xml --testdox $@
+${PROJECT_ROOT}/vendor/bin/phpunit --configuration ${SCRIPT_DIR}/phpunit.xml --testdox $@

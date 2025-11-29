@@ -184,7 +184,7 @@ function db_pass_setting($current) {
 
 function db_driver_setting($current) {
     $opts = PDO::getAvailableDrivers();
-    return '<tr><td>Databse Type</td><td>'.select_box('auth_type', $selected, $opts).'</td></tr>';
+    return '<tr><td>Database Type</td><td>'.select_box('auth_type', $selected, $opts).'</td></tr>';
 }
 
 function output_settings($settings) {

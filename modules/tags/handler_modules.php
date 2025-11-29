@@ -23,8 +23,8 @@ class Hm_Handler_add_tag_to_message extends Hm_Handler_Module {
      * Use IMAP to tag the selected message uid
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('tag_id', 'list_path'));
-        if (!$success) {
+        list($success, $form) = $this->process_form(array('tag_id', 'list_path', 'tag'));
+        if (!$success || !isset($form['tag']) || $form['tag'] != true) {
             return;
         }
 
@@ -47,6 +47,45 @@ class Hm_Handler_add_tag_to_message extends Hm_Handler_Module {
             $type = 'warning';
         } else {
             $msg = 'ERRFailed to tag selected messages';
+            $type = 'danger';
+        }
+        Hm_Msgs::add($msg, $type);
+    }
+}
+
+/**
+ * Remove tag/label from message
+ * @subpackage imap/handler
+ */
+class Hm_Handler_remove_tag_from_message extends Hm_Handler_Module {
+    /**
+     * Use IMAP to remove tag from the selected message uid
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('tag_id', 'list_path', 'untag'));
+        if (!$success || !isset($form['untag']) || $form['untag'] != true) {
+            return;
+        }
+
+        $untaged_messages = 0;
+        $ids = explode(',', $form['list_path']);
+        foreach ($ids as $msg_part) {
+            list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
+            $folder = hex2bin($folder);
+            $untagged = Hm_Tags::removeMessage($msg_id, $form['tag_id']);
+            if ($untagged) {
+                $untaged_messages++;
+            }
+        }
+        $this->out('untaged_messages', $untaged_messages);
+        $type = 'success';
+        if ($untaged_messages == count($ids)) {
+            $msg = 'Tag removed';
+        } elseif ($untaged_messages > 0) {
+            $msg = 'Messages have been untaged';
+            $type = 'warning';
+        } else {
+            $msg = 'ERRFailed to remove tag from selected messages';
             $type = 'danger';
         }
         Hm_Msgs::add($msg, $type);
@@ -102,6 +141,7 @@ class Hm_Handler_process_tag_update extends Hm_Handler_Module {
             Hm_Tags::add($tag);
             Hm_Msgs::add('Tag Created');
         }
+        $this->session->set('tags_updated', true);
     }
 }
 
@@ -117,6 +157,7 @@ class Hm_Handler_process_tag_delete extends Hm_Handler_Module {
         if (($tag = Hm_Tags::get($form['tag_id']))) {
             Hm_Tags::del($tag['id']);
             Hm_Msgs::add('Tag Deleted');
+            $this->session->set('tags_updated', true);
         } else {
             Hm_Msgs::add('Tag ID not found', 'warning');
             return;
@@ -189,6 +230,10 @@ class Hm_Handler_tag_data extends Hm_Handler_Module {
     public function process() {
         Hm_Tags::init($this);
         $this->out('tags', Hm_Tags::getAll());
+        if ($this->session->get('tags_updated')) {
+            $this->out('tags_updated', true);
+            $this->session->set('tags_updated', false);
+        }
     }
 }
 

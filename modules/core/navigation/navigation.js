@@ -30,6 +30,10 @@ window.addEventListener('popstate', function(event) {
 });
 
 window.addEventListener('load', function() {
+    if (!hm_is_logged()) {
+        return;
+    }
+    
     const unMountCallback = renderPage(window.location.href);
     history.replaceState({ main: $('#cypht-main').prop('outerHTML'), scripts: extractCustomScripts($(document)) }, "");
 
@@ -40,14 +44,24 @@ window.addEventListener('load', function() {
 
 
 $(document).on('click', '.cypht-layout a', function(event) {
-    if ($(this).attr('href') !== "#" && $(this).attr('target') !== '_blank' && !$(this).data('external')) {
+    const href = $(this).attr('href');
+    const target = $(this).attr('target');
+    const isExternal = $(this).data('external');
+    
+    const isExternalDomain = href && (
+        href.startsWith('http://') || 
+        href.startsWith('https://') || 
+        href.startsWith('//')
+    ) && !href.includes(window.location.hostname);
+    
+    if (href !== "#" && target !== '_blank' && !isExternal && !isExternalDomain) {
         event.preventDefault();
         const currentUrl = new URL(window.location.href);
         const currentPage = currentUrl.searchParams.toString();
-        const target = new URLSearchParams($(this).attr('href').split('?')[1]);
-        if (currentPage !== target.toString()) {
+        const targetParams = new URLSearchParams(href.split('?')[1]);
+        if (currentPage !== targetParams.toString()) {
             Hm_Ajax.abort_all_requests();
-            navigate(autoAppendParamsForNavigation($(this).attr('href')));
+            navigate(autoAppendParamsForNavigation(href));
         }
     }
 });
@@ -102,6 +116,16 @@ async function navigate(url, loaderMessage) {
         if (!html || typeof html !== 'string') {
             throw new Error("Failed navigating to page, empty or invalid response body.");
         }
+
+        // load custom javascript
+        const scripts = extractCustomScripts($(html));
+        loadCustomScripts(scripts);
+
+        if (!hm_is_logged()) {
+            logout();
+            return;
+        }
+
         const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
         if (!titleMatch) {
             throw new Error("No <title> element found in response HTML");
@@ -127,10 +151,6 @@ async function navigate(url, loaderMessage) {
             cyphtMain = innerMain.prop('outerHTML');
         }
         document.title = title.replace(/<[^>]*>/g, '');
-        
-        // load custom javascript
-        const scripts = extractCustomScripts($(html));
-        loadCustomScripts(scripts);
 
         window.location.next = url;
 

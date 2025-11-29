@@ -22,7 +22,7 @@ return [
             /*
             | Flag to enable or disable TLS connections
             */
-            'enable_tls' => env('LDAP_ENABLE_TLS', true),
+            'enable_tls' => env('LDAP_ENABLE_TLS', false),
 
             /*
             | Port to connect to
@@ -43,6 +43,11 @@ return [
             | Flag to enable user binding. Anonymous binding is used when set to false
             */
             'auth' => env('LDAP_AUTH', false),
+
+            /*
+            | Attribute to use for user identification
+            */
+            'ldap_uid_attr' => env('LDAP_UID_ATTR', 'uid'),
 
             /*
             | Global username and password to bind with if auth is set to true. If left

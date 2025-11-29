@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" cacheDirectory=".phpunit.cache">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" cacheDirectory=".phpunit.cache" bootstrap="bootstrap.php">
   <php>
       <const name="CYPHT_PHPUNIT_TEST_MODE" value="phpunit"/>
   </php>
@@ -137,6 +137,10 @@
       <file>./modules/core/handler_modules.php</file>
       <file>./modules/core/output_modules.php</file>
       <file>./modules/core/output_modules_debug.php</file>
+    </testsuite>
+    <testsuite name="modules_saved_searches">
+      <file>./modules/saved_searches/functions.php</file>
+      <file>./modules/saved_searches/class.php</file>
     </testsuite>
   </testsuites>
   <source>

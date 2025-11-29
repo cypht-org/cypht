@@ -30,8 +30,10 @@ class ServersTest(WebTest):
 
     def server_stmp_and_imap_add(self):
         self.toggle_server_section('server_config')
+        self.wait_on_class('imap-jmap-smtp-btn')
         self.by_id('add_new_server_button').click()
-        name = self.by_name('srv_setup_stepper_profile_name')
+        # self.wait_on_class('srv_setup_stepper_profile_name')
+        name = self.by_id('srv_setup_stepper_profile_name')
         name.send_keys('Test')
         email = self.by_name('srv_setup_stepper_email')
         email.send_keys('test@localhost')
@@ -40,7 +42,16 @@ class ServersTest(WebTest):
         next_button = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable((By.ID, "step_config_action_next"))
         )
-        next_button.click()
+         # Scroll to the button and wait for any animations/overlays to finish
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant', block: 'center'});", next_button)
+        WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(next_button))
+
+        # Try multiple click methods for better reliability
+        try:
+            next_button.click()
+        except Exception as e:
+            print(f"Normal click failed: {e}. Trying JavaScript click...")
+            self.driver.execute_script("arguments[0].click();", next_button)
         # show step two
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, '//h2[text()="Step 2"]'))
@@ -60,8 +71,8 @@ class ServersTest(WebTest):
         signature = self.by_name('srv_setup_stepper_profile_signature')
         signature.send_keys('Test')
         elem = self.by_id('step_config_action_finish')
-        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
-        sleep(1)
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant'})", elem)
+        WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(elem))
         elem.click()
         wait = WebDriverWait(self.driver, 30)
         element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "sys_messages")))
