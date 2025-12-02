@@ -125,6 +125,15 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                             return 'data-src="' . $matches[1] . '" ' . 'src="" ' . 'data-message-part="' . $this->html_safe($this->get('imap_msg_part')) . '"';
                         }, $msgText);
                     }
+
+                    $images_blacklist = $this->get('images_blacklist');
+                    if (in_array($sender_email, $images_blacklist)) {
+                        $msgText = preg_replace_callback('/\<[^>]*(src="(https?:\/\/[^"]*)"|src=\'(https?:\/\/[^\']*)\')[^>]*\>/i', function ($matches) {
+                            return '';
+                        }, $msgText);
+
+                        $msgText = '<div data-external-resources-blocked="1"></div>' . $msgText;
+                    }
                 }
 
                 $msgText = sanitize_email_html($msgText);
