@@ -2471,3 +2471,14 @@ document.addEventListener("show.bs.dropdown", function (event) {
     });
 });
 
+window.addEventListener('page-change', () => {
+    document.getElementById("cypht-upgrade-alert")?.addEventListener("close.bs.alert", function () {
+        Hm_Utils.save_to_local_storage('cypht_upgrade_alert_dismissed', '1');
+    });
+    if (Hm_Utils.get_from_local_storage('cypht_upgrade_alert_dismissed') !== '1') {
+        $("#cypht-upgrade-alert").addClass("show");
+    } else {
+        $("#cypht-upgrade-alert").addClass("hide");
+    }
+})
+
