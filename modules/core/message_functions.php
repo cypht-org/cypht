@@ -35,6 +35,7 @@ function format_msg_html($str, $images=false) {
         foreach ($html_tags as $tag) {
             $def->addAttribute($tag, 'data-src', 'Text');
         }
+        $def->addAttribute('div', 'data-external-resources-blocked', 'Text');
     }
 
     try {
