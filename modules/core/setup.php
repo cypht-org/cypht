@@ -14,13 +14,13 @@ output_source('core');
 /* homepage */
 setup_base_page('home');
 add_handler('home', 'check_missing_passwords', true, 'core', 'load_user_data', 'after');
-add_output('home', 'home_heading', true, 'core', 'content_section_start', 'after');
+add_output('home', 'home_heading', true, 'core', 'version_upgrade_checker', 'after');
 add_output('home', 'home_password_dialogs', true, 'core', 'home_heading', 'after');
 
 /* servers page */
 setup_base_page('servers');
 add_handler('servers', 'reload_folder_cookie', true, 'core', 'save_user_data', 'after');
-add_output('servers', 'server_content_start', true, 'core', 'content_section_start', 'after');
+add_output('servers', 'server_content_start', true, 'core', 'version_upgrade_checker', 'after');
 add_output('servers', 'server_config_stepper', true, 'core', 'server_content_start', 'after');
 add_output('servers', 'server_config_stepper_end_part', true, 'core', 'server_config_stepper', 'after');
 add_output('servers', 'server_config_stepper_accordion_end_part', true, 'core', 'server_config_stepper_end_part', 'after');
@@ -32,7 +32,7 @@ setup_base_page('compose');
 /* save settings */
 setup_base_page('save');
 add_handler('save', 'process_save_form', true, 'core', 'load_user_data', 'after');
-add_output('save', 'save_form', true, 'core', 'content_section_start', 'after');
+add_output('save', 'save_form', true, 'core', 'version_upgrade_checker', 'after');
 
 /* settings */
 setup_base_page('settings');
@@ -69,7 +69,7 @@ add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'b
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
 add_handler('settings', 'privacy_settings', true, 'core', 'date', 'after');
 
-add_output('settings', 'start_settings_form', true, 'core', 'content_section_start', 'after');
+add_output('settings', 'start_settings_form', true, 'core', 'version_upgrade_checker', 'after');
 add_output('settings', 'start_search_settings', true, 'core', 'start_settings_form', 'after');
 add_output('settings', 'start_general_settings', true, 'core', 'start_search_settings', 'after');
 add_output('settings', 'language_setting', true, 'core', 'start_general_settings', 'after');
@@ -113,14 +113,14 @@ add_output('settings', 'privacy_settings', 'true', 'core', 'start_unread_setting
 /* message list page */
 setup_base_page('message_list');
 add_handler('message_list', 'default_sort_order_setting', true, 'core', 'load_user_data', 'after');
-add_output('message_list', 'message_list_heading', true, 'core', 'content_section_start', 'after');
+add_output('message_list', 'message_list_heading', true, 'core', 'version_upgrade_checker', 'after');
 add_output('message_list', 'message_list_start', true, 'core', 'message_list_heading', 'after');
 add_output('message_list', 'message_list_end', true, 'core', 'message_list_start', 'after');
 
 /* search page */
 setup_base_page('search');
 add_handler('search', 'default_sort_order_setting', true, 'core', 'load_user_data', 'after');
-add_output('search', 'search_content_start', true, 'core', 'content_section_start', 'after');
+add_output('search', 'search_content_start', true, 'core', 'version_upgrade_checker', 'after');
 add_output('search', 'search_form_start', true, 'core', 'search_content_start', 'after');
 add_output('search', 'search_form_content', true, 'core', 'search_form_start', 'after');
 add_output('search', 'search_form_end', true, 'core', 'search_form_content', 'after');
@@ -139,12 +139,12 @@ add_handler('ajax_reset_search', 'reset_search', true, 'core', 'load_user_data',
 
 /* message view page */
 setup_base_page('message');
-add_output('message', 'message_start', true, 'core', 'content_section_start', 'after');
+add_output('message', 'message_start', true, 'core', 'version_upgrade_checker', 'after');
 add_output('message', 'message_end', true, 'core', 'message_start', 'after');
 
 /* not-found page data and output */
 setup_base_page('notfound');
-add_output('notfound', 'notfound_content', true, 'core', 'content_section_start', 'after');
+add_output('notfound', 'notfound_content', true, 'core', 'version_upgrade_checker', 'after');
 
 /* message action ajax request */
 setup_base_ajax_page('ajax_message_action', 'core');

@@ -11,7 +11,7 @@ setup_base_page('contacts', 'core');
 
 add_handler('contacts', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
 add_handler('contacts', 'check_imported_contacts', true, 'contacts', 'load_user_data', 'after');
-add_output('contacts', 'contacts_content_start', true, 'contacts', 'content_section_start', 'after');
+add_output('contacts', 'contacts_content_start', true, 'contacts', 'version_upgrade_checker', 'after');
 add_output('contacts', 'contacts_list', true, 'contacts', 'contacts_content_start', 'after');
 add_output('contacts', 'contacts_content_end', true, 'contacts', 'contacts_list', 'after');
 add_output('settings', 'contact_auto_collect_setting', true, 'contacts', 'max_google_contacts_number', 'after');

@@ -8,7 +8,7 @@ output_source('advanced_search');
 /* advanced search page */
 setup_base_page('advanced_search', 'core');
 add_handler('advanced_search', 'advanced_search_prepare', true, 'advanced_search', 'date', 'after');
-add_output('advanced_search', 'advanced_search_content_start', true, 'advanced_search', 'content_section_start', 'after');
+add_output('advanced_search', 'advanced_search_content_start', true, 'advanced_search', 'version_upgrade_checker', 'after');
 add_output('advanced_search', 'advanced_search_form_start', true, 'advanced_search', 'advanced_search_content_start', 'after');
 add_output('advanced_search', 'advanced_search_form_content', true, 'advanced_search', 'advanced_search_form_start', 'after');
 add_output('advanced_search', 'advanced_search_form_end', true, 'advanced_search', 'advanced_search_form_content', 'after');
