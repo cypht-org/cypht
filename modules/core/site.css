@@ -1,6 +1,6 @@
 :root {
   --nav-collapsed-size: 130px;
-  --nav-expanded-size: 320px;
+  --nav-expanded-size: 380px;
   --nav-size: var(--nav-expanded-size);
 }
 
@@ -818,12 +818,15 @@ div.unseen,
   background-color: #ccc;
   font-size: 90%;
   margin-left: 10px;
-  padding: 0px;
-  padding-bottom: 1px;
+  padding: 2px 6px;
+  padding-bottom: 3px;
   border-radius: 4px 4px 4px 4px;
   vertical-align: 2px;
   font-weight: bold;
   color: #fff;
+}
+.unread_count:empty {
+  display: none;
 }
 .debug_title {
   color: var(--bs-primary);
@@ -1571,6 +1574,30 @@ a[disabled] {
   white-space: normal;
   word-break: break-word;
   overflow-wrap: anywhere;
+}
+
+/* Make images in email content responsive */
+.msg_text img,
+.msg_text_inner img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* Prevent images from breaking layout */
+.msg_text table,
+.msg_text_inner table {
+  max-width: 100% !important;
+  table-layout: auto !important;
+}
+
+/* Ensure text doesn't get hidden behind images */
+.msg_text_inner {
+  overflow-x: auto;
+}
+
+/* Simply hide plain text parts - HTML will be shown via the links below */
+.msg_plain_part {
+  display: none !important;
 }
 
 .long_header {

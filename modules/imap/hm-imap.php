@@ -1140,7 +1140,24 @@ if (!class_exists('Hm_IMAP')) {
                                 }
                             }
                         }
-                        $headers[$uid]['preview_msg'] = $flds['body'] != "content_body" ? $flds['body'] :  "";
+                        // Clean preview message: remove HTML tags, URLs, and special characters
+                        $preview = $flds['body'] != "content_body" ? $flds['body'] : "";
+                        if ($preview) {
+                            // Remove HTML tags
+                            $preview = strip_tags($preview);
+                            // Remove URLs (http/https)
+                            $preview = preg_replace('#https?://[^\s<>"\'\)]+#i', '', $preview);
+                            // Remove email-style markers like [<url>] or <url>
+                            $preview = preg_replace('#\[<[^>]+>\]|<[^>]+>#', '', $preview);
+                            // Remove multiple spaces and newlines
+                            $preview = preg_replace('/\s+/', ' ', $preview);
+                            // Trim and limit length
+                            $preview = trim($preview);
+                            if (mb_strlen($preview) > 200) {
+                                $preview = mb_substr($preview, 0, 200) . '...';
+                            }
+                        }
+                        $headers[$uid]['preview_msg'] = $preview;
 
                         if ($raw) {
                             $headers[$uid] = array_map('trim', $headers[$uid]);
