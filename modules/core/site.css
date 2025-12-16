@@ -1596,7 +1596,7 @@ a[disabled] {
 }
 
 /* Simply hide plain text parts - HTML will be shown via the links below */
-.msg_html_part ~ .msg_plain_part {
+.msg_html_part ~ .msg_html_part ~ .msg_plain_part {
   display: none !important;
 }
 
