@@ -7,8 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     COMPOSER_HOME=/tmp/composer_home
 
 # Install system packages and PHP extensions
-RUN --mount=type=cache,target=/var/cache/apt \
-    set -eux \
+RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         supervisor \
