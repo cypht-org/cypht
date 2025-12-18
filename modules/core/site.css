@@ -1579,8 +1579,8 @@ a[disabled] {
 /* Make images in email content responsive */
 .msg_text img,
 .msg_text_inner img {
-  max-width: 100% !important;
-  height: auto !important;
+  max-width: 100%;
+  height: auto;
 }
 
 /* Prevent images from breaking layout */
@@ -1597,7 +1597,7 @@ a[disabled] {
 
 /* Simply hide plain text parts - HTML will be shown via the links below */
 .msg_html_part ~ .msg_html_part ~ .msg_plain_part {
-  display: none !important;
+  display: none;
 }
 
 .long_header {
