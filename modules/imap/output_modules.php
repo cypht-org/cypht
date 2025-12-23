@@ -137,18 +137,20 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                 }
 
                 $msgText = sanitize_email_html($msgText);
-                $txt .= format_msg_html($msgText, $allowed);
+                $txt .= '<div class="msg_html_part">' . format_msg_html($msgText, $allowed) . '</div>';
             }
             elseif (isset($struct['type']) && mb_strtolower($struct['type']) == 'image') {
                 $txt .= format_msg_image($this->get('msg_text'), mb_strtolower($struct['subtype']));
             }
             else {
+                $plainContent = '';
                 if ($this->get('imap_msg_part') === "0") {
-                    $txt .= format_msg_text($this->get('msg_text'), $this, false);
+                    $plainContent = format_msg_text($this->get('msg_text'), $this, false);
                 }
                 else {
-                    $txt .= format_msg_text($this->get('msg_text'), $this);
+                    $plainContent = format_msg_text($this->get('msg_text'), $this);
                 }
+                $txt .= '<div class="msg_plain_part">' . $plainContent . '</div>';
             }
         }
         $txt .= '</div>';
@@ -893,7 +895,7 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-folder me-2"></i>';
                 }
-                $res .= $this->html_safe($folder).'</a></li>';
+                $res .= $this->html_safe($folder).'</a><span class="unread_count unread_imap_server_'.$id.'"></span></li>';
             }
         }
         if ($res) {

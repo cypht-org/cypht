@@ -1220,6 +1220,26 @@ var Hm_Folders = {
     update_unread_counts: function(folder) {
         if (folder) {
             $('.unread_'+folder).html('&#160;'+Hm_Folders.unread_counts[folder]+'&#160;');
+
+            // Update server total when a single folder is updated
+            if (folder.startsWith('imap_') || folder.startsWith('jmap_') || folder.startsWith('ews_')) {
+                var parts = folder.split('_');
+                if (parts.length >= 2) {
+                    var server_type = parts[0];
+                    var server_id = parts[1];
+                    var server_total = 0;
+                    for (var name in Hm_Folders.unread_counts) {
+                        if (name.startsWith(server_type + '_' + server_id + '_')) {
+                            server_total += parseInt(Hm_Folders.unread_counts[name]) || 0;
+                        }
+                    }
+                    if (server_total > 0) {
+                        $('.unread_imap_server_'+server_id).html('&#160;'+server_total+'&#160;');
+                    } else {
+                        $('.unread_imap_server_'+server_id).html('');
+                    }
+                }
+            }
         }
         else {
             var name;
@@ -1235,6 +1255,32 @@ var Hm_Folders = {
                         /* HERE */
                     }
                     $('.unread_'+name).html('&#160;'+count+'&#160;');
+                }
+            }
+
+            // Calculate and display total unread counts per IMAP/JMAP/EWS server
+            var server_totals = {};
+            for (name in Hm_Folders.unread_counts) {
+                // Check if this is an email folder (format: type_serverid_folderid)
+                if (name.startsWith('imap_') || name.startsWith('jmap_') || name.startsWith('ews_')) {
+                    var parts = name.split('_');
+                    if (parts.length >= 2) {
+                        var server_id = parts[1];
+                        if (!server_totals[server_id]) {
+                            server_totals[server_id] = 0;
+                        }
+                        server_totals[server_id] += parseInt(Hm_Folders.unread_counts[name]) || 0;
+                    }
+                }
+            }
+
+            // Update the display for each server
+            for (var server_id in server_totals) {
+                var total = server_totals[server_id];
+                if (total > 0) {
+                    $('.unread_imap_server_'+server_id).html('&#160;'+total+'&#160;');
+                } else {
+                    $('.unread_imap_server_'+server_id).html('');
                 }
             }
         }
