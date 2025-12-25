@@ -559,7 +559,9 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     } else {
                         $folder = hex2bin($parts[2]);
                     }
-                    
+
+                    $details['password'] =  "";
+                    $details['username'] = $details['user'];
                     $mailbox = Hm_IMAP_List::get_mailbox_without_connection($details);
                     $label = $mailbox->get_folder_name($folder);
                     if(!$label) {
