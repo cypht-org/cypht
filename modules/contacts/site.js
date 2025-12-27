@@ -275,3 +275,45 @@ var check_cc_exist_in_contacts_list = function() {
     return "";
 };
 
+var initContactTabs = function() {
+    $('.category-tab').on('click', function(e) {
+        e.preventDefault();
+        
+        var targetId = $(this).data('target');
+        
+        $('.category-tab').removeClass('active');
+        
+        $(this).addClass('active');
+        
+        $('.tab-content-section').removeClass('active');
+        
+        $('#' + targetId).addClass('active');
+    });
+};
+
+var initPagination = function() {
+    $(document).on('click', '.pagination-btn:not([disabled]), .pagination-number', function(e) {
+        e.preventDefault();
+        var page = $(this).data('page');
+        var currentPage = parseInt(getUrlParameter('contact_page')) || 1;
+        
+        if (page && page !== currentPage) {
+            var currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('contact_page', page);
+            window.location.href = currentUrl.toString();
+        }
+    });
+};
+
+var getUrlParameter = function(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+
+$(document).ready(function() {
+    initContactTabs();
+    initPagination();
+});
+
