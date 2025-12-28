@@ -548,9 +548,11 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                         $res .= '<div class="contact-actions">';
                         
                         if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
+                            $modal_type = $c->value('source') === 'ldap' ? 'ldap' : 'local';
+                            $modal_target = '#'.$modal_type.'ContactModal';
                             $edit_url = '?page=contacts&amp;contact_id='.$this->html_safe($c->value('id')).'&amp;contact_source='.
                                 $this->html_safe($c->value('source')).'&amp;contact_type='.
-                                $this->html_safe($c->value('type')).'&amp;contact_page='.$current_page;
+                                $this->html_safe($c->value('type')).'&amp;contact_page='.$current_page.'&amp;open_modal='.$modal_type;
                             $res .= '<a href="'.$edit_url.'" class="action-btn action-btn-edit" title="Modifier">';
                             $res .= '<i class="bi bi-pencil-fill"></i>';
                             $res .= '</a>';

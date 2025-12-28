@@ -83,5 +83,9 @@ return array(
         'ldap_uid' => FILTER_UNSAFE_RAW,
         'ldap_usernames' => array('filter' => FILTER_UNSAFE_RAW, 'flags'  => FILTER_FORCE_ARRAY),
         'ldap_passwords' => array('filter' => FILTER_UNSAFE_RAW, 'flags'  => FILTER_FORCE_ARRAY)
-    )
+    ),
+    'allowed_output' => array(
+        'contact_added' => FILTER_VALIDATE_INT,
+        'contact_updated' => FILTER_VALIDATE_INT,
+    ),
 );

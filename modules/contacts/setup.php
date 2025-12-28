@@ -34,6 +34,11 @@ add_handler('ajax_add_contact', 'load_contacts', true, 'contacts', 'load_user_da
 add_handler('ajax_add_contact', 'save_user_data', true, 'core', 'language', 'after');
 add_handler('ajax_add_contact', 'save_contact',  true);
 
+setup_base_ajax_page('ajax_update_contact', 'core');
+add_handler('ajax_update_contact', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
+add_handler('ajax_update_contact', 'save_user_data', true, 'core', 'language', 'after');
+add_handler('ajax_update_contact', 'save_contact',  true);
+
 
 setup_base_ajax_page('ajax_autocomplete_contact', 'core');
 add_handler('ajax_autocomplete_contact', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
@@ -62,6 +67,7 @@ return array(
         'contacts',
         'ajax_add_contact',
         'ajax_delete_contact',
+        'ajax_update_contact',
         'export_contact',
         'ajax_autocomplete_contact'
     ),

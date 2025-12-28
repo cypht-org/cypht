@@ -315,5 +315,19 @@ var getUrlParameter = function(name) {
 $(document).ready(function() {
     initContactTabs();
     initPagination();
+    
+    // Auto-open modal if open_modal parameter is in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const modalType = urlParams.get('open_modal');
+    
+    if (modalType) {
+        const modalId = modalType === 'ldap' ? 'ldapContactModal' : 'localContactModal';
+        const modalElement = document.getElementById(modalId);
+        
+        if (modalElement) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
+    }
 });
 
