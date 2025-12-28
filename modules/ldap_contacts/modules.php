@@ -33,6 +33,11 @@ class Hm_Handler_process_add_ldap_contact_from_message extends Hm_Handler_Module
                 $contacts = $this->get('contact_store');
                 if ($ldap->connect()) {
                     foreach ($addresses as $vals) {
+                        // Validate email address before adding to LDAP
+                        if (empty($vals['email']) || !filter_var($vals['email'], FILTER_VALIDATE_EMAIL) || !is_email_address($vals['email'], false)) {
+                            Hm_Msgs::add('Invalid email address: ' . htmlspecialchars($vals['email']) . '. Please use a valid email address with a proper domain (e.g., user@example.com)', 'danger');
+                            continue;
+                        }
                         $atts = array('mail' => $vals['email'], 'objectclass' => $config['objectclass']);
                         if (array_key_exists('name', $vals) && trim($vals['name'])) {
                             $dn = sprintf('cn=%s,%s', $vals['name'], $config['base_dn']);
@@ -193,7 +198,21 @@ class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
             // Skip uid attribute when uidattr is 'cn' to avoid empty uid values
             if ($name === 'ldap_uid' && $uidattr === 'cn') {
                 continue;
-            }      
+            }
+            // Validate email address if it's the mail field
+            if ($name === 'ldap_mail') {
+                $email = '';
+                if (array_key_exists($name, $form)) {
+                    $email = $form[$name];
+                }
+                elseif (array_key_exists($name, $this->request->post) && trim($this->request->post[$name])) {
+                    $email = $this->request->post[$name];
+                }
+                if ($email && (!filter_var($email, FILTER_VALIDATE_EMAIL) || !is_email_address($email, false))) {
+                    Hm_Msgs::add('Invalid email address. Please use a valid email address with a proper domain (e.g., user@example.com)', 'danger');
+                    return;
+                }
+            }
             if (array_key_exists($name, $form)) {
                 $result[$val] = $form[$name];
             }
