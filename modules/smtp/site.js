@@ -336,9 +336,27 @@ var copy_text_to_clipboard = function(e) {
 }
 
 var is_valid_recipient = function(recipient) {
-    // Require FQDN with TLD (at least 2 characters after the last dot)
-    var valid_regex = /^[\p{L}|\d' ]*(<)?[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}(>)?$/u;
-    return recipient.match(valid_regex);
+    if (!recipient) {
+        return false;
+    }
+    var val = recipient.trim();
+
+    // Check format: "Display Name <email@example.com>", "Display Name email@example.com", or "email@example.com"
+    var match = val.match(/^(.+)\s+<([^>]+)>$/);
+    var email;
+
+    if (match) {
+        // Format: "Display Name <email>"
+        email = match[2].trim();
+    } else if (!val.includes('<') && !val.includes('>')) {
+        // Format: "email" or "Display Name email" (no angle brackets)
+        // Extract last word as email
+        email = val.split(/\s+/).pop();
+    } else {
+        return false;
+    }
+
+    return Hm_Utils.is_valid_email(email);
 };
 
 var process_compose_form = function(){
