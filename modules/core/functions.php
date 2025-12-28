@@ -212,6 +212,15 @@ function validate_domain_full($val) {
         $val[0] == '-' || $val[(mb_strlen($val) - 1)] == '-') {
         return false;
     }
+    /* ensure domain is a proper FQDN with TLD (at least 2 characters after the last dot) */
+    $last_dot_pos = mb_strrpos($val, '.');
+    if ($last_dot_pos === false) {
+        return false;
+    }
+    $tld = mb_substr($val, $last_dot_pos + 1);
+    if (mb_strlen($tld) < 2 || preg_match("/[^A-Z0-9\-]/i", $tld)) {
+        return false;
+    }
     return true;
 }}
 
