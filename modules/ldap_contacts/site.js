@@ -109,4 +109,46 @@ $(function() {
     }
 
     $(document).ready(enhanceLdapContacts);
+
+    // Validate LDAP contact email on form submit
+    $('.add_contact_form').on('submit', function(e) {
+        var emailField = $('#ldap_mail');
+        if (emailField.length && emailField.val()) {
+            var email = emailField.val().trim();
+            // Require FQDN with TLD (at least 2 characters after the last dot)
+            var emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/;
+            
+            if (!emailRegex.test(email)) {
+                e.preventDefault();
+                e.stopPropagation();
+                emailField.focus();
+                Hm_Notices.show(hm_trans('Invalid email address. Please use a valid email address with a proper domain (e.g., user@example.com)'), 'danger');
+                return false;
+            }
+        }
+        return true;
+    });
+
+    $('#ldap_mail').on('blur', function() {
+        var email = $(this).val();
+        if (email) {
+            var emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(email)) {
+                $(this).addClass('is-invalid');
+                if ($(this).next('.invalid-feedback').length === 0) {
+                    $(this).after('<div class="invalid-feedback">' + hm_trans('Please enter a valid email address with a proper domain (e.g., user@example.com)') + '</div>');
+                }
+            } else {
+                $(this).removeClass('is-invalid');
+                $(this).next('.invalid-feedback').remove();
+            }
+        }
+    });
+
+    $('#ldap_mail').on('input', function() {
+        if ($(this).hasClass('is-invalid')) {
+            $(this).removeClass('is-invalid');
+            $(this).next('.invalid-feedback').remove();
+        }
+    });
 });
