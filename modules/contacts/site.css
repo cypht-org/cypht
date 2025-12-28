@@ -678,7 +678,7 @@
   }
 
   .category-tab {
-    min-width: calc(33.333% - 0.75rem);
+    min-width: calc(29.333% - 0.75rem);
   }
 
   .action-buttons {

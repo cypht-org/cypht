@@ -19,6 +19,7 @@ add_handler('compose', 'load_local_contacts', true, 'local_contacts', 'load_cont
 add_handler('ajax_add_contact', 'load_local_contacts', true, 'local_contacts', 'load_contacts', 'after');
 add_handler('ajax_add_contact', 'process_add_contact_from_message', true, 'local_contacts', 'save_user_data', 'before');
 add_handler('ajax_add_contact', 'process_add_contact', true, 'local_contacts', 'load_contacts', 'after');
+// add_handler('ajax_import_contacts', 'process_import_contact', true, 'local_contacts', 'load_contacts', 'after');
 add_handler('ajax_update_contact', 'process_edit_contact', true, 'local_contacts', 'load_contacts', 'after');
 
 add_handler('ajax_delete_contact', 'load_local_contacts', true, 'local_contacts', 'load_contacts', 'after');
@@ -47,7 +48,5 @@ return array(
     ),
     'allowed_output' => array(
         'current_contact' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
-        'contact_added' => FILTER_VALIDATE_INT,
-        'contact_updated' => FILTER_VALIDATE_INT,
     ),
 );

@@ -62,7 +62,6 @@ var initLocalContactModal = function() {
                         if (modal) {
                             modal.hide();
                         }
-                        // window.location.reload();
                         window.location.href = '?page=contacts';
                     }
                 },
@@ -70,17 +69,20 @@ var initLocalContactModal = function() {
                 false,
                 function() {
                     $('#submit-local-contact-btn').prop('disabled', false).text(isEdit ? 'Update Contact' : 'Add Contact');
-                    // Hm_Notices.show('An error occurred while ' + (isEdit ? 'updating' : 'adding') + ' the contact', 'warning');
                 }
             );
         } else {
-            var fileInput = $('#contact_csv')[0];
-            if (!fileInput.files.length) {
-                alert('Please select a CSV file');
+            // CSV import - submit form normally (no AJAX)
+            var form = $('#csv-import-form')[0];
+            if (!form.checkValidity()) {
+                form.reportValidity();
                 return;
             }
-            //TODO: Implement CSV import functionality
-            console.log('CSV import not implemented yet');
+            
+            $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Importing...');
+            
+            // Submit the form normally
+            form.submit();
         }
     });
 
@@ -136,7 +138,7 @@ $(document).on('change', '#contact_csv', function(e) {
     if (fileName) {
         const label = $(this).siblings('.csv-upload-label');
         label.find('.csv-upload-text strong').text(fileName);
-        label.find('.csv-upload-hint').text(Hm_Trans('Click to change file'));
+        label.find('.csv-upload-hint').text(hm_trans('Click to change file'));
         label.addClass('file-selected');
     }
 });

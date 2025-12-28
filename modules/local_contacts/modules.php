@@ -77,7 +77,7 @@ class Hm_Handler_process_add_contact extends Hm_Handler_Module {
  */
 class Hm_Handler_process_import_contact extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('contact_source', 'import_contact'));
+        list($success, $form) = $this->process_form(array('contact_source'));
         if ($success && $form['contact_source'] == 'csv') {
             $file = $this->request->files['contact_csv'];
             $csv = fopen($file['tmp_name'], 'r');
@@ -154,6 +154,7 @@ class Hm_Handler_process_import_contact extends Hm_Handler_Module {
 
                 $this->session->set('imported_contact', $import_result);
                 Hm_Msgs::add($message, $type);
+                $this->out('contacts_imported', $create_count + $update_count);
             }
         }
     }
