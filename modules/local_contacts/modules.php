@@ -54,14 +54,9 @@ class Hm_Handler_process_delete_contact extends Hm_Handler_Module {
  */
 class Hm_Handler_process_add_contact extends Hm_Handler_Module {
     public function process() {
-        exit(var_dump($this->request->post));
         $contacts = $this->get('contact_store');
         list($success, $form) = $this->process_form(array('contact_source', 'contact_email', 'contact_name'));
-        if ($success && $form['contact_source'] == 'local') {
-            if (!is_email_address($form['contact_email'], false)) {
-                Hm_Msgs::add('Invalid email address. Please use a valid email address with a proper domain (e.g., user@example.com)', 'danger');
-                return;
-            }
+        if ($success && $form['contact_source'] == 'local:local') {
             $details = array('source' => 'local', 'email_address' => $form['contact_email'], 'display_name' => $form['contact_name']);
             if (array_key_exists('contact_phone', $this->request->post) && $this->request->post['contact_phone']) {
                 $details['phone_number'] = $this->request->post['contact_phone'];
@@ -174,12 +169,8 @@ class Hm_Handler_process_import_contact extends Hm_Handler_Module {
 class Hm_Handler_process_edit_contact extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
-        list($success, $form) = $this->process_form(array('contact_source', 'contact_id', 'contact_email', 'contact_name', 'edit_contact'));
-        if ($success && $form['contact_source'] == 'local') {
-            if (!is_email_address($form['contact_email'], false)) {
-                Hm_Msgs::add('Invalid email address. Please use a valid email address with a proper domain (e.g., user@example.com)', 'danger');
-                return;
-            }
+        list($success, $form) = $this->process_form(array('contact_source', 'contact_id', 'contact_email', 'contact_name'));
+        if ($success && $form['contact_source'] == 'local:local') {
             $details = array('email_address' => $form['contact_email'], 'display_name' => $form['contact_name']);
             if (array_key_exists('contact_phone', $this->request->post)) {
                 $details['phone_number'] = $this->request->post['contact_phone'];
@@ -193,6 +184,7 @@ class Hm_Handler_process_edit_contact extends Hm_Handler_Module {
             if ($contacts->update_contact($form['contact_id'], $details)) {
                 $this->session->record_unsaved('Contact Updated');
                 Hm_Msgs::add('Contact Updated');
+                $this->out('contact_updated', 1);
             }
         }
     }
@@ -312,6 +304,7 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
         $res .= '<label for="contact_group" class="form-label">';
         $res .= $this->trans('Category');
         $res .= '</label>';
+        // exit(var_dump($group));
         $res .= '<select class="form-select custom-input" id="contact_group" name="contact_group">';
         $res .= '<option value="Collected Recipients"'.($group == 'Collected Recipients' ? ' selected' : '').'>' . $this->trans('Collected Recipients') . '</option>';
         $res .= '<option value="Trusted Senders"'.($group == 'Trusted Senders' ? ' selected' : '').'>' . $this->trans('Trusted Senders') . '</option>';
