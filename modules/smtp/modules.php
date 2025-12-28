@@ -678,7 +678,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* missing field */
-        list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_body', 'compose_smtp_id', 'draft_id', 'post_archive', 'next_email_post'));
+        list($success, $form) = $this->process_form(array('compose_subject', 'compose_body', 'compose_smtp_id', 'draft_id', 'post_archive', 'next_email_post'));
         if (!$success) {
             Hm_Msgs::add('Required field missing', 'warning');
             return;
@@ -686,11 +686,11 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* defaults */
         $smtp_id = server_from_compose_smtp_id($form['compose_smtp_id']);
-        $to = $form['compose_to'];
+        $to = isset($this->request->post['compose_to']) ? $this->request->post['compose_to'] : '';
         $subject = $form['compose_subject'];
         $body_type = $this->get('smtp_compose_type', DEFAULT_SMTP_COMPOSE_TYPE);
         $draft = array(
-            'draft_to' => $form['compose_to'],
+            'draft_to' => isset($this->request->post['compose_to']) ? $this->request->post['compose_to'] : '',
             'draft_body' => '',
             'draft_subject' => $form['compose_subject'],
             'draft_smtp' => $smtp_id
@@ -1195,7 +1195,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '<div class="to_outer">'.
                     '<div class="mb-3 position-relative compose_container p-1 w-100 form-control">'.
                         '<div class="bubbles bubble_dropdown"></div>'.
-                        '<input autocomplete="off" value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to w-75" type="text" placeholder="'.$this->trans('To').'" id="compose_to" />'.
+                        '<input autocomplete="off" value="'.$this->html_safe($to).'" name="compose_to" class="compose_to w-75" type="text" placeholder="'.$this->trans('To').'" id="compose_to" />'.
                         '<a href="#" tabindex="-1" class="toggle_recipients position-absolute end-0 pe-2"><i class="bi bi-plus-square-fill fs-3"></i></a>'.
                         '<div id="to_contacts"></div>'.
                     '</div>'.
