@@ -233,7 +233,7 @@ class Hm_Output_contacts_content_start extends Hm_Output_Module {
             '<div class="list_actions">'.$actions.'</div>';
 
         $res .= '<div class="app-container">';
-        $res .= '<div class="container-fluid py-5">';
+        $res .= '<div class="container-fluid pt-1">';
         
         // category tabs starts here
         $res .= '<div class="row mb-4">';
@@ -458,7 +458,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
 
         $res .= '</div>';
 
-        $res .= '<div class="row p-3">';
+        $res .= '<div class="row mx-1 my-3 contact-list-section">';
         $res .= '<div class="col-12 px-0">';
 
         $contactGroupsToDisplay = [
