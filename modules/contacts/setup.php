@@ -98,11 +98,13 @@ return array(
     ),
     'allowed_output' => array(
         'contact_deleted' => array(FILTER_VALIDATE_INT, false),
+        'contact_added' => FILTER_VALIDATE_INT,
+        'contact_updated' => FILTER_VALIDATE_INT,
         'imported_contact' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY),
         'contact_suggestions' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY),
         'collect_contacts' => array(FILTER_VALIDATE_BOOLEAN, false),
         'imap_allow_images' => array(FILTER_VALIDATE_BOOLEAN, false),
         'collected_contact_email' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'collected_contact_name' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
-    ),
+    )
 );
