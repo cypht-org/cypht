@@ -57,6 +57,10 @@ class Hm_Handler_process_add_contact extends Hm_Handler_Module {
         $contacts = $this->get('contact_store');
         list($success, $form) = $this->process_form(array('contact_source', 'contact_email', 'contact_name', 'add_contact'));
         if ($success && $form['contact_source'] == 'local') {
+            if (!is_email_address($form['contact_email'], false)) {
+                Hm_Msgs::add('Invalid email address. Please use a valid email address with a proper domain (e.g., user@example.com)', 'danger');
+                return;
+            }
             $details = array('source' => 'local', 'email_address' => $form['contact_email'], 'display_name' => $form['contact_name']);
             if (array_key_exists('contact_phone', $this->request->post) && $this->request->post['contact_phone']) {
                 $details['phone_number'] = $this->request->post['contact_phone'];
@@ -109,7 +113,10 @@ class Hm_Handler_process_import_contact extends Hm_Handler_Module {
                         'phone_number' => $data[2] ?? ''
                     ];
                     $email = $data[1];
-                    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    // Use both PHP's built-in filter and custom validation for defense in depth
+                    // FILTER_VALIDATE_EMAIL provides basic format validation
+                    // is_email_address() enforces FQDN requirement (requires TLD)
+                    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !is_email_address($email, false)) {
                         $single_contact['status'] = 'invalid email';
                         array_push($import_result, $single_contact);
                         $invalid_mail_count++;
@@ -169,6 +176,10 @@ class Hm_Handler_process_edit_contact extends Hm_Handler_Module {
         $contacts = $this->get('contact_store');
         list($success, $form) = $this->process_form(array('contact_source', 'contact_id', 'contact_email', 'contact_name', 'edit_contact'));
         if ($success && $form['contact_source'] == 'local') {
+            if (!is_email_address($form['contact_email'], false)) {
+                Hm_Msgs::add('Invalid email address. Please use a valid email address with a proper domain (e.g., user@example.com)', 'danger');
+                return;
+            }
             $details = array('email_address' => $form['contact_email'], 'display_name' => $form['contact_name']);
             if (array_key_exists('contact_phone', $this->request->post)) {
                 $details['phone_number'] = $this->request->post['contact_phone'];
