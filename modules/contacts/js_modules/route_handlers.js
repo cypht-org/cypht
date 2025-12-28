@@ -1,22 +1,10 @@
-// Validate email address with FQDN requirement (matches backend validation)
-var is_valid_contact_email = function(email) {
-    if (!email || typeof email !== 'string') {
-        return false;
-    }
-    email = email.trim();
-    // Require FQDN with TLD (at least 2 characters after the last dot)
-    // This matches the backend validate_domain_full() function
-    var emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
-};
-
 function applyContactsPageHandlers() {
     // Validate contact form on submit
     $('.add_contact_form').on('submit', function(e) {
         var emailField = $('#contact_email');
         var email = emailField.val();
         
-        if (email && !is_valid_contact_email(email)) {
+        if (email && Hm_Utils.is_valid_email(email)) {
             e.preventDefault();
             e.stopPropagation();
             emailField.focus();
@@ -29,7 +17,7 @@ function applyContactsPageHandlers() {
     // Real-time validation feedback on email field
     $('#contact_email').on('blur', function() {
         var email = $(this).val();
-        if (email && !is_valid_contact_email(email)) {
+        if (email && !Hm_Utils.is_valid_email(email)) {
             $(this).addClass('is-invalid');
             if ($(this).next('.invalid-feedback').length === 0) {
                 $(this).after('<div class="invalid-feedback">' + hm_trans('Please enter a valid email address with a proper domain (e.g., user@example.com)') + '</div>');
