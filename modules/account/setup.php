@@ -11,13 +11,13 @@ add_handler('accounts', 'process_create_account', true, 'account', 'login', 'aft
 add_handler('accounts', 'process_delete_account', true, 'account', 'process_create_account', 'after');
 add_handler('accounts', 'check_internal_users', true, 'account', 'login', 'after');
 add_handler('accounts', 'account_list', true, 'account', 'check_internal_users', 'after');
-add_output('accounts', 'create_form', true, 'account', 'content_section_start', 'after');
+add_output('accounts', 'create_form', true, 'account', 'version_upgrade_checker', 'after');
 add_output('accounts', 'user_list', true, 'account', 'create_form', 'after');
 
 setup_base_page('change_password', 'core');
 add_handler('change_password', 'process_change_password', true, 'account', 'load_user_data', 'after');
 add_handler('change_password', 'check_internal_users', true, 'account', 'login', 'after');
-add_output('change_password', 'change_password', true, 'account', 'content_section_start', 'after');
+add_output('change_password', 'change_password', true, 'account', 'version_upgrade_checker', 'after');
 
 /* folder list link */
 add_handler('ajax_hm_folders', 'check_internal_users', true, 'account', 'login', 'after');
