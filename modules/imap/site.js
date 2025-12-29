@@ -1400,7 +1400,8 @@ $('.screen-email-like').on("click", function() {
         }
     });
 
-    if (email_existing_in_blocked_senders) {
+    
+    if (email_existing_in_blocked_senders.length > 0) {
         var list_html = "<ol>";
         email_existing_in_blocked_senders.forEach(sender => {
             sender = sender.trim();
