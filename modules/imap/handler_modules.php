@@ -532,7 +532,7 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                 $this->out('list_path', $path, false);
                 $this->out('move_copy_controls', true);
                 $parts = explode('_', $path, 3);
-                $details = Hm_IMAP_List::dump($parts[1]);
+                $details = Hm_IMAP_List::dump($parts[1], true);
                 $custom_link = 'add';
                 foreach (imap_data_sources($this->user_config->get('custom_imap_sources', array())) as $vals) {
                     if ($vals['id'] == $parts[1] && $vals['folder'] == $parts[2]) {
@@ -559,7 +559,11 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     } else {
                         $folder = hex2bin($parts[2]);
                     }
-                    
+
+                    if (array_key_exists('user', $details) && array_key_exists('pass', $details)) {
+                        $details['username'] = $details['user'];
+                        $details['password'] = $details['pass'];
+                    }
                     $mailbox = Hm_IMAP_List::get_mailbox_without_connection($details);
                     $label = $mailbox->get_folder_name($folder);
                     if(!$label) {
