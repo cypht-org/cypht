@@ -797,6 +797,7 @@ var imap_message_view_finished = function(msg_uid, detail, listParent, skip_link
     $('#move_message').on("click", function(e) { return imap_move_copy(e, 'move', 'message');});
     $('#copy_message').on("click", function(e) { return imap_move_copy(e, 'copy', 'message');});
     $('#archive_message').on("click", function(e) { return imap_archive_message();});
+    $('#restore_message').on("click", function(e) { return imap_restore_message(e);});
     $('#unread_message').on("click", function() { return imap_unread_message(msg_uid, detail);});
     $('#block_sender').on("click", function(e) {
         e.preventDefault();
@@ -1331,6 +1332,41 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
                 }
             }
         );
+    }
+    return false;
+};
+
+var imap_restore_message = function(e, supplied_uid, supplied_detail) {
+    e.preventDefault();
+    var uid = getMessageUidParam();
+    var detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
+    if (supplied_uid) {
+        uid = supplied_uid;
+    }
+    if (supplied_detail) {
+        detail = supplied_detail;
+    }
+    if (detail && uid) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_restore_message'},
+            {'name': 'imap_msg_uid', 'value': uid},
+            {'name': 'imap_server_id', 'value': detail.server_id},
+            {'name': 'folder', 'value': detail.folder}],
+            function(res) {
+                if (res.restore_result) {
+                    if (hm_list_parent() == 'message') {
+                        if (hm_auto_advance_email_enabled()) {
+                            Hm_Utils.redirect("?page=message_list&list_path="+getListPathParam());
+                        } else if (hm_list_parent() == 'search') {
+                            Hm_Utils.redirect("?page=search&list_path="+hm_list_parent());
+                        } else {
+                            Hm_Utils.redirect("?page=message_list&list_path="+hm_list_parent());
+                        }
+                    }
+                }
+            }
+        );
+
     }
     return false;
 };
