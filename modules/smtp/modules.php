@@ -2081,8 +2081,8 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $imap_profile = Hm_IMAP_List::getForMailbox($imap_profile['id']);
     $specials = get_special_folders($mod, $imap_profile['id']);
 
-    if ((!array_key_exists('draft', $specials) || !$specials['draft']) && !array_key_exists('schedule', $atts)) {
-        Hm_Msgs::add('There is no draft directory configured for this account.', 'warning');
+    if ((!array_key_exists('draft', $specials) || !$specials['draft']) && (!array_key_exists('schedule', $atts) || empty($atts['schedule']))) {
+        Hm_Msgs::add('No draft directory configured for this account. Set it in account settings to save drafts.', 'warning');
         return -1;
     }
     $mailbox = new Hm_Mailbox($imap_profile['id'], $mod->user_config, $session, $imap_profile);
@@ -2114,7 +2114,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $msg = rtrim($msg)."\r\n";
 
     if (! $mailbox->store_message($folder, $msg, false, true)) {
-        Hm_Msgs::add('An error occurred saving the draft message', 'danger');
+        Hm_Msgs::add('Unable to save draft message. Please check your account settings and ensure the draft folder is properly configured.', 'danger');
         return -1;
     }
     
