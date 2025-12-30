@@ -163,10 +163,13 @@ var autocomplete_keyboard_nav = function(event, list_div, class_name, fld_val) {
         return false;
     }
     else if (event.keyCode == 13) {
-        $(class_name).focus();
-        $(list_div).hide();
-        add_autocomplete(event, class_name, list_div);
-        return false;
+        if ($(event.target).hasClass('contact_suggestion')) {
+            $(class_name).focus();
+            $(list_div).hide();
+            add_autocomplete(event, class_name, list_div);
+            return false;
+        }
+        return true;
     }
     else if (event.keyCode == 27) {
         $(list_div).html('');
