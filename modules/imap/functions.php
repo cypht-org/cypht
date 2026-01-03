@@ -951,15 +951,17 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_ema
                 $result = $mailbox->message_action(hex2bin($folder), mb_strtoupper($action), $msgs, hex2bin($dest_path[2]));
                 if ($result['status']) {
                     foreach ($msgs as $index => $msg) {
-                        $response = $result['responses'][$index];
                         $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
-                        $responses[] = [
-                            'oldUid' => $msg,
-                            'newUid' => $response['newUid'],
-                            'oldFolder' => hex2bin($folder),
-                            'newFolder' => hex2bin($dest_path[2]),
-                            'oldServer' => $server_id,
-                        ];
+                        if ($action == 'move') {
+                            $response = $result['responses'][$index];
+                            $responses[] = [
+                                'oldUid' => $msg,
+                                'newUid' => $response['newUid'],
+                                'oldFolder' => hex2bin($folder),
+                                'newFolder' => hex2bin($dest_path[2]),
+                                'oldServer' => $server_id,
+                            ];
+                        }
                     }
                 }
             }
