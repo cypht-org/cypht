@@ -258,7 +258,7 @@ class Hm_Handler_process_add_to_ldap_server extends Hm_Handler_Module {
                 Hm_Msgs::add('Contact Added');
             }
             else {
-                Hm_Msgs::add('Could not add contact', 'danger');
+                Hm_Msgs::add('Could not add contact, eror: '.$ldap->error(), 'danger');
             }
         } else {
             Hm_Msgs::add('Could not add contact: failed to connect to LDAP server', 'danger');
@@ -347,21 +347,23 @@ class Hm_Handler_load_ldap_contacts extends Hm_Handler_Module {
 class Hm_Handler_load_edit_ldap_contact extends Hm_Handler_Module {
     public function process() {
         $ldap_config = $this->get('ldap_config');
+
         if (array_key_exists('contact_source', $this->request->get) &&
             array_key_exists('contact_type', $this->request->get) &&
             $this->request->get['contact_type'] == 'ldap' &&
             array_key_exists($this->request->get['contact_source'], $ldap_config) &&
             array_key_exists('contact_id', $this->request->get)) {
-
             $contacts = $this->get('contact_store');
             $contact_id = $this->request->get['contact_id'];
             $contact_source = $this->request->get['contact_source'];
+            
             
             $target_dn = isset($this->request->get['dn']) ? Hm_LDAP_Contact::decodeDN($this->request->get['dn']) : null;
             
             if ($target_dn) {
                 $contact = Hm_LDAP_Contact::findByDN($contacts, $target_dn, $contact_source);
-                
+                exit(var_dump("CURRENT", $contact));
+                exit(var_dump("CURRENT", $contact, $target_dn, $contacts));
                 if ($contact) {
                     $current = $contact->export();
                     $current['id'] = $contact_id;
@@ -528,6 +530,8 @@ class Hm_Output_ldap_form_first_name extends Hm_Output_Module {
         $name = get_ldap_value('givenname', $this);
         $current = $this->get('current_ldap_contact');
         $is_edit = !empty($current);
+
+        // exit(var_dump($is_edit, $current, $name));
         
         // if ($is_edit) {
         //     $uidattr = get_ldap_value('uidattr', $this);
@@ -566,18 +570,17 @@ class Hm_Output_ldap_form_submit extends Hm_Output_Module {
             $label = 'Update';
             $name = 'update_ldap_contact';
         }
-        // return '<br /><input name="'.$name.'" type="submit" value="'.$this->trans($label).'" class="btn btn-primary me-1" />'.
-        //     '<input type="button" class="reset_contact btn btn-secondary" value="'.$this->trans('Cancel').'" />';
 
         //close Additional Information Section
         $res = '</div>';
         $res .= '</div>';
-
+        
+        $res .= '<input name="'.$name.'" type="hidden" value="'.$this->trans($label).'" class="btn btn-primary custom-btn-primary me-1" />';
         $res .= '</form>';
         $res .= '</div>';
 
         $res .= '<div class="modal-footer custom-modal-footer">';
-        $res .= '<button type="button" class="btn btn-secondary custom-btn-secondary" data-bs-dismiss="modal">';
+        $res .= '<button type="button" class="reset_contact btn btn-secondary custom-btn-secondary" data-bs-dismiss="modal">';
         $res .= $this->trans('Cancel');
         $res .= '</button>';
         $res .= '<button type="submit" class="btn btn-primary custom-btn-primary" id="submit-ldap-contact-btn">';
@@ -600,6 +603,7 @@ class Hm_Output_ldap_form_last_name extends Hm_Output_Module {
         $current = $this->get('current_ldap_contact');
         $is_edit = !empty($current);
         
+        // TODO: make last name read-only to prevent DN conflicts
         // if ($is_edit) {
         //     $uidattr = get_ldap_value('uidattr', $this);
         //     if ($uidattr === 'cn') {
@@ -632,13 +636,9 @@ class Hm_Output_ldap_form_title extends Hm_Output_Module {
             return;
         }
         $title = get_ldap_value('title', $this);
-        // return '<div class="form-floating mb-2">'.
-        //     '<input placeholder="'.$this->trans('Title').'" id="ldap_title" type="text" name="ldap_title" '.
-        //     'value="'.$this->html_safe($title).'" class="form-control"  />'.
-        //     '<label for="ldap_title">'.$this->trans('Title').'</label></div>';
         $res = '<div class="col-md-4 mb-3">';
         $res .= '<label for="ldap_title" class="form-label">' . $this->trans('Title') . '</label>';
-        $res .= '<input placeholder="' . $this->trans('Title') . '" id="ldap_title" type="text" name="ldap_title" value="" class="form-control custom-input">';
+        $res .= '<input placeholder="' . $this->trans('Title') . '" id="ldap_title" type="text" name="ldap_title" value="'.$this->html_safe($title).'" class="form-control custom-input">';
         $res .= '</div>';
         return $res;
     }
@@ -693,7 +693,9 @@ class Hm_Output_ldap_contact_form_start extends Hm_Output_Module {
 
         $res .= '<div class="modal-body custom-modal-body">';
         
-        $res .= '<form class="ldap-contact-form" id="ldap-contact-form">';
+        $res .= '<form class="ldap-contact-form" id="ldap-contact-form" method="POST" action="">';
+        $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+        $res .= '<input type="hidden" name="contact_source" value="ldap" />';
         $res .= '<div class="form-section mb-4">';
         $res .= '<h6 class="form-section-title">' . $this->trans('Basic Information') . '</h6>';
         $res .= '<div class="row">';
@@ -729,7 +731,7 @@ class Hm_Output_ldap_form_displayname extends Hm_Output_Module {
 
         $res = '<div class="col-md-6 mb-3">';
         $res .= '<label for="ldap_displayname" class="form-label">' . $this->trans('Display Name') . '</label>';
-        $res .= '<input placeholder="' . $this->trans('Display Name') . '" id="ldap_displayname" type="text" name="ldap_displayname" value="" class="form-control custom-input">';
+        $res .= '<input placeholder="' . $this->trans('Display Name') . '" id="ldap_displayname" type="text" name="ldap_displayname" value="'.$this->html_safe($val).'" class="form-control custom-input">';
         $res .= '</div>';
 
         //close Basic Information group
