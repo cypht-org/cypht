@@ -99,28 +99,6 @@ var initLocalContactModal = function() {
 $(document).ready(function() {
     initLocalContactModal();
 });
-//TODO: Remove this block when form submission is implemented with ajax
-// $(document).on('click', '#submit-local-contact-btn', function(e) {
-//     e.preventDefault();
-//
-//     const isCSVMode = $('#csv-import-btn').hasClass('active');
-//     const form = isCSVMode ? $('#csv-import-form') : $('#manual-contact-form');
-//
-//     if (form[0].checkValidity()) {
-//         const formData = new FormData(form[0]);
-//
-//         if (isCSVMode) {
-//             formData.append('import_contact', '1');
-//         } else {
-//             const isEdit = form.find('input[name="contact_id"]').length > 0;
-//             formData.append(isEdit ? 'edit_contact' : 'add_contact', '1');
-//         }
-//         form.submit();
-//         $('#localContactModal').modal('hide');
-//     } else {
-//         form[0].reportValidity();
-//     }
-// });
 
 $('#localContactModal').on('hidden.bs.modal', function () {
     $('#manual-contact-form')[0].reset();
