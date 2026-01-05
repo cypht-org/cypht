@@ -300,7 +300,6 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
         $res .= '<label for="contact_group" class="form-label">';
         $res .= $this->trans('Category');
         $res .= '</label>';
-        // exit(var_dump($group));
         $res .= '<select class="form-select custom-input" id="contact_group" name="contact_group">';
         $res .= '<option value="Collected Recipients"'.($group == 'Collected Recipients' ? ' selected' : '').'>' . $this->trans('Collected Recipients') . '</option>';
         $res .= '<option value="Trusted Senders"'.($group == 'Trusted Senders' ? ' selected' : '').'>' . $this->trans('Trusted Senders') . '</option>';
