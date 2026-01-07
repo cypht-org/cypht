@@ -1325,7 +1325,7 @@ $(function() {
         // AJAX call to report spam
         Hm_Ajax.request(
             [
-                {'name': 'hm_ajax_hook', 'value': 'ajax_imap_report_spam'},
+                {'name': 'hm_ajax_hook', 'value': 'ajax_report_spam'},
                 {'name': 'message_ids', 'value': messageIds},
                 {'name': 'spam_reasons', 'value': reasons}
             ],

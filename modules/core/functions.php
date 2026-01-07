@@ -276,15 +276,7 @@ function process_site_setting($type, $handler, $callback=false, $default=false, 
         }
     }
     else {
-        list($success, $form) = $handler->process_form(array('save_settings'));
-        if ($success) {
-            if (array_key_exists($type, $handler->request->post)) {
-                $form[$type] = $handler->request->post[$type];
-            }
-            else {
-                $form[$type] = '';
-            }
-        }
+        list($success, $form) = $handler->process_form(array('save_settings', $type));
     }
     
     $new_settings = $handler->get('new_user_settings', array());
@@ -300,8 +292,7 @@ function process_site_setting($type, $handler, $callback=false, $default=false, 
         $new_settings[$type.'_setting'] = $result;
     }
     else {
-        $value_from_config = $handler->user_config->get($type.'_setting', $default);
-        $settings[$type] = $value_from_config;
+        $settings[$type] = $handler->user_config->get($type.'_setting', $default);
     }
     $handler->out('new_user_settings', $new_settings, false);
     $handler->out('user_settings', $settings, false);
@@ -794,24 +785,3 @@ function isPageConfigured($page) {
     $pages = array_keys(Hm_Handler_Modules::dump());
     return in_array($page, $pages);
 }
-
-/**
- * Get setting value with fallback to _setting suffix
- * @subpackage core/functions
- * @param array $settings User settings array
- * @param string $key Setting key without _setting suffix
- * @param mixed $default Default value
- * @return mixed Setting value
- */
-if (!hm_exists('get_setting_value')) {
-    function get_setting_value($settings, $key, $default = '') {
-        if (array_key_exists($key, $settings)) {
-            return $settings[$key];
-        }
-        if (array_key_exists($key . '_setting', $settings)) {
-            return $settings[$key . '_setting'];
-        }
-        return $default;
-    }
-}
-

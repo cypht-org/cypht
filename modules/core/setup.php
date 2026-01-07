@@ -56,7 +56,6 @@ add_handler('settings', 'process_trash_since_setting', true, 'core', 'date', 'af
 add_handler('settings', 'process_trash_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_drafts_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_drafts_source_max_setting', true, 'core', 'date', 'after');
-add_handler('settings', 'process_spam_report_settings', true, 'core', 'save_user_settings', 'before');
 add_handler('settings', 'process_hide_folder_icons', true, 'core', 'date', 'after');
 add_handler('settings', 'process_delete_prompt_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_delete_attachment_setting', true, 'core', 'date', 'after');
@@ -102,14 +101,6 @@ add_output('settings', 'trash_source_max_setting', true, 'core', 'trash_since_se
 add_output('settings', 'start_drafts_settings', true, 'core', 'trash_source_max_setting', 'after');
 add_output('settings', 'drafts_since_setting', true, 'core', 'start_drafts_settings', 'after');
 add_output('settings', 'drafts_source_max_setting', true, 'core', 'drafts_since_setting', 'after');
-add_output('settings', 'start_report_spam_settings', true, 'core', 'drafts_source_max_setting', 'after');
-add_output('settings', 'spamcop_enabled_setting', true, 'core', 'start_report_spam_settings', 'after');
-add_output('settings', 'spamcop_submission_email_setting', true, 'core', 'spamcop_enabled_setting', 'after');
-add_output('settings', 'spamcop_from_email_setting', true, 'core', 'spamcop_submission_email_setting', 'after');
-add_output('settings', 'apwg_enabled_setting', true, 'core', 'spamcop_from_email_setting', 'after');
-add_output('settings', 'apwg_from_email_setting', true, 'core', 'apwg_enabled_setting', 'after');
-add_output('settings', 'abuseipdb_enabled_setting', true, 'core', 'apwg_from_email_setting', 'after');
-add_output('settings', 'abuseipdb_api_key_setting', true, 'core', 'abuseipdb_enabled_setting', 'after');
 add_output('settings', 'start_everything_settings', true, 'core', 'abuseipdb_api_key_setting', 'after');
 add_output('settings', 'all_since_setting', true, 'core', 'start_everything_settings', 'after');
 add_output('settings', 'all_source_max_setting', true, 'core', 'all_since_setting', 'after');
@@ -369,8 +360,5 @@ return array(
         'srv_setup_stepper_imap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
         'images_whitelist' => FILTER_UNSAFE_RAW,
         'update' => FILTER_VALIDATE_BOOLEAN,
-        'spamcop_settings' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FORCE_ARRAY),
-        'apwg_settings' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FORCE_ARRAY),
-        'abuseipdb_settings' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FORCE_ARRAY),
     )
 );

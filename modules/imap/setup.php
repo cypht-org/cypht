@@ -221,16 +221,6 @@ add_handler('ajax_imap_archive_message', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_archive_message', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_archive_message', 'imap_archive_message',  true);
 
-/* report spam callback */
-setup_base_ajax_page('ajax_imap_report_spam', 'core');
-add_handler('ajax_imap_report_spam', 'message_list_type', true, 'core');
-add_handler('ajax_imap_report_spam', 'imap_message_list_type', true);
-add_handler('ajax_imap_report_spam', 'load_imap_servers_from_config',  true);
-add_handler('ajax_imap_report_spam', 'imap_oauth2_token_check', true);
-add_handler('ajax_imap_report_spam', 'close_session_early',  true, 'core');
-add_handler('ajax_imap_report_spam', 'imap_report_spam',  true);
-
-
 /* ajax message action callback */
 add_handler('ajax_message_action', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_message_action', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
@@ -321,7 +311,6 @@ return array(
         'ajax_imap_snooze',
         'ajax_imap_unsnooze',
         'ajax_imap_junk',
-        'ajax_imap_report_spam',
         'message_source',
         'ajax_share_folders',
     ),
@@ -349,9 +338,6 @@ return array(
         'do_not_flag_as_read_on_open' => array(FILTER_VALIDATE_BOOLEAN, false),
         'ajax_imap_folders_permissions' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'move_responses' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
-        'spam_report_error' => array(FILTER_VALIDATE_BOOLEAN, false),
-        'spam_report_message' => array(FILTER_UNSAFE_RAW, false),
-        'spam_report_count' => array(FILTER_VALIDATE_INT, false),
     ),
 
     'allowed_get' => array(
@@ -447,6 +433,5 @@ return array(
         'count_children' => FILTER_VALIDATE_BOOL,
         'reset_cache' => FILTER_VALIDATE_BOOL,
         'active_body_structure' => FILTER_VALIDATE_BOOLEAN,
-        'spam_reasons' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
     )
 );
