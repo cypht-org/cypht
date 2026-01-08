@@ -650,9 +650,9 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
         const onSuccess = function(res) {
             $('.msg_text').html('');
             $('.msg_text').append(res.msg_headers);
+            $('.msg_text').append(res.new_filter);
             $('.msg_text').append(res.msg_text);
             $('.msg_text').append(res.msg_parts);
-
 
             document.title = $('.msg_text .small_header').first().text();
             imap_message_view_finished(uid, detail, listParent);

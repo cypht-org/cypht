@@ -121,6 +121,7 @@ add_output('settings', 'enable_sieve_filter_setting', true, 'sievefilters', 'sta
 
 add_handler('home', 'check_sieve_configuration', true, 'nux','load_imap_servers_from_config', 'after');
 add_output('home', 'display_sieve_misconfig_alert', true, 'nux', 'start_welcome_dialog', 'after');
+add_output('ajax_imap_message_content', 'new_sieve_filter_for_message_like_this', true, 'sievefilters', 'filter_message_headers', 'after');
 
 /**
  * toggle fliter
@@ -151,6 +152,7 @@ return array(
         'message',
         'ajax_account_sieve_filters',
         'ajax_block_account_sieve_filters',
+        'ajax_imap_message_content',
     ),
     'allowed_output' => array(
         'imap_server_ids' => array(FILTER_UNSAFE_RAW, false),
@@ -165,7 +167,8 @@ return array(
         'script_details' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'ajax_list_block_sieve' => array(FILTER_UNSAFE_RAW, false),
         'mailbox' => array(FILTER_UNSAFE_RAW, false),
-        'reload_page' => array(FILTER_VALIDATE_BOOL, false)
+        'reload_page' => array(FILTER_VALIDATE_BOOL, false),
+        'new_filter' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_get' => array(),
     'allowed_post' => array(

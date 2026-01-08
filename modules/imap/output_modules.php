@@ -194,6 +194,16 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
       protected function output() {
 
         $mailbox_name = $this->get('mailbox_name');
+        $headers = $this->get('msg_headers', array());
+        $lc_headers = lc_headers($headers);
+
+        $filter_headers = [
+            'from'     => addr_parse($lc_headers['from'] ?? '')['email'] ?? '',
+            'to'       => $lc_headers['to'] ?? '',
+            'subject'  => $lc_headers['subject'] ?? '',
+            'reply-to' => $lc_headers['reply-to'] ?? '',
+        ];
+        
 
         if ($this->get('msg_headers')) {
             $txt = '';
@@ -380,7 +390,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<a class="hlink small_headers text-decoration-none btn btn-sm btn-outline-secondary" href="#">'.$this->trans('Small headers').'</a>';
             $txt .= '</div>';
 
-            $txt .= '<div class="d-flex flex-wrap gap-2">';
+            $txt .= '<div class="d-flex flex-wrap gap-2">';           
             if (!array_key_exists('flags', $lc_headers) || !mb_stristr($lc_headers['flags'], 'draft')) {
                 $txt .= '<a class="reply_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
                 if ($size > 1) {
@@ -438,56 +448,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 }
             }
 
-            if ($this->get('sieve_filters_enabled')) {
-                $txt .= '<a class="hLink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle me-2" '
-                    . 'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
-                    . $this->trans('Filter similar messages')
-                    . '</a>'
-                    . '<div class="dropdown-menu move_to_location p-3">'
-                    . '<form id="create-filter-form" style="min-width:260px;" account="' . $mailbox_name . '">'
-                    // From (enabled, checked by default)
-                    . '<div class="form-check mb-1">'
-                    . '<input class="form-check-input" type="checkbox" id="use_from" checked>'
-                    . '<input type="hidden" name="from" value="' . htmlspecialchars($sender) . '">'
-                    . '<label class="form-check-label small" for="use_from">'
-                    . $this->trans('From:') . ' ' . htmlspecialchars($sender)
-                    . '</label>'
-                    . '</div>'
-
-                    // To (disabled by default)
-                    . '<div class="form-check mb-1">'
-                    . '<input class="form-check-input" type="checkbox" id="use_to" >'
-                    . '<input type="hidden" name="to" value="' . htmlspecialchars($headers['To']) . '">'
-                    . '<label class="form-check-label small text-muted" for="use_to">'
-                    . $this->trans('To:') . ' ' . $headers['To']
-                    . '</label>'
-                    . '</div>'
-
-                    // Subject (disabled by default)
-                    . '<div class="form-check mb-1">'
-                    . '<input class="form-check-input" type="checkbox" id="use_subject" >'
-                    . '<input type="hidden" name="subject" value="' . htmlspecialchars($headers['Subject']) . '">'
-                    . '<label class="form-check-label small text-muted" for="use_subject">'
-                    . $this->trans('Subject contains:') . ' ' . $headers['Subject']
-                    . '</label>'
-                    . '</div>'
-
-                    // Reply-To (disabled by default)
-                    . '<div class="form-check mb-2">'
-                    . '<input class="form-check-input" type="checkbox" id="use_reply" >'
-                    . '<input type="hidden" name="reply-to" value="' . htmlspecialchars($headers['Reply-To']) . '">'
-                    . '<label class="form-check-label small text-muted" for="use_reply">'
-                    . $this->trans('Reply-To:') . ' ' . $headers['Reply-To']
-                    . '</label>'
-                    . '</div>'
-
-                    . '<button type="submit" id="create_filter" class="btn btn-primary btn-sm" >'
-                    . $this->trans('Create filter')
-                    . '</button>'
-                    . '</form>'
-                    . '</div>';
-            }
-
             $txt .= '<a class="hlink text-decoration-none btn btn-sm btn-outline-secondary" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
             $txt .= '</div><span id="extra-header-buttons"></span>';
@@ -497,8 +457,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
             $txt .= '</div></div>';
             $txt .= '</div>';
-
             $this->out('msg_headers', $txt, false);
+            $this->out('filter_headers', $filter_headers, false);
         }
     }
 }
