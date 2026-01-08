@@ -1535,7 +1535,7 @@ class Hm_Output_new_sieve_filter_for_message_like_this extends Hm_Output_Module 
         $subject = $headers['subject'] ?? '';
         $replyTo = $headers['reply-to'] ?? '';
 
-        $res = '<a class="hLink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle me-2 mt-2" '
+        $res = '<a class="hLink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle me-2" '
                     . 'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
                     . $this->trans('Filter similar messages')
                     . '</a>'
@@ -1584,7 +1584,7 @@ class Hm_Output_new_sieve_filter_for_message_like_this extends Hm_Output_Module 
                     . '</button>'
                     . '</form>'
                     . '</div>';
-           
+
                     $this->out('new_filter', $res, false);
     }
 }
