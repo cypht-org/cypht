@@ -158,6 +158,7 @@ add_handler('ajax_imap_message_content', 'save_imap_cache',  true);
 add_handler('ajax_imap_message_content', 'save_imap_servers',  true);
 add_handler('ajax_imap_message_content', 'close_session_early',  true, 'core');
 add_output('ajax_imap_message_content', 'filter_message_headers', true);
+add_output('ajax_imap_message_content', 'filter_message_headers_end', true);
 add_output('ajax_imap_message_content', 'filter_message_body', true);
 add_output('ajax_imap_message_content', 'filter_message_struct', true);
 
@@ -339,6 +340,9 @@ return array(
         'do_not_flag_as_read_on_open' => array(FILTER_VALIDATE_BOOLEAN, false),
         'ajax_imap_folders_permissions' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'move_responses' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+        'mailbox_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'filter_headers' => array(FILTER_UNSAFE_RAW, false),
+        'msg_headers_end' => array(FILTER_UNSAFE_RAW, false),
     ),
 
     'allowed_get' => array(

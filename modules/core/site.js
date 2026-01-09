@@ -435,7 +435,6 @@ Hm_Modal.prototype = {
         this.modalTitle.html(title);
     }
 };
-
 class Hm_Alert {
     constructor() {
         this.container = document.querySelector('.sys_messages');
@@ -2528,3 +2527,122 @@ window.addEventListener('page-change', () => {
     }
 })
 
+
+document.addEventListener("show.bs.dropdown", function (event) {
+    const currentToggle = event.target;
+
+    // If it's nested inside a dropdown menu, skip
+    if (currentToggle.closest(".dropdown-menu")) {
+        return;
+    }
+
+    // Close other top-level dropdowns
+    document.querySelectorAll(".dropdown-toggle.show").forEach((openBtn) => {
+        if (openBtn !== currentToggle && !openBtn.closest(".dropdown-menu")) {
+            const dropdownInstance = bootstrap.Dropdown.getInstance(openBtn);
+            if (dropdownInstance) dropdownInstance.hide();
+        }
+    });
+});
+
+window.addEventListener('page-change', () => {
+    document.getElementById("cypht-upgrade-alert")?.addEventListener("close.bs.alert", function () {
+        Hm_Utils.save_to_local_storage('cypht_upgrade_alert_dismissed', '1');
+    });
+    if (Hm_Utils.get_from_local_storage('cypht_upgrade_alert_dismissed') !== '1') {
+        $("#cypht-upgrade-alert").addClass("show");
+    } else {
+        $("#cypht-upgrade-alert").addClass("hide");
+    }
+})
+
+
+document.addEventListener("show.bs.dropdown", function (event) {
+    const currentToggle = event.target;
+
+    // If it's nested inside a dropdown menu, skip
+    if (currentToggle.closest(".dropdown-menu")) {
+        return;
+    }
+
+    // Close other top-level dropdowns
+    document.querySelectorAll(".dropdown-toggle.show").forEach((openBtn) => {
+        if (openBtn !== currentToggle && !openBtn.closest(".dropdown-menu")) {
+            const dropdownInstance = bootstrap.Dropdown.getInstance(openBtn);
+            if (dropdownInstance) dropdownInstance.hide();
+        }
+    });
+});
+
+window.addEventListener('page-change', () => {
+    document.getElementById("cypht-upgrade-alert")?.addEventListener("close.bs.alert", function () {
+        Hm_Utils.save_to_local_storage('cypht_upgrade_alert_dismissed', '1');
+    });
+    if (Hm_Utils.get_from_local_storage('cypht_upgrade_alert_dismissed') !== '1') {
+        $("#cypht-upgrade-alert").addClass("show");
+    } else {
+        $("#cypht-upgrade-alert").addClass("hide");
+    }
+})
+
+
+document.addEventListener("show.bs.dropdown", function (event) {
+    const currentToggle = event.target;
+
+    // If it's nested inside a dropdown menu, skip
+    if (currentToggle.closest(".dropdown-menu")) {
+        return;
+    }
+
+    // Close other top-level dropdowns
+    document.querySelectorAll(".dropdown-toggle.show").forEach((openBtn) => {
+        if (openBtn !== currentToggle && !openBtn.closest(".dropdown-menu")) {
+            const dropdownInstance = bootstrap.Dropdown.getInstance(openBtn);
+            if (dropdownInstance) dropdownInstance.hide();
+        }
+    });
+});
+
+window.addEventListener('page-change', () => {
+    document.getElementById("cypht-upgrade-alert")?.addEventListener("close.bs.alert", function () {
+        Hm_Utils.save_to_local_storage('cypht_upgrade_alert_dismissed', '1');
+    });
+    if (Hm_Utils.get_from_local_storage('cypht_upgrade_alert_dismissed') !== '1') {
+        $("#cypht-upgrade-alert").addClass("show");
+    } else {
+        $("#cypht-upgrade-alert").addClass("hide");
+    }
+})
+
+class Hm_Filter_Modal extends Hm_Modal {
+  constructor(current_account) {
+    super({
+      size: "xl",
+      modalId: "myEditFilterModal",
+    });
+    const save_filter = Hm_Filters.save_filter;
+    const modalContent = document.querySelector("#edit_filter_modal");
+    if (modalContent) {
+      this.setContent(modalContent.innerHTML);
+      modalContent.remove();
+    } else {
+      this.setContent("<p>Could not load filter editor</p>");
+    }
+
+    this.addFooterBtn("Save", "btn-primary ms-auto", async () => {
+      let result = save_filter(current_account);
+      if (result) {
+        Hm_Notices.show("Filter saved", "success");
+        this.hide();
+      }
+    });
+
+    this.addFooterBtn("Convert to code", "btn-warning", async () => {
+      let result = save_filter(current_account, true);
+      if (result) {
+        Hm_Notices.show("Filter saved", "success");
+        this.hide();
+      }
+    });
+  }
+}

@@ -652,7 +652,9 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
             $('.msg_text').append(res.msg_headers);
             $('.msg_text').append(res.msg_text);
             $('.msg_text').append(res.msg_parts);
-
+            if (res.new_filter) {
+              $("#extra-header-buttons").append(res.new_filter);
+            }
 
             document.title = $('.msg_text .small_header').first().text();
             imap_message_view_finished(uid, detail, listParent);
@@ -913,7 +915,7 @@ var search_selected_for_imap = function() {
         $('.imap_move').on("click", function() { return false; });
         bootstrap.Dropdown.getOrCreateInstance($('.move_to_location')[0]).hide();
         $('.move_to_location').html('');
-    }
+    }es                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 };
 
 var unselect_non_imap_messages = function() {
@@ -960,6 +962,87 @@ var imap_move_copy = function(e, action, context) {
     });
     return false;
 };
+
+$(function () {
+    $(document).on("submit", "#create-filter-form", function (e) {
+        e.preventDefault();
+        const current_account = $(this).attr("account");
+
+        const edit_filter_modal = new Hm_Filter_Modal(current_account);
+        hm_sieve_button_events(edit_filter_modal);
+        edit_filter_modal.setTitle("Add Filter for message like this");
+        const add_filter_condition = Hm_Filters.add_filter_condition;
+        const add_filter_action = Hm_Filters.add_filter_action;
+
+        const $form = $(this);
+        const $btn = $form.find("#create_filter").prop("disabled", true);
+        const data = {};
+
+        if ($form.find("#use_from").is(":checked"))
+            data["from"] = $form.find('input[name="from"]').val();
+        if ($form.find("#use_to").is(":checked"))
+            data["to"] = $form.find('input[name="to"]').val();
+        if ($form.find("#use_subject").is(":checked"))
+            data["subject"] = $form.find('input[name="subject"]').val();
+        if ($form.find("#use_reply").is(":checked"))
+            data["reply-to"] = $form.find('input[name="reply-to"]').val();
+
+        if ($.isEmptyObject(data)) {
+            Hm_Notices.show(
+                "Please check at least one condition to create a filter.",
+                "danger"
+            );
+            $btn.prop("disabled", false);
+            return;
+        }
+
+        edit_filter_modal.open();
+
+    const allFields = hm_sieve_condition_fields();
+    const availableFields = [
+        ...allFields.Message.map((f) => f.name),
+        ...allFields.Header.map((f) => f.name),
+    ];
+
+    for (const [key, value] of Object.entries(data)) {
+        // If key is not in available fields, skip it
+        if (!availableFields.includes(key)) {
+        continue;
+        }
+
+        add_filter_condition();
+
+        const $lastRow = $(".sieve_list_conditions_modal tr").last();
+        const $selectField = $lastRow.find(
+            ".add_condition_sieve_filters"
+        );
+        const $selectOp = $lastRow.find(".condition_options");
+        const $inputVal = $lastRow.find(
+            'input[name="sieve_selected_option_value[]"]'
+        );
+        $selectField.val(key);
+        $selectOp.val("Contains");
+        $inputVal.val(value);
+    }
+
+    if (data["reply-to"]) {
+        add_filter_action("autoreply");
+
+        const $lastRow = $(".filter_actions_modal_table tr").last();
+        const $select = $lastRow.find(".sieve_actions_select");
+        $select.val("autoreply").trigger("change");
+
+            // Focus the input field for the message
+        const $input = $lastRow.find(
+            'input[name="sieve_selected_action_value[]"]'
+        );
+        if ($input.length) {
+            $input.focus();
+        }
+    }
+   
+    });
+});
 
 var imap_perform_move_copy = function(dest_id, context, action = null) {
     if (!action) {
