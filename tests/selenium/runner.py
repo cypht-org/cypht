@@ -20,6 +20,7 @@ def run_tests(obj, tests):
             print('%s %sFAILED%s' % (name, RED, END))
             exc_type, exc_value, exc_traceback = exc_info()
             print_exception(exc_type, exc_value, exc_traceback)
+            obj.save_debug_artifacts(obj.__class__.__name__ + "_" + name)
     print('')
     print('%s%s of %s PASSED%s' % (GREEN, passed, len(tests), END))
     print('')

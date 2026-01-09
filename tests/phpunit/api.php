@@ -3,10 +3,6 @@
 use PHPUnit\Framework\TestCase;
 
 class Hm_Test_API extends TestCase {
-
-    public function setUp(): void {
-        require 'bootstrap.php';
-    }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess

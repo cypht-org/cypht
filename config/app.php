@@ -454,7 +454,7 @@ return [
 
     'redis_pass' => env('REDIS_PASS'),
 
-    'redis_socket' => env('REDIS_SOCKET', '/var/run/redis/redis-server.sock'),
+    'redis_socket' => env('REDIS_SOCKET', ''),
 
     /*
     | -----------------

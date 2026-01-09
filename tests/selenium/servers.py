@@ -43,8 +43,8 @@ class ServersTest(WebTest):
             EC.element_to_be_clickable((By.ID, "step_config_action_next"))
         )
          # Scroll to the button and wait for any animations/overlays to finish
-        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", next_button)
-        sleep(0.5)  # Wait for smooth scroll to complete
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant', block: 'center'});", next_button)
+        WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(next_button))
 
         # Try multiple click methods for better reliability
         try:
@@ -71,8 +71,8 @@ class ServersTest(WebTest):
         signature = self.by_name('srv_setup_stepper_profile_signature')
         signature.send_keys('Test')
         elem = self.by_id('step_config_action_finish')
-        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
-        sleep(1)
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant'})", elem)
+        WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(elem))
         elem.click()
         wait = WebDriverWait(self.driver, 30)
         element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "sys_messages")))

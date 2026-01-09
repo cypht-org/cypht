@@ -9,7 +9,6 @@ class Hm_Test_Memcached_Session extends TestCase {
 
     public $config;
     public function setUp(): void {
-        require 'bootstrap.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
         $this->config = new Hm_Mock_Config();

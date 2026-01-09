@@ -48,7 +48,7 @@ jobs:
         run: |
           FILE=/tmp/test.db
           cat tests/phpunit/data/schema_sqlite.sql | sqlite3 ${FILE}
-          cat tests/phpunit/data/seed.sql | sqlite3 ${FILE}
+          cat tests/phpunit/data/seed_sqlite.sql | sqlite3 ${FILE}
         env:
           DB_DRIVER: sqlite
           DB_NAME: cypht_test
@@ -58,8 +58,7 @@ jobs:
       - name: "Generate Coverage Report"
         run: |
           mkdir -p build/logs
-          phpunit --bootstrap vendor/autoload.php \
-                  --configuration tests/phpunit/phpunit.xml \
+          phpunit --configuration tests/phpunit/phpunit.xml \
                   --coverage-clover build/logs/clover.xml \
                   --testdox
         env:

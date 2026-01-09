@@ -117,7 +117,7 @@ class Hm_Output_tags_tree extends Hm_Output_Module {
             // Generate the tree view HTML
             $treeViewHtml = generate_tree_view($folderTree, $this->html_safe(Hm_Request_Key::generate()));
             $treeContent = count($folderTree) > 0 ? $treeViewHtml : '<p>'. $this->trans('No tags available yet.') .'</p>';
-            $out = '<div class="tags_tree mt-3 col-lg-8 col-md-8 col-sm-12">
+            $out = '<div class="tags_tree mt-3 col-lg-8 col-md-12 col-sm-12">
                     <div class="card m-3 mr-0">
                         <div class="card-body">
                             <div class="tree-view">
@@ -151,9 +151,9 @@ class Hm_Output_tags_form extends Hm_Output_Module {
             $option_selected = !is_null($id) && $folder['id'] === $parent_tag ? 'selected' : '';
             $options .= '<option '. $option_selected.' value="'.$this->html_safe($folder['id']).'">'.$this->html_safe($folder['name']).'</option>';
         }
-        $form_title = !is_null($id) ? $this->trans('Edit tag/label').': '.$tag['name'] : $this->trans('Add an tag/label');
-        return '<div class="tags_tree mt-3 col-lg-4 col-md-4 col-sm-12">
-                    <div class="card m-4">
+        $form_title = !is_null($id) ? $this->trans('Edit tag/label').': '.$tag['name'] : $this->trans('Add a tag/label');
+        return '<div class="tags_tree mt-3 col-lg-4 col-md-8 col-sm-12">
+                    <div class="card m-3">
                         <div class="card-body">
                             <form class="add_tag me-0" method="POST" action="?page=tags">
                                 <input type="hidden" name="hm_page_key" id="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />

@@ -101,6 +101,10 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                     $imap_draft['Cc'] = $this->unangle($msg_header['Cc']);
                 }
 
+                if (array_key_exists('X-Original-Bcc', $msg_header)) {
+                    $imap_draft['Bcc'] = $this->unangle($msg_header['X-Original-Bcc']);
+                }
+
                 if ($imap_draft) {
                     recip_count_check($imap_draft, $this);
                     $this->out('draft_id', $this->request->get['uid']);
@@ -769,6 +773,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* check for associated IMAP server to save a copy */
         if ($imap_server !== false) {
+            $mime->set_original_bcc_header();
             $this->out('save_sent_server', $imap_server, false);
             $this->out('save_sent_msg', $mime);
         }
@@ -1147,6 +1152,9 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             }
             if (array_key_exists('Cc', $imap_draft)) {
                 $cc = $imap_draft['Cc'];
+            }
+            if (array_key_exists('Bcc', $imap_draft)) {
+                $bcc = $imap_draft['Bcc'];
             }
             if (array_key_exists('From', $imap_draft)) {
                 $from = $imap_draft['From'];
@@ -2034,6 +2042,8 @@ function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '', $
         $atts['schedule'],
         $profile_id
     );
+
+    $mime->set_original_bcc_header();
 
     $mime->add_attachments($uploaded_files);
 

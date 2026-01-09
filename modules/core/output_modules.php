@@ -616,6 +616,14 @@ class Hm_Output_js_data extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         $enable_snooze = $settings['enable_snooze'] ?? DEFAULT_ENABLE_SNOOZE;
         $enable_collect_address_on_send = $settings['enable_collect_address_on_send_setting'] ?? DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND;
+        $specialFolders = $settings['special_imap_folders'] ?? array();
+        $formattedSpecialFolders = [];
+        foreach ($specialFolders as $serverId => $folders) {
+            $formattedSpecialFolders[$serverId] = [];
+            foreach ($folders as $type => $folder) {
+                $formattedSpecialFolders[$serverId][] = ['type' => $type, 'label' => $folder, 'id' => bin2hex($folder)];
+            }
+        }
         $res = '<script type="text/javascript" id="data-store">'.
             'var globals = {};'.
             'var hm_is_logged = function () { return '.($this->get('is_logged') ? '1' : '0').'; };'.
@@ -633,6 +641,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_web_root_path = function() { return "'.WEB_ROOT.'"; };'.
             'var hm_flag_image_src = function() { return "<i class=\"bi bi-star-half\"></i>"; };'.
             'var hm_check_dirty_flag = function() { return '.($this->get('warn_for_unsaved_changes', '') ? '1' : '0').'; };'.
+            'var hm_special_folders = function() { return '.json_encode($formattedSpecialFolders).'; };'.
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {
@@ -1962,7 +1971,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
      */
     protected function output() {
         $search_field = '';
-        $terms = $this->get('search_terms', '');
+        $terms = $this->get('list_keyword', '');
         if ($this->get('custom_list_controls', '')) {
             $config_link = $this->get('custom_list_controls');
             $source_link = '';
@@ -1978,10 +1987,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             }
             $config_link = '<a title="'.$this->trans('Configure').'" href="?page=settings#'.$path.'_setting"><i class="bi bi-gear-wide refresh_list"></i></a>';
             $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a>';
-            //$search_field = '<form method="GET">
-            //<input type="hidden" name="page" value="message_list" />
-            //<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/>
-            //<input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="imap_keyword" name="search_terms" value="'.$this->html_safe($terms).'"/></form>';
+            $search_field = '<form method="GET"><input type="hidden" name="page" value="message_list" /><input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/><input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="form-control imap_keyword" name="keyword" value="'.$this->html_safe($terms).'"/></form>';
 
         }
         else {
@@ -2486,7 +2492,13 @@ class Hm_Output_privacy_settings extends Hm_Output_Module {
             'label' => 'External images whitelist',
             'description' => 'Cypht automatically prevents untrusted external images from loading in messages. Add senders from whom you want to allow images to load.',
             'separator' => ','
-        ]
+        ],
+        'images_blacklist' => [
+            'type' => 'text',
+            'label' => 'External images blacklist',
+            'description' => 'Add senders from whom you never want to allow external images to load.',
+            'separator' => ','
+        ],
     ];
 
     protected function output()
@@ -2506,5 +2518,22 @@ class Hm_output_combined_message_list extends Hm_Output_Module {
             $messageList = array_merge($messageList, $this->get('feed_list_data'), Hm_Output_filter_feed_list_data::formatMessageList($this));
         }
         $this->out('formatted_message_list', $messageList);
+    }
+}
+
+class Hm_Output_version_upgrade_checker extends Hm_Output_Module {
+    protected function output()
+    {
+        if (! $this->get('need_upgrade')) return '';
+
+        $latestVersion = $this->get('latest_version');
+
+        return '
+        <div class="alert alert-info alert-dismissible fade align-items-center" role="alert" id="cypht-upgrade-alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            You are currently running Cypht version '.CYPHT_VERSION.'. A higher version (<b>'. $latestVersion .'</b>) is available.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        ';
     }
 }

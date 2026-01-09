@@ -318,14 +318,24 @@ function write_config_file($settings, $filters) {
  * @return void
  */
 function append_bootstrap_icons_files() {
+    // Ensure target font directories exist for both deployment modes:
+    // - Running from site/: fonts are expected under site/fonts relative to site/site.css
+    // - Running from the main directory: fonts are expected under fonts relative to site.css
     if (!is_dir("site/fonts")) {
         mkdir('site/fonts', 0755);
+    }
+    if (!is_dir("fonts")) {
+        mkdir('fonts', 0755);
     }
     $source_folder = VENDOR_PATH.'twbs/bootstrap-icons/font/fonts/';
     $files = glob("$source_folder*.*");
     foreach($files as $file){
-        $dest_forlder = str_replace($source_folder, "site/fonts/", $file);
-        copy($file, $dest_forlder);
+        // Copy for site/ deployments (CSS loaded from site/site.css → ./fonts resolves to site/fonts)
+        $dest_folder_site = str_replace($source_folder, "site/fonts/", $file);
+        copy($file, $dest_folder_site);
+        // Copy for main-directory deployments (CSS loaded from site.css → ./fonts resolves to fonts)
+        $dest_folder_root = str_replace($source_folder, "fonts/", $file);
+        copy($file, $dest_folder_root);
     }
 }
 
@@ -372,8 +382,15 @@ function create_production_site($assets, $settings, $hashes) {
     copy('site.js', 'site/site.js');
     append_bootstrap_icons_files();
 
+    // Copy main assets directory
+    if (is_readable('assets/')) {
+        printf("copying assets directory...\n");
+        copy_recursive('assets');
+    }
+
     $index_file = file_get_contents('index.php');
     $index_file = preg_replace("/APP_PATH', ''/", "APP_PATH', '".APP_PATH."'", $index_file);
+    $index_file = preg_replace("/ASSETS_PATH', APP_PATH\.'assets\/'/", "ASSETS_PATH', WEB_ROOT.'assets/'", $index_file);
     $index_file = preg_replace("/CACHE_ID', ''/", "CACHE_ID', '".urlencode(Hm_Crypt::unique_id(32))."'", $index_file);
     $index_file = preg_replace("/SITE_ID', ''/", "SITE_ID', '".urlencode(Hm_Crypt::unique_id(64))."'", $index_file);
     $index_file = preg_replace("/DEBUG_MODE', true/", "DEBUG_MODE', false", $index_file);

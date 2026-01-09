@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Modules extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
         Hm_Test_Module_List::add('test', 'date', false, false, 'after', true, 'core');
     }
     /**
