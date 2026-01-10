@@ -331,6 +331,152 @@ class Hm_Output_sieve_get_mailboxes_output extends Hm_Output_Module {
     }
 }
 
+// /**
+// * @subpackage sievefilters/handler
+// */
+// class Hm_Handler_sieve_get_message_headers_script extends Hm_Handler_Module {
+//     public function process() {
+//         if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+//         list($success, $form) = $this->process_form(array('message_ids', 'list_path'));
+//         if (!$success) {
+//             return;
+//         }
+
+//         $message_ids = $this->request->post['message_ids'];
+//         if (!is_array($message_ids)) {
+//             $message_ids = [$message_ids];
+//         }
+
+//         // Parse list_path to get server_id and folder
+//         $list_path = $form['list_path'];
+//         $parts = explode('_', $list_path);
+        
+//         $messages = [];
+//         if (count($parts) >= 2 && $parts[0] === 'imap') {
+//             $imap_server_id = $parts[1];
+//             $folder = implode('_', array_slice($parts, 2)); // Handle folder names with underscores
+
+//             // Get IMAP mailbox connection
+//             $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
+//             if ($mailbox && $mailbox->authed()) {
+//                 $mailbox->select_folder($folder);
+                
+//                 // Fetch headers for each message
+//                 foreach ($message_ids as $mid) {
+//                     // message id may be in the format imap_{server}_{uid} or imap_{server}_{uid}_{folder}
+//                     $uid = $mid;
+//                     if (is_string($mid) && strpos($mid, 'imap_') === 0) {
+//                         $parts_mid = explode('_', $mid);
+//                         if (isset($parts_mid[2])) {
+//                             $uid = $parts_mid[2];
+//                         }
+//                     }
+
+//                     // decode folder if it's hex-encoded
+//                     $folder_name = @hex2bin($folder);
+//                     if ($folder_name === false) {
+//                         $folder_name = $folder;
+//                     }
+
+//                     // call with folder and uid (handler expects two args)
+//                     $headers = $mailbox->get_message_headers($folder_name, $uid);
+
+//                     if ($headers) {
+//                         $messages[] = array(
+//                             'uid' => $uid,
+//                             'from_email' => $headers['From'] ?? '',
+//                             'to_email' => $headers['To'] ?? '',
+//                             'cc_email' => $headers['Cc'] ?? '',
+//                             'subject' => $headers['Subject'] ?? ''
+//                         );
+//                     } else {
+//                         Hm_Debug::add(sprintf('Failed to fetch headers for uid %s in folder %s', $uid, $folder_name), 'warning');
+//                     }
+//                 }
+//             }
+//         }
+
+//         // return messages as a JSON string so the format layer can safely transmit it
+//         // $this->out('messages', json_encode($messages));
+//         $this->out('messages', ['sample'=>'qwerty1234']);
+//     }
+// }
+
+class Hm_Handler_sieve_get_message_headers_script extends Hm_Handler_Module {
+
+    public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
+            return;
+        }
+
+        list($success, $form) = $this->process_form(['message_ids', 'list_path']);
+        if (! $success) {
+            return;
+        }
+
+        $message_ids = $form['message_ids'];
+        if (! is_array($message_ids)) {
+            $message_ids = [$message_ids];
+        }
+
+        $messages = [];
+
+        foreach ($message_ids as $imap_msg_id) {
+
+            // Expected: imap_<server>_<uid>_<hexFolder>
+            $parts = explode('_', $imap_msg_id);
+            if (count($parts) < 4 || $parts[0] !== 'imap') {
+                continue;
+            }
+
+            $imap_server_id = $parts[1];
+            $uid            = $parts[2];
+            $hex_folder     = $parts[3];
+
+            $folder = hex2bin($hex_folder);
+            if ($folder === false) {
+                continue;
+            }
+
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
+            if (! $mailbox || ! $mailbox->authed()) {
+                continue;
+            }
+
+            // ✅ Correct call (same as imap_process_move)
+            $headers = $mailbox->get_message_headers($folder, $uid);
+
+            if (! $headers) {
+                continue;
+            }
+
+            $messages[] = [
+                'uid'        => $uid,
+                'from_email' => process_address_fld($headers['From'] ?? '')[0]['email'] ?? '',
+                'to_email'   => process_address_fld($headers['To'] ?? '')[0]['email'] ?? '',
+                'cc_email'   => process_address_fld($headers['Cc'] ?? '')[0]['email'] ?? '',
+                'subject'    => $headers['Subject'] ?? '',
+            ];
+        }
+
+        // JSON-safe output
+        $this->out('messages', $messages);
+    }
+}
+
+
+class Hm_Output_sieve_get_message_headers_output extends Hm_Output_Module {
+    public function output() {
+        // decode back into an array for the JSON formatter
+        $messages = $this->get('messages', '[]');
+        $decoded = json_decode($messages, true);
+        if (is_array($decoded)) {
+            $this->out('messages', $decoded);
+        }
+    }
+}
+
 /**
 * @subpackage sievefilters/handler
 */

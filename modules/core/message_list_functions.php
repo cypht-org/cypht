@@ -458,11 +458,11 @@ function message_controls($output_mod) {
     }
 
     $res .= '<div class="dropdown">'
-        . '<a class="msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle" '
-        . 'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
-        . 'Quick Actions'
-        . '</a>'
-        . '<div class="dropdown-menu custom-actions p-2" aria-labelledby="filter_message">';
+            .   '<a class="msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle" '
+            .   'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
+            .   'Quick Actions'
+            .   '</a>'
+            .   '<div class="dropdown-menu custom-actions p-2" aria-labelledby="filter_message">';
 
         if (!empty($custom_actions)) {
             foreach ($custom_actions as $filter) {
@@ -476,11 +476,63 @@ function message_controls($output_mod) {
         }
 
     // The “Add Custom Action” option at the bottom
-    $res .= '<a class="dropdown-item add_custom_action text-primary" href="#">'
-        . '<i class="bi bi-plus-circle"></i> Add Custom Action'
-        . '</a>'
-        . '</div>
-    </div>';
+    $res .= '<button class="dropdown-item add_custom_action text-primary" 
+               id="add_custom_action_button"
+            >'
+            .   '<i class="bi bi-plus-circle"></i> Add Custom Action'
+            . '</button>';
+            $res .= '
+<div class="modal fade" id="quickFilterModal" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h6 class="modal-title">Create filter from messages</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- FROM -->
+        <div class="mb-2">
+          <label class="form-label small">Emails from</label>
+          <div id="filter-from-list" class="filter-chip-list"></div>
+          <input type="email" class="form-control form-control-sm mt-1"
+                 id="filter-from-add" placeholder="Add email">
+        </div>
+
+        <!-- TO -->
+        <div class="mb-2">
+          <label class="form-label small">Sent to</label>
+          <div id="filter-to-list" class="filter-chip-list"></div>
+          <input type="email" class="form-control form-control-sm mt-1"
+                 id="filter-to-add" placeholder="Add email">
+        </div>
+
+        <!-- CONTAINS -->
+        <div class="mb-2">
+          <label class="form-label small">Containing</label>
+          <input type="text" class="form-control form-control-sm"
+                 id="filter-contains" placeholder="Keyword (optional)">
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button class="btn btn-sm btn-primary" id="create-filter-btn">
+          Create filter
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>';
+
+       $res .= '</div>
+                </div>';
 
     $res .= '</div>';
     return $res;

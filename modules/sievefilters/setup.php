@@ -99,6 +99,11 @@ add_handler('ajax_sieve_get_mailboxes', 'settings_load_imap',  true);
 add_handler('ajax_sieve_get_mailboxes', 'sieve_get_mailboxes_script',  true);
 add_output('ajax_sieve_get_mailboxes', 'sieve_get_mailboxes_output',  true);
 
+setup_base_ajax_page('ajax_sieve_get_message_headers', 'core');
+add_handler('ajax_sieve_get_message_headers', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_sieve_get_message_headers', 'sieve_get_message_headers_script',  true);
+add_output('ajax_sieve_get_message_headers', 'sieve_get_message_headers_output',  true);
+
 /* get mailboxes script */
 setup_base_ajax_page('ajax_sieve_block_domain', 'core');
 add_handler('ajax_sieve_block_domain', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
@@ -140,6 +145,7 @@ return array(
         'ajax_sieve_block_unblock',
         'ajax_sieve_unblock_sender',
         'ajax_sieve_get_mailboxes',
+        'ajax_sieve_get_message_headers',
         'ajax_sieve_block_domain',
         'ajax_sieve_block_change_behaviour',
         'ajax_sieve_toggle_script_state',
@@ -156,6 +162,7 @@ return array(
         'actions' => array(FILTER_UNSAFE_RAW, false),
         'test_type' => array(FILTER_UNSAFE_RAW, false),
         'mailboxes' => array(FILTER_UNSAFE_RAW, false),
+        'messages' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY, false),
         'sieve_detail_display' => array(FILTER_UNSAFE_RAW, false),
         'imap_extensions_display' => array(FILTER_UNSAFE_RAW, false),
         'script_details' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
@@ -190,5 +197,7 @@ return array(
         'change_behavior' => FILTER_VALIDATE_BOOL,
         'gen_script' => FILTER_VALIDATE_BOOL,
         'is_screened' => FILTER_VALIDATE_BOOL,
+        'message_ids' => FILTER_UNSAFE_RAW,
+        'list_path' => FILTER_UNSAFE_RAW,
     )
 );

@@ -1026,6 +1026,104 @@ function get_list_block_sieve() {
     }
 };
 
+    function renderChips(container, values) {
+      const $c = $(container).empty();
+      values.forEach((v) => {
+        $c.append(
+          `<span class="badge bg-light text-dark me-1 mb-1">
+                ${v}
+                <i class="bi bi-x ms-1 remove-chip" data-value="${v}"></i>
+             </span>`
+        );
+      });
+    }
+
+    function collectChips(container) {
+      return $(container)
+        .find(".remove-chip")
+        .map((_, el) => $(el).data("value"))
+        .get();
+    }
+
+    function createFilterRedirect() {
+      const from = collectChips("#filter-from-list");
+      const to = collectChips("#filter-to-list");
+      const contains = $("#filter-contains").val();
+
+      const params = new URLSearchParams({
+        from: from.join(","),
+        to: to.join(","),
+        contains,
+        use_from: from.length ? 1 : 0,
+        use_to: to.length ? 1 : 0,
+        use_contains: contains ? 1 : 0,
+      });
+
+      window.location.href =
+        "?page=sieve_filters&action=new&" + params.toString();
+    }
+
+    let custom_action_modal;
+
+    custom_action_modal = new Hm_Modal({
+      size: "xl",
+      modalId: "myCustomActionModal",
+    });
+
+    custom_action_modal.setTitle("Setup filters from selected messages");
+
+    custom_action_modal.setContent(`
+        <form id="create-filter-form">
+            <div class="modal-body">
+
+                <div class="mb-2">
+                    <label class="form-label small">Emails from</label>
+                    <div id="filter-from-list" class="filter-chip-list mb-1"></div>
+                    <input type="email"
+                           class="form-control form-control-sm"
+                           id="filter-from-add"
+                           placeholder="Add email">
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label small">Sent to</label>
+                    <div id="filter-to-list" class="filter-chip-list mb-1"></div>
+                    <input type="email"
+                           class="form-control form-control-sm"
+                           id="filter-to-add"
+                           placeholder="Add email">
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label small">Containing</label>
+                    <input type="text"
+                           class="form-control form-control-sm"
+                           id="filter-contains"
+                           placeholder="Keyword (optional)">
+                </div>
+
+            </div>
+        </form>
+    `);
+
+    custom_action_modal.addFooterBtn(
+      "Create Filter",
+      "btn-primary ms-auto",
+      async function () {
+        createFilterRedirect();
+        custom_action_modal.hide();
+      }
+    );
+
+    custom_action_modal.addFooterBtn(
+      "Cancel",
+      "btn-secondary",
+      async function () {
+        custom_action_modal.hide();
+      }
+    );
+
+
 $(function () {
     $(document).on('change', '#block_action', function(e) {
         if ($(this).val() == 'reject_with_message') {
@@ -1033,5 +1131,130 @@ $(function () {
         } else {
             $('#reject_message').remove();
         }
+    });
+
+//     $(document).on("click", "#add_custom_action_button", function () {
+      
+//     var msg_list = $(".message_table");
+//   const selected = [];
+//   $("input[type=checkbox]", $(".message_table")).each(function () {
+//     if (this.checked) {
+//       const row = $(this).closest("tr");
+//       selected.push({
+//         from_email: row.find(".from").text(),
+//         to_email: row.find(".to").text(), // if available
+//       });
+//     }
+//   });
+
+//     console.log(selected);
+//     console.log('Messages selected for custom action =====>', msg_list[0]);
+//       const fromSet = new Set();
+//       const toSet = new Set();
+
+//     //   selected.forEach((h) => {
+//     //     if (h.from_email) fromSet.add(h.from_email);
+//     //     if (h.to_email) toSet.add(h.to_email);
+//     //   });
+
+//       renderChips("#filter-from-list", fromSet);
+//       renderChips("#filter-to-list", toSet);
+
+//       $("#filter-contains").val("");
+
+//       custom_action_modal.open();
+//     });
+// ////////////////////////////////////////////////////////////////
+$(document).on("click", "#add_custom_action_button", function (e) {
+  console.log("add_custom_action_button click handler start", e);
+  // Block other handlers and default navigation immediately
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  e.stopPropagation();
+
+  // If inside a form, prevent it from submitting
+  try {
+    const $btn = $(this);
+    const $form = $btn.closest('form');
+    if ($form.length) {
+      $form.one('submit.hmcancel', function(ev) {
+        console.log('Preventing form submit triggered by add_custom_action_button');
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        return false;
+      });
+    }
+
+    var msg_list = $(".message_table");
+    const messageIds = [];
+
+    // Collect checked message IDs
+    $("input[type=checkbox]", $(".message_table")).each(function () {
+      if (this.checked) {
+        messageIds.push($(this).val());
+      }
+    });
+
+    console.log("Collected message IDs:", messageIds);
+
+    if (messageIds.length === 0) {
+      Hm_Notices.show("Please select at least one message", "warning");
+      return false;
+    }
+
+    const listPath = getListPathParam();
+    console.log("List path:", listPath);
+
+    // Fetch full message headers from server
+    const ajaxParams = [
+      { name: "hm_ajax_hook", value: "ajax_sieve_get_message_headers" },
+      { name: "message_ids", value: messageIds },
+      { name: "list_path", value: listPath },
+    ];
+
+    console.log("AJAX params:", ajaxParams);
+
+    Hm_Ajax.request(
+      ajaxParams,
+      function (res) {
+        console.log("AJAX Response received:", res);
+        if (res && res.messages && Array.isArray(res.messages)) {
+          const selected = res.messages;
+          const fromSet = new Set();
+          const toSet = new Set();
+          console.log("Selected messages:", selected);
+          selected.forEach((msg) => {
+            if (msg.from_email) fromSet.add(msg.from_email);
+            if (msg.to_email) toSet.add(msg.to_email);
+          });
+
+          renderChips("#filter-from-list", fromSet);
+          renderChips("#filter-to-list", toSet);
+
+          console.log("Messages with headers:", selected);
+          custom_action_modal.open();
+        } else {
+          console.log("No messages in response or not an array:", res);
+          Hm_Notices.show("Error fetching message headers", "danger");
+        }
+      },
+      [],
+      false,
+      false,
+      true
+    );
+
+    console.log('add_custom_action_button handler completed');
+    return false;
+  } catch (error) {
+    console.error("Error in click handler:", error);
+    Hm_Notices.show("Error: " + error.message, "danger");
+    return false;
+  }
+});
+// //////////////////////////////////////////////////////////////////
+
+    $(document).on("click", ".remove-chip", function () {
+      $(this).parent().remove();
     });
 });
