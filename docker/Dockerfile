@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM php:8.1-fpm-bookworm
+FROM php:8.1-fpm-bookworm
 
 WORKDIR /usr/local/share/cypht
 
@@ -7,8 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     COMPOSER_HOME=/tmp/composer_home
 
 # Install system packages and PHP extensions
-RUN --mount=type=cache,target=/var/cache/apt \
-    set -eux \
+RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         supervisor \
