@@ -481,55 +481,6 @@ function message_controls($output_mod) {
             >'
             .   '<i class="bi bi-plus-circle"></i> Add Custom Action'
             . '</button>';
-            $res .= '
-<div class="modal fade" id="quickFilterModal" tabindex="-1">
-  <div class="modal-dialog modal-sm modal-dialog-centered">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h6 class="modal-title">Create filter from messages</h6>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body">
-
-        <!-- FROM -->
-        <div class="mb-2">
-          <label class="form-label small">Emails from</label>
-          <div id="filter-from-list" class="filter-chip-list"></div>
-          <input type="email" class="form-control form-control-sm mt-1"
-                 id="filter-from-add" placeholder="Add email">
-        </div>
-
-        <!-- TO -->
-        <div class="mb-2">
-          <label class="form-label small">Sent to</label>
-          <div id="filter-to-list" class="filter-chip-list"></div>
-          <input type="email" class="form-control form-control-sm mt-1"
-                 id="filter-to-add" placeholder="Add email">
-        </div>
-
-        <!-- CONTAINS -->
-        <div class="mb-2">
-          <label class="form-label small">Containing</label>
-          <input type="text" class="form-control form-control-sm"
-                 id="filter-contains" placeholder="Keyword (optional)">
-        </div>
-
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
-          Cancel
-        </button>
-        <button class="btn btn-sm btn-primary" id="create-filter-btn">
-          Create filter
-        </button>
-      </div>
-
-    </div>
-  </div>
-</div>';
 
        $res .= '</div>
                 </div>';
