@@ -105,6 +105,10 @@ class Hm_MIME_Msg {
     function get_mime_msg() {
         if (!empty($this->body)) {
             $this->prep_message_body();
+        } elseif (!empty($this->attachments)) {
+            // Set Content-Type header for attachments-only messages
+            // This makes the boundary accessible via headers and enables MailMimeParser extraction
+            $this->headers['Content-Type'] = 'multipart/mixed; boundary='.$this->boundary;
         }
         $res = '';
         $headers = '';
@@ -143,6 +147,11 @@ class Hm_MIME_Msg {
 
     function get_bcc() {
         return $this->bcc;
+    }
+
+    /* return boundary */
+    function get_boundary() {
+        return $this->boundary;
     }
 
     function quote_fld($val) {

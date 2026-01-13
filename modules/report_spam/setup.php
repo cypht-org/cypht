@@ -28,9 +28,9 @@ add_handler('ajax_report_spam', 'close_session_early', true, 'core');
 add_handler('ajax_report_spam', 'report_spam', true);
 
 // Modal output
-// add_output('message', 'report_spam_modal', true, 'report_spam', 'modals', 'after');
-// add_output('message_list', 'report_spam_modal', true, 'report_spam', 'modals', 'after');
-// add_output('home', 'report_spam_modal', true, 'report_spam', 'modals', 'after');
+add_output('message', 'report_spam_modal', true, 'report_spam', 'modals', 'after');
+add_output('message_list', 'report_spam_modal', true, 'report_spam', 'modals', 'after');
+add_output('home', 'report_spam_modal', true, 'report_spam', 'modals', 'after');
 
 return array(
     'allowed_pages' => array(

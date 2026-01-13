@@ -196,7 +196,11 @@ class Hm_Handler_report_spam extends Hm_Handler_Module {
                             $imap_server_email = $imap_server_details['user'];
                         }
 
-                        $result = call_user_func($function_name, $msg_source, $reasons, $this->user_config, $this->session, $imap_server_email);
+                        if ($service === 'abuseipdb') {
+                            $result = call_user_func($function_name, $msg_source, $reasons, $this->user_config);
+                        } else {
+                            $result = call_user_func($function_name, $msg_source, $this->user_config, $this->session, $imap_server_email);
+                        }
                         if ($result['success']) {
                             $service_results[$service]['success_count']++;
                             $message_success_count++;
@@ -436,59 +440,51 @@ class Hm_Output_abuseipdb_api_key_setting extends Hm_Output_Module {
 }
 
 /**
- * Report Spam modal output
- * Outputs after the core modals
+ * Report Spam Modal
  * @subpackage report_spam/output
  */
-// class Hm_Output_report_spam_modal extends Hm_Output_Module {
-//     /**
-//      * Outputs the Report Spam modal
-//      */
-//     protected function output() {
-//         // Report Spam Modal
-//         $report_spam_modal = '<div class="modal fade" id="reportSpamModal" tabindex="-1" aria-labelledby="reportSpamModalLabel" aria-hidden="true">';
-//         $report_spam_modal .= '<div class="modal-dialog">';
-//         $report_spam_modal .= '<div class="modal-content">';
-//         $report_spam_modal .= '<div class="modal-header">';
-//         $report_spam_modal .= '<h5 class="modal-title" id="reportSpamModalLabel">'.$this->trans('Report Spam').'</h5>';
-//         $report_spam_modal .= '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
-//         $report_spam_modal .= '</div>';
-//         $report_spam_modal .= '<div class="modal-body">';
-//         $report_spam_modal .= '<p>'.$this->trans('Please tell us why you\'re reporting this email:').'</p>';
-//         $report_spam_modal .= '<form id="reportSpamForm">';
-//         $report_spam_modal .= '<div class="mb-3">';
-//         $report_spam_modal .= '<label for="spam_reason_select" class="form-label">'.$this->trans('Select one or more reasons:').'</label>';
-//         $report_spam_modal .= '<select class="form-select" id="spam_reason_select" name="spam_reason[]" multiple size="7">';
-//         $report_spam_modal .= '<option value="unsolicited">'.$this->trans('Unsolicited / Spam').'</option>';
-//         $report_spam_modal .= '<option value="phishing">'.$this->trans('Phishing or scam attempt').'</option>';
-//         $report_spam_modal .= '<option value="malicious">'.$this->trans('Malicious or harmful content').'</option>';
-//         $report_spam_modal .= '<option value="advertising">'.$this->trans('Advertising / Promotional').'</option>';
-//         $report_spam_modal .= '<option value="offensive">'.$this->trans('Offensive or inappropriate').'</option>';
-//         $report_spam_modal .= '<option value="wrong_recipient">'.$this->trans('Sent to the wrong recipient').'</option>';
-//         $report_spam_modal .= '<option value="other">'.$this->trans('Other – please specify').'</option>';
-//         $report_spam_modal .= '</select>';
-//         $report_spam_modal .= '<small class="form-text text-muted">'.$this->trans('Hold Ctrl (or Cmd on Mac) to select multiple options.').'</small>';
-//         $report_spam_modal .= '</div>';
-//         $report_spam_modal .= '<div class="mb-3" id="spam_reason_other_input" style="display: none;">';
-//         $report_spam_modal .= '<label for="spam_reason_other_text" class="form-label">'.$this->trans('Please specify:').'</label>';
-//         $report_spam_modal .= '<input type="text" class="form-control" id="spam_reason_other_text" placeholder="'.$this->trans('Please specify').'">';
-//         $report_spam_modal .= '</div>';
-//         $report_spam_modal .= '</form>';
-//         $report_spam_modal .= '</div>';
-//         $report_spam_modal .= '<div class="modal-footer">';
-//         $report_spam_modal .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$this->trans('Cancel').'</button>';
-//         $report_spam_modal .= '<button type="button" class="btn btn-warning" id="confirm_report_spam">'.$this->trans('Report as Spam').'</button>';
-//         $report_spam_modal .= '</div>';
-//         $report_spam_modal .= '</div>';
-//         $report_spam_modal .= '</div>';
-//         $report_spam_modal .= '</div>';
-
-//         if ($this->exists('modals')) {
-//             $this->concat('modals', $report_spam_modal);
-//             return '';
-//         }
-
-//         return $report_spam_modal;
-//     }
-// }
-
+class Hm_Output_report_spam_modal extends Hm_Output_Module {
+    /**
+     * Outputs the Report Spam modal
+     */
+    protected function output() {
+        $report_spam_modal = '<div class="modal fade" id="reportSpamModal" tabindex="-1" aria-labelledby="reportSpamModalLabel" aria-hidden="true">';
+        $report_spam_modal .= '<div class="modal-dialog">';
+        $report_spam_modal .= '<div class="modal-content">';
+        $report_spam_modal .= '<div class="modal-header">';
+        $report_spam_modal .= '<h5 class="modal-title" id="reportSpamModalLabel">'.$this->trans('Report Spam').'</h5>';
+        $report_spam_modal .= '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '<div class="modal-body">';
+        $report_spam_modal .= '<p>'.$this->trans('Please tell us why you\'re reporting this email:').'</p>';
+        $report_spam_modal .= '<form id="reportSpamForm">';
+        $report_spam_modal .= '<div class="mb-3">';
+        $report_spam_modal .= '<label for="spam_reason_select" class="form-label">'.$this->trans('Select one or more reasons:').'</label>';
+        $report_spam_modal .= '<select class="form-select" id="spam_reason_select" name="spam_reason[]" multiple size="7">';
+        $report_spam_modal .= '<option value="unsolicited">'.$this->trans('Unsolicited / Spam').'</option>';
+        $report_spam_modal .= '<option value="phishing">'.$this->trans('Phishing or scam attempt').'</option>';
+        $report_spam_modal .= '<option value="malicious">'.$this->trans('Malicious or harmful content').'</option>';
+        $report_spam_modal .= '<option value="advertising">'.$this->trans('Advertising / Promotional').'</option>';
+        $report_spam_modal .= '<option value="offensive">'.$this->trans('Offensive or inappropriate').'</option>';
+        $report_spam_modal .= '<option value="wrong_recipient">'.$this->trans('Sent to the wrong recipient').'</option>';
+        $report_spam_modal .= '<option value="other">'.$this->trans('Other – please specify').'</option>';
+        $report_spam_modal .= '</select>';
+        $report_spam_modal .= '<small class="form-text text-muted">'.$this->trans('Hold Ctrl (or Cmd on Mac) to select multiple options.').'</small>';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '<div class="mb-3" id="spam_reason_other_input" style="display: none;">';
+        $report_spam_modal .= '<label for="spam_reason_other_text" class="form-label">'.$this->trans('Please specify:').'</label>';
+        $report_spam_modal .= '<input type="text" class="form-control" id="spam_reason_other_text" placeholder="'.$this->trans('Please specify').'">';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '</form>';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '<div class="modal-footer">';
+        $report_spam_modal .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$this->trans('Cancel').'</button>';
+        $report_spam_modal .= '<button type="button" class="btn btn-warning" id="confirm_report_spam">'.$this->trans('Report as Spam').'</button>';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '</div>';
+        $report_spam_modal .= '</div>';
+        
+        return $report_spam_modal;
+    }
+}
