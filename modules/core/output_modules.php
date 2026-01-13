@@ -2449,7 +2449,7 @@ class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
                         <label class="" for="srv_setup_stepper_profile_reply_to">'.$this->trans('Reply to').'</label>
                     </div>
                     <div class="form-floating mb-2">
-                        <input required type="text" id="srv_setup_stepper_profile_signature" name="srv_setup_stepper_profile_signature" class="txt_fld form-control" value="" placeholder="'.$this->trans('Signature').'">
+                        <textarea id="srv_setup_stepper_profile_signature" name="srv_setup_stepper_profile_signature" class="txt_fld form-control" rows="4" style="min-height : 120px" placeholder="'.$this->trans('Signature').'"></textarea>
                         <label class="" for="srv_setup_stepper_profile_signature">'.$this->trans('Signature').'</label>
                     </div>
                     <div class="form-check" id="srv_setup_stepper_profile_checkbox_bloc">
