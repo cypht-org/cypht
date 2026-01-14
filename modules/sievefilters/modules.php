@@ -1533,6 +1533,49 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
     }
 }
 
+class Hm_Output_message_list_custom_actions extends Hm_Output_Module
+{
+    protected function output()
+    {
+        $custom_actions = $this->get('custom_actions', []);
+        // $mailbox = $this->get('mailbox');
+
+        $list_path = $this->get('list_path', '');
+        $mailbox_name = '';
+        if (preg_match('/^imap_(\d+)/', $list_path, $m)) {
+            $imap_server_id = $m[1];
+            $accounts = $this->get('imap_accounts', []);
+            if (isset($accounts[$imap_server_id])) {
+                $mailbox_name = $this->html_safe($accounts[$imap_server_id]['name']);
+            }
+        }
+        $res = '<div class="dropdown">'
+            .   '<a class="msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle" '
+            .   'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
+            .   'Quick Actions'
+            .   '</a>'
+            .   '<div class="dropdown-menu custom-actions p-2" aria-labelledby="filter_message">';
+
+            if (!empty($custom_actions)) {
+                foreach ($custom_actions as $filter) {
+                    $res .= sprintf(
+                        '<a class="dropdown-item msg_filter_action" href="#" data-filter-id="%s">%s</a>',
+                        htmlspecialchars($filter['id']),
+                        htmlspecialchars($filter['name'])
+                    );
+                }
+                $res .= '<hr class="dropdown-divider">';
+            }
+
+        $res .= '<button class="dropdown-item add_custom_action text-primary" '
+                    .'id="add_custom_action_button" account="'.$mailbox_name.'" '
+                .'>'
+                .   '<i class="bi bi-plus-circle"></i> Add Custom Action'
+                . '</button>';
+ 
+        $this->concat('msg_controls_custom_actions', $res);
+    }
+}
 class Hm_Handler_sieve_remame_folder extends Hm_Handler_Module
 {
     public function process()

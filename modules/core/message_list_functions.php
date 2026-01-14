@@ -457,33 +457,11 @@ function message_controls($output_mod) {
         $res .= tags_dropdown($output_mod, []);
     }
 
-    $res .= '<div class="dropdown">'
-            .   '<a class="msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle" '
-            .   'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
-            .   'Quick Actions'
-            .   '</a>'
-            .   '<div class="dropdown-menu custom-actions p-2" aria-labelledby="filter_message">';
+    if ($output_mod->get('msg_controls_custom_actions')) {
+        $res .= $output_mod->get('msg_controls_custom_actions');
+    }
 
-        if (!empty($custom_actions)) {
-            foreach ($custom_actions as $filter) {
-                $res .= sprintf(
-                    '<a class="dropdown-item msg_filter_action" href="#" data-filter-id="%s">%s</a>',
-                    htmlspecialchars($filter['id']),
-                    htmlspecialchars($filter['name'])
-                );
-            }
-            $res .= '<hr class="dropdown-divider">';
-        }
-
-    // The “Add Custom Action” option at the bottom
-    $res .= '<button class="dropdown-item add_custom_action text-primary" 
-               id="add_custom_action_button"
-            >'
-            .   '<i class="bi bi-plus-circle"></i> Add Custom Action'
-            . '</button>';
-
-       $res .= '</div>
-                </div>';
+    $res .= '</div></div>';
 
     $res .= '</div>';
     return $res;

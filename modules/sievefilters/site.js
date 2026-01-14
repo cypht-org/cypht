@@ -186,6 +186,191 @@ var hm_sieve_possible_actions = function () {
   ];
 };
 
+  function ordinal_number(n) {
+    let ord = "th";
+
+    if (n % 10 == 1 && n % 100 != 11) {
+      ord = "st";
+    } else if (n % 10 == 2 && n % 100 != 12) {
+      ord = "nd";
+    } else if (n % 10 == 3 && n % 100 != 13) {
+      ord = "rd";
+    }
+
+    return n + ord;
+  }
+
+
+function createSaveFilter({
+  getCurrentAccount,
+  getIsEditingFilter,
+  getCurrentEditingFilterName,
+  getEditScriptModal,
+  isFilterFromCustomActions = false
+}) {
+  return function save_filter(gen_script = false) {
+    let validation_failed = false;
+    let conditions_parsed = [];
+    let actions_parsed = [];
+
+    let conditions = $("select[name^=sieve_selected_conditions_field]")
+      .map((_, el) => $(el).val())
+      .get();
+
+    let conditions_type = $("select[name^=sieve_selected_conditions_options]")
+      .map((_, el) => $(el).val())
+      .get();
+
+    let conditions_value = $("input[name^=sieve_selected_option_value]")
+      .map((_, el) => $(el).val())
+      .get();
+
+    let conditions_extra_value = $(
+      "input[name^=sieve_selected_extra_option_value]"
+    )
+      .map((_, el) => $(el).val())
+      .get();
+
+    if (conditions.length === 0) {
+      Hm_Notices.show("You must provide at least one condition", "warning");
+      return false;
+    }
+
+    conditions.forEach(function (elem, idx) {
+      if (conditions_value[idx] === "" && conditions_value[idx] !== "none") {
+        let order = ordinal_number(idx + 1);
+        Hm_Notices.show(
+          "The " + order + " condition (" + elem + ") must be provided",
+          "warning"
+        );
+        validation_failed = true;
+      }
+
+      conditions_parsed.push({
+        condition: elem,
+        type: conditions_type[idx],
+        extra_option_value: conditions_extra_value[idx],
+        value: conditions_value[idx],
+      });
+    });
+
+    let actions_type = $("select[name^=sieve_selected_actions]")
+      .map((_, el) => $(el).val())
+      .get();
+
+    let actions_value = $("[name^=sieve_selected_action_value]")
+      .map((_, el) => $(el).val())
+      .get();
+
+    let actions_field_type = $("[name^=sieve_selected_action_value]")
+      .map((_, el) => $(el).attr("type"))
+      .get();
+
+    let actions_extra_value = $(
+      "input[name^=sieve_selected_extra_action_value]"
+    )
+      .map((_, el) => $(el).val())
+      .get();
+
+    if (actions_type.length === 0) {
+      Hm_Notices.show("You must provide at least one action", "warning");
+      return false;
+    }
+
+    actions_type.forEach(function (elem, idx) {
+      if (actions_value[idx] === "" && actions_field_type[idx] !== "hidden") {
+        let order = ordinal_number(idx + 1);
+        Hm_Notices.show(
+          "The " + order + " action (" + elem + ") must be provided",
+          "warning"
+        );
+        validation_failed = true;
+      }
+
+      actions_parsed.push({
+        action: elem,
+        value: actions_value[idx],
+        extra_option_value: actions_extra_value[idx],
+      });
+    });
+
+    if ($("#stop_filtering").is(":checked")) {
+      actions_parsed.push({
+        action: "stop",
+        value: "",
+        extra_option_value: "",
+      });
+    }
+
+    if ($(".modal_sieve_filter_name").val() === "") {
+      Hm_Notices.show("Filter name is required", "danger");
+      return false;
+    }
+
+    if (validation_failed) {
+      return false;
+    }
+
+    Hm_Ajax.request(
+      [
+        { name: "hm_ajax_hook", value: "ajax_sieve_save_filter" },
+        { name: "imap_account", value: getCurrentAccount() },
+        {
+          name: "sieve_filter_name",
+          value: $(".modal_sieve_filter_name").val(),
+        },
+        {
+          name: "sieve_filter_priority",
+          value: $(".modal_sieve_filter_priority").val(),
+        },
+        {
+          name: "is_editing_filter",
+          value: getIsEditingFilter(),
+        },
+        {
+          name: "current_editing_filter_name",
+          value: getCurrentEditingFilterName(),
+        },
+        {
+          name: "conditions_json",
+          value: JSON.stringify(conditions_parsed),
+        },
+        {
+          name: "actions_json",
+          value: JSON.stringify(actions_parsed),
+        },
+        {
+          name: "filter_test_type",
+          value: $(".modal_sieve_filter_test").val(),
+        },
+        { name: "gen_script", value: gen_script },
+      ],
+      function (res) {
+        if (
+          !res.script_details ||
+          Object.keys(res.script_details).length === 0
+        ) {
+          window.location = window.location;
+          return;
+        }
+
+        const edit_script_modal = getEditScriptModal();
+        edit_script_modal.open();
+
+        $(".modal_sieve_script_textarea").val(res.script_details.gen_script);
+        $(".modal_sieve_script_name").val(res.script_details.filter_name);
+        $(".modal_sieve_script_priority").val(
+          res.script_details.filter_priority
+        );
+      }
+    );
+
+    return true;
+  };
+}
+
+
+
 function add_filter_condition() {
   let header_fields = "";
   let message_fields = "";
@@ -552,9 +737,10 @@ function sieveFiltersPageHandler() {
   let current_editing_filter_name = "";
   let current_account;
 
-  function getCurrentAccount() {
-    return current_account;
-  }
+  const getCurrentAccount = () => current_account;
+  const getIsEditingFilter = () => is_editing_filter;
+  const getCurrentEditingFilterName = () => current_editing_filter_name;
+  const getEditScriptModal = () => edit_script_modal;
   /**************************************************************************************
    *                             BOOTSTRAP SCRIPT MODAL
    **************************************************************************************/
@@ -582,19 +768,13 @@ function sieveFiltersPageHandler() {
     getCurrentAccount
   );
 
-  function ordinal_number(n) {
-    let ord = "th";
 
-    if (n % 10 == 1 && n % 100 != 11) {
-      ord = "st";
-    } else if (n % 10 == 2 && n % 100 != 12) {
-      ord = "nd";
-    } else if (n % 10 == 3 && n % 100 != 13) {
-      ord = "rd";
-    }
-
-    return n + ord;
-  }
+  //  const save_filter = createSaveFilter({
+  //    getCurrentAccount,
+  //    getIsEditingFilter,
+  //    getCurrentEditingFilterName,
+  //    getEditScriptModal,
+  //  });
 
   /**************************************************************************************
    *                                    FUNCTIONS
@@ -764,6 +944,7 @@ function sieveFiltersPageHandler() {
 
     return true;
   }
+// ----------------------------------------------------------------------------------------------------------------------------save_filter
 
   function save_script(imap_account) {
     if ($(".modal_sieve_script_name").val() === "") {
@@ -1223,7 +1404,6 @@ function get_list_block_sieve() {
 }
 
 function populateFilterFromDraft(filterDraft) {
-  // Always start clean
   $(".sieve_list_conditions_modal").empty();
   $(".filter_actions_modal_table").empty();
 
@@ -1303,9 +1483,19 @@ function createFilterFromList() {
   };
 
   console.log("Filter draft:", filterDraft);
-  const save_filter = function () {};
 
   const getCurrentAccount = function () {};
+  const getIsEditingFilter = () => {};
+  const getCurrentEditingFilterName = () => {};
+  const getEditScriptModal = () => {};
+  
+  const save_filter = createSaveFilter({
+      getCurrentAccount,
+      getIsEditingFilter,
+      getCurrentEditingFilterName,
+      getEditScriptModal,
+      isFilterFromCustomActions: true,
+  });
 
   const edit_filter_modal = createEditFilterModal(
     save_filter,
@@ -1366,6 +1556,24 @@ $(function () {
     e.stopImmediatePropagation();
     e.stopPropagation();
 
+    let mailbox = $(this).data('account') || $(this).data('mailbox-id') || $(this).attr('mailbox') || '';
+    // If mailbox not provided by server, derive from current list path and data sources
+    if (!mailbox) {
+      try {
+        const detail = Hm_Utils.parse_folder_path(hm_list_path());
+        const serverId = detail && detail.server_id;
+        if (serverId && typeof hm_data_sources === 'function') {
+          const sources = hm_data_sources() || [];
+          const account = sources.find((s) => String(s.id) === String(serverId));
+          if (account && account.name) {
+            mailbox = account.name;
+          }
+        }
+      } catch (e) {
+        // ignore - fall back to empty mailbox
+      }
+    }
+    console.log("Custom action mailbox:", mailbox);
     const selected = [];
 
     $(".message_table input[type=checkbox]:checked").each(function () {
@@ -1398,6 +1606,7 @@ $(function () {
 
     const modalContent = `
   <div id="create-filter-form">
+    <input type="hidden" id="custom_action_mailbox" value="${mailbox}">
     <div class="modal-body">
       <div class="filter-section mb-4">
         <h6 class="fw-bold mb-3">From emails</h6>
