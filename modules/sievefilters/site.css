@@ -440,6 +440,23 @@ table.filter_actions_modal_table th {
     box-shadow: 0 0 0 2px #fcfcfc80;
 }
 
+.subject-filter-teal .btn-outline-primary {
+    --bs-btn-color: #005555;
+    --bs-btn-bg: #fff;
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #006363;
+    --bs-btn-hover-border-color: #005555;
+    --bs-btn-focus-shadow-rgb: 0, 128, 128;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #005555;
+    --bs-btn-active-border-color: #005555;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: teal;
+    --bs-btn-disabled-border-color: teal;
+}
+
 @media (max-width: 768px) {
     .chip {
         padding: 5px 10px;
