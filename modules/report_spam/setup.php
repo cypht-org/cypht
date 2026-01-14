@@ -7,8 +7,8 @@ output_source('report_spam');
 
 // Settings page handlers and outputs
 add_handler('settings', 'process_spam_report_settings', true, 'report_spam', 'save_user_settings', 'before');
-
-add_output('settings', 'start_report_spam_settings', true, 'report_spam', 'drafts_source_max_setting', 'after');
+// add_output('settings', 'start_report_spam_settings', true, 'report_spam', 'start_everything_settings', 'after');
+add_output('settings', 'start_report_spam_settings', true, 'report_spam', 'all_source_max_setting', 'after');
 add_output('settings', 'spamcop_enabled_setting', true, 'report_spam', 'start_report_spam_settings', 'after');
 add_output('settings', 'spamcop_submission_email_setting', true, 'report_spam', 'spamcop_enabled_setting', 'after');
 add_output('settings', 'spamcop_from_email_setting', true, 'report_spam', 'spamcop_submission_email_setting', 'after');

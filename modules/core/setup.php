@@ -101,7 +101,7 @@ add_output('settings', 'trash_source_max_setting', true, 'core', 'trash_since_se
 add_output('settings', 'start_drafts_settings', true, 'core', 'trash_source_max_setting', 'after');
 add_output('settings', 'drafts_since_setting', true, 'core', 'start_drafts_settings', 'after');
 add_output('settings', 'drafts_source_max_setting', true, 'core', 'drafts_since_setting', 'after');
-add_output('settings', 'start_everything_settings', true, 'core', 'abuseipdb_api_key_setting', 'after');
+add_output('settings', 'start_everything_settings', true, 'core', 'drafts_source_max_setting', 'after');
 add_output('settings', 'all_since_setting', true, 'core', 'start_everything_settings', 'after');
 add_output('settings', 'all_source_max_setting', true, 'core', 'all_since_setting', 'after');
 add_output('settings', 'start_all_email_settings', true, 'core', 'all_source_max_setting', 'after');
