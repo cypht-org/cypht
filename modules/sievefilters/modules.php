@@ -1521,13 +1521,26 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
         if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
 
         list($success, $form) = $this->process_form(array('imap_server_id'));
+        $imap_server_id = $form['imap_server_id'];
 
         if (!$success) {
-            return;
+            if (isset($_GET['list_path'])) {
+                $parts = explode('_', $_GET['list_path']);
+                if (count($parts) > 1) {
+                    $imap_server_id = $parts[1];
+                }
+            }
         }
+
+        $details = Hm_IMAP_List::dump($imap_server_id);
+        $mailbox_name = $details['name'];
+
         $accounts = $this->get('imap_accounts');
-        if (isset($accounts[$form['imap_server_id']])) {
-            $this->out('mailbox', $accounts[$form['imap_server_id']]);
+        $this->out('mailbox_name', $mailbox_name);
+        if (isset($accounts[$imap_server_id])) {
+            $this->out('mailbox', $accounts[$imap_server_id]);
+            // $this->out('mailbox_name', $accounts[$imap_server_id]['name']);
+           
             $this->session->close_early();
         }
     }
@@ -1538,17 +1551,10 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
     protected function output()
     {
         $custom_actions = $this->get('custom_actions', []);
-        // $mailbox = $this->get('mailbox');
+        // $mailbox_name = $this->get('mailbox_name', 'defaulttest');
+        $mailbox = $this->get('mailbox');
+        $mailbox_name = $mailbox['name'] ?? 'defaulttest';
 
-        $list_path = $this->get('list_path', '');
-        $mailbox_name = '';
-        if (preg_match('/^imap_(\d+)/', $list_path, $m)) {
-            $imap_server_id = $m[1];
-            $accounts = $this->get('imap_accounts', []);
-            if (isset($accounts[$imap_server_id])) {
-                $mailbox_name = $this->html_safe($accounts[$imap_server_id]['name']);
-            }
-        }
         $res = '<div class="dropdown">'
             .   '<a class="msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle" '
             .   'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'

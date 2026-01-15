@@ -18,6 +18,7 @@ add_handler('ajax_imap_status', 'sieve_status', true, 'sievefilters', 'imap_stat
 add_handler('ajax_imap_debug', 'sieve_connect', true, 'imap', 'imap_connect', 'after');
 
 // sieve filter
+add_handler('message_list', 'load_account_sieve_filters', true, 'sievefilters', 'load_user_data', 'after');
 add_output('sieve_filters', 'sievefilters_settings_start', true, 'sievefilters', 'version_upgrade_checker', 'after');
 add_output('message_list', 'sievefilters_settings_start', true, 'sievefilters', 'message_list_end', 'after');
 add_output('message_list', 'message_list_custom_actions', true, 'sievefilters', 'imap_custom_controls', 'after');
@@ -164,7 +165,8 @@ return array(
         'script_details' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'ajax_list_block_sieve' => array(FILTER_UNSAFE_RAW, false),
         'mailbox' => array(FILTER_UNSAFE_RAW, false),
-        'reload_page' => array(FILTER_VALIDATE_BOOL, false)
+        'reload_page' => array(FILTER_VALIDATE_BOOL, false),
+        'mailbox_name' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_get' => array(),
     'allowed_post' => array(

@@ -1467,12 +1467,18 @@ function collectChips(container) {
     .get();
 }
 
+let custom_action_modal;
+let current_mailbox_for_filter;
+
 function createFilterFromList() {
   const froms = collectChips("#filter-from-list");
   const subjects = collectChips("#filter-subject-list");
 
   const subjectFilterType = $("input[name='subjectFilterType']:checked").val();
   const fromFilterType = $("input[name='fromFilterType']:checked").val();
+
+  // Use the stored mailbox from the button click
+  const mailboxName = current_mailbox_for_filter;
 
   const filterDraft = {
     from: froms,
@@ -1483,10 +1489,13 @@ function createFilterFromList() {
   };
 
   console.log("Filter draft:", filterDraft);
+  console.log("Mailbox name:", mailboxName);
 
-  const getCurrentAccount = function () {};
-  const getIsEditingFilter = () => {};
-  const getCurrentEditingFilterName = () => {};
+  const getCurrentAccount = function () {
+    return mailboxName;
+  };
+  const getIsEditingFilter = () => false;
+  const getCurrentEditingFilterName = () => "";
   const getEditScriptModal = () => {};
   
   const save_filter = createSaveFilter({
@@ -1510,8 +1519,6 @@ function createFilterFromList() {
 function dryRunFilter() {
   console.log("........dry run filter");
 }
-
-let custom_action_modal;
 
 custom_action_modal = new Hm_Modal({
   size: "xl",
@@ -1556,24 +1563,10 @@ $(function () {
     e.stopImmediatePropagation();
     e.stopPropagation();
 
-    let mailbox = $(this).data('account') || $(this).data('mailbox-id') || $(this).attr('mailbox') || '';
-    // If mailbox not provided by server, derive from current list path and data sources
-    if (!mailbox) {
-      try {
-        const detail = Hm_Utils.parse_folder_path(hm_list_path());
-        const serverId = detail && detail.server_id;
-        if (serverId && typeof hm_data_sources === 'function') {
-          const sources = hm_data_sources() || [];
-          const account = sources.find((s) => String(s.id) === String(serverId));
-          if (account && account.name) {
-            mailbox = account.name;
-          }
-        }
-      } catch (e) {
-        // ignore - fall back to empty mailbox
-      }
-    }
-    console.log("Custom action mailbox:", mailbox);
+    const mailbox = $(this).attr("account");
+    current_mailbox_for_filter = mailbox;
+    console.log("Mailbox for filter:", current_mailbox_for_filter);
+
     const selected = [];
 
     $(".message_table input[type=checkbox]:checked").each(function () {
