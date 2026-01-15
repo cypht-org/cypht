@@ -693,7 +693,8 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             'draft_to' => isset($this->request->post['compose_to']) ? $this->request->post['compose_to'] : '',
             'draft_body' => '',
             'draft_subject' => $form['compose_subject'],
-            'draft_smtp' => $smtp_id
+            'draft_smtp' => $smtp_id,
+            'draft_compose_smtp_id' => $form['compose_smtp_id']
         );
         $delivery_receipt = !empty($this->request->post['compose_delivery_receipt']);
         $from_params = '';
@@ -1238,7 +1239,10 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
 
         /* select the correct account to unsubscribe from mailing lists */
         $selected_id = false;
-        if (empty($recip) && !empty($from)) {
+        if (!empty($draft) && array_key_exists('draft_compose_smtp_id', $draft) && $draft['draft_compose_smtp_id']) {
+            $selected_id = $draft['draft_compose_smtp_id'];
+        }
+        if ($selected_id === false && empty($recip) && !empty($from)) {
             /* This solves the problem when a profile is not associated with the email */
             $server_found = false;
             foreach ($this->module_output()['compose_profiles'] as $id => $server) {
@@ -1267,7 +1271,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         // matching that server to preselect on the list of available smtp options
         // relying on recipient here might fail as real recipient is sometimes different
         // than the address specified in the profile
-        if (! empty($reply) && $imap_server) {
+        if ($selected_id === false && ! empty($reply) && $imap_server) {
             foreach ($this->get('compose_profiles') as $profile) {
                 if ($profile['server'] == $imap_server['server'] && $profile['user'] == $imap_server['user']) {
                     $smtp_profiles = profiles_by_smtp_id($this->get('compose_profiles'), $profile['smtp_id']);
