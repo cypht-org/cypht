@@ -89,7 +89,7 @@ const handleExternalResources = (inline) => {
         allowAll.textContent = 'For security reasons, external resources have been blocked.';
         if (blockedResources.length > 1) {
             const allowAllLink = document.createElement('a');
-            allowAllLink.classList.add('btn', 'btn-light', 'btn-sm');
+            allowAllLink.classList.add('btn', 'btn-light', 'btn-sm', 'text-decoration-none');
             allowAllLink.href = '#';
             allowAllLink.dataset.src = blockedResources.join(',');
             allowAllLink.textContent = 'Allow all';
@@ -120,7 +120,7 @@ const handleExternalResources = (inline) => {
 
         const button = document.createElement('a');
         button.setAttribute('href', '#');
-        button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
+        button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm', 'text-decoration-none');
         button.innerHTML = '<i class="bi bi-check"></i> Allow';
         definitiveActions.append(button);
         const popover = sessionAvailableOnlyActionInfo(button)
@@ -132,7 +132,7 @@ const handleExternalResources = (inline) => {
             })
         });
 
-        const alwaysBlockButton = $('<a href="#" class="btn btn-light btn-sm ms-2"><i class="bi bi-shield-lock"></i> Block</a>');
+        const alwaysBlockButton = $('<a href="#" class="btn btn-light btn-sm ms-2 text-decoration-none"><i class="bi bi-shield-lock"></i> Block</a>');
         const blockPopover = sessionAvailableOnlyActionInfo(alwaysBlockButton[0]);
         definitiveActions.append(alwaysBlockButton[0]);
 

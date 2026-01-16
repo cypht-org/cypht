@@ -263,7 +263,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $txt .= '<div class="col-md-10">';
                             $txt .= '<div class="dropdown">';
                             $txt .= '<a id="contact_info" data-bs-toggle="dropdown" class="dropdown-toggle text-decoration-none js-header_from" href="#">' . $this->html_safe($value) . '</a>';
-                            $txt .= '<div class="dropdown-menu p-4" id="contact_popup" aria-labelledby="dropdownMenuContact">';
+                            $txt .= '<div class="dropdown-menu p-3" id="contact_popup" aria-labelledby="dropdownMenuContact">';
                             $txt .= '<div id="contact_popup_body">';
 
                             if($contact_exists){

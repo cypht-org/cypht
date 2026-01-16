@@ -654,13 +654,8 @@ button {
 }
 .plink,
 .nlink {
-  color: #666;
   font-size: 0.95rem;
   margin-top: 0.25rem;
-}
-.plink:hover,
-.nlink:hover {
-  color: var(--bs-primary) !important;
 }
 .limit {
   width: 50px;
@@ -1497,7 +1492,7 @@ nav.collapsed .app-logo, nav.collapsed .menu_search, nav.collapsed .nav-label, n
 }
 
 nav.collapsed .menu-toggle {
-  right: 32%;
+  right: 35%;
   margin: auto;
   /* margin-left: 32px; */
 }
@@ -1523,7 +1518,7 @@ nav.collapsed .total_unread_count {
 nav.collapsed .sidebar-footer {
   flex-direction: column;
   padding: 0;
-  padding-left: 20px;
+  padding-left: 15px;
   gap: 15px;
 }
 
@@ -1633,10 +1628,6 @@ a[disabled] {
   display: none;
 }
 
-.add_contact_row {
-  background-color: white;
-}
-
 .add_contact_row #add_contact {
   white-space: nowrap;
 }
@@ -1655,6 +1646,22 @@ pre.msg_source {
   border-color: var(--bs-primary);
 }
 
+.content_title a { text-decoration: none; }
+.folder_cell.collapsed .folders { margin-left: 15px !important; }
+.move_to_location .folders { margin-left: 10px !important; }
+.inner_list .unread_count { padding: 0px 6px; }
+#dropdownMenuForward + ul .forward_link span,
+#contact_info + #contact_popup span { white-space: nowrap; }
+
+/* some theming changes */
+.total_unread_count, .unread_count { color: #fff; background-color: RGBA(var(--bs-info-rgb), var(--bs-bg-opacity, 1)); }
+.folders a, .unread_link, .logout_link { color: rgba(var(--bs-body-color-rgb), 0.8); }
+.msg_text .js-header_subject { color: var(--bs-body-color) !important; font-size: 1.4rem !important; }
+.plink, .nlink { color: var(--bs-link-color); }
+.plink:hover, .nlink:hover { color: var(--bs-link-hover-color); text-decoration: none; }
+.menu-toggle i.bi { color: var(--bs-link-color); }
+
+/* some mobile changes */
 .mobile .no_mobile { display: none !important; }
 .mobile .on_mobile { display: block !important; }
 .mobile .move_to_location { right: 0; }
@@ -1666,6 +1673,7 @@ pre.msg_source {
 .mobile .user_settings table td { padding: 5px 10px; }
 .mobile .reset_factory_button { margin-right: 1rem; }
 .mobile .message_list .list_controls.on_mobile form { display: inline-block; }
+.mobile .mailbox_list_title.hide { display: block; }
 
 /* Mobile responsive overrides for Bootstrap classes */
 @media (max-width: 767.98px) {
