@@ -3,11 +3,18 @@
 use PHPUnit\Framework\TestCase;
 
 class Hm_Test_Core_Output_Modules_Debug extends TestCase {
+    public static function setUpBeforeClass(): void {
+        putenv('CYPHT_TEST_DEBUG_MODE=true');
+        $_ENV['CYPHT_TEST_DEBUG_MODE'] = 'true';
+    }
+
+    public static function tearDownAfterClass(): void {
+        putenv('CYPHT_TEST_DEBUG_MODE');
+        unset($_ENV['CYPHT_TEST_DEBUG_MODE']);
+    }
+
     public function setUp(): void {
-        define('DEBUG_MODE', true);
-        require __DIR__.'/../../bootstrap.php';
         require __DIR__.'/../../helpers.php';
-        require APP_PATH.'modules/core/modules.php';
     }
     /**
      * @preserveGlobalState disabled
@@ -83,9 +90,20 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
     public function test_main_menu_start_debug() {
         $test = new Output_Test('main_menu_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span><a href="?page=home" class="menu_home"><img class="app-logo" src="modules/core/assets/images/logo_dark.svg"></a><div class="main"><ul class="folders">'), $res->output_response);
+        $this->assertEquals(array('<a href="?page=home" class="menu_home"><img class="app-logo" src="modules/core/assets/images/logo_dark.svg"></a><div class="main"><ul class="folders">'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span><a href="?page=home" class="menu_home"><img class="app-logo" src="modules/core/assets/images/logo_dark.svg"></a><div class="main"><ul class="folders">'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<a href="?page=home" class="menu_home"><img class="app-logo" src="modules/core/assets/images/logo_dark.svg"></a><div class="main"><ul class="folders">'), $res->output_response);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_content_end_debug() {
+        $test = new Output_Test('content_end', 'core');
+        $res = $test->run();
+        $expected = '</div><span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span></body></html>';
+        $this->assertEquals(array($expected), $res->output_response);
     }
 }

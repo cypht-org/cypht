@@ -541,9 +541,6 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     }
                 }
                 $this->out('custom_list_controls_type', $custom_link);
-                if (array_key_exists('keyword', $this->request->get)) {
-                    $this->out('list_keyword', $this->request->get['keyword']);
-                }
                 if (array_key_exists('filter', $this->request->get)) {
                     if (in_array($this->request->get['filter'], array('all', 'unseen', 'seen',
                         'answered', 'unanswered', 'flagged', 'unflagged'), true)) {
@@ -605,6 +602,10 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
             } elseif ($default_sort_order = $this->user_config->get('default_sort_order_setting', false)) {
                 $this->out('list_sort', $default_sort_order);
             }
+
+            if (array_key_exists('keyword', $this->request->get)) {
+                $this->out('list_keyword', $this->request->get['keyword']);
+            }
         }
     }
 }
@@ -649,16 +650,36 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $folder = $this->request->post['folder'];
             }
             $path = sprintf("imap_%s_%s", $form['imap_server_id'], $folder);
-            $page_cache = $this->cache->get('imap_folders_'.$path);
+            $with_subscription = isset($this->request->post['subscription_state']) && $this->request->post['subscription_state'];
+
             if (array_key_exists('imap_prefetch', $this->request->post)) {
                 $prefetched = $this->session->get('imap_prefetched_ids', array());
                 $prefetched[] = $form['imap_server_id'];
                 $this->session->set('imap_prefetched_ids', array_unique($prefetched, SORT_STRING));
             }
-            $with_subscription = isset($this->request->post['subscription_state']) && $this->request->post['subscription_state'];
+
+            // Check cache FIRST before connecting to IMAP
+            $page_cache = $this->cache->get('imap_folders_'.$path);
+            if ($page_cache && is_array($page_cache) && isset($page_cache['folders'])) {
+                $this->out('imap_expanded_folder_data', $page_cache['folders']);
+                $this->out('imap_expanded_folder_id', $form['imap_server_id']);
+                $this->out('imap_expanded_folder_path', $path);
+                $this->out('with_input', $with_subscription);
+                $this->out('folder', $folder);
+                $this->out('can_share_folders', $page_cache['can_share_folders']);
+
+                if (isset($page_cache['quota'])) {
+                    $this->out('quota', $page_cache['quota']);
+                    $this->out('quota_max', $page_cache['quota_max']);
+                }
+                return;
+            }
+
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {
-                $this->out('can_share_folders', stripos($mailbox->get_capability(), 'ACL') !== false);
+                $can_share_folders = stripos($mailbox->get_capability(), 'ACL') !== false;
+                $this->out('can_share_folders', $can_share_folders);
+                $quota_data = array();
                 $quota_root = $mailbox->get_quota($folder ? $folder : 'INBOX', true);
                 if ($quota_root && isset($quota_root[0]['name'])) {
                     $quota = $mailbox->get_quota($quota_root[0]['name'], false);
@@ -666,19 +687,14 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                         $current = floatval($quota[0]['current']);
                         $max = floatval($quota[0]['max']);
                         if ($max > 0) {
-                            $this->out('quota', ceil(($current / $max) * 100));
-                            $this->out('quota_max', $max / 1024);
+                            $quota_percent = ceil(($current / $max) * 100);
+                            $quota_max = $max / 1024;
+                            $this->out('quota', $quota_percent);
+                            $this->out('quota_max', $quota_max);
+                            $quota_data = array('quota' => $quota_percent, 'quota_max' => $quota_max);
                         }
                     }
                 }
-            }
-            if ($page_cache) {
-                $this->out('imap_expanded_folder_data', $page_cache);
-                $this->out('imap_expanded_folder_id', $form['imap_server_id']);
-                $this->out('imap_expanded_folder_path', $path);
-                $this->out('with_input', $with_subscription);
-                $this->out('folder', $folder);
-                return;
             }
             if ($mailbox && $mailbox->authed()) {
                 $only_subscribed = $this->user_config->get('only_subscribed_folders_setting', false);
@@ -693,7 +709,16 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 if (isset($msgs[$folder])) {
                     unset($msgs[$folder]);
                 }
-                $this->cache->set('imap_folders_'.$path, $msgs);
+
+                $cache_data = array(
+                    'folders' => $msgs,
+                    'can_share_folders' => $can_share_folders ?? false
+                );
+                if (!empty($quota_data)) {
+                    $cache_data = array_merge($cache_data, $quota_data);
+                }
+                $this->cache->set('imap_folders_'.$path, $cache_data);
+
                 $this->out('imap_expanded_folder_data', $msgs);
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
@@ -737,6 +762,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
         $include_content_body = false;
         $include_preview = $this->user_config->get('active_preview_message_setting', false);
         $ceo_use_detect_ceo_fraud = $this->user_config->get('ceo_use_detect_ceo_fraud_setting', false);
+        $active_body_structure = $this->user_config->get('active_body_structure_setting', true);
         if ($include_preview || $ceo_use_detect_ceo_fraud) {
             $include_content_body = true;
         }
@@ -764,9 +790,9 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                     $existingEmails = array_map(function($c){
                         return $c->value('email_address');
                     },$contact_list);
-                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, $existingEmails, $include_content_body);
+                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, $existingEmails, $include_content_body, $active_body_structure);
                 } else {
-                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, null, $include_content_body);
+                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, null, $include_content_body, $active_body_structure);
                 }
                 foreach ($results as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
@@ -1358,6 +1384,11 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
 
         $terms = [[search_since_based_on_setting($this->user_config), $date]];
 
+        if (array_key_exists('keyword', $this->request->get) && $this->request->get['keyword']) {
+            $keyword = validate_search_terms($this->request->get['keyword']);
+            $terms[] = [validate_search_fld(DEFAULT_SEARCH_FLD), $keyword];
+        }
+
         $messages = [];
         $status = [];
         foreach ($ids as $key => $id) {
@@ -1944,6 +1975,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
 
             $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
             $this->out('images_whitelist', explode(',', $this->user_config->get('images_whitelist_setting')));
+            $this->out('images_blacklist', explode(',', $this->user_config->get('images_blacklist_setting')));
 
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {
@@ -2157,6 +2189,13 @@ class Hm_Handler_process_setting_active_preview_message extends Hm_Handler_Modul
     public function process() {
         function process_active_preview_message_callback($val) { return $val; }
         process_site_setting('active_preview_message', $this, 'process_active_preview_message_callback', true, true);
+    }
+}
+
+class Hm_Handler_process_setting_active_body_structure extends Hm_Handler_Module {
+    public function process() {
+        function process_active_body_structure_callback($val) { return $val; }
+        process_site_setting('active_body_structure', $this, 'process_active_body_structure_callback', true, true);
     }
 }
 

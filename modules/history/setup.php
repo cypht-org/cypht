@@ -5,7 +5,7 @@ output_source('history');
 
 setup_base_page('history', 'core');
 add_handler('history', 'load_message_history', true, 'history', 'save_user_data', 'before');
-add_output('history', 'history_heading', true, 'history', 'content_section_start', 'after');
+add_output('history', 'history_heading', true, 'history', 'version_upgrade_checker', 'after');
 add_output('history', 'history_content', true, 'history', 'history_heading', 'after');
 add_output('history', 'history_footer', true, 'history', 'history_content', 'after');
 

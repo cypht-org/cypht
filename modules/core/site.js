@@ -1220,6 +1220,26 @@ var Hm_Folders = {
     update_unread_counts: function(folder) {
         if (folder) {
             $('.unread_'+folder).html('&#160;'+Hm_Folders.unread_counts[folder]+'&#160;');
+
+            // Update server total when a single folder is updated
+            if (folder.startsWith('imap_') || folder.startsWith('jmap_') || folder.startsWith('ews_')) {
+                var parts = folder.split('_');
+                if (parts.length >= 2) {
+                    var server_type = parts[0];
+                    var server_id = parts[1];
+                    var server_total = 0;
+                    for (var name in Hm_Folders.unread_counts) {
+                        if (name.startsWith(server_type + '_' + server_id + '_')) {
+                            server_total += parseInt(Hm_Folders.unread_counts[name]) || 0;
+                        }
+                    }
+                    if (server_total > 0) {
+                        $('.unread_imap_server_'+server_id).html('&#160;'+server_total+'&#160;');
+                    } else {
+                        $('.unread_imap_server_'+server_id).html('');
+                    }
+                }
+            }
         }
         else {
             var name;
@@ -1235,6 +1255,32 @@ var Hm_Folders = {
                         /* HERE */
                     }
                     $('.unread_'+name).html('&#160;'+count+'&#160;');
+                }
+            }
+
+            // Calculate and display total unread counts per IMAP/JMAP/EWS server
+            var server_totals = {};
+            for (name in Hm_Folders.unread_counts) {
+                // Check if this is an email folder (format: type_serverid_folderid)
+                if (name.startsWith('imap_') || name.startsWith('jmap_') || name.startsWith('ews_')) {
+                    var parts = name.split('_');
+                    if (parts.length >= 2) {
+                        var server_id = parts[1];
+                        if (!server_totals[server_id]) {
+                            server_totals[server_id] = 0;
+                        }
+                        server_totals[server_id] += parseInt(Hm_Folders.unread_counts[name]) || 0;
+                    }
+                }
+            }
+
+            // Update the display for each server
+            for (var server_id in server_totals) {
+                var total = server_totals[server_id];
+                if (total > 0) {
+                    $('.unread_imap_server_'+server_id).html('&#160;'+total+'&#160;');
+                } else {
+                    $('.unread_imap_server_'+server_id).html('');
                 }
             }
         }
@@ -2400,140 +2446,6 @@ function getEmailProviderKey(email) {
     return "";
 }
 
-/**
- * Allow external resources for the provided element.
- *
- * @param {HTMLElement} element - The element containing the allow button.
- * @param {string} messagePart - The message part associated with the resource.
- * * @param {Boolean} inline - true if the message is displayed in inline mode, false otherwise.
- * @returns {void}
- */
-function handleAllowResource(element, messagePart, inline = false) {
-    element.querySelector('a').addEventListener('click', function (e) {
-        e.preventDefault();
-        $('.msg_text_inner').remove();
-        const externalSources = $(this).data('src').split(',');
-        externalSources?.forEach((source) => Hm_Utils.save_to_local_storage(source, 1));
-        if (inline) {
-            return inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
-        }
-        return get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), getParam('list_parent'), false, false, false);
-    });
-}
-
-/**
- * Create and insert in the DOM an element containing a message and a button to allow the resource.
- *
- * @param {HTMLElement} element - The element having the blocked resource.
- * @param {Boolean} inline - true if the message is displayed in inline mode, false otherwise.
- * @returns {void}
- */
-function handleInvisibleResource(element, inline = false) {
-    const dataSrc = element.dataset.src;
-
-    const allowResource = document.createElement('div');
-    allowResource.classList.add('alert', 'alert-warning', 'p-1');
-
-    const source = dataSrc.substring(0, 40) + (dataSrc.length > 40 ? '...' : '');
-    allowResource.innerHTML = `Source blocked: ${element.alt ? element.alt : source}
-    <a href="#" data-src="${dataSrc}" class="btn btn-light btn-sm">
-    Allow</a></div>
-    `;
-
-    document.querySelector('.external_notices').insertAdjacentElement('beforeend', allowResource);
-    handleAllowResource(allowResource, element.dataset.messagePart, inline);
-}
-
-const handleExternalResources = (inline) => {
-    const messageContainer = document.querySelector('.msg_text_inner');
-    messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
-
-    const senderEmail = document.querySelector('#contact_info')?.textContent.match(EMAIL_REGEX)[0];
-    const sender = senderEmail + '_external_resources_allowed';
-    const elements = messageContainer.querySelectorAll('[data-src]');
-    const blockedResources = [];
-    elements.forEach(function (element) {
-
-        const dataSrc = element.dataset.src;
-        const senderAllowed = Hm_Utils.get_from_local_storage(sender);
-        const allowed = Hm_Utils.get_from_local_storage(dataSrc);
-
-        switch (Number(allowed) || Number(senderAllowed)) {
-            case 1:
-                element.src = dataSrc;
-                break;
-            default:
-                if ((allowed || senderAllowed) === null) {
-                    Hm_Utils.save_to_local_storage(dataSrc, 0);
-                }
-                handleInvisibleResource(element, inline);
-                blockedResources.push(dataSrc);
-                break;
-        }
-    });
-
-    const noticesElement = document.createElement('div');
-    noticesElement.classList.add('notices');
-
-    if (blockedResources.length) {
-        const allowAll = document.createElement('div');
-        allowAll.classList.add('allow_image_link', 'all', 'fw-bold');
-        allowAll.textContent = 'For security reasons, external resources have been blocked.';
-        if (blockedResources.length > 1) {
-            const allowAllLink = document.createElement('a');
-            allowAllLink.classList.add('btn', 'btn-light', 'btn-sm');
-            allowAllLink.href = '#';
-            allowAllLink.dataset.src = blockedResources.join(',');
-            allowAllLink.textContent = 'Allow all';
-            allowAll.appendChild(allowAllLink);
-            handleAllowResource(allowAll, getParam('part'), inline);
-        }
-        noticesElement.appendChild(allowAll);
-
-        const button = document.createElement('a');
-        button.setAttribute('href', '#');
-        button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
-        button.textContent = 'Always allow from this sender';
-        noticesElement.appendChild(button);
-        const popover = sessionAvailableOnlyActionInfo(button)
-
-        button.addEventListener('click', function (e) {
-            e.preventDefault();
-            addSenderToImagesWhitelist(senderEmail).then(() => {
-                $('.msg_text_inner').remove();
-                if (inline) {
-                    inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
-                } else {
-                    get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), getParam('list_parent'), false, false, false)
-                }
-            }).finally(() => {
-                popover.dispose();
-            })
-        });
-    }
-
-    document.querySelector('.external_notices').insertAdjacentElement('beforebegin', noticesElement);
-};
-
-const observeMessageTextMutationAndHandleExternalResources = (inline) => {
-    const message = document.querySelector('.msg_text');
-    if (message) {
-        new MutationObserver(function (mutations) {
-            mutations.forEach(function (mutation) {
-                if (mutation.addedNodes.length > 0) {
-                    mutation.addedNodes.forEach(function (node) {
-                        if (node.classList.contains('msg_text_inner')) {
-                            handleExternalResources(inline);
-                        }
-                    });
-                }
-            });
-        }).observe(message, {
-            childList: true
-        });
-    }
-};
-
 function setupActionSchedule(callback) {
     $(document).on('click', '.nexter_date_picker', function (e) {
         document.querySelector('.nexter_input_date').showPicker();
@@ -2604,4 +2516,15 @@ document.addEventListener("show.bs.dropdown", function (event) {
         }
     });
 });
+
+window.addEventListener('page-change', () => {
+    document.getElementById("cypht-upgrade-alert")?.addEventListener("close.bs.alert", function () {
+        Hm_Utils.save_to_local_storage('cypht_upgrade_alert_dismissed', '1');
+    });
+    if (Hm_Utils.get_from_local_storage('cypht_upgrade_alert_dismissed') !== '1') {
+        $("#cypht-upgrade-alert").addClass("show");
+    } else {
+        $("#cypht-upgrade-alert").addClass("hide");
+    }
+})
 

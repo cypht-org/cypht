@@ -1,6 +1,6 @@
 :root {
   --nav-collapsed-size: 130px;
-  --nav-expanded-size: 320px;
+  --nav-expanded-size: 380px;
   --nav-size: var(--nav-expanded-size);
 }
 
@@ -290,6 +290,7 @@ td {
 .server_content,
 .profile_content,
 .user_settings {
+  position: relative;
   display: table;
   table-layout: fixed;
   width: 100%;
@@ -297,7 +298,7 @@ td {
   background: #fff;
   height: 100%;
   margin-right: 20px;
-  padding-bottom: 40px;
+  padding-bottom: 20px;
 }
 .user_settings table {
   table-layout: fixed;
@@ -312,12 +313,13 @@ td {
   color: var(--bs-body-color);
 }
 .reset_factory_button {
+  position: absolute;
+  bottom: 40px;
+  right: 10px;
+  margin-right: 37px;
   cursor: pointer;
   color: #666;
   font-size: 100%;
-  padding: 10px !important;
-  float: right !important;
-  margin-right: 20px;
 }
 .disabled_link {
   pointer-events: none;
@@ -816,12 +818,15 @@ div.unseen,
   background-color: #ccc;
   font-size: 90%;
   margin-left: 10px;
-  padding: 0px;
-  padding-bottom: 1px;
+  padding: 2px 6px;
+  padding-bottom: 3px;
   border-radius: 4px 4px 4px 4px;
   vertical-align: 2px;
   font-weight: bold;
   color: #fff;
+}
+.unread_count:empty {
+  display: none;
 }
 .debug_title {
   color: var(--bs-primary);
@@ -829,8 +834,7 @@ div.unseen,
   background-color: var(--bs-secondary-bg);
   bottom: 0px;
   right: 0px;
-  padding: 20px;
-  padding-left: 20px;
+  padding: 10px 20px;
   z-index: 1000;
 }
 .long_session {
@@ -1039,7 +1043,7 @@ div.unseen,
   font-size: 115%;
   padding-left: 5px;
   top: 0px;
-  left: 60px !important;
+  left: 50px !important;
 }
 @media (orientation: landscape) {
   .mobile .msg_controls {
@@ -1271,7 +1275,7 @@ div.unseen,
   right: 0px;
   display: none;
   padding: 0px 5px 5px 10px;
-  background-color: #fff;
+  background-color: var(--bs-body-bg);
 }
 .mobile #list_controls_menu.show {
   display: flex;
@@ -1314,7 +1318,7 @@ div.unseen,
   position: absolute;
   right: 0px;
   top: 54px;
-  background-color: #fafafa;
+  background-color: var(--bs-body-bg);
   font-size: 85%;
   padding: 15px 20px;
   display: none;
@@ -1356,16 +1360,6 @@ div.unseen,
 .on_mobile {
   display: none;
 }
-.mobile .no_mobile {
-  display: none !important;
-}
-.mobile .on_mobile {
-  display: block !important;
-}
-.mobile .move_to_location {
-  right: 0;
-}
-
 .server_title {
   font-size: 110%;
   margin-bottom: 0px;
@@ -1426,8 +1420,8 @@ div.unseen,
   z-index: 1000;
   text-align: left;
   top: 0;
-  padding: 10px 0 10px 20px;
-  background: #fff;
+  padding: 10px 0 10px 18px;
+  background: var(--bs-body-bg);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
 }
@@ -1473,7 +1467,7 @@ div.unseen,
   backdrop-filter: none;
   width: fit-content;
   margin-left: 0;
-  padding: 10px 20px;
+  padding: 10px 15px;
   display: block !important;
 }
 
@@ -1571,11 +1565,6 @@ a[disabled] {
   color: var(--bs-white);
 }
 
-.mobile .search_content .p-3 {
-  flex: 1 1 auto;
-  overflow: auto;
-}
-
 .search_content .refresh_link {
   display: none;
 }
@@ -1585,6 +1574,30 @@ a[disabled] {
   white-space: normal;
   word-break: break-word;
   overflow-wrap: anywhere;
+}
+
+/* Make images in email content responsive */
+.msg_text img,
+.msg_text_inner img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevent images from breaking layout */
+.msg_text table,
+.msg_text_inner table {
+  max-width: 100% !important;
+  table-layout: auto !important;
+}
+
+/* Ensure text doesn't get hidden behind images */
+.msg_text_inner {
+  overflow-x: auto;
+}
+
+/* Simply hide plain text parts - HTML will be shown via the links below */
+.msg_html_part ~ .msg_html_part ~ .msg_plain_part {
+  display: none;
 }
 
 .long_header {
@@ -1628,11 +1641,6 @@ a[disabled] {
   white-space: nowrap;
 }
 
-.mobile .folders {
-  margin-top: 1rem;
-  margin-left: 1rem !important;
-}
-
 pre.msg_source {
   white-space: pre-wrap;
   word-break: break-word;
@@ -1641,6 +1649,23 @@ pre.msg_source {
 .msg_text .col-md-2 {
   font-weight: bold;
 }
+
+.form-check-input:checked {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.mobile .no_mobile { display: none !important; }
+.mobile .on_mobile { display: block !important; }
+.mobile .move_to_location { right: 0; }
+.mobile .search_content .p-3 { flex: 1 1 auto; overflow: auto; }
+.mobile .search_form { padding-left: 0; }
+.mobile .folders { margin-top: 1rem; margin-left: 1rem !important; }
+.mobile .server_section { overflow: hidden; }
+.mobile .add_server .txt_fld { width: 100%; }
+.mobile .user_settings table td { padding: 5px 10px; }
+.mobile .reset_factory_button { margin-right: 1rem; }
+.mobile .message_list .list_controls.on_mobile form { display: inline-block; }
 
 /* Mobile responsive overrides for Bootstrap classes */
 @media (max-width: 767.98px) {
@@ -1669,19 +1694,29 @@ pre.msg_source {
     font-weight: bold; white-space: nowrap; width: fit-content;
   }
   .mobile .message_list .list_controls.on_mobile {
-    position: absolute; top: 11px; right: 15px;
+    position: absolute; top: 10px; right: 15px;
   }
+  .mobile .message_list .list_controls.on_mobile .form-control {
+    padding-top: 0.2rem; padding-bottom: 0.2rem; }
   .mobile .content_title > .flex-wrap {
     flex-wrap: nowrap !important; margin-bottom: 0px !important;
   }
   .mobile .content_title .list_meta { margin-bottom: 0px !important; }
+  .mobile .msg_text .small_header .col-md-2 { width: 16.667%; }
+  .mobile .msg_text .small_header > div + div { width: 83.333%; }
+  .mobile #list_controls_menu.show { left: auto; right: -15px; }
 }
 
 @media (max-width: 575.98px) {
   .mobile nav.folder_cell { width: 100%; }
-  .mobile #list_controls_menu.show { left: auto; right: -15px; }
   .mobile .calendar .month_label { padding: 1rem !important; }
   .mobile .calendar .border.m-4 { margin: 1rem !important; }
   .mobile .content_title { gap: 0.25rem; padding-bottom: 10px !important; }
   .mobile .small_header:nth-child(-n+3) { padding-bottom: 6px !important; }
+  .mobile .msg_text .small_header .col-md-2 { width: 20%; }
+  .mobile .msg_text .small_header > div + div { width: 80%; }
+  .mobile .msg_text .small_header > div.d-none + div { width: 100%; }
+  .notices .definitive_actions {
+    margin-left: 0 !important;
+  }
 }

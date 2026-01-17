@@ -16,7 +16,7 @@ class ProfileTest(SettingsHelpers):
         self.wait()
         self.wait_with_folder_list()
         self.by_css('[data-bs-target=".settings"]').click()
-        WebDriverWait(self.driver, 20).until(lambda x: self.by_class('menu_profiles').is_displayed())
+        self.wait_for_settings_to_expand()
         list_item = self.by_class('menu_profiles')
         self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
         self.wait_with_folder_list()

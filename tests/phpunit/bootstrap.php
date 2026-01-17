@@ -1,27 +1,44 @@
 <?php
 
 /* all the things */
-error_reporting(E_ALL | E_STRICT);
+error_reporting(E_ALL);
 
 /* debug mode has to be set to something or include files will die() */
 if (!defined('DEBUG_MODE')) {
-    define('DEBUG_MODE', false);
+    // Check if we're running a debug test via environment variable
+    $debug_mode = getenv('CYPHT_TEST_DEBUG_MODE') === 'true' ? true : false;
+    define('DEBUG_MODE', $debug_mode);
 }
 
 /* determine current absolute path used for require statements */
-define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
-define('VENDOR_PATH', APP_PATH.'vendor/');
-define('WEB_ROOT', '');
-define('CONFIG_PATH', APP_PATH.'config/');
+if (!defined('APP_PATH')) {
+    define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
+}
+if (!defined('VENDOR_PATH')) {
+    define('VENDOR_PATH', APP_PATH.'vendor/');
+}
+if (!defined('WEB_ROOT')) {
+    define('WEB_ROOT', '');
+}
+if (!defined('CONFIG_PATH')) {
+    define('CONFIG_PATH', APP_PATH.'config/');
+}
 
 /* random id */
-define('SITE_ID', 'randomid');
+if (!defined('SITE_ID')) {
+    define('SITE_ID', 'randomid');
+}
 
 /* cache id */
-define('CACHE_ID', 'asdf');
+if (!defined('CACHE_ID')) {
+    define('CACHE_ID', 'asdf');
+}
+
+/* load composer autoloader */
+require_once APP_PATH.'vendor/autoload.php';
 
 /* get mock objects */
-require APP_PATH.'tests/phpunit/mocks.php';
+require_once APP_PATH.'tests/phpunit/mocks.php';
 
 /* get the framework */
 require APP_PATH.'lib/framework.php';
@@ -36,6 +53,16 @@ Hm_Server_Wrapper::init($user_config, $session);
 Hm_Tags_Wrapper::init($user_config, $session);
 
 $environment = Hm_Environment::getInstance();
-$environment->load('.env.example');
+// Load test environment configuration from .env.test
+// Create this file by copying .env.test.example: cp .env.test.example .env.test
+$environment->load('.env.test');
 /* set the default since and per_source values */
 $environment->define_default_constants($mock_config);
+
+/* Load modules */
+if (file_exists(APP_PATH.'modules/core/modules.php')) {
+    require_once APP_PATH.'modules/core/modules.php';
+}
+if (file_exists(APP_PATH.'modules/saved_searches/modules.php')) {
+    require_once APP_PATH.'modules/saved_searches/modules.php';
+}

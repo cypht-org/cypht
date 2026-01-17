@@ -653,6 +653,7 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
             $('.msg_text').append(res.msg_text);
             $('.msg_text').append(res.msg_parts);
 
+
             document.title = $('.msg_text .small_header').first().text();
             imap_message_view_finished(uid, detail, listParent);
 
@@ -1012,7 +1013,7 @@ var imap_perform_move_copy = function(dest_id, context, action = null) {
                             $('.'+Hm_Utils.clean_selector(res.move_count[index])).remove();
                         }
                         if (res.emails_to_block) {
-                            block_unblock_sender("", Hm_Utils.parse_folder_path(getListPathParam()), 'sender', 'blocked', res.emails_to_block, '', true);
+                            block_unblock_sender("", Hm_Utils.parse_folder_path(getListPathParam()), 'sender', 'default', res.emails_to_block, '', true);
                         }
                     }
                     if (getListPathParam().substr(0, 4) === 'imap') {
@@ -1399,7 +1400,8 @@ $('.screen-email-like').on("click", function() {
         }
     });
 
-    if (email_existing_in_blocked_senders) {
+    
+    if (email_existing_in_blocked_senders.length > 0) {
         var list_html = "<ol>";
         email_existing_in_blocked_senders.forEach(sender => {
             sender = sender.trim();
@@ -1412,7 +1414,7 @@ $('.screen-email-like').on("click", function() {
             btnSize: 'sm'
         });
 
-        var modalContentHeadline = "Adress mail exist in your Block list";
+        var modalContentHeadline = "Address mail exists in your Block list";
         modal.addFooterBtn(hm_trans('Add Emails to Trust contact'), 'btn-warning', handleAddEmail);
         modal.setContent(modalContentHeadline + list_html + `<p>${hm_trans('If you add these, all will be unblocked.<br>Are you sure you want to add this in your Trust contact?')}</p>`);
         modal.open();

@@ -600,7 +600,14 @@ class Hm_Output_content_end extends Hm_Output_Module {
      * Closes the layout wrapper, body, and html tags
      */
     protected function output() {
-        return '</div></body></html>';
+        $res = '</div>';
+        if (DEBUG_MODE) {
+            $res .= '<span title="'.
+                $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.').
+                '" class="debug_title">'.$this->trans('Debug').'</span>';
+        }
+        $res .= '</body></html>';
+        return $res;
     }
 }
 
@@ -616,12 +623,20 @@ class Hm_Output_js_data extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         $enable_snooze = $settings['enable_snooze'] ?? DEFAULT_ENABLE_SNOOZE;
         $enable_collect_address_on_send = $settings['enable_collect_address_on_send_setting'] ?? DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND;
+        $specialFolders = $settings['special_imap_folders'] ?? array();
+        $formattedSpecialFolders = [];
+        foreach ($specialFolders as $serverId => $folders) {
+            $formattedSpecialFolders[$serverId] = [];
+            foreach ($folders as $type => $folder) {
+                $formattedSpecialFolders[$serverId][] = ['type' => $type, 'label' => $folder, 'id' => bin2hex($folder)];
+            }
+        }
         $res = '<script type="text/javascript" id="data-store">'.
             'var globals = {};'.
             'var hm_is_logged = function () { return '.($this->get('is_logged') ? '1' : '0').'; };'.
             'var hm_empty_folder = function() { return "'.$this->trans('So alone').'"; };'.
             'var hm_mobile = function() { return '.($this->get('is_mobile') ? '1' : '0').'; };'.
-            'var hm_debug = function() { return "' . ((DEBUG_MODE || DEFAULT_DEBUG_LOG) ? '1' : '0') . '"; };'.
+            'var hm_debug = function() { return "' . (DEBUG_MODE ? '1' : '0') . '"; };'.
             'var hm_mailto = function() { return '.($this->get('mailto_handler') ? '1' : '0').'; };'.
             'var hm_page_name = function() { return "'.$this->html_safe($this->get('router_page_name')).'"; };'.
             'var hm_language_direction = function() { return "'.$this->html_safe($this->dir).'"; };'.
@@ -633,6 +648,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_web_root_path = function() { return "'.WEB_ROOT.'"; };'.
             'var hm_flag_image_src = function() { return "<i class=\"bi bi-star-half\"></i>"; };'.
             'var hm_check_dirty_flag = function() { return '.($this->get('warn_for_unsaved_changes', '') ? '1' : '0').'; };'.
+            'var hm_special_folders = function() { return '.json_encode($formattedSpecialFolders).'; };'.
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {
@@ -1320,11 +1336,6 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
      */
     protected function output() {
         $res = '';
-        if (DEBUG_MODE or DEFAULT_DEBUG_LOG) {
-            $res .= '<span title="'.
-                $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.').
-                '" class="debug_title">'.$this->trans('Debug').'</span>';
-        }
         $theme = $this->get('theme');
         $logo = $theme === 'darkly' ? 'modules/core/assets/images/logo.svg' : 'modules/core/assets/images/logo_dark.svg' ;
         $res .= '<a href="?page=home" class="menu_home"><img class="app-logo" src="'.WEB_ROOT.$logo.'"></a>';
@@ -1962,7 +1973,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
      */
     protected function output() {
         $search_field = '';
-        $terms = $this->get('search_terms', '');
+        $terms = $this->get('list_keyword', '');
         if ($this->get('custom_list_controls', '')) {
             $config_link = $this->get('custom_list_controls');
             $source_link = '';
@@ -1978,10 +1989,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             }
             $config_link = '<a title="'.$this->trans('Configure').'" href="?page=settings#'.$path.'_setting"><i class="bi bi-gear-wide refresh_list"></i></a>';
             $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a>';
-            //$search_field = '<form method="GET">
-            //<input type="hidden" name="page" value="message_list" />
-            //<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/>
-            //<input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="imap_keyword" name="search_terms" value="'.$this->html_safe($terms).'"/></form>';
+            $search_field = '<form method="GET"><input type="hidden" name="page" value="message_list" /><input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/><input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="form-control imap_keyword" name="keyword" value="'.$this->html_safe($terms).'"/></form>';
 
         }
         else {
@@ -2443,7 +2451,7 @@ class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
                         <label class="" for="srv_setup_stepper_profile_reply_to">'.$this->trans('Reply to').'</label>
                     </div>
                     <div class="form-floating mb-2">
-                        <input required type="text" id="srv_setup_stepper_profile_signature" name="srv_setup_stepper_profile_signature" class="txt_fld form-control" value="" placeholder="'.$this->trans('Signature').'">
+                        <textarea id="srv_setup_stepper_profile_signature" name="srv_setup_stepper_profile_signature" class="txt_fld form-control" rows="4" style="min-height : 120px" placeholder="'.$this->trans('Signature').'"></textarea>
                         <label class="" for="srv_setup_stepper_profile_signature">'.$this->trans('Signature').'</label>
                     </div>
                     <div class="form-check" id="srv_setup_stepper_profile_checkbox_bloc">
@@ -2486,7 +2494,13 @@ class Hm_Output_privacy_settings extends Hm_Output_Module {
             'label' => 'External images whitelist',
             'description' => 'Cypht automatically prevents untrusted external images from loading in messages. Add senders from whom you want to allow images to load.',
             'separator' => ','
-        ]
+        ],
+        'images_blacklist' => [
+            'type' => 'text',
+            'label' => 'External images blacklist',
+            'description' => 'Add senders from whom you never want to allow external images to load.',
+            'separator' => ','
+        ],
     ];
 
     protected function output()
@@ -2506,5 +2520,22 @@ class Hm_output_combined_message_list extends Hm_Output_Module {
             $messageList = array_merge($messageList, $this->get('feed_list_data'), Hm_Output_filter_feed_list_data::formatMessageList($this));
         }
         $this->out('formatted_message_list', $messageList);
+    }
+}
+
+class Hm_Output_version_upgrade_checker extends Hm_Output_Module {
+    protected function output()
+    {
+        if (! $this->get('need_upgrade')) return '';
+
+        $latestVersion = $this->get('latest_version');
+
+        return '
+        <div class="alert alert-info alert-dismissible fade align-items-center" role="alert" id="cypht-upgrade-alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            You are currently running Cypht version '.CYPHT_VERSION.'. A higher version (<b>'. $latestVersion .'</b>) is available.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        ';
     }
 }

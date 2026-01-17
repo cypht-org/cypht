@@ -12,7 +12,7 @@ if (DEBUG_MODE) {
     /* info page */
     setup_base_page('info', 'core');
     add_handler('info', 'process_server_info', true, 'developer', 'load_user_data', 'after');
-    add_output('info', 'info_heading', true, 'developer', 'content_section_start', 'after');
+    add_output('info', 'info_heading', true, 'developer', 'version_upgrade_checker', 'after');
     add_output('info', 'server_information', true, 'developer', 'info_heading', 'after');
     add_output('info', 'server_status_start', true, 'developer', 'server_information', 'after');
     add_output('info', 'server_status_end', true, 'developer', 'server_status_start', 'after');
@@ -26,7 +26,7 @@ if (DEBUG_MODE) {
 
     /* developer docs */
     setup_base_page('dev', 'core');
-    add_output('dev', 'dev_content', true, 'developer', 'content_section_start', 'after');
+    add_output('dev', 'dev_content', true, 'developer', 'version_upgrade_checker', 'after');
 
     /* add pages */
     return array(

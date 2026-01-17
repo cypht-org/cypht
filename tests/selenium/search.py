@@ -3,7 +3,8 @@ from base import WebTest, USER, PASS
 from selenium.webdriver.common.by import By
 from creds import RECIP
 from runner import test_runner
-from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import Select, WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 class SearchTest(WebTest):
 
@@ -33,14 +34,19 @@ class SearchTest(WebTest):
 
     def reset_search(self):
         elem = self.by_class('search_reset')
-        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
-        sleep(1)
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant'})", elem)
+        WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(elem))
         elem.click()
-        self.wait_with_folder_list()
-        sleep(1)
-        assert self.by_id('search_terms').get_attribute('value') == ''
+
+        # Wait until tbody is empty (re-find table element after page reload)
+        WebDriverWait(self.driver, 60).until(
+            lambda driver: len(driver.find_elements(By.CSS_SELECTOR, '.message_table_body tr')) == 0
+        )
+
+        # Assert that tbody is actually empty (re-find table element)
         table = self.by_class('message_table_body')
-        assert len(table.find_elements(By.TAG_NAME, 'tr')) == 0
+        table_rows = table.find_elements(By.TAG_NAME, 'tr')
+        assert len(table_rows) == 0, f"Expected tbody to be empty, but found {len(table_rows)} rows"
 
 if __name__ == '__main__':
 

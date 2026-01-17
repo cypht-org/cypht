@@ -21,6 +21,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             $filter = $this->get('list_filter');
             $sort = $this->get('list_sort');
             $keyword = $this->get('list_keyword');
+            $screen_emails = $this->get('screen_emails');
             $opts = array('all' => $this->trans('All'), 'unseen' => $this->trans('Unread'),
                 'seen' => $this->trans('Read'), 'flagged' => $this->trans('Flagged'),
                 'unflagged' => $this->trans('Unflagged'), 'answered' => $this->trans('Answered'),
@@ -41,6 +42,9 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             $custom .= '<input type="hidden" name="list_page" value="'.$this->html_safe($this->get('list_page')).'" />';
             $custom .= '<input type="search" placeholder="'.$this->trans('Search').
                 '" class="imap_keyword form-control form-control-sm" name="keyword" value="'.$this->html_safe($keyword).'" />';
+            if ($screen_emails) {
+                $custom .= '<input type="hidden" value="1" name="screen_emails"/>';
+            }
             $custom .= '<select name="sort" class="imap_sort form-control form-control-sm">';
             foreach ($sorts as $name => $val) {
                 $custom .= '<option ';
@@ -125,21 +129,32 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                             return 'data-src="' . $matches[1] . '" ' . 'src="" ' . 'data-message-part="' . $this->html_safe($this->get('imap_msg_part')) . '"';
                         }, $msgText);
                     }
+
+                    $images_blacklist = $this->get('images_blacklist');
+                    if (in_array($sender_email, $images_blacklist)) {
+                        $msgText = preg_replace_callback('/\<[^>]*(src="(https?:\/\/[^"]*)"|src=\'(https?:\/\/[^\']*)\')[^>]*\>/i', function ($matches) {
+                            return '';
+                        }, $msgText);
+
+                        $msgText = '<div data-external-resources-blocked="1"></div>' . $msgText;
+                    }
                 }
 
                 $msgText = sanitize_email_html($msgText);
-                $txt .= format_msg_html($msgText, $allowed);
+                $txt .= '<div class="msg_html_part">' . format_msg_html($msgText, $allowed) . '</div>';
             }
             elseif (isset($struct['type']) && mb_strtolower($struct['type']) == 'image') {
                 $txt .= format_msg_image($this->get('msg_text'), mb_strtolower($struct['subtype']));
             }
             else {
+                $plainContent = '';
                 if ($this->get('imap_msg_part') === "0") {
-                    $txt .= format_msg_text($this->get('msg_text'), $this, false);
+                    $plainContent = format_msg_text($this->get('msg_text'), $this, false);
                 }
                 else {
-                    $txt .= format_msg_text($this->get('msg_text'), $this);
+                    $plainContent = format_msg_text($this->get('msg_text'), $this);
                 }
+                $txt .= '<div class="msg_plain_part">' . $plainContent . '</div>';
             }
         }
         $txt .= '</div>';
@@ -183,7 +198,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
       protected function output() {
         if ($this->get('msg_headers')) {
             $txt = '';
-            $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'reply-to', 'cc', 'flags');
+            $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'reply-to', 'cc', 'x-original-bcc', 'flags');
             $reply_args = sprintf('&amp;list_path=%s&amp;uid=%s',
                 $this->html_safe($this->get('msg_list_path')),
                 $this->html_safe($this->get('msg_text_uid'))
@@ -297,6 +312,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                     $new_value[] = $this->trans(trim($v));
                                 }
                                 $value = implode(', ', $new_value);
+                            }
+                            if (mb_strtolower($name) == 'x-original-bcc') {
+                                $name = 'Bcc';
                             }
                             $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
                             $txt .= '<div class="col-md-2"><span class="text-muted">'.$this->trans($name).'</span></div>';
@@ -490,7 +508,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $pass_value = '';
             }
             $res .= '<div class="' . mb_strtolower($type) . '_server mb-3">';
-            $res .= '<form class="imap_connect" method="POST">';
+            $res .= '<form class="imap_connect" method="POST"><div class="row">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
             $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-xl-2 col-lg-2 col-md-6 overflow-auto" >';
@@ -543,7 +561,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2 mt-3" />';
 
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
-            $res .= '</div></div></div></form>';
+            $res .= '</div></div></div></form></div>';
         }
         $res .= '';
         return $res;
@@ -877,11 +895,11 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         $res = '';
         if ($this->get('imap_folders')) {
             foreach ($this->get('imap_folders', array()) as $id => $folder) {
-                $res .= '<li class="imap_'.$id.'_"><a href="#" class="imap_folder_link" data-target="imap_'.$id.'_">';
+                $res .= '<li class="imap_'.$id.'_" data-server-id="' . $id . '"><a href="#" class="imap_folder_link" data-target="imap_'.$id.'_">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-folder me-2"></i>';
                 }
-                $res .= $this->html_safe($folder).'</a></li>';
+                $res .= $this->html_safe($folder).'</a><span class="unread_count unread_imap_server_'.$id.'"></span></li>';
             }
         }
         if ($res) {
@@ -1546,7 +1564,7 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
                 $pass_value = '';
             }
             $res .= '<div class="ews_server mt-3 mb-3">';
-            $res .= '<form class="imap_connect" method="POST">';
+            $res .= '<form class="imap_connect" method="POST"><div class="row">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
             $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-xl-2 col-lg-2 col-md-6">';
@@ -1588,7 +1606,7 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
             $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
 
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
-            $res .= '</div></div></div></form>';
+            $res .= '</div></div></div></form></div>';
         }
 
         $res .= '
@@ -1649,6 +1667,23 @@ class Hm_Output_setting_active_preview_message extends Hm_Output_Module {
         return $res;
     }
 }
+
+class Hm_Output_setting_active_body_structure extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $checked = "checked";
+        if (array_key_exists('active_body_structure', $settings)) {
+            if (!$settings['active_body_structure']) {
+                $checked = "";
+            }
+        }
+
+        $res = '<tr class="general_setting"><td><label for="active_body_structure">'.
+            $this->trans('Analyze the structure of the message (BODYSTRUCTURE)').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="active_body_structure" name="active_body_structure" '.$checked.' ></td></tr>';
+        return $res;
+    }
+}
+
 class Hm_Output_setting_ceo_detection_fraud extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());

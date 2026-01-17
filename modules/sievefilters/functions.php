@@ -161,7 +161,7 @@ if (!hm_exists('get_mailbox_filters')) {
                     <span class="form-switch">
                         <input script_name_parsed="'.$parsed_name.'" priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'" class="toggle_filter form-check-input" type="checkbox" role="switch" id="Check" name="script_state"'.$checked.'>
                     </span>
-                    <a href="#" script_name_parsed="'.$parsed_name.'"  priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'"  class="edit_'.$base_class.'">
+                    <a href="#" script_name_parsed="'.$parsed_name.'"  priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'"  class="edit_'.$base_class.' ps-2">
                         <i class="bi bi-pencil-fill"></i>
                     </a>
                     <a href="#" script_name_parsed="'.$parsed_name.'" priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'" class="delete_'.$base_class.' ps-2">

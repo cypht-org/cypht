@@ -37,6 +37,37 @@ add_handler('ajax_update_save_search_label', 'date', true, 'core');
 add_handler('ajax_update_save_search_label', 'http_headers', true, 'core');
 add_output('ajax_update_save_search_label', 'filter_saved_search_result', true);
 
+add_handler('ajax_save_advanced_search', 'login', false, 'core');
+add_handler('ajax_save_advanced_search', 'load_user_data', true, 'core');
+add_handler('ajax_save_advanced_search', 'save_advanced_search', true, 'saved_searches');
+add_handler('ajax_save_advanced_search', 'language', true);
+add_handler('ajax_save_advanced_search', 'date', true, 'core');
+add_handler('ajax_save_advanced_search', 'http_headers', true, 'core');
+add_output('ajax_save_advanced_search', 'filter_advanced_search_result', true);
+
+add_handler('ajax_load_advanced_search', 'login', false, 'core');
+add_handler('ajax_load_advanced_search', 'load_user_data', true, 'core');
+add_handler('ajax_load_advanced_search', 'load_advanced_search', true, 'saved_searches');
+add_handler('ajax_load_advanced_search', 'language', true);
+add_handler('ajax_load_advanced_search', 'date', true, 'core');
+add_handler('ajax_load_advanced_search', 'http_headers', true, 'core');
+add_output('ajax_load_advanced_search', 'filter_advanced_search_result', true);
+
+add_handler('ajax_update_advanced_search', 'login', false, 'core');
+add_handler('ajax_update_advanced_search', 'load_user_data', true, 'core');
+add_handler('ajax_update_advanced_search', 'update_advanced_search', true, 'saved_searches');
+add_handler('ajax_update_advanced_search', 'language', true);
+add_handler('ajax_update_advanced_search', 'date', true, 'core');
+add_handler('ajax_update_advanced_search', 'http_headers', true, 'core');
+add_output('ajax_update_advanced_search', 'filter_advanced_search_result', true);
+
+add_handler('ajax_delete_advanced_search', 'login', false, 'core');
+add_handler('ajax_delete_advanced_search', 'load_user_data', true, 'core');
+add_handler('ajax_delete_advanced_search', 'delete_advanced_search', true, 'saved_searches');
+add_handler('ajax_delete_advanced_search', 'language', true);
+add_handler('ajax_delete_advanced_search', 'date', true, 'core');
+add_handler('ajax_delete_advanced_search', 'http_headers', true, 'core');
+add_output('ajax_delete_advanced_search', 'filter_advanced_search_result', true);
 
 add_handler('ajax_hm_folders', 'saved_search_folder_data',  true, 'saved_searches', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'search_folders',  true, 'saved_searches', 'folder_list_content_start', 'before');
@@ -48,6 +79,13 @@ add_output('search', 'search_name_fld', true, 'saved_searches', 'search_form_con
 add_output('search', 'delete_search_icon', true, 'saved_searches', 'search_form_end', 'after');
 add_output('search', 'update_search_icon', true, 'saved_searches', 'search_form_end', 'after');
 
+add_handler('advanced_search', 'saved_search_folder_data', true, 'saved_searches', 'load_user_data', 'after');
+add_handler('advanced_search', 'advanced_search_data', true, 'saved_searches', 'load_user_data', 'after');
+add_output('advanced_search', 'advanced_search_data_handler', true, 'saved_searches', 'advanced_search_form_start', 'after');
+add_output('advanced_search', 'advanced_search_save_icon', true, 'saved_searches', 'advanced_search_results_table_end', 'after');
+add_output('advanced_search', 'advanced_search_update_icon', true, 'saved_searches', 'advanced_search_results_table_end', 'after');
+add_output('advanced_search', 'advanced_search_delete_icon', true, 'saved_searches', 'advanced_search_update_icon', 'after');
+
 
 
 return array(
@@ -56,6 +94,10 @@ return array(
         'ajax_update_search',
         'ajax_delete_search',
         'ajax_update_save_search_label',
+        'ajax_save_advanced_search',
+        'ajax_load_advanced_search',
+        'ajax_update_advanced_search',
+        'ajax_delete_advanced_search',
     ),
     'allowed_get' => array(
         'search_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -69,10 +111,22 @@ return array(
         'search_fld' => FILTER_UNSAFE_RAW,
         'search_since' => FILTER_UNSAFE_RAW,
         'search_terms_label' => FILTER_UNSAFE_RAW,
-        'old_search_terms_label' => FILTER_UNSAFE_RAW
+        'old_search_terms_label' => FILTER_UNSAFE_RAW,
+        'adv_search_data' => FILTER_UNSAFE_RAW,
+        'adv_terms' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
+        'adv_targets' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
+        'adv_source' => FILTER_UNSAFE_RAW,
+        'adv_start' => FILTER_UNSAFE_RAW,
+        'adv_end' => FILTER_UNSAFE_RAW,
+        'adv_source_limit' => FILTER_VALIDATE_INT,
+        'adv_charset' => FILTER_UNSAFE_RAW,
+        'adv_flags' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
     ),
     'allowed_output' => array(
         'saved_search_result' => array(FILTER_VALIDATE_INT, false),
         'new_saved_search_label' => array(FILTER_UNSAFE_RAW, false),
+        'advanced_search_result' => array(FILTER_VALIDATE_INT, false),
+        'advanced_search_data' => array(FILTER_UNSAFE_RAW, false),
+        'advanced_search_name' => array(FILTER_UNSAFE_RAW, false),
     ),
 );

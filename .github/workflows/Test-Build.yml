@@ -140,3 +140,11 @@ jobs:
 
       - name: "Script: test.sh"
         run: bash .github/tests/test.sh
+
+      - name: Upload Selenium debug artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selenium-debug
+          path: |
+            tests/selenium/artifacts/**/*

@@ -61,6 +61,16 @@ class Hm_EWS {
         return '';
     }
 
+    public function supports_dsn() {
+        // For EWS, "receipt-like" behavior should use EWS flags instead:
+        //  - IsDeliveryReceiptRequested (already used in send_message)
+        //  - IsReadReceiptRequested (can be added similarly if needed)
+        // TODO: If we decide to expose receipt options in the UI for EWS profiles,
+        //       map those UI controls to the EWS flags above and keep DSN disabled here
+        //       so that SMTP-specific DSN UI remains hidden for EWS connections.
+        return false;
+    }
+
     public function get_folders($folder = null, $only_subscribed = false, $unsubscribed_folders = [], $with_input = false) {
         $result = [];
         if (empty($folder)) {
@@ -605,14 +615,17 @@ class Hm_EWS {
             'x_schedule' => null,
             'x_profile_id' => null,
             'x_delivery' => null,
+            'type_msg' => '',
         ];
 
         switch ($messageType) {
             case 'calendar':
                 $msg = array_merge($msg, $this->getCalendarProperties($message));
+                $msg['type_msg'] = 'calendar';
                 break;
             case 'meeting_request':
                 $msg = array_merge($msg, $this->getMeetingRequestProperties($message));
+                $msg['type_msg'] = 'calendar';
                 break;
             case 'message':
             default:
@@ -1040,8 +1053,20 @@ class Hm_EWS {
             $struct[$part_num]['md5'] = '';
             $struct[$part_num]['disposition'] = $part->getContentDisposition();
 
-            if ($filename = $part->getFilename()) {
+            $filename = $part->getFilename();
+            if (! $filename) {
+                $filename = $part->getHeaderParameter('Content-Type', 'name');
+            }
+            if (! $filename) {
+                $filename = $part->getHeaderParameter('Content-Disposition', 'filename');
+            }
+            if ($filename) {
                 $struct[$part_num]['file_attributes'] = ['filename' => $filename];
+
+                if (! isset($struct[$part_num]['attributes']) || ! is_array($struct[$part_num]['attributes'])) {
+                    $struct[$part_num]['attributes'] = [];
+                }
+                $struct[$part_num]['attributes']['name'] = $filename;
 
                 if ($part->getContentDisposition() == 'attachment') {
                     $struct[$part_num]['file_attributes']['attachment'] = true;

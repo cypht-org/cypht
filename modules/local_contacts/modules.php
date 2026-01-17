@@ -25,6 +25,7 @@ class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
                 foreach ($addresses as $vals) {
                     $contacts->add_contact(array('source' => 'local', 'email_address' => $vals['email'], 'display_name' => $vals['name'], 'group' => isset($vals['contact_group']) ? $vals['contact_group'] : 'Personal Addresses'));
                 }
+                $this->session->record_unsaved('Contact Added');
                 Hm_Msgs::add('Contact Added');
             }
         }
@@ -40,6 +41,7 @@ class Hm_Handler_process_delete_contact extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('contact_type', 'contact_source', 'contact_id'));
         if ($success && $form['contact_type'] == 'local' && $form['contact_source'] == 'local') {
             if ($contacts->delete($form['contact_id'])) {
+                $this->session->record_unsaved('Contact Deleted');
                 $this->out('contact_deleted', 1);
                 Hm_Msgs::add('Contact Deleted');
             }
@@ -66,6 +68,7 @@ class Hm_Handler_process_add_contact extends Hm_Handler_Module {
                 $details['group'] = 'Personal Addresses';
             }
             $contacts->add_contact($details);
+            $this->session->record_unsaved('Contact Added');
             Hm_Msgs::add('Contact Added');
         }
     }
@@ -148,7 +151,7 @@ class Hm_Handler_process_import_contact extends Hm_Handler_Module {
                     $message = $create_count.' contacts created, '.$update_count.' contacts updated, '.$invalid_mail_count.' Invalid email address';
                     $type = 'success';
                 } else {
-                    $message = 'An error occured';
+                    $message = 'An error occurred';
                 }
 
                 $this->session->set('imported_contact', $import_result);
@@ -177,6 +180,7 @@ class Hm_Handler_process_edit_contact extends Hm_Handler_Module {
                 $details['group'] = 'Personal Addresses';
             }
             if ($contacts->update_contact($form['contact_id'], $details)) {
+                $this->session->record_unsaved('Contact Updated');
                 Hm_Msgs::add('Contact Updated');
             }
         }

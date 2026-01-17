@@ -20,9 +20,14 @@ var insert_sig = function(textarea, sig) {
 };
 
 function profilesComposePageHandler() {
+    // Ensure profile_signatures is defined
+    if (typeof profile_signatures === 'undefined') {
+        window.profile_signatures = {};
+    }
+
     $('.compose_sign').on("click", function() {
         var server_id = $('.compose_server').val();
-        if (profile_signatures[server_id]) {
+        if (profile_signatures && profile_signatures[server_id]) {
             var ta = $('.ke-content', $('iframe').contents());
             if (ta.length) {
                 ta.html(ta.html() + profile_signatures[server_id].replace(/\n/g, '<br />'));

@@ -8,7 +8,7 @@ output_source('advanced_search');
 /* advanced search page */
 setup_base_page('advanced_search', 'core');
 add_handler('advanced_search', 'advanced_search_prepare', true, 'advanced_search', 'date', 'after');
-add_output('advanced_search', 'advanced_search_content_start', true, 'advanced_search', 'content_section_start', 'after');
+add_output('advanced_search', 'advanced_search_content_start', true, 'advanced_search', 'version_upgrade_checker', 'after');
 add_output('advanced_search', 'advanced_search_form_start', true, 'advanced_search', 'advanced_search_content_start', 'after');
 add_output('advanced_search', 'advanced_search_form_content', true, 'advanced_search', 'advanced_search_form_start', 'after');
 add_output('advanced_search', 'advanced_search_form_end', true, 'advanced_search', 'advanced_search_form_content', 'after');
@@ -30,6 +30,9 @@ return array(
         'advanced_search',
         'ajax_adv_search'
     ),
+    'allowed_get' => array(
+        'search_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    ),
     'allowed_post' => array(
         'adv_source' => FILTER_UNSAFE_RAW,
         'adv_start' => FILTER_UNSAFE_RAW,
@@ -40,7 +43,6 @@ return array(
         'adv_terms' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
         'adv_targets' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
         'all_folders' => FILTER_VALIDATE_BOOLEAN,
-        'all_special_folders' => FILTER_VALIDATE_BOOLEAN,
         'include_subfolders' => FILTER_VALIDATE_BOOLEAN,
     )
 );

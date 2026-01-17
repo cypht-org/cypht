@@ -63,7 +63,7 @@ function applySmtpComposePageHandlers(routeParams) {
             var checkInList = check_cc_exist_in_contacts_list();
             // if contact_cc not exist in contact list for user
             if (checkInList) {
-                modalContentHeadline = "Adress mail not exist in your contact list";
+                modalContentHeadline = "Address mail not exist in your contact list";
                 showBtnSendAnywayDontWarnFuture = false;
             }
 
@@ -266,6 +266,7 @@ function applySmtpComposePageHandlers(routeParams) {
     $(document).on('click', '.bubble_close', function(e) {
         e.stopPropagation();
         $(".bubble_dropdown-content").remove();
+        remove_recipient_from_list($(this).parent().data('id'));
         $(this).parent().remove();
     });
 

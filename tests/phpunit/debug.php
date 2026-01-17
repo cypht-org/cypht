@@ -6,10 +6,6 @@ use PHPUnit\Framework\TestCase;
  * tests for Hm_Debug
  */
 class Hm_Test_Debug extends TestCase {
-
-    public function setUp(): void {
-        require 'bootstrap.php';
-    }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
