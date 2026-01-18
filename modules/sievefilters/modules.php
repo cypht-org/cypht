@@ -1640,14 +1640,18 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
         $res = '<div class="dropdown">'
             .   '<a class="msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle" '
             .   'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
-            .   'Quick Actions'
+            .   $this->trans('Quick Actions')
             .   '</a>'
             .   '<div class="dropdown-menu custom-actions p-2" aria-labelledby="filter_message">';
 
             if (!empty($custom_actions)) {
+                $res .= '<small class="dropdown-header text-muted px-2 py-1">'
+                     .  '<i class="bi bi-info-circle me-1"></i>'.$this->trans('Auto-run on new emails')
+                     .  '</small>';
                 foreach ($custom_actions as $filter) {
                     $res .= sprintf(
-                        '<a class="dropdown-item msg_filter_action" href="#" data-filter-id="%s">%s</a>',
+                        '<button class="dropdown-item msg_filter_action py-2 btn btn-secondary" data-filter-id="%s">'
+                        .'<i class="bi bi-play-circle me-2 text-success"></i>%s</button>',
                         htmlspecialchars($filter['id']),
                         htmlspecialchars($filter['name'])
                     );
@@ -1655,10 +1659,10 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
                 $res .= '<hr class="dropdown-divider">';
             }
 
-        $res .= '<button class="dropdown-item add_custom_action text-primary" '
+        $res .= '<button class="dropdown-item add_custom_action text-primary btn btn-secondary py-2" '
                     .'id="add_custom_action_button" account="'.$mailbox_name.'" '
                 .'>'
-                .   '<i class="bi bi-plus-circle"></i> Add Custom Action'
+                .   '<i class="bi bi-plus-circle me-2"></i>'.$this->trans('Create from Selected')
                 . '</button>';
  
         $this->concat('msg_controls_custom_actions', $res);
