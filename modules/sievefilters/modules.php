@@ -1006,6 +1006,7 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
         $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
         $header_obj .= "\n# ".base64_encode($this->request->post['conditions_json']);
         $header_obj .= "\n# ".base64_encode($this->request->post['actions_json']);
+        $header_obj .= "\n# ".base64_encode($this->request->post['filter_source']);
         $script_parsed = $header_obj."\n\n".$script_parsed;
 
         $factory = get_sieve_client_factory($this->config);
@@ -1521,28 +1522,111 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
         if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
 
         list($success, $form) = $this->process_form(array('imap_server_id'));
-        $imap_server_id = $form['imap_server_id'];
 
         if (!$success) {
-            if (isset($_GET['list_path'])) {
-                $parts = explode('_', $_GET['list_path']);
-                if (count($parts) > 1) {
-                    $imap_server_id = $parts[1];
-                }
+            return;
+        }
+        $accounts = $this->get('imap_accounts');
+        if (isset($accounts[$form['imap_server_id']])) {
+            $this->out('mailbox', $accounts[$form['imap_server_id']]);
+            $this->session->close_early();
+        }
+    }
+}
+
+class Hm_Handler_load_mailbox_name extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $imap_server_id = null;
+        if (array_key_exists('list_path', $this->request->get)) {
+            $path = $this->request->get['list_path'];
+            if (preg_match("/^imap_(\w+)_(.+)$/", $path, $matches)) {
+                $imap_server_id = $matches[1];
             }
         }
 
         $details = Hm_IMAP_List::dump($imap_server_id);
         $mailbox_name = $details['name'];
-
-        $accounts = $this->get('imap_accounts');
         $this->out('mailbox_name', $mailbox_name);
-        if (isset($accounts[$imap_server_id])) {
-            $this->out('mailbox', $accounts[$imap_server_id]);
-            // $this->out('mailbox_name', $accounts[$imap_server_id]['name']);
-           
-            $this->session->close_early();
+    }
+}
+
+class Hm_Handler_load_custom_actions extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+        $imap_server_id = null;
+        if (array_key_exists('list_path', $this->request->get)) {
+            $path = $this->request->get['list_path'];
+            if (preg_match("/^imap_(\w+)_(.+)$/", $path, $matches)) {
+                $imap_server_id = $matches[1];
+            }
         }
+
+        if ($imap_server_id === null) {
+            $this->out('custom_actions', []);
+            return;
+        }
+
+        $imap_servers = $this->user_config->get('imap_servers');
+        if (!isset($imap_servers[$imap_server_id])) {
+            $this->out('custom_actions', []);
+            return;
+        }
+
+        $mailbox = $imap_servers[$imap_server_id];
+        if (empty($mailbox['sieve_config_host'])) {
+            $this->out('custom_actions', []);
+            return;
+        }
+
+        $filters = [];
+        $factory = get_sieve_client_factory($this->config);
+        try {
+            $client = $factory->init($this->user_config, $mailbox, $this->module_is_supported('nux'));
+            $scripts = $client->listScripts();
+            
+            foreach ($scripts as $script_name) {
+                // Only include filter scripts (ending with cyphtfilter)
+                if (mb_strstr($script_name, 'cyphtfilter')) {
+                    $raw_script = $client->getScript($script_name); // raw content
+
+                    // Parse the source from line 3 of the script header
+                    $lines = preg_split('#\r?\n#', $raw_script);
+                    $source = ''; // default
+                    if (isset($lines[3])) {
+                        $meta_b64 = str_replace("# ", "", $lines[3]);
+                        $source = base64_decode($meta_b64);
+                    }
+
+                    // Only include filters created from message_list
+                    if ($source !== 'message_list') {
+                        continue;
+                    }
+
+                    $exp_name = explode('-', $script_name);
+                    $parsed_name = str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2)));
+                    
+                    if (preg_match('/^s(en|dis)abled/', $parsed_name)) {
+                        $parsed_name = str_replace(['senabled ', 'sdisabled '], '', $parsed_name);
+                    }
+
+                    $filters[] = [
+                        'id' => $script_name,
+                        'name' => $parsed_name,
+                        'source' => $source,
+                    ];
+                }
+            }
+            $client->close();
+        } catch (Exception $e) {
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
+        }
+
+        $this->out('custom_actions', $filters);
     }
 }
 
@@ -1551,9 +1635,7 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
     protected function output()
     {
         $custom_actions = $this->get('custom_actions', []);
-        // $mailbox_name = $this->get('mailbox_name', 'defaulttest');
-        $mailbox = $this->get('mailbox');
-        $mailbox_name = $mailbox['name'] ?? 'defaulttest';
+        $mailbox_name = $this->get('mailbox_name', '');
 
         $res = '<div class="dropdown">'
             .   '<a class="msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle" '
