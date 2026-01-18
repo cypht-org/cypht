@@ -344,6 +344,7 @@ function createSaveFilter({
           value: $(".modal_sieve_filter_test").val(),
         },
         { name: "gen_script", value: gen_script },
+        { name: "filter_source", value: isFilterFromCustomActions ? "message_list" : "sieve_filters" },
       ],
       function (res) {
         if (
@@ -368,8 +369,6 @@ function createSaveFilter({
     return true;
   };
 }
-
-
 
 function add_filter_condition() {
   let header_fields = "";
@@ -702,7 +701,7 @@ function createEditFilterModal(save_filter, current_account) {
     document.querySelector("#edit_filter_modal").innerHTML
   );
   $("#edit_filter_modal").remove();
-  console.log(save_filter, current_account());
+
   // add a button
   edit_filter_modal.addFooterBtn(
     "Save",
@@ -1488,9 +1487,6 @@ function createFilterFromList() {
     from_filter_type: fromFilterType,
   };
 
-  console.log("Filter draft:", filterDraft);
-  console.log("Mailbox name:", mailboxName);
-
   const getCurrentAccount = function () {
     return mailboxName;
   };
@@ -1498,13 +1494,17 @@ function createFilterFromList() {
   const getCurrentEditingFilterName = () => "";
   const getEditScriptModal = () => {};
   
-  const save_filter = createSaveFilter({
+  const save_filter_inner = createSaveFilter({
       getCurrentAccount,
       getIsEditingFilter,
       getCurrentEditingFilterName,
       getEditScriptModal,
       isFilterFromCustomActions: true,
   });
+
+  const save_filter = function(imap_account, gen_script = false) {
+    return save_filter_inner(gen_script);
+  };
 
   const edit_filter_modal = createEditFilterModal(
     save_filter,
@@ -1565,7 +1565,6 @@ $(function () {
 
     const mailbox = $(this).attr("account");
     current_mailbox_for_filter = mailbox;
-    console.log("Mailbox for filter:", current_mailbox_for_filter);
 
     const selected = [];
 
