@@ -18,7 +18,8 @@ add_handler('ajax_imap_status', 'sieve_status', true, 'sievefilters', 'imap_stat
 add_handler('ajax_imap_debug', 'sieve_connect', true, 'imap', 'imap_connect', 'after');
 
 // sieve filter
-add_handler('message_list', 'load_account_sieve_filters', true, 'sievefilters', 'load_user_data', 'after');
+add_handler('message_list', 'load_mailbox_name', true, 'sievefilters', 'load_user_data', 'after');
+add_handler('message_list', 'load_custom_actions', true, 'sievefilters', 'load_mailbox_name', 'after');
 add_output('sieve_filters', 'sievefilters_settings_start', true, 'sievefilters', 'version_upgrade_checker', 'after');
 add_output('message_list', 'sievefilters_settings_start', true, 'sievefilters', 'message_list_end', 'after');
 add_output('message_list', 'message_list_custom_actions', true, 'sievefilters', 'imap_custom_controls', 'after');
@@ -182,6 +183,7 @@ return array(
         'conditions_json' => FILTER_UNSAFE_RAW,
         'actions_json' => FILTER_UNSAFE_RAW,
         'filter_test_type' => FILTER_UNSAFE_RAW,
+        'filter_source' => FILTER_UNSAFE_RAW,
         'imap_msg_uid' => FILTER_VALIDATE_INT,
         'imap_server_id' => FILTER_UNSAFE_RAW,
         'folder' => FILTER_UNSAFE_RAW,
