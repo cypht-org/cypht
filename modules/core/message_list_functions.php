@@ -461,8 +461,6 @@ function message_controls($output_mod) {
         $res .= $output_mod->get('msg_controls_custom_actions');
     }
 
-    $res .= '</div></div>';
-
     $res .= '</div>';
     return $res;
 }}

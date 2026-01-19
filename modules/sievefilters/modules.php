@@ -1666,6 +1666,7 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
                 .'>'
                 .   '<i class="bi bi-plus-circle me-2"></i>'.$this->trans('Create from Selected')
                 . '</button>';
+        $res .= '</div></div>';
  
         $this->concat('msg_controls_custom_actions', $res);
     }
