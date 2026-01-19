@@ -1650,9 +1650,11 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
                      .  '</small>';
                 foreach ($custom_actions as $filter) {
                     $res .= sprintf(
-                        '<button class="dropdown-item msg_filter_action py-2 btn btn-secondary" data-filter-id="%s">'
+                        '<button class="dropdown-item msg_filter_action py-2 btn btn-secondary" data-filter-id="%s" data-imap-account="%s" data-filter-name="%s">'
                         .'<i class="bi bi-play-circle me-2 text-success"></i>%s</button>',
                         htmlspecialchars($filter['id']),
+                        htmlspecialchars($mailbox_name),
+                        htmlspecialchars($filter['name']),
                         htmlspecialchars($filter['name'])
                     );
                 }

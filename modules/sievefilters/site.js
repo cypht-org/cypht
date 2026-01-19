@@ -766,11 +766,17 @@ function createEditFilterModal(save_filter, current_account, options = {}) {
         modalId: "myEditFilterModal",
     });
 
+    // Store template content on first use, then reuse it
+    if (!edit_filter_template_content) {
+        const templateEl = document.querySelector("#edit_filter_modal");
+        if (templateEl) {
+            edit_filter_template_content = templateEl.innerHTML;
+            $("#edit_filter_modal").remove();
+        }
+    }
+
     // set content
-    edit_filter_modal.setContent(
-        document.querySelector("#edit_filter_modal").innerHTML,
-    );
-    $("#edit_filter_modal").remove();
+    edit_filter_modal.setContent(edit_filter_template_content);
 
     // add a button
     edit_filter_modal.addFooterBtn(
@@ -1473,6 +1479,8 @@ function collectChips(container) {
 
 let custom_action_modal;
 let current_mailbox_for_filter;
+let edit_filter_modal_for_custom_actions;
+let edit_filter_template_content;
 
 function createFilterFromList() {
     const froms = collectChips("#filter-from-list");
@@ -1513,13 +1521,30 @@ function createFilterFromList() {
         return save_filter_inner(gen_script);
     };
 
-    const edit_filter_modal = createEditFilterModal(
+    // Dispose previous modal if it exists
+    if (edit_filter_modal_for_custom_actions) {
+        try {
+            const existingModal = document.getElementById("myEditFilterModal");
+            if (existingModal) {
+                const bsModal = bootstrap.Modal.getInstance(existingModal);
+                if (bsModal) bsModal.dispose();
+                existingModal.remove();
+            }
+        } catch (e) {
+            // Ignore errors during cleanup
+        }
+    }
+
+    edit_filter_modal_for_custom_actions = createEditFilterModal(
         save_filter,
         getCurrentAccount,
         { isFromMessageList: true },
     );
-    edit_filter_modal.open();
+    edit_filter_modal_for_custom_actions.open();
     custom_action_modal.hide();
+
+    // Remove any previous dry run results
+    $(".dry-run-results").remove();
 
     populateFilterFromDraft(filterDraft);
 }
@@ -1765,6 +1790,123 @@ $(function () {
         } else {
             $("#reject_message").remove();
         }
+    });
+
+    // Handler for existing filter action buttons in Quick Actions dropdown
+    $(document).on("click", ".msg_filter_action", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const filterId = $(this).data("filter-id");
+        const imapAccount = $(this).data("imap-account");
+        const filterName = $(this).data("filter-name");
+
+        current_mailbox_for_filter = imapAccount;
+
+        // Setup the save filter function for this context
+        const getCurrentAccount = () => imapAccount;
+        const getIsEditingFilter = () => true;
+        const getCurrentEditingFilterName = () => filterId;
+        const getEditScriptModal = () => {};
+
+        const save_filter_inner = createSaveFilter({
+            getCurrentAccount,
+            getIsEditingFilter,
+            getCurrentEditingFilterName,
+            getEditScriptModal,
+            isFilterFromCustomActions: true,
+        });
+
+        const save_filter = function (imap_account, gen_script = false) {
+            return save_filter_inner(gen_script);
+        };
+
+        const edit_filter_modal = createEditFilterModal(
+            save_filter,
+            getCurrentAccount,
+            { isFromMessageList: true },
+        );
+
+        // Clear previous content
+        $(".modal_sieve_filter_name").val(filterName);
+        $(".modal_sieve_filter_priority").val("");
+        $(".sieve_list_conditions_modal").html("");
+        $(".filter_actions_modal_table").html("");
+        $("#stop_filtering").prop("checked", false);
+
+        // Fetch filter details from server
+        Hm_Ajax.request(
+            [
+                { name: "hm_ajax_hook", value: "ajax_sieve_edit_filter" },
+                { name: "imap_account", value: imapAccount },
+                { name: "sieve_script_name", value: filterId },
+            ],
+            function (res) {
+                const conditions = JSON.parse(JSON.parse(res.conditions));
+                const actions = JSON.parse(JSON.parse(res.actions));
+                const test_type = res.test_type;
+
+                $(".modal_sieve_filter_test").val(test_type);
+
+                // Populate conditions
+                conditions.forEach(function (condition) {
+                    add_filter_condition();
+                    $(".add_condition_sieve_filters")
+                        .last()
+                        .val(condition.condition);
+                    $(".add_condition_sieve_filters").last().trigger("change");
+                    $(".condition_options").last().val(condition.type);
+                    $("[name^=sieve_selected_extra_option_value]")
+                        .last()
+                        .val(condition.extra_option_value);
+                    if (
+                        $("[name^=sieve_selected_option_value]")
+                            .last()
+                            .is("input")
+                    ) {
+                        $("[name^=sieve_selected_option_value]")
+                            .last()
+                            .val(condition.value);
+                    }
+                });
+
+                // Populate actions
+                actions.forEach(function (action) {
+                    if (action.action === "stop") {
+                        $("#stop_filtering").prop("checked", true);
+                    } else {
+                        add_filter_action(action.value);
+                        $(".sieve_actions_select").last().val(action.action);
+                        $(".sieve_actions_select").last().trigger("change");
+                        $("[name^=sieve_selected_extra_action_value]")
+                            .last()
+                            .val(action.extra_option_value);
+                        if (
+                            $("[name^=sieve_selected_action_value]")
+                                .last()
+                                .is("input")
+                        ) {
+                            $("[name^=sieve_selected_action_value]")
+                                .last()
+                                .val(action.value);
+                        } else if (
+                            $("[name^=sieve_selected_action_value]")
+                                .last()
+                                .is("textarea")
+                        ) {
+                            $("[name^=sieve_selected_action_value]")
+                                .last()
+                                .text(action.value);
+                        }
+                    }
+                });
+
+                edit_filter_modal.setTitle(
+                    hm_trans("Edit Filter") + ": " + filterName,
+                );
+                edit_filter_modal.open();
+            },
+        );
     });
 
     $(document).on("click", "#add_custom_action_button", function (e) {
