@@ -21,6 +21,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             $filter = $this->get('list_filter');
             $sort = $this->get('list_sort');
             $keyword = $this->get('list_keyword');
+            $screen_emails = $this->get('screen_emails');
             $opts = array('all' => $this->trans('All'), 'unseen' => $this->trans('Unread'),
                 'seen' => $this->trans('Read'), 'flagged' => $this->trans('Flagged'),
                 'unflagged' => $this->trans('Unflagged'), 'answered' => $this->trans('Answered'),
@@ -41,6 +42,9 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             $custom .= '<input type="hidden" name="list_page" value="'.$this->html_safe($this->get('list_page')).'" />';
             $custom .= '<input type="search" placeholder="'.$this->trans('Search').
                 '" class="imap_keyword form-control form-control-sm" name="keyword" value="'.$this->html_safe($keyword).'" />';
+            if ($screen_emails) {
+                $custom .= '<input type="hidden" value="1" name="screen_emails"/>';
+            }
             $custom .= '<select name="sort" class="imap_sort form-control form-control-sm">';
             foreach ($sorts as $name => $val) {
                 $custom .= '<option ';

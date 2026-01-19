@@ -267,13 +267,17 @@ class Hm_Auth_LDAP extends Hm_Auth {
         $base_dn = $this->site_config->get('ldap_auth_base_dn', false);
         $uid_auth_attr = $this->site_config->get('ldap_auth_uid_attr', false);
         if ($server && $port && $base_dn) {
-            $user = sprintf('%s=%s,%s', $uid_auth_attr, $user, $base_dn);
+            if (strpos($user, '@') !== false || strpos($user, '\\') !== false) {
+                $bind_dn = $user;
+            } else {
+                $bind_dn = sprintf('%s=%s,%s', $uid_auth_attr, $user, $base_dn);
+            }
             $this->config = [
                 'server' => $server,
                 'port' => $port,
                 'enable_tls' => $tls,
                 'base_dn' => $base_dn,
-                'user' => $user,
+                'user' => $bind_dn,
                 'pass' => $pass
             ];
             return $this->connect();
@@ -294,6 +298,10 @@ class Hm_Auth_LDAP extends Hm_Auth {
         $this->fh = @ldap_connect($uri);
         if ($this->fh) {
             ldap_set_option($this->fh, LDAP_OPT_PROTOCOL_VERSION, 3);
+            // Disable LDAP referral following: Active Directory may return referrals for searches
+            // across domains or special partitions, but for authentication we should keep the check
+            // local to the connected server without following referrals to other DCs
+            ldap_set_option($this->fh, LDAP_OPT_REFERRALS, 0);
             return $this->auth();
         }
         Hm_Debug::add(sprintf('Unable to connect to the LDAP auth server %s', $this->config['server']));
