@@ -452,3 +452,415 @@ if (!hm_exists('vendor_detection_lowercase_list')) {
         return vendor_detection_unique_lowercase($vals);
     }
 }
+
+if (!hm_exists('vendor_detection_load_datarequests_registry')) {
+    function vendor_detection_load_datarequests_registry($path = null) {
+        static $cached = null;
+        $use_cache = $path === null;
+        if ($use_cache && $cached !== null) {
+            return $cached;
+        }
+        if (!$path) {
+            $path = APP_PATH.'assets/data/datarequests_companies.json';
+        }
+        $registry = array(
+            'entities' => array(),
+            'companies' => array()
+        );
+        if (!is_readable($path)) {
+            if ($use_cache) {
+                $cached = $registry;
+            }
+            return $registry;
+        }
+        $json = file_get_contents($path);
+        $data = json_decode($json, true);
+        if (is_array($data)) {
+            if (isset($data['entities']) && is_array($data['entities'])) {
+                $registry['entities'] = vendor_detection_normalize_entities($data['entities']);
+            } elseif (isset($data['companies']) && is_array($data['companies'])) {
+                $registry['companies'] = vendor_detection_normalize_companies($data['companies']);
+            } elseif (vendor_detection_is_assoc_array($data)) {
+                $registry['companies'] = vendor_detection_normalize_companies($data);
+            } elseif (isset($data['vendors']) && is_array($data['vendors'])) {
+                $registry['companies'] = vendor_detection_normalize_companies($data['vendors']);
+            }
+        }
+        if ($use_cache) {
+            $cached = $registry;
+        }
+        return $registry;
+    }
+}
+
+if (!hm_exists('vendor_detection_match_data_request')) {
+    function vendor_detection_match_data_request($vendor_detection, $msg_headers, $registry = null) {
+        if (!is_array($vendor_detection)) {
+            $vendor_detection = array();
+        }
+        if ($registry === null) {
+            $registry = vendor_detection_load_datarequests_registry();
+        }
+        $entities = $registry['entities'] ?? array();
+        $companies = $registry['companies'] ?? array();
+        if (empty($entities) && empty($companies)) {
+            return array();
+        }
+        $controller_domains = vendor_detection_get_controller_domains($msg_headers, $vendor_detection);
+        $platform_domains = vendor_detection_unique_lowercase($vendor_detection['platform_domains'] ?? array());
+        $vendor_id = $vendor_detection['vendor_id'] ?? '';
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            error_log('[data_request_match_debug] '.json_encode(array(
+                'controller_domains' => $controller_domains,
+                'vendor_id' => $vendor_id,
+                'platform_domains' => $platform_domains,
+                'has_vendor_detection' => !empty($vendor_detection)
+            )));
+        }
+
+        if (!empty($controller_domains)) {
+            if (!empty($entities)) {
+                foreach ($controller_domains as $controller_domain) {
+                    foreach ($entities as $entity) {
+                        $match = vendor_detection_match_entity_controller($entity, $controller_domain);
+                        if ($match) {
+                            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                                error_log('[data_request_match_debug] matched controller domain');
+                            }
+                            return $match;
+                        }
+                    }
+                }
+            } else {
+                foreach ($controller_domains as $controller_domain) {
+                    foreach ($companies as $entry) {
+                        $match = vendor_detection_match_data_request_entry(
+                            $entry,
+                            $controller_domain,
+                            $vendor_id,
+                            $platform_domains,
+                            true
+                        );
+                        if ($match) {
+                            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                                error_log('[data_request_match_debug] matched controller domain');
+                            }
+                            return $match;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!empty($entities)) {
+            foreach ($entities as $entity) {
+                $match = vendor_detection_match_entity_vendor($entity, $vendor_id, $platform_domains);
+                if ($match) {
+                    if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                        error_log('[data_request_match_debug] matched vendor fallback');
+                    }
+                    return $match;
+                }
+            }
+        } else {
+            $first_controller = $controller_domains[0] ?? '';
+            foreach ($companies as $entry) {
+                $match = vendor_detection_match_data_request_entry(
+                    $entry,
+                    $first_controller,
+                    $vendor_id,
+                    $platform_domains,
+                    false
+                );
+                if ($match) {
+                    if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                        error_log('[data_request_match_debug] matched vendor fallback');
+                    }
+                    return $match;
+                }
+            }
+        }
+
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            error_log('[data_request_match_debug] no match');
+        }
+        return array();
+    }
+}
+
+if (!hm_exists('vendor_detection_match_data_request_entry')) {
+    function vendor_detection_match_data_request_entry($entry, $controller_domain, $vendor_id, $platform_domains, $controller_only) {
+        $domains = vendor_detection_lowercase_list($entry['domains'] ?? array());
+        $vendor_ids = vendor_detection_lowercase_list($entry['vendor_ids'] ?? array());
+        $type = $entry['type'] ?? '';
+        $is_controller = $type === 'controller';
+
+        if ($controller_only && !$is_controller) {
+            return array();
+        }
+
+        if ($controller_domain && in_array($controller_domain, $domains, true)) {
+            return vendor_detection_build_data_request_match($entry, 'controller_domain', $controller_domain, array());
+        }
+
+        if ($controller_only) {
+            return array();
+        }
+
+        if ($vendor_id && in_array(mb_strtolower($vendor_id), $vendor_ids, true)) {
+            return vendor_detection_build_data_request_match($entry, 'vendor_id', $vendor_id, array());
+        }
+
+        foreach ($platform_domains as $domain) {
+            if (in_array($domain, $domains, true)) {
+                return vendor_detection_build_data_request_match($entry, 'platform_domain', $domain, array());
+            }
+        }
+
+        return array();
+    }
+}
+
+if (!hm_exists('vendor_detection_build_data_request_match')) {
+    function vendor_detection_build_data_request_match($entry, $match_type, $match_value, $entity) {
+        return array(
+            'vendor_id' => $entry['slug'] ?? ($entry['id'] ?? ''),
+            'vendor_name' => $entry['name'] ?? '',
+            'company_type' => $entry['type'] ?? '',
+            'country' => $entry['country'] ?? '',
+            'datarequests_url' => $entry['datarequests_url'] ?? '',
+            'gdpr' => $entry['gdpr'] ?? array(),
+            'entity_id' => $entity['id'] ?? '',
+            'entity_name' => $entity['name'] ?? '',
+            'match_type' => $match_type,
+            'match_value' => $match_value
+        );
+    }
+}
+
+if (!hm_exists('vendor_detection_match_entity_controller')) {
+    function vendor_detection_match_entity_controller($entity, $controller_domain) {
+        $entries = $entity['entries'] ?? array();
+        foreach ($entries as $entry) {
+            if (($entry['type'] ?? '') !== 'controller') {
+                continue;
+            }
+            $domains = vendor_detection_lowercase_list($entry['domains'] ?? array());
+            if (in_array($controller_domain, $domains, true)) {
+                return vendor_detection_build_data_request_match($entry, 'controller_domain', $controller_domain, $entity);
+            }
+        }
+        return array();
+    }
+}
+
+if (!hm_exists('vendor_detection_match_entity_vendor')) {
+    function vendor_detection_match_entity_vendor($entity, $vendor_id, $platform_domains) {
+        $vendor_ids = vendor_detection_lowercase_list($entity['vendor_ids'] ?? array());
+        $entries = $entity['entries'] ?? array();
+        $vendor_id = mb_strtolower((string) $vendor_id);
+
+        if ($vendor_id && in_array($vendor_id, $vendor_ids, true)) {
+            $entry = vendor_detection_pick_entity_fallback_entry($entries);
+            if ($entry) {
+                return vendor_detection_build_data_request_match($entry, 'vendor_id', $vendor_id, $entity);
+            }
+        }
+
+        foreach ($platform_domains as $domain) {
+            foreach ($entries as $entry) {
+                $domains = vendor_detection_lowercase_list($entry['domains'] ?? array());
+                if (in_array($domain, $domains, true)) {
+                    return vendor_detection_build_data_request_match($entry, 'platform_domain', $domain, $entity);
+                }
+            }
+        }
+
+        return array();
+    }
+}
+
+if (!hm_exists('vendor_detection_pick_entity_fallback_entry')) {
+    function vendor_detection_pick_entity_fallback_entry($entries) {
+        $processor = null;
+        foreach ($entries as $entry) {
+            if (($entry['type'] ?? '') === 'processor') {
+                $processor = $entry;
+                break;
+            }
+        }
+        if ($processor) {
+            return $processor;
+        }
+        return $entries[0] ?? null;
+    }
+}
+
+if (!hm_exists('vendor_detection_get_controller_domain')) {
+    function vendor_detection_get_controller_domain($vendor_detection, $msg_headers) {
+        $domains = vendor_detection_get_controller_domains($msg_headers, $vendor_detection);
+        return $domains[0] ?? '';
+    }
+}
+
+if (!hm_exists('vendor_detection_get_controller_domains')) {
+    function vendor_detection_get_controller_domains($msg_headers, $vendor_detection = array()) {
+        $domains = array();
+        if (is_array($vendor_detection) && !empty($vendor_detection['controller_domain'])) {
+            $domains[] = $vendor_detection['controller_domain'];
+        }
+        if (function_exists('lc_headers')) {
+            $headers = lc_headers($msg_headers);
+            foreach (array('reply-to', 'from', 'return-path') as $header_name) {
+                $value = $headers[$header_name] ?? '';
+                if (is_array($value)) {
+                    foreach ($value as $item) {
+                        $domains = array_merge($domains, vendor_detection_extract_domains_from_address_header($item));
+                    }
+                } elseif ($value) {
+                    $domains = array_merge($domains, vendor_detection_extract_domains_from_address_header($value));
+                }
+            }
+        }
+        $normalized = array();
+        foreach ($domains as $domain) {
+            $normalized_domain = vendor_detection_normalize_domain($domain);
+            if ($normalized_domain) {
+                $normalized[] = $normalized_domain;
+            }
+        }
+        return vendor_detection_unique_lowercase($normalized);
+    }
+}
+
+if (!hm_exists('vendor_detection_normalize_domain')) {
+    function vendor_detection_normalize_domain($value) {
+        if (!$value) {
+            return '';
+        }
+        $value = trim($value);
+        if (strpos($value, '@') !== false) {
+            $parts = explode('@', $value);
+            $value = end($parts);
+        }
+        $value = trim($value, ". \t\r\n");
+        $value = mb_strtolower($value);
+        if (filter_var($value, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
+            return $value;
+        }
+        return '';
+    }
+}
+
+if (!hm_exists('vendor_detection_get_user_email')) {
+    function vendor_detection_get_user_email($imap_accounts, $server_id) {
+        if (!is_array($imap_accounts) || !$server_id) {
+            return '';
+        }
+        if (!isset($imap_accounts[$server_id])) {
+            return '';
+        }
+        $account = $imap_accounts[$server_id];
+        if (isset($account['user'])) {
+            return (string) $account['user'];
+        }
+        return '';
+    }
+}
+
+if (!hm_exists('vendor_detection_get_profile_name')) {
+    function vendor_detection_get_profile_name() {
+        if (!class_exists('Hm_Profiles')) {
+            return '';
+        }
+        $profile = Hm_Profiles::getDefault();
+        if (!$profile || empty($profile['name'])) {
+            return '';
+        }
+        if (mb_strtolower($profile['name']) === 'default') {
+            return '';
+        }
+        return (string) $profile['name'];
+    }
+}
+
+if (!hm_exists('vendor_detection_get_message_id')) {
+    function vendor_detection_get_message_id($msg_headers) {
+        if (!is_array($msg_headers)) {
+            return '';
+        }
+        if (function_exists('lc_headers')) {
+            $msg_headers = lc_headers($msg_headers);
+        }
+        $message_id = $msg_headers['message-id'] ?? '';
+        if (is_array($message_id)) {
+            $message_id = $message_id[0] ?? '';
+        }
+        return (string) $message_id;
+    }
+}
+
+if (!hm_exists('vendor_detection_build_request_template')) {
+    function vendor_detection_build_request_template($vendor_name, $user_email, $display_name, $message_id) {
+        $lines = array();
+        $lines[] = 'Subject: Data request';
+        $lines[] = '';
+        $lines[] = 'Hello '.$vendor_name.',';
+        $lines[] = '';
+        $lines[] = 'I am requesting access to the personal data you hold about me.';
+        $lines[] = 'Please also let me know how I can correct or delete that data, and how to stop direct marketing.';
+        $lines[] = '';
+        $lines[] = 'My email address: '.($user_email ? $user_email : '');
+        $lines[] = 'My name: '.($display_name ? $display_name : '');
+        if ($message_id) {
+            $lines[] = 'Reference message ID: '.$message_id;
+        }
+        $lines[] = '';
+        $lines[] = 'Thank you.';
+        return implode("\n", $lines);
+    }
+}
+
+if (!hm_exists('vendor_detection_normalize_companies')) {
+    function vendor_detection_normalize_companies($companies) {
+        $normalized = array();
+        foreach ($companies as $key => $entry) {
+            if (!is_array($entry)) {
+                continue;
+            }
+            if (empty($entry['slug'])) {
+                $entry['slug'] = is_string($key) ? $key : '';
+            }
+            $normalized[] = $entry;
+        }
+        return $normalized;
+    }
+}
+
+if (!hm_exists('vendor_detection_normalize_entities')) {
+    function vendor_detection_normalize_entities($entities) {
+        $normalized = array();
+        foreach ($entities as $key => $entity) {
+            if (!is_array($entity)) {
+                continue;
+            }
+            if (empty($entity['id'])) {
+                $entity['id'] = is_string($key) ? $key : '';
+            }
+            $entries = $entity['entries'] ?? array();
+            $entity['entries'] = vendor_detection_normalize_companies($entries);
+            $normalized[] = $entity;
+        }
+        return $normalized;
+    }
+}
+
+if (!hm_exists('vendor_detection_is_assoc_array')) {
+    function vendor_detection_is_assoc_array($array) {
+        if (!is_array($array)) {
+            return false;
+        }
+        $keys = array_keys($array);
+        return array_keys($keys) !== $keys;
+    }
+}
