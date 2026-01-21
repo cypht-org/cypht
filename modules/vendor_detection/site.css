@@ -29,7 +29,6 @@
 }
 
 .vendor-detection-evidence {
-    display: none;
     margin-top: 0.5rem;
     padding: 0.5rem 0.75rem;
     border: 1px solid #e5e7eb;
@@ -37,8 +36,9 @@
     background: #f8f9fa;
 }
 
-.vendor-detection-evidence.is-open {
+.vendor-detection-evidence.show {
     display: flex;
+    width: max-content;
     flex-direction: column !important;
 }
 
@@ -56,4 +56,56 @@
 .vendor-detection-evidence-label {
     font-weight: 600;
     margin-right: 0.35rem;
+}
+
+.vendor-detection-requests {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.vendor-detection-requests-label {
+    font-weight: 600;
+    margin-right: 0.35rem;
+}
+
+.vendor-detection-request-link {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.vendor-detection-request-link:hover {
+    text-decoration: underline;
+}
+
+.vendor-detection-request-sep {
+    margin: 0 0.35rem;
+    color: #9aa1a9;
+}
+
+.vendor-detection-template {
+    margin-top: 0.35rem;
+}
+
+.vendor-detection-template-panel {
+    margin-top: 0.4rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.35rem;
+    background: #f8f9fa;
+    padding: 0.5rem;
+}
+
+.vendor-detection-template-text {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 0.35rem;
+    padding: 0.45rem;
+    font-size: 0.85rem;
+    color: #374151;
+    background: #fff;
+    resize: vertical;
+}
+
+.vendor-detection-content {
+    display: flex;
 }

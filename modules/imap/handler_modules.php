@@ -2001,12 +2001,19 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 $vendor_registry = vendor_detection_load_registry();
                 $msg_source = $mailbox->get_message_content(hex2bin($form['folder']), $form['imap_msg_uid']);
                 $vendor_detection = vendor_detection_detect_sender($msg_headers, $msg_source, $vendor_registry);
+                $data_request_match = vendor_detection_match_data_request($vendor_detection, $msg_headers);
                 if (defined('DEBUG_MODE') && DEBUG_MODE) {
                     error_log('[vendor_detection] '.json_encode(array(
                         'imap_server_id' => $form['imap_server_id'],
                         'folder' => $form['folder'],
                         'uid' => $form['imap_msg_uid'],
                         'vendor_detection' => $vendor_detection
+                    )));
+                    error_log('[data_request_match] '.json_encode(array(
+                        'imap_server_id' => $form['imap_server_id'],
+                        'folder' => $form['folder'],
+                        'uid' => $form['imap_msg_uid'],
+                        'data_request_match' => $data_request_match
                     )));
                 }
 
@@ -2016,6 +2023,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 $this->out('list_headers', get_list_headers($msg_headers));
                 $this->out('msg_headers', $msg_headers);
                 $this->out('vendor_detection', $vendor_detection);
+                $this->out('data_request_match', $data_request_match);
                 $this->out('imap_prefetch', $prefetch);
                 $this->out('imap_msg_part', "$part");
                 $this->out('use_message_part_icons', $this->user_config->get('msg_part_icons_setting', false));
