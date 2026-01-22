@@ -15,8 +15,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/386
 
 
       - name: Log in to Docker Hub
@@ -28,13 +33,15 @@ jobs:
       - name: Get tags
         id: tags
         run: |
-          echo "tags=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          DOCKER_TAG="${TAG_NAME#v}"
+          echo "tags=$DOCKER_TAG" >> $GITHUB_OUTPUT
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/386
           file: ./docker/Dockerfile
           push: true
           tags: |
