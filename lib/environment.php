@@ -107,6 +107,73 @@ class Hm_Environment {
     protected function get_environment_variables() {
         return array_merge($_ENV, $_SERVER);
     }
+
+    /**
+     * Check for required and optional dependencies and add warnings for missing ones
+     *
+     * @return void
+     */
+    public function check_dependencies() {
+        $minVersion = '8.1.0';
+        $version = phpversion();
+        if (version_compare($version, $minVersion, '<')) {
+            Hm_Msgs::add(sprintf('Cypht requires PHP version %s or greater. Current version: %s', $minVersion, $version), 'danger');
+        }
+
+        $requiredExtensions = [
+            'curl' => 'cURL (required for HTTP requests)',
+            'fileinfo' => 'fileinfo (required for file handling)',
+            'filter' => 'filter (required for input validation and sanitization)',
+            'iconv' => 'iconv (required for character encoding)',
+            'json' => 'json (required for JSON operations)',
+            'mbstring' => 'mbstring (required for multibyte string operations)',
+            'openssl' => 'openssl (required for encryption and secure connections)',
+            'session' => 'session (required for session management)',
+            'xml' => 'XML (required for HTMLPurifier, Gmail contacts, CardDAV, and feeds)',
+            'dom' => 'DOM (required for HTMLPurifier and XML processing)',
+        ];
+
+        foreach ($requiredExtensions as $ext => $description) {
+            if (!extension_loaded($ext)) {
+                Hm_Msgs::add(sprintf('Missing required PHP extension: %s - %s', $ext, $description), 'danger');
+            }
+        }
+
+        // Log missing optional extensions to debug log (not shown to users)
+        if (!class_exists('PDO')) {
+            Hm_Debug::add('Optional PHP extension missing: pdo - Database features will not work', 'warning');
+        }
+        if (!class_exists('Redis')) {
+            Hm_Debug::add('Optional PHP extension missing: redis - Redis caching or sessions will not work', 'warning');
+        }
+        if (!class_exists('Memcached')) {
+            Hm_Debug::add('Optional PHP extension missing: memcached - Memcached caching or sessions will not work', 'warning');
+        }
+        if (!class_exists('gnupg')) {
+            Hm_Debug::add('Optional PHP extension missing: gnupg - PGP module set will not work if enabled', 'warning');
+        }
+        if (!extension_loaded('gd')) {
+            Hm_Debug::add('Optional PHP extension missing: gd - Some image processing features may not work', 'warning');
+        }
+        if (!extension_loaded('imagick') && !class_exists('Imagick')) {
+            Hm_Debug::add('Optional PHP extension missing: imagick - Some image processing features may not work', 'warning');
+        }
+        if (!extension_loaded('ldap')) {
+            Hm_Debug::add('Optional PHP extension missing: ldap - LDAP contacts and authentication will not work', 'warning');
+        }
+        if (!extension_loaded('xmlwriter')) {
+            Hm_Debug::add('Optional PHP extension missing: xmlwriter - Some XML operations may not work', 'warning');
+        }
+        if (!extension_loaded('soap')) {
+            Hm_Debug::add('Optional PHP extension missing: soap - SOAP protocol features will not work', 'warning');
+        }
+        if (!extension_loaded('zip')) {
+            Hm_Debug::add('Optional PHP extension missing: zip - ZIP file handling may not work', 'warning');
+        }
+        if (!extension_loaded('zlib')) {
+            Hm_Debug::add('Optional PHP extension missing: zlib - IMAP compression and cache compression will not work', 'warning');
+        }
+    }
 }
 
 if (!function_exists('env')) {
