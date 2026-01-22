@@ -221,7 +221,6 @@ add_handler('ajax_imap_archive_message', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_archive_message', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_archive_message', 'imap_archive_message',  true);
 
-
 /* ajax message action callback */
 add_handler('ajax_message_action', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_message_action', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');

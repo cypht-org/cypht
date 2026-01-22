@@ -278,6 +278,7 @@ function process_site_setting($type, $handler, $callback=false, $default=false, 
     else {
         list($success, $form) = $handler->process_form(array('save_settings', $type));
     }
+    
     $new_settings = $handler->get('new_user_settings', array());
     $settings = $handler->get('user_settings', array());
 
@@ -796,4 +797,3 @@ function isPageConfigured($page) {
     $pages = array_keys(Hm_Handler_Modules::dump());
     return in_array($page, $pages);
 }
-

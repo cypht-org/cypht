@@ -221,8 +221,15 @@ function renderPage(href) {
         const routeParams = Object.fromEntries(searchParams.entries());
         
         if (route) {
-            const unMountCallback = route.handler(routeParams, url.hash?.substring(1));
-            return unMountCallback;
+            try {
+                const unMountCallback = route.handler(routeParams, url.hash?.substring(1));
+                return unMountCallback;
+            } catch (error) {
+                console.error(`Error in route handler for page "${page}":`, error);
+                Hm_Notices.show(`Error loading page: ${error.message}`, 'danger');
+            }
+        } else {
+            console.warn(`No route handler found for page: "${page}". Available routes:`, ROUTES.map(r => r.page));
         }
     }
 }

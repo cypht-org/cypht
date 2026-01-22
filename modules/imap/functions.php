@@ -1675,3 +1675,55 @@ function is_imap_archive_folder($server_id, $user_config, $current_folder) {
     
     return false;
 }}
+
+/**
+ * Send spam report via PHP mail() function (fallback)
+ * @param string $to_email Recipient email address
+ * @param string $subject Email subject
+ * @param string $mime_body MIME message body
+ * @param array $headers Headers array for mail() function
+ * @param string $service_name Service name for logging (e.g., 'SpamCop' or 'APWG')
+ * @return array Array with 'success' and optional 'error'
+ */
+if (!hm_exists('send_spam_report_via_mail')) {
+function send_spam_report_via_mail($to_email, $subject, $mime_body, $headers, $service_name) {
+    $timeout = 10;
+    $old_timeout = ini_get('default_socket_timeout');
+    ini_set('default_socket_timeout', $timeout);
+    
+    try {
+        $mail_sent = @mail($to_email, $subject, $mime_body, implode("\r\n", $headers));
+        
+        ini_set('default_socket_timeout', $old_timeout);
+        
+        if ($mail_sent) {
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                if ($service_name === 'APWG') {
+                    Hm_Debug::add(sprintf('%s: mail() function returned true (delivery status unknown - no SMTP response available)', $service_name), 'info');
+                }
+            }
+            return array('success' => true);
+        } else {
+            $error = sprintf('Failed to send email to %s. Please ensure your server has valid SPF/DKIM records or configure an SMTP server.', $service_name);
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                Hm_Debug::add(sprintf('%s: mail() function failed', $service_name), 'error');
+                if ($service_name === 'APWG') {
+                    $last_error = error_get_last();
+                    if ($last_error) {
+                        Hm_Debug::add(sprintf('%s: PHP error: %s', $service_name, $last_error['message']), 'error');
+                    }
+                }
+            }
+            return array('success' => false, 'error' => $error);
+        }
+    } catch (Exception $e) {
+        ini_set('default_socket_timeout', $old_timeout);
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            Hm_Debug::add(sprintf('%s: Exception in mail(): %s', $service_name, $e->getMessage()), 'error');
+        }
+        return array('success' => false, 'error' => $e->getMessage());
+    }
+}}
+
+
+
