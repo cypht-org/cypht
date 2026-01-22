@@ -82,7 +82,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             }
             if ($this->get('folder')) {
                 if ($this->get('screen_emails')) {
-                    $custom .= '<span title="Disike" class="screen-email-unlike cursor-pointer"><i class="bi bi-hand-thumbs-down-fill"></i></span><span title="Like" class="screen-email-like cursor-pointer"></i><i class="bi bi-hand-thumbs-up-fill"></i></span>';
+                    $custom .= '<span title="Dislike" class="screen-email-unlike cursor-pointer"><i class="bi bi-hand-thumbs-down-fill"></i></span><span title="Like" class="screen-email-like cursor-pointer"><i class="bi bi-hand-thumbs-up-fill"></i></span>';
                     if ($this->get('move_messages_in_screen_email')) {
                         $custom .= '<input type="hidden" value="1" id="move_messages_in_screen_email"/>';
                     } else {
