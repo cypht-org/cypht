@@ -1232,6 +1232,12 @@ return [
     'default_setting_enable_collect_address_on_send' => env('DEFAULT_SETTING_ENABLE_COLLECT_ADDRESS_ON_SEND', false),
 
     /*
+    | This will not include auto-bcc'ed messages
+    | Defaults to true
+    */
+    'default_setting_enable_exclude_auto_bcc' => env('DEFAULT_SETTING_ENABLE_EXCLUDE_AUTO_BCC', true),
+
+    /*
     |
     | Timezone for date displays
     | Defaults to UTC
