@@ -130,6 +130,18 @@ class Hm_Mailbox {
                     $this->connect();
                 }
                 $result = $this->connection->get_folder_status($folder);
+
+                // Proper error handling instead of masking
+                if (empty($result)) {
+                    error_log("Folder not found: " . $folder . " on server " . $this->server_id);
+                    return false;
+                }
+
+                if (!isset($result['name'])) {
+                    error_log("Folder status missing name field: " . print_r($result, true));
+                    return $folder;
+                }
+
                 return $result['name'];
             }
         }
