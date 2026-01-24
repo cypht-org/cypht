@@ -122,16 +122,12 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $folder;
         } else {
-            $result = $this->connection->get_folder_name_quick($folder);
-            if ($result) {
-                return $result;
-            } else {
-                if (! $this->connection->authed()) {
-                    $this->connect();
-                }
-                $result = $this->connection->get_folder_status($folder);
-                return $result['name'];
-            }
+            // EWS identifies folders by opaque binary IDs rather than human-readable path
+            // strings like IMAP/JMAP. get_folder_name_quick() only resolves distinguished
+            // folder names (e.g. inbox, sentitems). For all other folders the caller must
+            // use an authenticated connection (e.g. via get_connected_mailbox()) to resolve
+            // the display name — this method does not attempt to connect on its own.
+            return $this->connection->get_folder_name_quick($folder) ?: null;
         }
     }
 
