@@ -108,5 +108,38 @@ $(function() {
         });
     }
 
-    $(document).ready(enhanceLdapContacts);
+    var initLdapContactModal = function() {
+        $('#submit-ldap-contact-btn').on('click', function(e) {
+            var firstName = $('#ldap_first_name').val();
+            var lastName = $('#ldap_last_name').val();
+            var email = $('#ldap_mail').val();
+            
+            if (!firstName || !lastName || !email) {
+                e.preventDefault();
+                //TODO: Use better error display
+                alert('Please fill in the required fields (First Name, Last Name, and Email)');
+                return false;
+            }
+            
+            // Validation passed, let the form submit normally
+            $('#ldap-contact-form').submit();
+        });
+
+        $('#ldapContactModal').on('hidden.bs.modal', function() {
+            $('#ldap-contact-form')[0].reset();
+        });
+
+        $('#ldap_uidattr').on('change', function() {
+            if ($(this).val() === 'uid') {
+                $('#ldap_uid_field_wrapper').removeClass('d-none');
+            } else {
+                $('#ldap_uid_field_wrapper').addClass('d-none');
+            }
+        });
+    };
+
+    $(document).ready(function() {
+        enhanceLdapContacts();
+        initLdapContactModal();
+    });
 });
