@@ -21,6 +21,7 @@ class ProfileTest(SettingsHelpers):
         self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
         self.wait_with_folder_list()
         self.wait_for_navigation_to_complete()
+        self.wait_for_class_text_contains('profile_content_title', 'Profiles')
         assert self.by_class('profile_content_title').text == 'Profiles'
 
     def add_profile(self):

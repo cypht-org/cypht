@@ -774,19 +774,17 @@ function getSettingsSectionOutput($section, $sectionLabel, $sectionIcon, $settin
         ['type' => $type, 'label' => $label, 'description' => $description] = $setting;
 
         if ($type === 'checkbox') {
-            $input = '<input type="checkbox" id="'.$key.'" name="'.$key.'" '.($value ? 'checked' : '').' class="form-check-input">';
+            $input = '<input type="checkbox" id="'.$key.'" name="'.$key.'" '.($value ? 'checked' : '').' class="form-check-input me-2">';
         } else {
             $input = '<input type="'.$type.'" id="'.$key.'" name="'.$key.'" value="'.$value.'" class="form-control">';
         }
 
         $res .= "<tr class='{$section}_setting'>" .
-        "<td><label for='$key'>$label</label></td>" .
-        "<td>
-            <div>
-                $input
-            </div>
-            <div class='setting_description'>$description</div>
-        </td>" .
+        "<td class='d-block d-md-table-cell'><label for='$key'>$label</label></td>" .
+        "<td class='d-block d-md-table-cell'>" .
+            "<div class='d-flex align-items-center'>$input</div>" .
+            "<div class='setting_description'>$description</div>" .
+        "</td>" .
         "</tr>";
     }
     return $res;
