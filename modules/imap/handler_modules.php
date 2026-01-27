@@ -2003,6 +2003,15 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 $vendor_detection = vendor_detection_detect_sender($msg_headers, $msg_source, $vendor_registry);
                 $data_request_match = vendor_detection_match_data_request($vendor_detection, $msg_headers);
                 if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                    $controller_domains = vendor_detection_get_controller_domains($msg_headers, $vendor_detection);
+                    error_log('[data_request_match_handler_debug] '.json_encode(array(
+                        'imap_server_id' => $form['imap_server_id'],
+                        'folder' => $form['folder'],
+                        'uid' => $form['imap_msg_uid'],
+                        'controller_domains' => $controller_domains,
+                        'vendor_id' => $vendor_detection['vendor_id'] ?? '',
+                        'platform_domains' => $vendor_detection['platform_domains'] ?? array()
+                    )));
                     error_log('[vendor_detection] '.json_encode(array(
                         'imap_server_id' => $form['imap_server_id'],
                         'folder' => $form['folder'],
