@@ -94,7 +94,18 @@ class Hm_Output_vendor_detection_label extends Hm_Output_Module {
                 $data_request_enabled = (bool) $override;
             }
         }
-        $has_data_request = $data_request_enabled && !empty($data_request_match['datarequests_url']);
+        $company_slug = $data_request_match['vendor_id'] ?? '';
+        $has_data_request = $data_request_enabled && $company_slug;
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            error_log('[data_request_ui_debug] '.json_encode(array(
+                'vendor_name' => $vendor_name_raw,
+                'has_vendor_label' => $has_vendor_label,
+                'data_request_enabled' => $data_request_enabled,
+                'company_slug' => $company_slug,
+                'has_data_request' => (bool) $has_data_request,
+                'data_request_match' => $data_request_match
+            )));
+        }
         if (!$has_vendor_label && !$has_data_request) {
             return '';
         }
@@ -167,45 +178,29 @@ class Hm_Output_vendor_detection_label extends Hm_Output_Module {
 
         $data_request_html = '';
         if ($has_data_request) {
-            $base_url = $this->html_safe($data_request_match['datarequests_url']);
+            $language = $this->get('language', '');
             $request_target = $this->html_safe($data_request_match['vendor_name'] ?? '');
             $target_label = $request_target ? $request_target.' ' : '';
+            $request_types = array(
+                'access' => $this->trans('Get access to my data'),
+                'delete' => $this->trans('Delete my data'),
+                'rectification' => $this->trans('Correct my data'),
+                'objection' => $this->trans('Stop direct marketing')
+            );
+            $links = array();
+            foreach ($request_types as $request_type => $label) {
+                $url = vendor_detection_build_datarequests_generator_url($company_slug, $request_type, $language);
+                if (!$url) {
+                    continue;
+                }
+                $links[] = '<a href="'.$this->html_safe($url).'" class="vendor-detection-request-link" '.
+                    'target="_blank" rel="noopener">'.$label.'</a>';
+            }
             $data_request_html = '<div class="vendor-detection-requests">'.
                 '<span class="vendor-detection-requests-label">'.$this->trans('Data requests').':</span> '.
                 $target_label.
-                '<a href="'.$base_url.'" class="vendor-detection-request-link" target="_blank" rel="noopener">'.
-                $this->trans('Get access to data about me').'</a> '.
-                '<span class="vendor-detection-request-sep">|</span> '.
-                '<a href="'.$base_url.'" class="vendor-detection-request-link" target="_blank" rel="noopener">'.
-                $this->trans('Delete data about me').'</a> '.
-                '<span class="vendor-detection-request-sep">|</span> '.
-                '<a href="'.$base_url.'" class="vendor-detection-request-link" target="_blank" rel="noopener">'.
-                $this->trans('Correct data about me').'</a> '.
-                '<span class="vendor-detection-request-sep">|</span> '.
-                '<a href="'.$base_url.'" class="vendor-detection-request-link" target="_blank" rel="noopener">'.
-                $this->trans('Stop direct marketing').'</a>'.
+                implode(' <span class="vendor-detection-request-sep">|</span> ', $links).
                 '</div>';
-
-            $imap_accounts = $this->get('imap_accounts', array());
-            $server_id = $this->get('msg_server_id');
-            $user_email = vendor_detection_get_user_email($imap_accounts, $server_id);
-            $display_name = vendor_detection_get_profile_name();
-            $message_id = vendor_detection_get_message_id($this->get('msg_headers', array()));
-            $template_name = $vendor_name_raw ?: ($data_request_match['vendor_name'] ?? 'there');
-            $template = vendor_detection_build_request_template(
-                $template_name,
-                $user_email,
-                $display_name,
-                $message_id
-            );
-            $template_id = 'vendor-detection-template-'.$uid;
-            $data_request_html .= '<div class="vendor-detection-template">'.
-                '<button class="vendor-detection-toggle" type="button" data-bs-toggle="collapse" '.
-                'data-bs-target="#'.$this->html_safe($template_id).'" aria-expanded="false" aria-controls="'.$this->html_safe($template_id).'">'.
-               // '<i class="bi bi-pencil-square"></i> '.$this->trans('Request template').'</button>'.
-                '<div class="vendor-detection-template-panel collapse" id="'.$this->html_safe($template_id).'">'.
-                '<textarea class="vendor-detection-template-text" rows="8">'.$this->html_safe($template).'</textarea>'.
-                '</div></div>';
         }
 
         $requests_wrapper = $data_request_html ? '<div class="vendor-detection-requests-content">'.$data_request_html.'</div>' : '';

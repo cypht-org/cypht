@@ -83,29 +83,6 @@
     color: #9aa1a9;
 }
 
-.vendor-detection-template {
-    margin-top: 0.35rem;
-}
-
-.vendor-detection-template-panel {
-    margin-top: 0.4rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.35rem;
-    background: #f8f9fa;
-    padding: 0.5rem;
-}
-
-.vendor-detection-template-text {
-    width: 100%;
-    border: 1px solid #d1d5db;
-    border-radius: 0.35rem;
-    padding: 0.45rem;
-    font-size: 0.85rem;
-    color: #374151;
-    background: #fff;
-    resize: vertical;
-}
-
 .vendor-detection-content {
     display: flex;
 }
