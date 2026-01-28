@@ -1053,8 +1053,29 @@ function blockListPageHandlers() {
         let row = $(this).closest('tr');
         let sender = row.find('.blocked_sender_fld').first().text().trim();
         let elem = $(this);
+        if (sender.startsWith('platform:')) {
+            const vendorId = sender.replace('platform:', '');
+            Hm_Ajax.request(
+                [
+                    {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_unblock'},
+                    {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
+                    {'name': 'block_action', 'value': 'unblock'},
+                    {'name': 'scope', 'value': 'platform'},
+                    {'name': 'sender', 'value': vendorId},
+                ],
+                function(res) {
+                    elem.parent().parent().remove();
+                    var num_filters = $("#filter_num_" + elem.attr('mailbox_id')).html();
+                    num_filters = parseInt(num_filters) - 1;
+                    $("#filter_num_" + elem.attr('mailbox_id')).html(num_filters);
+                }
+            );
+            return;
+        }
+
         Hm_Ajax.request(
-            [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_unblock_sender'},
+            [
+                {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_unblock_sender'},
                 {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
                 {'name': 'sender', 'value': sender}
             ],
@@ -1073,6 +1094,10 @@ function blockListPageHandlers() {
         let elem = parent.find('.block_action');
         let sender = $(this).closest('tr').find('.blocked_sender_fld').first().text().trim();
         let scope = sender.startsWith('*@') ? 'domain': 'sender';
+        if (sender.startsWith('platform:')) {
+            scope = 'platform';
+            sender = sender.replace('platform:', '');
+        }
 
         Hm_Ajax.request(
             [

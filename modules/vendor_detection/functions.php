@@ -55,6 +55,24 @@ if (!hm_exists('vendor_detection_load_registry')) {
     }
 }
 
+if (!hm_exists('vendor_detection_get_vendor_by_id')) {
+    function vendor_detection_get_vendor_by_id($vendor_id, $registry = null) {
+        if (!$vendor_id) {
+            return array();
+        }
+        if ($registry === null) {
+            $registry = vendor_detection_load_registry();
+        }
+        $registry = vendor_detection_normalize_registry($registry);
+        foreach ($registry['vendors'] as $vendor) {
+            if (!empty($vendor['vendor_id']) && $vendor['vendor_id'] === $vendor_id) {
+                return $vendor;
+            }
+        }
+        return array();
+    }
+}
+
 if (!hm_exists('vendor_detection_detect_sender')) {
     function vendor_detection_detect_sender($msg_headers, $msg_source = '', $registry = null) {
         if (!is_array($msg_headers) || empty($msg_headers)) {
