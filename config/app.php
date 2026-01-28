@@ -1358,6 +1358,13 @@ return [
     'default_setting_enable_sieve_filter' => env('DEFAULT_SETTING_ENABLE_SIEVE_FILTER', false),
 
     /*
+    |
+    | Enable platform/vendor blocking in sieve block sender
+    | Defaults to false
+    */
+    'enable_platform_blocking' => env('ENABLE_PLATFORM_BLOCKING', true),
+
+    /*
     | Fancy Login page
     | Use this setting switch between the legacy login page and the fancy one
     */
