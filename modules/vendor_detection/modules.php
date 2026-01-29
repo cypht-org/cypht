@@ -83,7 +83,8 @@ class Hm_Output_vendor_detection_label extends Hm_Output_Module {
         $vendor_name_raw = $vendor_detection['vendor_name'] ?? '';
         $has_vendor_label = $vendor_label_enabled && $vendor_name_raw;
 
-        $data_request_match = $this->get('data_request_match', array());
+        $data_request_sender_match = $this->get('data_request_sender_match', array());
+        $data_request_platform_match = $this->get('data_request_platform_match', array());
         $data_request_enabled = false;
         if ($user_config && method_exists($user_config, 'get')) {
             $data_request_enabled = (bool) $user_config->get('data_request_ui_setting', false);
@@ -94,18 +95,10 @@ class Hm_Output_vendor_detection_label extends Hm_Output_Module {
                 $data_request_enabled = (bool) $override;
             }
         }
-        $company_slug = $data_request_match['vendor_id'] ?? '';
-        $has_data_request = $data_request_enabled && $company_slug;
-        if (defined('DEBUG_MODE') && DEBUG_MODE) {
-            error_log('[data_request_ui_debug] '.json_encode(array(
-                'vendor_name' => $vendor_name_raw,
-                'has_vendor_label' => $has_vendor_label,
-                'data_request_enabled' => $data_request_enabled,
-                'company_slug' => $company_slug,
-                'has_data_request' => (bool) $has_data_request,
-                'data_request_match' => $data_request_match
-            )));
-        }
+        $sender_domain = $data_request_sender_match['sender_domain'] ?? '';
+        $sender_slug = $data_request_sender_match['vendor_id'] ?? '';
+        $platform_slug = $data_request_platform_match['vendor_id'] ?? '';
+        $has_data_request = $data_request_enabled && ($sender_domain || $platform_slug);
         if (!$has_vendor_label && !$has_data_request) {
             return '';
         }
@@ -179,27 +172,69 @@ class Hm_Output_vendor_detection_label extends Hm_Output_Module {
         $data_request_html = '';
         if ($has_data_request) {
             $language = $this->get('language', '');
-            $request_target = $this->html_safe($data_request_match['vendor_name'] ?? '');
-            $target_label = $request_target ? $request_target.' ' : '';
+            $base_url = vendor_detection_get_datarequests_base_url($language);
+            $sender_label = $data_request_sender_match['vendor_name'] ?? $sender_domain;
+            $platform_label = $data_request_platform_match['vendor_name'] ?? $platform_slug;
+
+            $sender_help = $this->trans('The sender is usually the data controller and most likely to respond.');
+            $platform_help = $this->trans('Platforms may also process your data. Responses can vary.');
+            $sender_missing_help = $this->trans('This sender was not found on datarequests.org.');
+            $platform_only_help = $this->trans('The actual data controller may be the organization mentioned in the message content.');
+
+            $target_options = '';
+            $checked_sender = $sender_domain ? ' checked' : '';
+            $checked_platform = (!$sender_domain && $platform_slug) ? ' checked' : '';
+
+            if ($sender_domain) {
+                $target_options .= '<label class="vendor-detection-request-option">'.
+                    '<input type="radio" name="data_request_target" class="js-data-request-target" value="sender" data-company-slug="'.
+                    $this->html_safe($sender_slug).'"'.$checked_sender.' /> '.
+                    $this->trans('The sender').': '.$this->html_safe($sender_label).
+                    '<div class="vendor-detection-request-help">'.$this->html_safe($sender_help).'</div>';
+                if (!$sender_slug) {
+                    $target_options .= '<div class="vendor-detection-request-help">'.$this->html_safe($sender_missing_help).'</div>';
+                }
+                $target_options .= '</label>';
+            }
+
+            if ($platform_slug) {
+                $target_options .= '<label class="vendor-detection-request-option">'.
+                    '<input type="radio" name="data_request_target" class="js-data-request-target" value="platform" data-company-slug="'.
+                    $this->html_safe($platform_slug).'"'.$checked_platform.' /> '.
+                    $this->trans('The sending platform').': '.$this->html_safe($platform_label).
+                    '<div class="vendor-detection-request-help">'.$this->html_safe($platform_help).'</div>';
+                if (!$sender_domain) {
+                    $target_options .= '<div class="vendor-detection-request-help">'.$this->html_safe($platform_only_help).'</div>';
+                }
+                $target_options .= '</label>';
+            }
+
             $request_types = array(
-                'access' => $this->trans('Get access to my data'),
+                'access' => $this->trans('Access my data'),
                 'delete' => $this->trans('Delete my data'),
                 'rectification' => $this->trans('Correct my data'),
                 'objection' => $this->trans('Stop direct marketing')
             );
-            $links = array();
-            foreach ($request_types as $request_type => $label) {
-                $url = vendor_detection_build_datarequests_generator_url($company_slug, $request_type, $language);
-                if (!$url) {
-                    continue;
-                }
-                $links[] = '<a href="'.$this->html_safe($url).'" class="vendor-detection-request-link" '.
-                    'target="_blank" rel="noopener">'.$label.'</a>';
+            $type_options = '';
+            foreach ($request_types as $value => $label) {
+                $checked = $value === 'access' ? ' checked' : '';
+                $type_options .= '<label class="vendor-detection-request-type">'.
+                    '<input type="radio" name="data_request_type" class="js-data-request-type" value="'.
+                    $this->html_safe($value).'"'.$checked.' /> '.$this->html_safe($label).
+                    '</label>';
             }
-            $data_request_html = '<div class="vendor-detection-requests">'.
-                '<span class="vendor-detection-requests-label">'.$this->trans('Data requests').':</span> '.
-                $target_label.
-                implode(' <span class="vendor-detection-request-sep">|</span> ', $links).
+
+            $selected_slug = $sender_domain ? $sender_slug : $platform_slug;
+            $button_disabled_class = $selected_slug ? '' : ' disabled';
+            $button_aria = $selected_slug ? 'false' : 'true';
+            $data_request_html = '<div class="vendor-detection-requests" data-base-url="'.$this->html_safe($base_url).'">'.
+                '<div class="vendor-detection-requests-label">'.$this->trans('Data requests').'</div>'.
+                '<div class="vendor-detection-request-question">'.$this->trans('Request my data from').':</div>'.
+                '<div class="vendor-detection-request-targets">'.$target_options.'</div>'.
+                '<div class="vendor-detection-request-types">'.$type_options.'</div>'.
+                '<a class="btn btn-primary btn-sm vendor-detection-request-button js-data-request-button'.$button_disabled_class.'" href="#" '.
+                'target="_blank" rel="noopener" aria-disabled="'.$button_aria.'">'.
+                $this->trans('Generate data request').'</a>'.
                 '</div>';
         }
 

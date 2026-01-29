@@ -634,6 +634,84 @@ if (!hm_exists('vendor_detection_match_data_request')) {
     }
 }
 
+if (!hm_exists('vendor_detection_match_sender_data_request')) {
+    function vendor_detection_match_sender_data_request($msg_headers, $registry = null) {
+        $sender_domain = vendor_detection_get_sender_domain($msg_headers);
+        $sender_domain = vendor_detection_normalize_domain($sender_domain);
+        $result = array(
+            'sender_domain' => $sender_domain
+        );
+        if (!$sender_domain) {
+            return $result;
+        }
+        if ($registry === null) {
+            $registry = vendor_detection_load_datarequests_registry();
+        }
+        $entities = $registry['entities'] ?? array();
+        $companies = $registry['companies'] ?? array();
+        if (!empty($entities)) {
+            foreach ($entities as $entity) {
+                $match = vendor_detection_match_entity_domain_fallback($entity, $sender_domain);
+                if ($match) {
+                    $match['sender_domain'] = $sender_domain;
+                    return $match;
+                }
+            }
+        } else {
+            foreach ($companies as $entry) {
+                $match = vendor_detection_match_data_request_domain_fallback($entry, $sender_domain);
+                if ($match) {
+                    $match['sender_domain'] = $sender_domain;
+                    return $match;
+                }
+            }
+        }
+        return $result;
+    }
+}
+
+if (!hm_exists('vendor_detection_match_platform_data_request')) {
+    function vendor_detection_match_platform_data_request($vendor_detection, $registry = null) {
+        if (!is_array($vendor_detection) || empty($vendor_detection)) {
+            return array();
+        }
+        if ($registry === null) {
+            $registry = vendor_detection_load_datarequests_registry();
+        }
+        $entities = $registry['entities'] ?? array();
+        $companies = $registry['companies'] ?? array();
+        if (empty($entities) && empty($companies)) {
+            return array();
+        }
+        $platform_domains = vendor_detection_unique_lowercase($vendor_detection['platform_domains'] ?? array());
+        $vendor_id = $vendor_detection['vendor_id'] ?? '';
+
+        if (!empty($entities)) {
+            foreach ($entities as $entity) {
+                $match = vendor_detection_match_entity_vendor($entity, $vendor_id, $platform_domains);
+                if ($match) {
+                    return $match;
+                }
+            }
+        } else {
+            foreach ($companies as $entry) {
+                $match = vendor_detection_match_data_request_entry(
+                    $entry,
+                    '',
+                    $vendor_id,
+                    $platform_domains,
+                    false
+                );
+                if ($match) {
+                    return $match;
+                }
+            }
+        }
+
+        return array();
+    }
+}
+
 if (!hm_exists('vendor_detection_match_data_request_entry')) {
     function vendor_detection_match_data_request_entry($entry, $controller_domain, $vendor_id, $platform_domains, $controller_only) {
         $domains = vendor_detection_lowercase_list($entry['domains'] ?? array());
@@ -783,6 +861,25 @@ if (!hm_exists('vendor_detection_get_controller_domain')) {
     function vendor_detection_get_controller_domain($vendor_detection, $msg_headers) {
         $domains = vendor_detection_get_controller_domains($msg_headers, $vendor_detection);
         return $domains[0] ?? '';
+    }
+}
+
+if (!hm_exists('vendor_detection_get_sender_domain')) {
+    function vendor_detection_get_sender_domain($msg_headers) {
+        if (!is_array($msg_headers)) {
+            return '';
+        }
+        if (!function_exists('lc_headers') || !function_exists('process_address_fld')) {
+            return '';
+        }
+        $headers = lc_headers($msg_headers);
+        $from_value = $headers['from'] ?? '';
+        $addresses = process_address_fld($from_value);
+        if (empty($addresses)) {
+            return '';
+        }
+        $email = $addresses[0]['email'] ?? '';
+        return vendor_detection_normalize_domain($email);
     }
 }
 
