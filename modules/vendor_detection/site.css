@@ -62,11 +62,47 @@
     margin-top: 0.4rem;
     font-size: 0.85rem;
     color: #6c757d;
+    flex-direction: column !important;
+    width: fit-content;
 }
 
 .vendor-detection-requests-label {
     font-weight: 600;
     margin-right: 0.35rem;
+}
+
+.vendor-detection-request-question {
+    margin-top: 0.35rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+.vendor-detection-request-targets,
+.vendor-detection-request-types {
+    margin-top: 0.35rem;
+}
+
+.vendor-detection-request-option,
+.vendor-detection-request-type {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #495057;
+}
+
+.vendor-detection-request-option input,
+.vendor-detection-request-type input {
+    margin-right: 0.35rem;
+}
+
+.vendor-detection-request-help {
+    margin-left: 1.3rem;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.vendor-detection-request-button.disabled {
+    pointer-events: none;
+    opacity: 0.6;
 }
 
 .vendor-detection-request-link {
