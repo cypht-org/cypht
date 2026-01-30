@@ -21,8 +21,7 @@ class PageTests(WebTest):
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
         # More flexible text matching for search page
-        self.wait_on_class('content_title')
-        content_title = self.by_class('content_title')
+        content_title = self.wait_for_class_text_contains('content_title', 'Search')
         title_text = content_title.text.strip()
         print(f"MESSAGES FOUND: '{title_text}'")
         assert 'Search' in title_text or 'search' in title_text.lower(), f"Expected 'Search' in title, got: '{title_text}'"
@@ -36,12 +35,12 @@ class PageTests(WebTest):
         self.wait_for_navigation_to_complete()
         # Look for mailbox_list_title inside content_title
         try:
-            mailbox_title = self.by_class('mailbox_list_title')
+            mailbox_title = self.wait_for_class_text_contains('mailbox_list_title', 'Sent')
             title_text = mailbox_title.text.strip()
             assert 'Sent' in title_text, f"Expected 'Sent' in mailbox title, got: '{title_text}'"
         except:
             # Fallback: check content_title for sent-related text
-            content_title = self.by_class('content_title')
+            content_title = self.wait_for_class_text_contains('content_title', 'Sent')
             title_text = content_title.text.strip()
             assert 'Sent' in title_text, f"Expected 'Sent' in content title, got: '{title_text}'"
 
@@ -54,12 +53,12 @@ class PageTests(WebTest):
         self.wait_for_navigation_to_complete()
         # Look for mailbox_list_title inside content_title
         try:
-            mailbox_title = self.by_class('mailbox_list_title')
+            mailbox_title = self.wait_for_class_text_contains('mailbox_list_title', 'Unread')
             title_text = mailbox_title.text.strip()
             assert 'Unread' in title_text, f"Expected 'Unread' in mailbox title, got: '{title_text}'"
         except:
             # Fallback: check content_title for unread-related text
-            content_title = self.by_class('content_title')
+            content_title = self.wait_for_class_text_contains('content_title', 'Unread')
             title_text = content_title.text.strip()
             assert 'Unread' in title_text, f"Expected 'Unread' in content title, got: '{title_text}'"
 
@@ -74,12 +73,12 @@ class PageTests(WebTest):
         self.wait_for_navigation_to_complete()
         # Look for mailbox_list_title inside content_title
         try:
-            mailbox_title = self.by_class('mailbox_list_title')
+            mailbox_title = self.wait_for_class_text_contains('mailbox_list_title', 'Everything')
             title_text = mailbox_title.text.strip()
             assert 'Everything' in title_text, f"Expected 'Everything' in mailbox title, got: '{title_text}'"
         except:
             # Fallback: check content_title for everything-related text
-            content_title = self.by_class('content_title')
+            content_title = self.wait_for_class_text_contains('content_title', 'Everything')
             title_text = content_title.text.strip()
             assert 'Everything' in title_text, f"Expected 'Everything' in content title, got: '{title_text}'"
 
@@ -90,7 +89,7 @@ class PageTests(WebTest):
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
-        mailbox_title = self.by_class('mailbox_list_title')
+        mailbox_title = self.wait_for_class_text_contains('mailbox_list_title', 'Flagged')
         title_text = mailbox_title.text.strip()
         assert 'Flagged' in title_text, f"Expected 'Flagged' in mailbox title, got: '{title_text}'"
 
@@ -104,7 +103,7 @@ class PageTests(WebTest):
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
         # More flexible text matching for contacts page
-        content_title = self.by_class('content_title')
+        content_title = self.wait_for_class_text_contains('content_title', 'Contacts')
         title_text = content_title.text.strip()
         assert 'Contacts' in title_text, f"Expected 'Contacts' in title, got: '{title_text}'"
 
@@ -118,7 +117,7 @@ class PageTests(WebTest):
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
         # More flexible text matching for compose page
-        content_title = self.by_class('content_title')
+        content_title = self.wait_for_class_text_contains('content_title', 'Compose')
         title_text = content_title.text.strip()
         assert 'Compose' in title_text, f"Expected 'Compose' in title, got: '{title_text}'"
 
@@ -131,7 +130,8 @@ class PageTests(WebTest):
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
-        assert self.by_class('calendar_content_title').text == 'Calendar'
+        title = self.wait_for_class_text_contains('calendar_content_title', 'Calendar')
+        assert title.text == 'Calendar'
 
     def history(self):
         if not self.mod_active('history'):
@@ -142,7 +142,8 @@ class PageTests(WebTest):
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
-        assert 'Message history' in self.by_class('content_title').text
+        content_title = self.wait_for_class_text_contains('content_title', 'Message history')
+        assert 'Message history' in content_title.text
 
     def home(self):
         list_item = self.by_class('menu_home')
@@ -181,7 +182,11 @@ class PageTests(WebTest):
         try:
             # Try to expand settings menu first
             self.wait_for_settings_to_expand()
-
+            
+            # Add a small delay to ensure the menu is fully expanded
+            import time
+            time.sleep(0.5)
+            
             list_item = self.by_class('menu_settings')
             link = list_item.find_element(By.TAG_NAME, 'a')
 
@@ -193,6 +198,8 @@ class PageTests(WebTest):
         except Exception as e:
             print(f" - site test failed: {e}")
             # Check if the element exists
+            if not self.element_exists('menu_settings'):
+                print(" - menu_settings element not found")
             if not self.element_exists('menu_settings'):
                 print(" - menu_settings element not found")
                 return
