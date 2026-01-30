@@ -221,6 +221,15 @@ add_handler('ajax_imap_archive_message', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_archive_message', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_archive_message', 'imap_archive_message',  true);
 
+/* restore message callback */
+setup_base_ajax_page('ajax_imap_restore_message', 'core');
+add_handler('ajax_imap_restore_message', 'message_list_type', true, 'core');
+add_handler('ajax_imap_restore_message', 'imap_message_list_type', true);
+add_handler('ajax_imap_restore_message', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_restore_message', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_restore_message', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_restore_message', 'imap_restore_message',  true);
+
 
 /* ajax message action callback */
 add_handler('ajax_message_action', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
@@ -314,6 +323,7 @@ return array(
         'ajax_imap_junk',
         'message_source',
         'ajax_share_folders',
+        'ajax_imap_restore_message',
     ),
 
     'allowed_output' => array(
