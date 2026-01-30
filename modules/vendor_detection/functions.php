@@ -953,11 +953,39 @@ if (!hm_exists('vendor_detection_get_datarequests_base_url')) {
             $parts = preg_split('/[_-]/', $language);
             $language = $parts[0] ?? $language;
         }
-        $supported = array('fr', 'de', 'es', 'it');
-        if ($language && in_array($language, $supported, true)) {
-            return 'https://'.$language.'.datarequests.org';
+        $domains = vendor_detection_load_datarequests_domains();
+        $base_url = '';
+        if ($language && isset($domains[$language]['base_url'])) {
+            $base_url = $domains[$language]['base_url'];
+        } elseif (isset($domains['en']['base_url'])) {
+            $base_url = $domains['en']['base_url'];
         }
-        return 'https://www.datarequests.org';
+        $base_url = is_string($base_url) ? rtrim($base_url, '/') : '';
+        return $base_url ? $base_url : 'https://www.datarequests.org';
+    }
+}
+
+if (!hm_exists('vendor_detection_load_datarequests_domains')) {
+    function vendor_detection_load_datarequests_domains($path = null) {
+        static $cache = null;
+        if ($cache !== null) {
+            return $cache;
+        }
+        if (!$path) {
+            $path = APP_PATH.'assets/data/datarequests_domains.json';
+        }
+        if (!is_readable($path)) {
+            $cache = array();
+            return $cache;
+        }
+        $contents = file_get_contents($path);
+        if ($contents === false) {
+            $cache = array();
+            return $cache;
+        }
+        $data = json_decode($contents, true);
+        $cache = is_array($data) ? $data : array();
+        return $cache;
     }
 }
 
