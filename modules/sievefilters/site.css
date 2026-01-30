@@ -387,3 +387,85 @@ table.filter_actions_modal_table th {
 .mobile table.filter_actions_modal_table td:last-child {
     border-bottom: 0;
 }
+
+.chip-container {
+    min-height: 60px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: #ffffff;
+    color: #4f4f4f;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 2px;
+    max-width: 100%;
+    word-break: break-word;
+    border: 1px solid #cacaca;
+}
+
+.chip-remove {
+    background-color: #b8b8b841;
+    border: none;
+    color: #000000;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    margin-left: 8px;
+    padding: 0 0 0 4px;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+
+.chip-remove:hover {
+    opacity: 1;
+    background-color: #b8b8b841;
+}
+
+.chip-remove:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #fcfcfc80;
+}
+
+.subject-filter-teal .btn-outline-primary {
+    --bs-btn-color: #005555;
+    --bs-btn-bg: #fff;
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #006363;
+    --bs-btn-hover-border-color: #005555;
+    --bs-btn-focus-shadow-rgb: 0, 128, 128;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #005555;
+    --bs-btn-active-border-color: #005555;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: teal;
+    --bs-btn-disabled-border-color: teal;
+}
+
+@media (max-width: 768px) {
+    .chip {
+        padding: 5px 10px;
+        font-size: 13px;
+    }
+
+    .chip-remove {
+        font-size: 16px;
+        width: 18px;
+        height: 18px;
+    }
+}

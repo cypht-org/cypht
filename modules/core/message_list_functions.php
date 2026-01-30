@@ -421,6 +421,8 @@ function icon_callback($vals, $style, $output_mod) {
  */
 if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
+    $custom_actions = [];
+
     $txt = '';
     $controls = ['read', 'unread', 'flag', 'unflag', 'delete', 'archive', 'junk'];
     $controls = array_filter($controls, function($val) use ($output_mod) {
@@ -454,6 +456,11 @@ function message_controls($output_mod) {
     if(!empty($output_mod->get('tags'))) {
         $res .= tags_dropdown($output_mod, []);
     }
+
+    if ($output_mod->get('msg_controls_custom_actions')) {
+        $res .= $output_mod->get('msg_controls_custom_actions');
+    }
+
     $res .= '</div>';
     return $res;
 }}
