@@ -21,6 +21,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             $filter = $this->get('list_filter');
             $sort = $this->get('list_sort');
             $keyword = $this->get('list_keyword');
+            $screen_emails = $this->get('screen_emails');
             $opts = array('all' => $this->trans('All'), 'unseen' => $this->trans('Unread'),
                 'seen' => $this->trans('Read'), 'flagged' => $this->trans('Flagged'),
                 'unflagged' => $this->trans('Unflagged'), 'answered' => $this->trans('Answered'),
@@ -41,6 +42,9 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             $custom .= '<input type="hidden" name="list_page" value="'.$this->html_safe($this->get('list_page')).'" />';
             $custom .= '<input type="search" placeholder="'.$this->trans('Search').
                 '" class="imap_keyword form-control form-control-sm" name="keyword" value="'.$this->html_safe($keyword).'" />';
+            if ($screen_emails) {
+                $custom .= '<input type="hidden" value="1" name="screen_emails"/>';
+            }
             $custom .= '<select name="sort" class="imap_sort form-control form-control-sm">';
             foreach ($sorts as $name => $val) {
                 $custom .= '<option ';
@@ -78,7 +82,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             }
             if ($this->get('folder')) {
                 if ($this->get('screen_emails')) {
-                    $custom .= '<span title="Disike" class="screen-email-unlike cursor-pointer"><i class="bi bi-hand-thumbs-down-fill"></i></span><span title="Like" class="screen-email-like cursor-pointer"></i><i class="bi bi-hand-thumbs-up-fill"></i></span>';
+                    $custom .= '<span title="Dislike" class="screen-email-unlike cursor-pointer"><i class="bi bi-hand-thumbs-down-fill"></i></span><span title="Like" class="screen-email-like cursor-pointer"><i class="bi bi-hand-thumbs-up-fill"></i></span>';
                     if ($this->get('move_messages_in_screen_email')) {
                         $custom .= '<input type="hidden" value="1" id="move_messages_in_screen_email"/>';
                     } else {
@@ -125,21 +129,32 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                             return 'data-src="' . $matches[1] . '" ' . 'src="" ' . 'data-message-part="' . $this->html_safe($this->get('imap_msg_part')) . '"';
                         }, $msgText);
                     }
+
+                    $images_blacklist = $this->get('images_blacklist');
+                    if (in_array($sender_email, $images_blacklist)) {
+                        $msgText = preg_replace_callback('/\<[^>]*(src="(https?:\/\/[^"]*)"|src=\'(https?:\/\/[^\']*)\')[^>]*\>/i', function ($matches) {
+                            return '';
+                        }, $msgText);
+
+                        $msgText = '<div data-external-resources-blocked="1"></div>' . $msgText;
+                    }
                 }
 
                 $msgText = sanitize_email_html($msgText);
-                $txt .= format_msg_html($msgText, $allowed);
+                $txt .= '<div class="msg_html_part">' . format_msg_html($msgText, $allowed) . '</div>';
             }
             elseif (isset($struct['type']) && mb_strtolower($struct['type']) == 'image') {
                 $txt .= format_msg_image($this->get('msg_text'), mb_strtolower($struct['subtype']));
             }
             else {
+                $plainContent = '';
                 if ($this->get('imap_msg_part') === "0") {
-                    $txt .= format_msg_text($this->get('msg_text'), $this, false);
+                    $plainContent = format_msg_text($this->get('msg_text'), $this, false);
                 }
                 else {
-                    $txt .= format_msg_text($this->get('msg_text'), $this);
+                    $plainContent = format_msg_text($this->get('msg_text'), $this);
                 }
+                $txt .= '<div class="msg_plain_part">' . $plainContent . '</div>';
             }
         }
         $txt .= '</div>';
@@ -183,7 +198,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
       protected function output() {
         if ($this->get('msg_headers')) {
             $txt = '';
-            $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'reply-to', 'cc', 'flags');
+            $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'reply-to', 'cc', 'x-original-bcc', 'flags');
             $reply_args = sprintf('&amp;list_path=%s&amp;uid=%s',
                 $this->html_safe($this->get('msg_list_path')),
                 $this->html_safe($this->get('msg_text_uid'))
@@ -193,17 +208,17 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if (!array_key_exists('subject', lc_headers($headers)) || !trim(lc_headers($headers)['subject'])) {
                 $headers['subject'] = $this->trans('[No Subject]');
             }
-            
+
             // Start Bootstrap container
             $txt .= '<div class="container-fluid p-0 ml-0 border-bottom border-secondary-subtle text-muted">';
-            
+
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
                     if ($fld == mb_strtolower($name)) {
                         if ($fld == 'subject') {
                             $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
                             $txt .= '<div class="col-12">';
-                            if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
+                            if (array_key_exists('flags', lc_headers($headers)) && mb_stristr(lc_headers($headers)['flags'], 'flagged')) {
                                 $txt .= '<i class="bi bi-star-half account_icon"></i> ';
                             }
                             $txt .= '<span class="fs-5 fw-normal text-dark js-header_subject">' . $this->html_safe($value) . '</span>';
@@ -252,7 +267,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $txt .= '<div class="col-md-10">';
                             $txt .= '<div class="dropdown">';
                             $txt .= '<a id="contact_info" data-bs-toggle="dropdown" class="dropdown-toggle text-decoration-none js-header_from" href="#">' . $this->html_safe($value) . '</a>';
-                            $txt .= '<div class="dropdown-menu p-4" id="contact_popup" aria-labelledby="dropdownMenuContact">';
+                            $txt .= '<div class="dropdown-menu p-3" id="contact_popup" aria-labelledby="dropdownMenuContact">';
                             $txt .= '<div id="contact_popup_body">';
 
                             if($contact_exists){
@@ -271,10 +286,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $txt .= '</div></div></div></div></div>';
                         }
                         elseif ($fld == 'reply-to') {
-                            $from = addr_parse($headers['From']);
+                            $from = addr_parse(lc_headers($headers)['from'] ?? '');
                             $replyEmails = array_map(function ($addr) {
                                 return $addr['email'];
-                            }, process_address_fld($headers['Reply-To']));
+                            }, process_address_fld(lc_headers($headers)['reply-to'] ?? ''));
 
                             if (count($replyEmails) === 1 && ($replyEmails[0] === $from['email'])) {
                                 $txt .= '<div class="row g-0 py-1 long_header">';
@@ -298,6 +313,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                 }
                                 $value = implode(', ', $new_value);
                             }
+                            if (mb_strtolower($name) == 'x-original-bcc') {
+                                $name = 'Bcc';
+                            }
                             $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
                             $txt .= '<div class="col-md-2"><span class="text-muted">'.$this->trans($name).'</span></div>';
                             $txt .= '<div class="col-md-10 col-12 js-header_' . strtolower($name) . '">'.$this->html_safe($value).'</div>';
@@ -307,7 +325,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     }
                 }
             }
-            $is_draft = isset($headers['Flags']) && mb_stristr($headers['Flags'], 'draft');
+            $is_draft = array_key_exists('flags', lc_headers($headers)) && mb_stristr(lc_headers($headers)['flags'], 'draft');
             if($is_draft) {
                 $txt .= '<div class="row g-0 py-2"><div class="col-12 text-center text-md-start"><a class="btn btn-primary" href="?page=compose'.$reply_args.'&imap_draft=1"><i class="bi bi-pencil"></i> '.$this->trans('Edit Draft').'</a></div></div>';
             }
@@ -328,11 +346,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     }
                 }
             }
-            
+
             if ($this->get('list_headers')) {
                 $txt .= format_list_headers($this);
             }
-            
+
             $lc_headers = lc_headers($headers);
             if (array_key_exists('to', $lc_headers)) {
                 $addr_list = process_address_fld($lc_headers['to']);
@@ -362,9 +380,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<a href="#" class="hlink all_headers text-decoration-none btn btn-sm btn-outline-secondary">'.$this->trans('All headers').'</a>';
             $txt .= '<a class="hlink small_headers text-decoration-none btn btn-sm btn-outline-secondary" href="#">'.$this->trans('Small headers').'</a>';
             $txt .= '</div>';
-            
+
             $txt .= '<div class="d-flex flex-wrap gap-2">';
-            if (!isset($headers['Flags']) || !mb_stristr($headers['Flags'], 'draft')) {
+            if (!array_key_exists('flags', $lc_headers) || !mb_stristr($lc_headers['flags'], 'draft')) {
                 $txt .= '<a class="reply_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
                 if ($size > 1) {
                     $txt .= '<a class="reply_all_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
@@ -373,7 +391,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 }
                 $txt .= forward_dropdown($this, $reply_args);
             }
-            if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
+            if (array_key_exists('flags', $lc_headers) && mb_stristr($lc_headers['flags'], 'flagged')) {
                 $txt .= '<a id="flag_msg" class="flagged_link hlink text-decoration-none btn btn-sm btn-outline-secondary hide" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
                 $txt .= '<a id="unflag_msg" class="unflagged_link hlink text-decoration-none btn btn-sm btn-outline-secondary" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             } else {
@@ -388,17 +406,17 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if (!$this->get('is_archive_folder')) {
                 $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
             }
-            
+
             if($this->get('tags')){
-                $txt .= tags_dropdown($this, $headers);
+                $txt .= tags_dropdown($this);
             }
-            if (isset($headers['X-Schedule'])) {
+            if (isset($lc_headers['x-schedule'])) {
                 $txt .= schedule_dropdown($this, true);
             }
 
             $settings = $this->get('user_settings', array());
             if(array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting']) {
-                $txt .= snooze_dropdown($this, isset($headers['X-Snoozed']));
+                $txt .= snooze_dropdown($this, isset($lc_headers['x-snoozed']));
             }
             if ($this->get('sieve_filters_enabled') && !$is_draft) {
                 $server_id = $this->get('msg_server_id');
@@ -407,7 +425,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $user_config = $this->get('user_config');
                     $contact_list = $user_config->get('contacts', []);
                     $existing_emails = array_column($contact_list, 'email_address');
-                    $sender = addr_parse($headers['From'])['email'];
+                    $sender = addr_parse($lc_headers['from'] ?? '')['email'];
                     $domain = '*@'.get_domain($sender);
                     $blocked_senders = get_blocked_senders_array($imap_server, $this->get('site_config'), $this->get('user_config'));
                     $sender_blocked = in_array($sender, $blocked_senders);
@@ -490,7 +508,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $pass_value = '';
             }
             $res .= '<div class="' . mb_strtolower($type) . '_server mb-3">';
-            $res .= '<form class="imap_connect" method="POST">';
+            $res .= '<form class="imap_connect" method="POST"><div class="row">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
             $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-xl-2 col-lg-2 col-md-6 overflow-auto" >';
@@ -543,7 +561,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2 mt-3" />';
 
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
-            $res .= '</div></div></div></form>';
+            $res .= '</div></div></div></form></div>';
         }
         $res .= '';
         return $res;
@@ -742,7 +760,7 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
                 }
                 $res .= '</tr>';
             }
-        }   
+        }
         return $res;
     }
 }
@@ -877,11 +895,11 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         $res = '';
         if ($this->get('imap_folders')) {
             foreach ($this->get('imap_folders', array()) as $id => $folder) {
-                $res .= '<li class="imap_'.$id.'_"><a href="#" class="imap_folder_link" data-target="imap_'.$id.'_">';
+                $res .= '<li class="imap_'.$id.'_" data-server-id="' . $id . '"><a href="#" class="imap_folder_link" data-target="imap_'.$id.'_">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<i class="bi bi-folder fs-5 me-2"></i>';
+                    $res .= '<i class="bi bi-folder me-2"></i>';
                 }
-                $res .= $this->html_safe($folder).'</a></li>';
+                $res .= $this->html_safe($folder).'</a><span class="unread_count unread_imap_server_'.$id.'"></span></li>';
             }
         }
         if ($res) {
@@ -1041,9 +1059,8 @@ class Hm_Output_imap_unread_on_open extends Hm_Output_Module {
         if (array_key_exists('unread_on_open', $settings) && $settings['unread_on_open']) {
             $checked = ' checked="checked"';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="unread_on_open">'.
-            $this->trans('Don\'t flag a message as read on open').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="unread_on_open" name="unread_on_open" data-default-value="false" value="1" /></td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="unread_on_open">'.
+            $this->trans('Don\'t flag a message as read on open').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' id="unread_on_open" name="unread_on_open" data-default-value="false" value="1" /></div></td></tr>';
     }
 }
 
@@ -1061,9 +1078,8 @@ class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
         } else {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="simple_msg_parts">'.
-            $this->trans('Show simple message part structure when reading a message').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="simple_msg_parts" name="simple_msg_parts" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="simple_msg_parts">'.
+            $this->trans('Show simple message part structure when reading a message').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' id="simple_msg_parts" name="simple_msg_parts" data-default-value="false" value="1" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -1082,9 +1098,8 @@ class Hm_Output_imap_pagination_links extends Hm_Output_Module {
         if($settings['pagination_links'] !== DEFAULT_PAGINATION_LINKS) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        $res = '<tr class="general_setting"><td><label class="form-check-label" for="pagination_links">'.
-            $this->trans('Show next & previous emails links when reading a message').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox"'.$checked.' id="pagination_links" name="pagination_links"  data-default-value="'.(DEFAULT_PAGINATION_LINKS ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="pagination_links">'.
+            $this->trans('Show next & previous emails links when reading a message').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox"'.$checked.' id="pagination_links" name="pagination_links"  data-default-value="'.(DEFAULT_PAGINATION_LINKS ? 'true' : 'false') . '" value="1" />'.$reset.'</div></td></tr>';
         return $res;
     }
 }
@@ -1103,9 +1118,8 @@ class Hm_Output_imap_auto_advance_email extends Hm_Output_Module {
         } else {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        $res = '<tr class="general_setting"><td><label class="form-check-label" for="auto_advance_email">'.
-            $this->trans('Show next email instead of your inbox after performing action (delete, archive, move, etc)').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox"'.$checked.' id="auto_advance_email" name="auto_advance_email" data-default-value="true" value="1" />'.$reset.'</td></tr>';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="auto_advance_email">'.
+            $this->trans('Show next email instead of your inbox after performing action (delete, archive, move, etc)').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox"'.$checked.' id="auto_advance_email" name="auto_advance_email" data-default-value="true" value="1" />'.$reset.'</div></td></tr>';
         return $res;
     }
 }
@@ -1139,9 +1153,9 @@ class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
         if ($per_page != DEFAULT_IMAP_PER_PAGE) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
-        return '<tr class="general_setting"><td><label for="imap_per_page">'.
-            $this->trans('Messages per page for IMAP folder views').'</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" id="imap_per_page" '.
-            'name="imap_per_page" value="'.$this->html_safe($per_page).'" data-default-value="'.DEFAULT_IMAP_PER_PAGE.'"/>'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="imap_per_page">'.
+            $this->trans('Messages per page for IMAP folder views').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-control form-control-sm w-auto" type="text" id="imap_per_page" '.
+            'name="imap_per_page" value="'.$this->html_safe($per_page).'" data-default-value="'.DEFAULT_IMAP_PER_PAGE.'"/>'.$reset.'</div></td></tr>';
     }
 }
 
@@ -1160,9 +1174,9 @@ class Hm_Output_max_google_contacts_number extends Hm_Output_Module {
         if ($max_google_contacts_number != DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input" default-value="'.DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER.'"></i></span>';
         }
-        return '<tr class="general_setting"><td><label for="max_google_contacts_number">'.
-            $this->trans('Max google contacts number').'</label></td><td><input class="form-control form-control-sm w-auto" type="number" id="max_google_contacts_number" '.
-            'name="max_google_contacts_number" value="'.$this->html_safe($max_google_contacts_number).'" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="max_google_contacts_number">'.
+            $this->trans('Max google contacts number').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-control form-control-sm w-auto" type="number" id="max_google_contacts_number" '.
+            'name="max_google_contacts_number" value="'.$this->html_safe($max_google_contacts_number).'" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -1179,9 +1193,8 @@ class Hm_Output_imap_msg_icons_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="msg_part_icons">'.
-            $this->trans('Show message part icons when reading a message').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="msg_part_icons" name="msg_part_icons" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="msg_part_icons">'.
+            $this->trans('Show message part icons when reading a message').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' id="msg_part_icons" name="msg_part_icons" data-default-value="false" value="1" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -1200,9 +1213,8 @@ class Hm_Output_text_only_setting extends Hm_Output_Module {
         if($settings['text_only'] !== DEFAULT_TEXT_ONLY) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="text_only">'.
-            $this->trans('Prefer text over HTML when reading messages').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="text_only" name="text_only" data-default-value="'.(DEFAULT_TEXT_ONLY ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="text_only">'.
+            $this->trans('Prefer text over HTML when reading messages').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' id="text_only" name="text_only" data-default-value="'.(DEFAULT_TEXT_ONLY ? 'true' : 'false') . '" value="1" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -1240,9 +1252,8 @@ class Hm_Output_original_folder_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="original_folder">'.
-            $this->trans('Archive to the original folder').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="original_folder" name="original_folder" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="original_folder">'.
+            $this->trans('Archive to the original folder').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' id="original_folder" name="original_folder" data-default-value="false" value="1" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -1261,9 +1272,8 @@ class Hm_Output_setting_enable_snooze extends Hm_Output_Module {
         if ($settings['enable_snooze'] !== DEFAULT_ENABLE_SNOOZE) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_snooze">'.
-            $this->trans('Enable Snooze functionality').' <span class="badge bg-warning text-dark ms-2">'.$this->trans('Experimental').'</span></label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="enable_snooze" name="enable_snooze" data-default-value="'.(DEFAULT_ENABLE_SNOOZE ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="enable_snooze">'.
+            $this->trans('Enable Snooze functionality').' <span class="badge bg-warning text-dark ms-2">'.$this->trans('Experimental').'</span></label></span><div><input class="form-check-input" type="checkbox" '.$checked.' id="enable_snooze" name="enable_snooze" data-default-value="'.(DEFAULT_ENABLE_SNOOZE ? 'true' : 'false') . '" value="1" />'.$reset.'</div></div></td></tr>';
     }
 }
 
@@ -1281,9 +1291,8 @@ class Hm_Output_review_sent_email extends Hm_Output_Module {
         if($settings['review_sent_email'] !== DEFAULT_REVIEW_SENT_EMAIL) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="review_sent_email">'.
-            $this->trans('Review sent message').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="review_sent_email" name="review_sent_email" data-default-value="'.(DEFAULT_REVIEW_SENT_EMAIL ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="review_sent_email">'.
+            $this->trans('Review sent message').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' id="review_sent_email" name="review_sent_email" data-default-value="'.(DEFAULT_REVIEW_SENT_EMAIL ? 'true' : 'false') . '" value="1" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -1299,7 +1308,7 @@ class Hm_Output_snooze_msg_control extends Hm_Output_Module {
         if (!$enable_snooze) {
             return;
         }
-        
+
         $parts = explode('_', $this->get('list_path'));
         $unsnooze = $parts[0] == 'imap' && hex2bin($parts[2]) == 'Snoozed';
         $res = snooze_dropdown($this, $unsnooze);
@@ -1338,7 +1347,7 @@ class Hm_Output_stepper_setup_server_jmap extends Hm_Output_Module {
         if(!in_array('jmap', $this->get('router_module_list'), true)) return '';
         return '
                 <div class="form-check"  id="srv_setup_stepper_jmap_select_box">
-                    <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_only_jmap" name="srv_setup_stepper_only_jmap" onchange="handleJmapCheckboxChange(this)">
+                    <input class="form-check-input me-2" type="checkbox" role="switch" id="srv_setup_stepper_only_jmap" name="srv_setup_stepper_only_jmap" onchange="handleJmapCheckboxChange(this)">
                     <label class="form-check-label" style="font-size: 12px;" for="srv_setup_stepper_only_jmap">
                       '.$this->trans('Setup JMAP Server').'
                     </label>
@@ -1399,8 +1408,8 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                              $res .=  '
 
                                         <div class="form-check">
-                                           <input class="form-check-input" type="checkbox" id="srv_setup_stepper_enable_sieve"  onchange="handleSieveStatusChange(this)">
-                                           <label class="form-check-label" for="srv_setup_stepper_enable_sieve">'.$this->trans('Enable Sieve').'</label>
+                                           <input class="form-check-input me-2" type="checkbox" id="srv_setup_stepper_enable_sieve"  onchange="handleSieveStatusChange(this)">
+                                           <label for="srv_setup_stepper_enable_sieve">'.$this->trans('Enable Sieve').'</label>
                                         </div>
                                         <div id="srv_setup_stepper_imap_sieve_host_bloc" class="hide">
                                             <div class="form-floating">
@@ -1410,8 +1419,8 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                                             </div>
                                             <div class="form-floating">
                                                 <div class="form-check" id="srv_setup_stepper_imap_sieve_mode_tls_bloc">
-                                                    <input class="form-check-input" type="checkbox" role="switch" value="1" id="srv_setup_stepper_imap_sieve_mode_tls" name="srv_setup_stepper_imap_sieve_mode_tls">
-                                                    <label class="form-check-label" for="srv_setup_stepper_imap_sieve_mode_tls">
+                                                    <input class="form-check-input me-2" type="checkbox" role="switch" value="1" id="srv_setup_stepper_imap_sieve_mode_tls" name="srv_setup_stepper_imap_sieve_mode_tls">
+                                                    <label for="srv_setup_stepper_imap_sieve_mode_tls">
                                                         '.$this->trans('Sieve TLS Mode').'
                                                     </label>
                                                 </div>
@@ -1428,8 +1437,8 @@ class Hm_Output_stepper_setup_server_jmap_imap_common extends Hm_Output_Module {
     protected function output() {
         $res = '
             <div class="form-check" id="step_config_combined_view">
-                <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_imap_hide_from_c_page" name="srv_setup_stepper_imap_hide_from_c_page">
-                <label class="form-check-label" for="srv_setup_stepper_imap_hide_from_c_page">
+                <input class="form-check-input me-2" type="checkbox" role="switch" id="srv_setup_stepper_imap_hide_from_c_page" name="srv_setup_stepper_imap_hide_from_c_page">
+                <label for="srv_setup_stepper_imap_hide_from_c_page">
                     '.$this->trans('Hide From Combined Pages').'
                 </label>
             </div>
@@ -1481,15 +1490,15 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
                             </div>
                             <div class="form-check">
                                 <input type="hidden" name="ews_hide_from_c_page" value="0">
-                                <input class="form-check-input" type="checkbox" role="switch" id="ews_hide_from_c_page" name="ews_hide_from_c_page" value="1">
-                                <label class="form-check-label" for="ews_hide_from_c_page">
+                                <input class="form-check-input me-2" type="checkbox" role="switch" id="ews_hide_from_c_page" name="ews_hide_from_c_page" value="1">
+                                <label for="ews_hide_from_c_page">
                                     '.$this->trans('Hide From Combined Pages').'
                                 </label>
                             </div>
                             <div class="form-check form-switch mt-3">
                                 <input type="hidden" name="ews_create_profile" value="0">
-                                <input class="form-check-input" type="checkbox" role="switch" onchange="handleCreateProfileCheckboxChange(this)" id="ews_create_profile" name="ews_create_profile" value="1" checked>
-                                <label class="form-check-label" for="ews_create_profile">'.$this->trans('Create Profile').'</label>
+                                <input class="form-check-input me-2" type="checkbox" role="switch" onchange="handleCreateProfileCheckboxChange(this)" id="ews_create_profile" name="ews_create_profile" value="1" checked>
+                                <label for="ews_create_profile">'.$this->trans('Create Profile').'</label>
                             </div>
                             <div class="ms-3">
                                 <div class="form-floating mb-2">
@@ -1502,8 +1511,8 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
                                 </div>
                                 <div class="form-check">
                                     <input type="hidden" name="ews_profile_is_default" value="0">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="ews_profile_is_default" name="ews_profile_is_default" value="1" checked>
-                                    <label class="form-check-label" for="ews_profile_is_default">'.$this->trans('Set this profile default').'</label>
+                                    <input class="form-check-input me-2" type="checkbox" role="switch" id="ews_profile_is_default" name="ews_profile_is_default" value="1" checked>
+                                    <label for="ews_profile_is_default">'.$this->trans('Set this profile default').'</label>
                                 </div>
                             </div>
                         </div>
@@ -1546,7 +1555,7 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
                 $pass_value = '';
             }
             $res .= '<div class="ews_server mt-3 mb-3">';
-            $res .= '<form class="imap_connect" method="POST">';
+            $res .= '<form class="imap_connect" method="POST"><div class="row">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
             $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-xl-2 col-lg-2 col-md-6">';
@@ -1588,7 +1597,7 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
             $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
 
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
-            $res .= '</div></div></div></form>';
+            $res .= '</div></div></div></form></div>';
         }
 
         $res .= '
@@ -1614,9 +1623,9 @@ class Hm_Output_first_time_screen_emails_per_page_setting extends Hm_Output_Modu
         if ($per_page != 20) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
-        return '<tr class="general_setting"><td><label for="first_time_screen_emails">'.
-            $this->trans('First-time screen senders').'</label></td><td><input class="form-control form-control-sm w-auto" type="text" id="first_time_screen_emails" '.
-            'name="first_time_screen_emails" value="'.$this->html_safe($per_page).'" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="first_time_screen_emails">'.
+            $this->trans('First-time screen senders').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-control form-control-sm w-auto" type="text" id="first_time_screen_emails" '.
+            'name="first_time_screen_emails" value="'.$this->html_safe($per_page).'" />'.$reset.'</div></td></tr>';
     }
 }
 class Hm_Output_setting_move_messages_in_screen_email extends Hm_Output_Module {
@@ -1628,8 +1637,8 @@ class Hm_Output_setting_move_messages_in_screen_email extends Hm_Output_Module {
                 $checked = "checked";
             }
         }
-        $res = '<tr class="general_setting"><td><label for="move_messages_in_screen_email">'.
-            $this->trans('Move all messages in Screen Email folder if dislike email').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="move_messages_in_screen_email" name="move_messages_in_screen_email" '.$checked.' ></td></tr>';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="move_messages_in_screen_email">'.
+            $this->trans('Move all messages in Screen Email folder if dislike email').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" role="switch" id="move_messages_in_screen_email" name="move_messages_in_screen_email" '.$checked.' ></div></td></tr>';
 
         return $res;
     }
@@ -1644,11 +1653,28 @@ class Hm_Output_setting_active_preview_message extends Hm_Output_Module {
                 $checked = "checked";
             }
         }
-        $res = '<tr class="general_setting"><td><label for="active_preview_message">'.
-            $this->trans('Active preview message').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="active_preview_message" name="active_preview_message" '.$checked.' ></td></tr>';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="active_preview_message">'.
+            $this->trans('Active preview message').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" role="switch" id="active_preview_message" name="active_preview_message" '.$checked.' ></div></td></tr>';
         return $res;
     }
 }
+
+class Hm_Output_setting_active_body_structure extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $checked = "checked";
+        if (array_key_exists('active_body_structure', $settings)) {
+            if (!$settings['active_body_structure']) {
+                $checked = "";
+            }
+        }
+
+        $res = '<tr class="general_setting"><td><label for="active_body_structure">'.
+            $this->trans('Analyze the structure of the message (BODYSTRUCTURE)').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="active_body_structure" name="active_body_structure" '.$checked.' ></td></tr>';
+        return $res;
+    }
+}
+
 class Hm_Output_setting_ceo_detection_fraud extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());
@@ -1683,18 +1709,18 @@ class Hm_Output_setting_ceo_detection_fraud extends Hm_Output_Module {
             }
         }
 
-        $res = '<tr class="general_setting"><td><label for="ceo_use_detect_ceo_fraud">'.
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="ceo_use_detect_ceo_fraud">'.
             $this->trans('CEO fraud: Use Detect CEO Fraud').
-            '</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="ceo_use_detect_ceo_fraud" name="ceo_use_detect_ceo_fraud" '. $ceo_use_detect_ceo_fraud .' ></td></tr>';
-        $res .= '<tr class="general_setting"><td><label for="ceo_use_trusted_contact">'.
+            '</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" role="switch" id="ceo_use_detect_ceo_fraud" name="ceo_use_detect_ceo_fraud" '. $ceo_use_detect_ceo_fraud .' ></div></td></tr>';
+        $res .= '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="ceo_use_trusted_contact">'.
             $this->trans('CEO fraud: Use Trusted Contacts as Valid emails ').
-            '</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="ceo_use_trusted_contact" name="ceo_use_trusted_contact" '. $ceo_use_trusted_contact .' ></td></tr>';
-        $res .= '<tr class="general_setting"><td><label for="ceo_suspicious_terms">'.
+            '</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" role="switch" id="ceo_use_trusted_contact" name="ceo_use_trusted_contact" '. $ceo_use_trusted_contact .' ></div></td></tr>';
+        $res .= '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="ceo_suspicious_terms">'.
             $this->trans('CEO fraud: Suspicious Phrases or Requests(separate by ",")').
-            '</label></td><td><textarea class="form-control form-control-sm w-auto" role="switch" id="ceo_suspicious_terms" name="ceo_suspicious_terms">'. $ceo_suspicious_terms .'</textarea></td></tr>';
-        $res .= '<tr class="general_setting"><td><label for="ceo_rate_limit">'.
+            '</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><textarea class="form-control form-control-sm w-auto" role="switch" id="ceo_suspicious_terms" name="ceo_suspicious_terms">'. $ceo_suspicious_terms .'</textarea></div></td></tr>';
+        $res .= '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="ceo_rate_limit">'.
             $this->trans('CEO fraud: Rate-Limit or Monitor Unusual Requests').
-            '</label></td><td><input class="form-control form-control-sm w-auto" type="number" min="0" role="switch" id="ceo_rate_limit" name="ceo_rate_limit" value="'. $ceo_rate_limit .'" ></td></tr>';
+            '</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-control form-control-sm w-auto" type="number" min="0" role="switch" id="ceo_rate_limit" name="ceo_rate_limit" value="'. $ceo_rate_limit .'" ></div></td></tr>';
         return $res;
     }
 }

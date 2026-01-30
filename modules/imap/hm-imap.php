@@ -52,7 +52,7 @@ class Hm_IMAP_List {
         if (self::$use_cache && $cache && is_array($cache)) {
             self::$server_list[$id]['object']->get_connection()->load_cache($cache, 'array');
         }
-        
+
         return self::$server_list[$id]['object']->connect();
     }
 
@@ -75,6 +75,10 @@ class Hm_IMAP_List {
 
     public static function get_mailbox_without_connection($config) {
         $config['type'] = array_key_exists('type', $config) ? $config['type'] : 'imap';
+        if (array_key_exists('user', $config)) {
+            $config['username'] = $config['user'];
+            $config['password'] = "";
+        }
         return new Hm_Mailbox($config['id'], self::$user_config, self::$session, $config);
     }
 }
@@ -268,7 +272,7 @@ if (!class_exists('Hm_IMAP')) {
             $this->get_capability();
             if (!$this->tls) {
                 $this->starttls();
-            } 
+            }
             $scramMechanisms = [
                 'scram-sha-1', 'scram-sha-1-plus',
                 'scram-sha-256', 'scram-sha-256-plus',
@@ -401,7 +405,7 @@ if (!class_exists('Hm_IMAP')) {
         * - Remove rights (using a `-` prefix),
         * - Completely replace existing rights (no prefix).
         *
-        * For more information on ACLs, see RFC 4314: 
+        * For more information on ACLs, see RFC 4314:
         * [Access Control Lists (ACLs) in Internet Message Access Protocol (IMAP)](https://tools.ietf.org/html/rfc4314).
         *
         * @param string $mailbox_name The name of the mailbox for which the ACL is to be set.
@@ -413,7 +417,7 @@ if (!class_exists('Hm_IMAP')) {
         */
         public function set_acl($mailbox_name, $identifier, $rights_modification) {
             $command = "SETACL \"$mailbox_name\" \"$identifier\" \"$rights_modification\"\r\n";
-            
+
             $this->send_command($command);
             $response = $this->get_response();
 
@@ -437,7 +441,7 @@ if (!class_exists('Hm_IMAP')) {
         * This function sends a DELETEACL command to remove any <identifier, rights> pair
         * for the specified identifier from the access control list for the specified mailbox.
         *
-        * For more information on ACLs, see RFC 4314: 
+        * For more information on ACLs, see RFC 4314:
         * [Access Control Lists (ACLs) in Internet Message Access Protocol (IMAP)](https://tools.ietf.org/html/rfc4314).
         *
         * @param string $mailbox The name of the mailbox from which to delete the ACL entry.
@@ -473,7 +477,7 @@ if (!class_exists('Hm_IMAP')) {
         * parses the server's response and maps the raw rights to human-readable
         * permissions using the `map_permissions` function.
         *
-        * For more information on ACLs, see RFC 4314: 
+        * For more information on ACLs, see RFC 4314:
         * [Access Control Lists (ACLs) in Internet Message Access Protocol (IMAP)](https://tools.ietf.org/html/rfc4314).
         *
         * @param string $mailbox_name The name of the mailbox for which to retrieve the ACL.
@@ -482,20 +486,20 @@ if (!class_exists('Hm_IMAP')) {
         *               and the values are human-readable permissions (e.g., 'Read, Write').
         */
         public function get_acl($mailbox_name) {
-            $acl_list = [];        
+            $acl_list = [];
             $command = "GETACL \"$mailbox_name\"\r\n";
             $this->send_command($command);
             $response = $this->get_response();
-        
+
             foreach ($response as $line) {
                 if (preg_match('/^\* ACL ([^\s]+) (.+)$/', $line, $matches)) {
                     $mailbox = $matches[1];
                     $acl_string = $matches[2];
-        
+
                     $acl_parts = explode(' ', $acl_string);
                     for ($i = 1; $i < count($acl_parts); $i += 2) {
                         $user = $acl_parts[$i - 1];
-                        $rights = $acl_parts[$i];      
+                        $rights = $acl_parts[$i];
                         $acl_list[$user] = $this->map_permissions($rights);
                     }
                 }
@@ -727,20 +731,20 @@ if (!class_exists('Hm_IMAP')) {
         function preprocess_folders($result, $mailbox, $delim) {
             $folderPaths = [];
             $processedResult = [];
-        
+
             // Step 1: Extract all folder paths from the array (using the last element in each sub-array)
             foreach ($result as $entry) {
                 if (isset($entry[count($entry) - 1]) && is_string($entry[count($entry) - 1])) {
                     $folderPaths[] = $entry[count($entry) - 1];
                 }
             }
-        
+
             // Step 2: Process each folder to determine if it has subfolders
             foreach ($result as $entry) {
                 if (isset($entry[count($entry) - 1]) && is_string($entry[count($entry) - 1])) {
                     $currentFolder = $entry[count($entry) - 1];
                     $hasChildren = false;
-        
+
                     // Check if any other folder starts with the current folder followed by the delimiter
                     foreach ($folderPaths as $path) {
                         if (strpos($path, $currentFolder . $delim) === 0) {
@@ -748,14 +752,14 @@ if (!class_exists('Hm_IMAP')) {
                             break;
                         }
                     }
-        
+
                     // Add the appropriate flag (\HasChildren or \HasNoChildren)
                     $entry = array_merge(
                         array_slice($entry, 0, 3),
                         [$hasChildren ? "\\HasChildren" : "\\HasNoChildren"],
                         array_slice($entry, 3)
                     );
-        
+
                     // Root folder processing
                     if (empty($mailbox)) {
                         if (strpos($currentFolder, $delim) === false) {
@@ -966,7 +970,7 @@ if (!class_exists('Hm_IMAP')) {
          * @param bool $exclude_auto_bcc don't include auto-bcc'ed messages
          * @return array list of headers and values for the specified uids
          */
-        public function get_message_list($uids, $raw=false, $include_content_body = false, $exclude_auto_bcc = true) {
+        public function get_message_list($uids, $raw=false, $include_content_body = false, $exclude_auto_bcc = true, $active_body_structure = true) {
             if (is_array($uids)) {
                 sort($uids);
                 $sorted_string = implode(',', array_filter($uids));
@@ -981,7 +985,10 @@ if (!class_exists('Hm_IMAP')) {
             if ($this->is_supported( 'X-GM-EXT-1' )) {
                 $command .= 'X-GM-MSGID X-GM-THRID X-GM-LABELS ';
             }
-            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID IN-REPLY-TO X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY)]";
+            if ($active_body_structure) {
+                $command .= "BODYSTRUCTURE ";
+            }
+            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID IN-REPLY-TO X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY X-MS-EXCHANGE-CALENDAR-SERIES-INSTANCE-ID SENDER)]";
             if ($include_content_body) {
                 $command .= " BODY.PEEK[TEXT]<0.500>";
             }
@@ -995,8 +1002,10 @@ if (!class_exists('Hm_IMAP')) {
             $res = $this->get_response(false, true);
             $status = $this->check_response($res, true);
             $tags = array('X-GM-MSGID' => 'google_msg_id', 'X-GM-THRID' => 'google_thread_id', 'X-GM-LABELS' => 'google_labels', 'UID' => 'uid', 'FLAGS' => 'flags', 'RFC822.SIZE' => 'size', 'INTERNALDATE' => 'internal_date');
-            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'IN-REPLY-TO', 'REFERENCES', 'X-SNOOZED', 'X-SCHEDULE', 'X-PROFILE-ID', 'X-DELIVERY', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
-            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'in-reply-to' => 'in_reply_to', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body');
+            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'IN-REPLY-TO', 'REFERENCES', 'X-SNOOZED', 'X-SCHEDULE', 'X-PROFILE-ID', 'X-DELIVERY', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE', 'X-MS-EXCHANGE-CALENDAR-SERIES-INSTANCE-ID', 'SENDER');
+            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'in-reply-to' => 'in_reply_to', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body', 'type_msg' => 'type_msg');
+            $flds['x-ms-exchange-calendar-series-instance-id'] = "x_ms_exchange_calendar_series_instance_id";
+            $flds['sender'] = "sender";
             $headers = array();
 
             foreach ($res as $n => $vals) {
@@ -1023,10 +1032,29 @@ if (!class_exists('Hm_IMAP')) {
                     $x_schedule = '';
                     $x_profile_id = '';
                     $x_delivery = '';
+                    $x_ms_exchange_calendar_series_instance_id = '';
+                    $sender = '';
                     $count = count($vals);
                     $header_founded = false;
                     $body_founded = false;
+                    $flds['type_msg'] = '';
+                    $bodystructure_found = false;
                     for ($i=0;$i<$count;$i++) {
+                        if ($vals[$i] == 'BODYSTRUCTURE' && !$bodystructure_found) {
+                            $bodystructure_found = true;
+
+                            $struct = new Hm_IMAP_Struct(array_slice($vals, $i + 1), $this);
+
+                            $calendar_parts = $struct->search(array('type' => 'text', 'subtype' => 'calendar'), true);
+
+                            if (empty($calendar_parts)) {
+                                $calendar_parts = $struct->search(array('type' => 'application', 'subtype' => 'ics'), true);
+                            }
+
+                            if (!empty($calendar_parts)) {
+                                $flds['type_msg'] = "calendar";
+                            }
+                        }
                         if ($vals[$i] == 'BODY[HEADER.FIELDS' && !$header_founded) {
                             $header_founded = true;
                             $i++;
@@ -1103,8 +1131,37 @@ if (!class_exists('Hm_IMAP')) {
                                          'timestamp' => time(), 'charset' => $cset, 'x-priority' => $x_priority, 'google_msg_id' => $google_msg_id,
                                          'google_thread_id' => $google_thread_id, 'google_labels' => $google_labels, 'list_archive' => $list_archive,
                                          'references' => $references, 'message_id' => $message_id, 'in_reply_to' => $in_reply_to, 'x_auto_bcc' => $x_auto_bcc,
-                                         'x_snoozed'  => $x_snoozed, 'x_schedule' => $x_schedule, 'x_profile_id' => $x_profile_id, 'x_delivery' => $x_delivery);
-                        $headers[$uid]['preview_msg'] = $flds['body'] != "content_body" ? $flds['body'] :  "";
+                                         'x_snoozed'  => $x_snoozed, 'x_schedule' => $x_schedule, 'x_profile_id' => $x_profile_id, 'x_delivery' => $x_delivery, 'x_ms_exchange_calendar_series_instance_id' => $x_ms_exchange_calendar_series_instance_id, 'sender' => $sender);
+
+                        $headers[$uid]['type_msg'] = $flds['type_msg'] != "type_msg" ? $flds['type_msg'] :  "";
+                        if ($headers[$uid]['type_msg'] != "calendar") {
+                            if ($headers[$uid]['x_ms_exchange_calendar_series_instance_id'] || $headers[$uid]['sender']) {
+                                if (strpos($headers[$uid]['sender'], 'Google Calendar <calendar-')) {
+                                    $headers[$uid]['type_msg'] = "calendar";
+                                }
+                                if (! empty(trim($headers[$uid]['x_ms_exchange_calendar_series_instance_id']))) {
+                                    $headers[$uid]['type_msg'] = "calendar";
+                                }
+                            }
+                        }
+                        // Clean preview message: remove HTML tags, URLs, and special characters
+                        $preview = $flds['body'] != "content_body" ? $flds['body'] : "";
+                        if ($preview) {
+                            // Remove HTML tags
+                            $preview = strip_tags($preview);
+                            // Remove URLs (http/https)
+                            $preview = preg_replace('#https?://[^\s<>"\'\)]+#i', '', $preview);
+                            // Remove email-style markers like [<url>] or <url>
+                            $preview = preg_replace('#\[<[^>]+>\]|<[^>]+>#', '', $preview);
+                            // Remove multiple spaces and newlines
+                            $preview = preg_replace('/\s+/', ' ', $preview);
+                            // Trim and limit length
+                            $preview = trim($preview);
+                            if (mb_strlen($preview) > 200) {
+                                $preview = mb_substr($preview, 0, 200) . '...';
+                            }
+                        }
+                        $headers[$uid]['preview_msg'] = $preview;
 
                         if ($raw) {
                             $headers[$uid] = array_map('trim', $headers[$uid]);
@@ -1146,7 +1203,7 @@ if (!class_exists('Hm_IMAP')) {
         * It takes the raw IMAP rights string, such as 'lrws' and converts it into a more
         * understandable format like 'Lookup, Read, Write, Write Seen'.
         *
-        * @param string $rights The string of IMAP rights (e.g., 'lrws'), where each character 
+        * @param string $rights The string of IMAP rights (e.g., 'lrws'), where each character
         *                       represents a specific permission.
         *
         * @return string A comma-separated string of human-readable permissions.
@@ -1167,13 +1224,13 @@ if (!class_exists('Hm_IMAP')) {
                 'c' => 'Create',
                 'd' => 'Delete'
             ];
-        
+
             foreach (str_split($rights_string) as $char) {
                 if (isset($permission_map[$char])) {
                     $permissions[] = $permission_map[$char];
                 }
             }
-        
+
             return implode(', ', $permissions);
         }
 
@@ -1972,7 +2029,7 @@ if (!class_exists('Hm_IMAP')) {
                     }
                 }
             }
-            
+
             return ['status' => $status, 'responses' => $responses];
         }
 
@@ -2494,7 +2551,7 @@ if (!class_exists('Hm_IMAP')) {
          * @return array list of headers
          */
 
-        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=array(), $include_preview = false) {
+        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=array(), $include_preview = false, $active_body_structure = true) {
             $result = array();
 
             /* select the mailbox if need be */
@@ -2519,7 +2576,7 @@ if (!class_exists('Hm_IMAP')) {
                 foreach ($trusted_senders as $sender) {
                     $terms[] = array('FROM', 'NOT '. $sender);
                 }
-                
+
             }
             // Perform a single search call with the combined terms
             if (!empty($terms)) {
@@ -2534,7 +2591,7 @@ if (!class_exists('Hm_IMAP')) {
 
             /* get the headers and build a result array by UID */
             if (!empty($uids)) {
-                $headers = $this->get_message_list($uids, false, $include_preview);
+                $headers = $this->get_message_list($uids, false, $include_preview, true, $active_body_structure);
                 foreach($uids as $uid) {
                     if (isset($headers[$uid])) {
                         $result[$uid] = $headers[$uid];
@@ -2557,7 +2614,7 @@ if (!class_exists('Hm_IMAP')) {
             } else {
                 $folders = $this->get_mailbox_list($only_subscribed, $level, "*", false);
             }
-            
+
             foreach ($folders as $name => $folder) {
                 $result[$name] = array(
                     'name' => $folder['name'],
@@ -2620,6 +2677,7 @@ if (!class_exists('Hm_IMAP')) {
 
             return false;
         }
+
 
     }
 }

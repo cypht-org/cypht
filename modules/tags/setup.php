@@ -6,7 +6,7 @@ handler_source('tags');
 output_source('tags');
 
 setup_base_page('tags');
-add_output('tags', 'tags_heading', true, 'core', 'content_section_start', 'after');
+add_output('tags', 'tags_heading', true, 'core', 'version_upgrade_checker', 'after');
 add_output('tags', 'tags_tree', true, 'core', 'tags_heading', 'after');
 add_output('tags', 'tags_form', true, 'core', 'tags_tree', 'after');
 
@@ -47,6 +47,7 @@ add_handler('ajax_imap_tag', 'save_imap_cache',  true, 'imap');
 add_handler('ajax_imap_tag', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_tag', 'tag_data', true, 'tags', 'load_user_data', 'after');
 add_handler('ajax_imap_tag', 'add_tag_to_message',  true, 'tags', 'save_imap_cache', 'after');
+add_handler('ajax_imap_tag', 'remove_tag_from_message',  true, 'tags', 'save_imap_cache', 'after');
 
 /* Sync the Tags Repository when moving messages */
 add_handler('ajax_imap_move_copy_action', 'tag_data', true, 'tags', 'load_user_data', 'after');
@@ -68,6 +69,8 @@ return array(
         'tag_delete' => FILTER_UNSAFE_RAW,
         'tag_per_source' => FILTER_VALIDATE_INT,
         'tag_since' => FILTER_UNSAFE_RAW,
+        'untag' => FILTER_VALIDATE_BOOLEAN,
+        'tag' => FILTER_VALIDATE_BOOLEAN,
     ),
     'allowed_get' => array(
         'tag_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,

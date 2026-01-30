@@ -1,5 +1,5 @@
 // TODO: This function is too large for a route handler, decouple it into multiple functions with action scope focused.
-function applySmtpComposePageHandlers() {
+function applySmtpComposePageHandlers(routeParams) {
     init_resumable_upload()
 
     setupActionSchedule(function () {
@@ -63,7 +63,7 @@ function applySmtpComposePageHandlers() {
             var checkInList = check_cc_exist_in_contacts_list();
             // if contact_cc not exist in contact list for user
             if (checkInList) {
-                modalContentHeadline = "Adress mail not exist in your contact list";
+                modalContentHeadline = "Address mail not exist in your contact list";
                 showBtnSendAnywayDontWarnFuture = false;
             }
 
@@ -131,7 +131,11 @@ function applySmtpComposePageHandlers() {
 
         async function handleSendAnyway() {
             if ($('.saving_draft').val() !== '0') {
-                Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+                if ($('.nexter_input').val()) {
+                    Hm_Notices.show([hm_trans('Please wait, message scheduling in progress...')]);
+                } else {
+                    Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+                }
                 await waitForValueChange('.saving_draft', '0');
             }
 
@@ -196,10 +200,10 @@ function applySmtpComposePageHandlers() {
         toggle_recip_flds();
     }
     // Handle focus management for different compose scenarios
-    if (window.location.href.search('&reply=1') !== -1 || window.location.href.search('&reply_all=1') !== -1) {
+    if (routeParams.reply == 1 || routeParams.reply_all == 1) {
         replace_cursor_positon ($('textarea[name="compose_body"]'));
     }
-    else if (window.location.href.search('&forward=1') !== -1) {
+    else if (routeParams.forward == 1) {
         replace_cursor_positon ($('textarea[name="compose_body"]'));
         setTimeout(function() {
             save_compose_state();
@@ -213,11 +217,25 @@ function applySmtpComposePageHandlers() {
             $('textarea[name="compose_body"]').focus();
         }
     }
+
+    const getSmtpProfileCallback = (res) => {
+        const deliveryReceiptCheckBox = $('#compose_delivery_receipt');
+        if (! res.dsn_supported) {
+            deliveryReceiptCheckBox.prop('checked', false);
+            deliveryReceiptCheckBox.prop('disabled', true);
+            deliveryReceiptCheckBox.next('label').after('<span class="badge bg-warning text-dark ms-2">Not supported by the selected SMTP server</span>');
+        } else {
+            deliveryReceiptCheckBox.prop('disabled', false);
+            deliveryReceiptCheckBox.prop('checked', true);
+            deliveryReceiptCheckBox.next('label').next('span.badge').remove();
+        }
+    };
+
     if ($('.sys_messages').text() != 'Message Sent') {
-        get_smtp_profile($('.compose_server').val());
+        get_smtp_profile($('.compose_server').val(), getSmtpProfileCallback);
     }
     $('.compose_server').on('change', function() {
-        get_smtp_profile($('.compose_server').val());
+        get_smtp_profile($('.compose_server').val(), getSmtpProfileCallback);
     });
     if($('.compose_attach_button').attr('disabled') == 'disabled'){
         check_attachment_dir_access();
@@ -230,9 +248,37 @@ function applySmtpComposePageHandlers() {
             text_to_bubbles(this);
         }
     });
+    $('.compose_to, .compose_cc, .compose_bcc').on('keydown', function(e) {
+        // Handle backspace to select/delete bubbles
+        if(e.which == 8 || e.keyCode == 8) {
+            var $input = $(this);
+            var $bubblesContainer = $input.prev('.bubbles');
+            var $bubbles = $bubblesContainer.find('.bubble');
+            var $selectedBubble = $bubblesContainer.find('.bubble.bubble_selected');
+
+            if ($input.val() === '' && $bubbles.length > 0) {
+                e.preventDefault();
+                if ($selectedBubble.length > 0) {
+                    $(".bubble_dropdown-content").remove();
+                    remove_recipient_from_list($selectedBubble.data('id'));
+                    $selectedBubble.remove();
+                } else {
+                    $bubbles.last().addClass('bubble_selected');
+                }
+            } else if ($input.val() !== '') {
+                $bubblesContainer.find('.bubble_selected').removeClass('bubble_selected');
+            }
+        } else if (e.which !== 13) {
+            // On any other key (except Enter), deselect selected bubble
+            var $input = $(this);
+            var $bubblesContainer = $input.prev('.bubbles');
+            $bubblesContainer.find('.bubble_selected').removeClass('bubble_selected');
+        }
+    });
     $('.compose_to, .compose_cc, .compose_bcc').on('blur', function(e) {
         e.preventDefault();
         text_to_bubbles(this);
+        $(this).prev('.bubbles').find('.bubble_selected').removeClass('bubble_selected');
     });
     $('.compose_subject, .compose_body, .compose_server, .smtp_send_placeholder, .smtp_send_archive').on('focus', function(e) {
         $('.compose_to, .compose_cc, .compose_bcc').each(function() {
@@ -241,6 +287,7 @@ function applySmtpComposePageHandlers() {
     });
     $('.compose_to, .compose_cc, .compose_bcc').on('focus', function(e) {
         text_to_bubbles(this);
+        $(this).prev('.bubbles').find('.bubble_selected').removeClass('bubble_selected');
     });
     $('.compose_container').on('click', function() {
         $(this).find('input').focus();
@@ -248,6 +295,7 @@ function applySmtpComposePageHandlers() {
     $(document).on('click', '.bubble_close', function(e) {
         e.stopPropagation();
         $(".bubble_dropdown-content").remove();
+        remove_recipient_from_list($(this).parent().data('id'));
         $(this).parent().remove();
     });
 

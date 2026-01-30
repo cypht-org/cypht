@@ -4,7 +4,8 @@ from creds import RECIP
 from runner import test_runner
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoSuchElementException
-import time
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 class SendTest(WebTest):
 
@@ -32,8 +33,8 @@ class SendTest(WebTest):
         send_button = self.by_class('smtp_send_placeholder')
         if send_button.get_attribute('disabled'):
             self.driver.execute_script("arguments[0].removeAttribute('disabled')", send_button)
-        self.driver.execute_script("arguments[0].scrollIntoView()", send_button)
-        time.sleep(1)
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant'})", send_button)
+        WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(send_button))
         send_button.click()
         self.wait_with_folder_list()
         self.wait_on_class('sys_messages')

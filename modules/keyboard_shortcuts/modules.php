@@ -109,10 +109,9 @@ class Hm_Output_enable_shortcut_setting extends Hm_Output_Module {
             $checked = '';
             $reset='';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_keyboard_shortcuts">'.
-            $this->trans('Enable keyboard shortcuts').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.
-            ' value="1" id="enable_keyboard_shortcuts" name="enable_keyboard_shortcuts" data-default-value="'.(DEFAULT_ENABLE_KEYBOARD_SHORTCUTS ? 'true' : 'false') . '"/>'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="enable_keyboard_shortcuts">'.
+            $this->trans('Enable keyboard shortcuts').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.
+            ' value="1" id="enable_keyboard_shortcuts" name="enable_keyboard_shortcuts" data-default-value="'.(DEFAULT_ENABLE_KEYBOARD_SHORTCUTS ? 'true' : 'false') . '"/>'.$reset.'</div></td></tr>';
     }
 }
 

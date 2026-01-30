@@ -4,10 +4,6 @@ use PHPUnit\Framework\TestCase;
 
 class Hm_Test_Core_Functions extends TestCase {
 
-    public function setUp(): void {
-        require __DIR__.'/../../bootstrap.php';
-        require APP_PATH.'modules/core/modules.php';
-    }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
@@ -169,8 +165,8 @@ class Hm_Test_Core_Functions extends TestCase {
         $len =  count($res['foo']);
         $res2 = Hm_Output_Modules::dump();
         $len2 = count($res2['foo']);
-        $this->assertEquals(12, $len);
-        $this->assertEquals(19, $len2);
+        $this->assertEquals(13, $len);
+        $this->assertEquals(20, $len2);
     }
     /**
      * @preserveGlobalState disabled

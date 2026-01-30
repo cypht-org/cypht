@@ -281,7 +281,7 @@ class Hm_Output_profile_page_link extends Hm_Output_Module {
  */
 class Hm_Output_compose_signature_button extends Hm_Output_Module {
     protected function output() {
-        return '<input type="hidden" value="'.$this->trans('You need at least one profile with a signature to sign messages. Please configure a signature in your profile settings.').'" id="sign_msg" />'.
+        return '<input type="hidden" value="'.$this->trans('No signature is configured for this profile. Add a signature in your profile settings to use the Sign button.').'" id="sign_msg" />'.
             '<input class="compose_sign btn btn-light float-end mt-3 me-2 border" type="button" value="'.$this->trans('Sign').'" />';
     }
 }
@@ -293,28 +293,20 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
     protected function output() {
         $res = '<script type="text/javascript">var profile_signatures = {';
         $sigs = array();
-        $used = array();
-        $profiles = $this->get('profiles');
-        foreach ($this->get('compose_profiles', array()) as $vals) {
-            $smtp_profiles = profiles_by_smtp_id($profiles, $vals['smtp_id']);
+        $profiles = $this->get('profiles', array());
+        $smtp_servers = $this->get('smtp_servers', array());
+
+        foreach ($smtp_servers as $id => $vals) {
+            $smtp_profiles = profiles_by_smtp_id($profiles, $vals['id']);
             if (count($smtp_profiles) > 0) {
-                foreach ($smtp_profiles as $index => $smtp_vals) {
-                    if (in_array($smtp_vals['id'], $used, true)) {
-                        continue;
+                foreach ($smtp_profiles as $index => $profile) {
+                    if (mb_strlen(trim($profile['sig']))) {
+                        $sig = $profile['sig'];
+                        $sig = str_replace(array("\r\n", "\r"), "\n", $sig);
+                        $sig = "\n" . $sig . "\n";
+                        $encoded_sig = json_encode($sig, JSON_UNESCAPED_SLASHES);
+                        $sigs[] = sprintf("\"%s\": %s", $vals['id'].'.'.($index+1), $encoded_sig);
                     }
-                    if (mb_strlen(trim($smtp_vals['sig']))) {
-                        $sigs[] = sprintf("\"%s\": \"\\n%s\\n\"", $smtp_vals['smtp_id'].'.'.($index+1), $this->html_safe(str_replace("\r\n", "\\n", $smtp_vals['sig'])));
-                        $used[] = $smtp_vals['id'];
-                    }
-                }
-            }
-            else {
-                if (in_array($vals['id'], $used, true)) {
-                    continue;
-                }
-                if (mb_strlen(trim($vals['sig']))) {
-                    $sigs[] = sprintf("\"%s\": \"\\n%s\\n\"", $vals['smtp_id'], $this->html_safe(str_replace("\r\n", "\\n", $vals['sig'])));
-                    $used[] = $vals['id'];
                 }
             }
         }

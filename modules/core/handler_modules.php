@@ -1179,7 +1179,11 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     $this->out('imap_service_name', $provider);
                 }
                 $this->out('just_saved_credentials', true);
-                Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                if (isPageConfigured('save')) {
+                    Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                } else {
+                    Hm_Msgs::add("Server saved.");
+                }
             }
 
             if ($createProfile && $this->smtp_server_id && ($this->imap_server_id || $this->jmap_server_id)) {
@@ -1201,5 +1205,33 @@ class Hm_Handler_privacy_settings extends Hm_Handler_Module {
         foreach ($settings as $key => $setting) {
             process_site_setting($key, $this, 'privacy_setting_callback');
         }
+    }
+}
+
+class Hm_Handler_version_upgrade_checker extends Hm_Handler_Module {
+
+    public function process()
+    {
+        if ($this->session->get('latest_version')) {
+            $latestVersion = $this->session->get('latest_version');
+        } else {
+            $api = new Hm_API_Curl();
+            $data = $api->command('https://api.github.com/repos/cypht-org/cypht/releases');
+
+            if ($api->last_status == 200) {
+                $latestRelease = reset($data);
+                $latestVersion = substr($latestRelease['tag_name'], 1);
+
+                $this->session->set('latest_version', $latestVersion);
+            }
+        }
+
+        if (version_compare(CYPHT_VERSION, $latestVersion, '<')) {
+            $needUpgrade = true;
+        } else {
+            $needUpgrade = false;
+        }
+        $this->out('need_upgrade', $needUpgrade);
+        $this->out('latest_version', $latestVersion);
     }
 }

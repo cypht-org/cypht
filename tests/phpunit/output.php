@@ -9,7 +9,6 @@ class Hm_Test_Output extends TestCase {
 
     public $http;
     public function setUp(): void {
-        require 'bootstrap.php';
         $this->http = new Hm_Output_HTTP();
     }
     /**

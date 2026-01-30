@@ -13,10 +13,14 @@ function showLoaderToast(text = 'Loading...') {
     </div>
     `
 
+    if (document.getElementById('loading_indicator')) {
+        document.getElementById('loading_indicator').remove();
+    }
+
     document.body.insertAdjacentHTML('beforeend', toastHTML)
 
     const instance = bootstrap.Toast.getOrCreateInstance(document.getElementById(uniqueId));
-    instance.show();    
+    instance.show();
 
     return instance;
 }

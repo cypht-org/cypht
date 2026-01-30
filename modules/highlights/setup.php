@@ -9,10 +9,10 @@ setup_base_page('highlights', 'core');
 add_handler('highlights', 'load_feeds_from_config', true, 'feeds', 'load_user_data', 'after');
 add_handler('highlights', 'highlight_process_form', true, 'highlights', 'language', 'after');
 add_handler('highlights', 'highlight_page_data', true, 'highlights', 'highlight_process_form', 'after');
-add_output('highlights', 'highlight_config_page', true, 'highlights', 'content_section_start', 'after');
+add_output('highlights', 'highlight_config_page', true, 'highlights', 'version_upgrade_checker', 'after');
 
 add_handler('message_list', 'highlight_list_data', true, 'highlights', 'load_user_data', 'after');
-add_output('message_list', 'highlight_css', true, 'highlights', 'content_section_start', 'before');
+add_output('message_list', 'highlight_css', true, 'highlights', 'version_upgrade_checker', 'before');
 
 add_output('ajax_hm_folders', 'highlight_link', true, 'highlights', 'settings_save_link', 'after');
 

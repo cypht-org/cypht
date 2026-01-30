@@ -635,7 +635,7 @@ class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
             $folder_name = $this->get('special_folder_names')['junk'] ?? $junk_folder;
         }
 
-        $res = '<div class="row m-0 px-3 mt-3">';
+        $res = '<div class="row m-0 px-3 mt-3 pb-3">';
         $res .= '<div data-target=".junk_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
                     <a href="#" class="pe-auto"><i class="bi bi-envelope-x-fill fs-5 me-2"></i>'.$this->trans('Junk Folder').':<span id="junk_val">'.$folder_name.'</span></a>
                 </div>';
@@ -789,8 +789,7 @@ class Hm_Output_imap_only_subscribed_folders_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label for="only_subscribed_folders">'.
-            $this->trans('Showing subscribed folders only').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="only_subscribed_folders" name="only_subscribed_folders" data-default-value="false" value="1" class="form-check-input" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="only_subscribed_folders">'.
+            $this->trans('Showing subscribed folders only').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' id="only_subscribed_folders" name="only_subscribed_folders" data-default-value="false" value="1" />'.$reset.'</div></td></tr>';
     }
 }

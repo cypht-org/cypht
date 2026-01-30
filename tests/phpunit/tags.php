@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Tags extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
         require __DIR__.'/helpers.php';
 
     }

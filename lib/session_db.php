@@ -97,11 +97,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
         if (is_array($results)) {
             if (array_key_exists('data', $results) && array_key_exists('hm_version', $results)) {
                 $this->version = $results['hm_version'];
-                $data = $results['data'];
-                if (is_resource($data)) {
-                    $data = stream_get_contents($data);
-                }
-                return $this->plaintext($data);
+                return $this->plaintext($results['data']);
             }
         }
         Hm_Debug::add('DB SESSION failed to read session data');

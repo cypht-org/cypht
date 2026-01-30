@@ -89,6 +89,7 @@ class Hm_SMTP {
     private $scramAuthenticator;
     private $supports_tls;
     private $supports_auth;
+    private $supports_dsn;
     private $max_message_size;
 
     function __construct($conf) {
@@ -110,13 +111,33 @@ class Hm_SMTP {
         else {
             $this->port = 25;
         }
-        if (isset($conf['tls']) && $conf['tls']) {
-            $this->tls = true;
+        $this->tls = false;
+        $this->starttls = false;
+        if (isset($conf['tls'])) {
+            $tls_val = $conf['tls'];
+            if (is_string($tls_val)) {
+                $normalized = mb_strtolower(trim($tls_val));
+                if ($normalized === 'starttls') {
+                    $this->starttls = true;
+                }
+                elseif ($normalized === 'tls' || $normalized === 'ssl' || $normalized === 'true' || $normalized === '1') {
+                    $this->tls = true;
+                }
+                elseif ($normalized === 'false' || $normalized === '0' || $normalized === '') {
+                    // leave both false
+                }
+                elseif ($tls_val) {
+                    $this->tls = true;
+                }
+            }
+            elseif ($tls_val === true || $tls_val === 1) {
+                $this->tls = true;
+            }
+            elseif ($tls_val) {
+                $this->tls = true;
+            }
         }
-        else {
-            $this->tls = false;
-        }
-        if (!$this->tls) {
+        if (!$this->tls && !$this->starttls) {
             $this->starttls = true;
         }
         $this->request_auths = array(
@@ -249,6 +270,9 @@ class Hm_SMTP {
                 case 'auth': // supported auth mechanisims
                     $auth_mecs = array_slice($line[1], 1);
                     $this->supports_auth = array_map(function($v) { return mb_strtolower($v); }, $auth_mecs);
+                    break;
+                case 'dsn': // supports delivery status notifications
+                    $this->supports_dsn = true;
                     break;
                 case 'size': // advisary maximum message size
                     if(isset($line[1][1]) && is_numeric($line[1][1])) {
@@ -632,6 +656,10 @@ class Hm_SMTP {
             $result = "There was an error sending your message. One or more of the recipient addresses may be invalid (RCPT command failed). Please check the email addresses and try again.";
         }
         return $result;
+    }
+
+    function supports_dsn() {
+        return $this->supports_dsn;
     }
 
     function puke() {

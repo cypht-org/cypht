@@ -336,7 +336,6 @@
 }
 .move_to_title {
   padding: 5px 10px;
-  background-color: #fff;
   border-bottom: solid 1px #ede8e6;
 }
 .move_to_title span {
@@ -370,7 +369,6 @@
   left: -5%;
   top: 40px;
   right: 100%;
-  background-color: white;
   border: 0.4px solid #8080807a;
   border-radius: 4px;
   z-index: 50;
@@ -382,7 +380,7 @@
   box-shadow: 0px 5px 10px #8080804a;
 }
 .move_to_location .folders li {
-  display: flex;
+  display: block;
   flex-direction: column;
 }
 .move_to_location .folders .inner_list li {

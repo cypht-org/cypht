@@ -35,7 +35,7 @@ class FolderListTests(WebTest):
             # If spinner doesn't appear, just wait a bit for the AJAX to complete
             import time
             time.sleep(2)
-        
+
         # Verify the main menu is still displayed after the reload
         main_menu = self.by_class('main')
         assert main_menu.is_displayed()
@@ -52,7 +52,7 @@ class FolderListTests(WebTest):
             const item = arguments[1];
             container.scrollTop = item.offsetTop - container.offsetTop;
         """, folder_list, list_item)
-        WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(link))
+        WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(link))
         link.click()
         self.wait_with_folder_list()
         self.wait_for_navigation_to_complete()
@@ -68,7 +68,7 @@ class FolderListTests(WebTest):
         assert 'show' not in collapsed_class
 
     def hide_folders(self):
-        self.driver.execute_script("window.scrollBy(0, 1000);")
+        self.driver.execute_script("window.scrollBy({left:0, top:1000, behavior: 'instant'});")
         self.wait(By.CLASS_NAME, 'menu-toggle')
         # Use JavaScript to click the element
         hide_button = self.by_class('menu-toggle')

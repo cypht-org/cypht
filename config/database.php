@@ -31,15 +31,15 @@ return [
     | Database port. Only needed if your database is running on a non-standard
     | port
     */
-    'db_port' => env('DB_PORT', 3306),
+    'db_port' => env('DB_PORT', ''),
 
     /*
     |
-    | If db_connection_type is set to "socket", this should be the filesystem
-    | location of the unix socket file. If db_connection_type is set to "host"
-    | this value is ignored.
+    | If db_connection_type is set to "socket", DB_SOCKET must be provided in
+    | the .env file with the filesystem location of the unix socket file.
+    | If db_connection_type is set to "host", this value is ignored.
     */
-    'db_socket' => env('DB_SOCKET','/var/lib/mysqld/mysqld.sock'),
+    'db_socket' => env('DB_SOCKET', ''),
 
     /*
     |

@@ -312,7 +312,7 @@ class Hm_MessagesStore {
         } else {
             if (this.path == 'tag') {
                 config.push({ name: "hm_ajax_hook", value: 'ajax_imap_tag_data' });
-                config.push({ name: "folder", value: getParam('tag_id') });
+                config.push({ name: "folder", value: getParam('filter') });
                 configs.push(config);
             } else {
                 let sources = hm_data_sources();

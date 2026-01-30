@@ -425,6 +425,7 @@ function setup_base_page($name, $source=false, $use_layout=true) {
     add_handler($name, 'save_user_data', true, $source);
     add_handler($name, 'logout', true, $source);
     add_handler($name, 'http_headers', true, $source);
+    add_handler($name, 'version_upgrade_checker', true, $source);
 
     add_output($name, 'header_start', false, $source);
     add_output($name, 'header_css', false, $source);
@@ -442,6 +443,7 @@ function setup_base_page($name, $source=false, $use_layout=true) {
         add_output($name, 'folder_list_start', true, $source);
         add_output($name, 'folder_list_end', true, $source);
         add_output($name, 'content_section_start', true, $source);
+        add_output($name, 'version_upgrade_checker', true, $source, 'content_section_start', 'after');
         add_output($name, 'content_section_end', true, $source);
         add_output($name, 'modals', true, $source);
         add_output($name, 'save_reminder', true, $source);
@@ -632,15 +634,25 @@ function privacy_setting_callback($val, $key, $mod) {
     $key .= '_setting';
     $user_setting = $mod->user_config->get($key);
     $update = $mod->request->post['update'];
+    $pop = $mod->request->post['pop'];
 
     if ($update) {
-        $val = implode($setting['separator'], array_filter(array_merge(explode($setting['separator'], $user_setting), [$val])));
-        $mod->user_config->set($key, $val);
+        if ($pop) {
+            $new_value = implode($setting['separator'], array_filter(explode($setting['separator'], $user_setting), function($item) use ($val) {
+                return $item != $val;
+            }));
+        } else {
+            $new_value = implode($setting['separator'], array_filter(array_merge(explode($setting['separator'], $user_setting), [$val])));
+        }
+        
+        $mod->user_config->set($key, $new_value);
 
         $user_data = $mod->session->get('user_data', array());
-        $user_data[$key] = $val;
+        $user_data[$key] = $new_value;
         $mod->session->set('user_data', $user_data);
         $mod->session->record_unsaved('Privacy settings updated');
+
+        return $new_value;
     }
     return $val;
 }
@@ -762,21 +774,24 @@ function getSettingsSectionOutput($section, $sectionLabel, $sectionIcon, $settin
         ['type' => $type, 'label' => $label, 'description' => $description] = $setting;
 
         if ($type === 'checkbox') {
-            $input = '<input type="checkbox" id="'.$key.'" name="'.$key.'" '.($value ? 'checked' : '').' class="form-check-input">';
+            $input = '<input type="checkbox" id="'.$key.'" name="'.$key.'" '.($value ? 'checked' : '').' class="form-check-input me-2">';
         } else {
             $input = '<input type="'.$type.'" id="'.$key.'" name="'.$key.'" value="'.$value.'" class="form-control">';
         }
 
         $res .= "<tr class='{$section}_setting'>" .
-        "<td><label for='$key'>$label</label></td>" .
-        "<td>
-            <div>
-                $input
-            </div>
-            <div class='setting_description'>$description</div>
-        </td>" .
+        "<td class='d-block d-md-table-cell'><label for='$key'>$label</label></td>" .
+        "<td class='d-block d-md-table-cell'>" .
+            "<div class='d-flex align-items-center'>$input</div>" .
+            "<div class='setting_description'>$description</div>" .
+        "</td>" .
         "</tr>";
     }
     return $res;
+}
+
+function isPageConfigured($page) {
+    $pages = array_keys(Hm_Handler_Modules::dump());
+    return in_array($page, $pages);
 }
 

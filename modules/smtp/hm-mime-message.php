@@ -129,6 +129,16 @@ class Hm_MIME_Msg {
         $this->headers['X-Auto-Bcc'] = 'cypht';
     }
 
+    function set_original_bcc_header() {
+        if ($this->bcc) {
+            $this->headers['X-Original-Bcc'] = $this->bcc;
+        }
+    }
+
+    function get_bcc() {
+        return $this->bcc;
+    }
+
     function quote_fld($val) {
         if (!trim($val)) {
             return '';

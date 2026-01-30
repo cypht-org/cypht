@@ -1144,12 +1144,12 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
         }
         $res = '<li class="menu_sieve_filters"><a class="unread_link" href="?page=sieve_filters">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-journal-bookmark-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-journal-bookmark-fill me-2"></i>';
         }
         $res .= $this->trans('Filters').'</a></li>';
         $res .= '<li class="menu_block_list"><a class="unread_link" href="?page=block_list">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-x-circle-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-x-circle-fill me-2"></i>';
         }
         $res .= $this->trans('Block List').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -1167,7 +1167,7 @@ class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
         $socked_connected = $this->get('socket_connected', false);
         $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters').'</div>';
         $res .= '<div class="p-3">';
-        $res .= '<div class="p-3" id="sieve_accounts"></div>';
+        $res .= '<div id="sieve_accounts"></div>';
         $res .= get_classic_filter_modal_content();
         $res .= get_script_modal_content();
         return $res;
@@ -1339,10 +1339,9 @@ class Hm_Output_enable_sieve_filter_setting extends Hm_Output_Module {
         }else {
             $reset = '';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_sieve_filter">'.
-            $this->trans('Enable sieve filter').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.
-            ' value="1" id="enable_sieve_filter" name="enable_sieve_filter" data-default-value="'.(DEFAULT_ENABLE_SIEVE_FILTER ? 'true' : 'false') . '"/>'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="enable_sieve_filter">'.
+            $this->trans('Enable sieve filter').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.
+            ' value="1" id="enable_sieve_filter" name="enable_sieve_filter" data-default-value="'.(DEFAULT_ENABLE_SIEVE_FILTER ? 'true' : 'false') . '"/>'.$reset.'</div></td></tr>';
     }
 }
 

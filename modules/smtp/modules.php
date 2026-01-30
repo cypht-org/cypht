@@ -101,6 +101,10 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                     $imap_draft['Cc'] = $this->unangle($msg_header['Cc']);
                 }
 
+                if (array_key_exists('X-Original-Bcc', $msg_header)) {
+                    $imap_draft['Bcc'] = $this->unangle($msg_header['X-Original-Bcc']);
+                }
+
                 if ($imap_draft) {
                     recip_count_check($imap_draft, $this);
                     $this->out('draft_id', $this->request->get['uid']);
@@ -564,6 +568,27 @@ class Hm_Handler_profile_status extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_smtp_supports_dsn extends Hm_Handler_Module {
+    public function process() {
+        if (! $this->user_config->get('enable_compose_delivery_receipt_setting')) {
+            return;
+        }
+
+        Hm_SMTP_List::init($this->user_config, $this->session);
+
+        $smtp_id = server_from_compose_smtp_id($this->request->post['compose_smtp_id']);
+        $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
+        $mailbox = Hm_SMTP_List::connect($smtp_id, false, $smtp_details['user'], $smtp_details['pass']);
+        if (! $mailbox || ! $mailbox->authed()) {
+            Hm_Msgs::add("Failed to determine Delivery Status Notification. The server refused connection. user is: ".$smtp_details['user'], "danger");
+            $this->out('dsn_supported', false);
+            return;
+        }
+
+        $this->out('dsn_supported', $mailbox->get_connection()->supports_dsn());
+    }
+}
+
 if (!hm_exists('get_mime_type')) {
     function get_mime_type($filename)
     {
@@ -653,7 +678,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* missing field */
-        list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_body', 'compose_smtp_id', 'draft_id', 'post_archive', 'next_email_post'));
+        list($success, $form) = $this->process_form(array('compose_subject', 'compose_body', 'compose_smtp_id', 'draft_id', 'post_archive', 'next_email_post'));
         if (!$success) {
             Hm_Msgs::add('Required field missing', 'warning');
             return;
@@ -661,11 +686,11 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* defaults */
         $smtp_id = server_from_compose_smtp_id($form['compose_smtp_id']);
-        $to = $form['compose_to'];
+        $to = isset($this->request->post['compose_to']) ? $this->request->post['compose_to'] : '';
         $subject = $form['compose_subject'];
         $body_type = $this->get('smtp_compose_type', DEFAULT_SMTP_COMPOSE_TYPE);
         $draft = array(
-            'draft_to' => $form['compose_to'],
+            'draft_to' => isset($this->request->post['compose_to']) ? $this->request->post['compose_to'] : '',
             'draft_body' => '',
             'draft_subject' => $form['compose_subject'],
             'draft_smtp' => $smtp_id
@@ -748,6 +773,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* check for associated IMAP server to save a copy */
         if ($imap_server !== false) {
+            $mime->set_original_bcc_header();
             $this->out('save_sent_server', $imap_server, false);
             $this->out('save_sent_msg', $mime);
         }
@@ -892,10 +918,9 @@ class Hm_Output_enable_compose_delivery_receipt_setting extends Hm_Output_Module
             $checked = '';
             $reset = '';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_compose_delivery_receipt">'.
-            $this->trans('Enable delivery receipt').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.
-            ' value="1" id="enable_compose_delivery_receipt" name="enable_compose_delivery_receipt" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="enable_compose_delivery_receipt">'.
+            $this->trans('Enable delivery receipt').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.
+            ' value="1" id="enable_compose_delivery_receipt" name="enable_compose_delivery_receipt" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -928,9 +953,8 @@ class Hm_Output_attachment_setting extends Hm_Output_Module {
         if ($size_in_kbs > 0) {
             $size_in_kbs = round(($size_in_kbs / 1024), 2);
         }
-        return '<tr class="general_setting"><td><label>'.
-            $this->trans('Attachment Chunks').'</label></td>'.
-            '<td><small>('.$num_chunks.' Chunks) '.$size_in_kbs.' KB</small> <button id="clear_chunks_button" class="btn btn-light btn-sm border">Clear Chunks</button></td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell align-middle"><label class="mb-1 mb-md-0">'.
+            $this->trans('Attachment Chunks').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2"><small>('.$num_chunks.' Chunks) '.$size_in_kbs.' KB</small><button id="clear_chunks_button" class="btn btn-light btn-sm border">Clear Chunks</button></div></td></tr>';
     }
 }
 
@@ -953,10 +977,9 @@ class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
             $checked = '';
             $reset='';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_attachment_reminder">'.
-            $this->trans('Enable Attachment Reminder').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.
-            ' value="1" id="enable_attachment_reminder" class="form-check-input" name="enable_attachment_reminder" data-default-value="false" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="enable_attachment_reminder">'.
+            $this->trans('Enable Attachment Reminder').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.
+            ' value="1" id="enable_attachment_reminder" name="enable_attachment_reminder" data-default-value="false" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -1127,6 +1150,9 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             if (array_key_exists('Cc', $imap_draft)) {
                 $cc = $imap_draft['Cc'];
             }
+            if (array_key_exists('Bcc', $imap_draft)) {
+                $bcc = $imap_draft['Bcc'];
+            }
             if (array_key_exists('From', $imap_draft)) {
                 $from = $imap_draft['From'];
             }
@@ -1166,7 +1192,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '<div class="to_outer">'.
                     '<div class="mb-3 position-relative compose_container p-1 w-100 form-control">'.
                         '<div class="bubbles bubble_dropdown"></div>'.
-                        '<input autocomplete="off" value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to w-75" type="text" placeholder="'.$this->trans('To').'" id="compose_to" />'.
+                        '<input autocomplete="off" value="'.$this->html_safe($to).'" name="compose_to" class="compose_to w-75" type="text" placeholder="'.$this->trans('To').'" id="compose_to" />'.
                         '<a href="#" tabindex="-1" class="toggle_recipients position-absolute end-0 pe-2"><i class="bi bi-plus-square-fill fs-3"></i></a>'.
                         '<div id="to_contacts"></div>'.
                     '</div>'.
@@ -1193,7 +1219,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                     (!$html ? '<label for="compose_body">'.$this->trans('Message').'</label>': '').
                 '</div>';
                 if($this->get('enable_compose_delivery_receipt_setting')) {
-                    $res .= '<div class="form-check mb-3"><input value="1" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" class="form-check-input" checked/><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
+                    $res .= '<div class="form-check mb-3"><input value="1" name="compose_delivery_receipt" disabled id="compose_delivery_receipt" type="checkbox" class="form-check-input" checked/><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
                 }
         if ($html == 2) {
             $res .= '<link href="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
@@ -1357,7 +1383,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
         if (array_key_exists('smtp_compose_type', $settings)) {
             $selected = $settings['smtp_compose_type'];
         }
-        $res = '<tr class="general_setting"><td>'.$this->trans('Outbound mail format').'</td><td><select class="form-select form-select-sm w-auto" name="smtp_compose_type" data-default-value="'.DEFAULT_SMTP_COMPOSE_TYPE.'">';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label>'.$this->trans('Outbound mail format').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select class="form-select form-select-sm w-auto" name="smtp_compose_type" data-default-value="'.DEFAULT_SMTP_COMPOSE_TYPE.'">';
         $res .= '<option ';
         if ($selected == 0) {
             $res .= 'selected="selected" ';
@@ -1373,7 +1399,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
         if ($selected != 0) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
         }
-        $res .= 'value="2">'.$this->trans('Markdown').'</option></select>'.$reset.'</td></tr>';
+        $res .= 'value="2">'.$this->trans('Markdown').'</option></select>'.$reset.'</div></td></tr>';
         return $res;
     }
 }
@@ -1388,13 +1414,13 @@ class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
         if (array_key_exists('smtp_auto_bcc', $settings)) {
             $auto = $settings['smtp_auto_bcc'];
         }
-        $res = '<tr class="general_setting"><td><label class="form-check-label" for="smtp_auto_bcc">'.$this->trans('Always BCC sending address').'</label></td><td><input class="form-check-input" value="1" type="checkbox" name="smtp_auto_bcc" id="smtp_auto_bcc"  data-default-value="false"';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="smtp_auto_bcc">'.$this->trans('Always BCC sending address').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" value="1" type="checkbox" name="smtp_auto_bcc" id="smtp_auto_bcc"  data-default-value="false"';
         $reset = '';
         if ($auto) {
             $res .= ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        $res .= '>'.$reset.'</td></tr>';
+        $res .= '>'.$reset.'</div></td></tr>';
         return $res;
     }
 }
@@ -2014,6 +2040,8 @@ function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '', $
         $profile_id
     );
 
+    $mime->set_original_bcc_header();
+
     $mime->add_attachments($uploaded_files);
 
     return $mime;
@@ -2050,8 +2078,8 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $imap_profile = Hm_IMAP_List::getForMailbox($imap_profile['id']);
     $specials = get_special_folders($mod, $imap_profile['id']);
 
-    if ((!array_key_exists('draft', $specials) || !$specials['draft']) && !array_key_exists('schedule', $atts)) {
-        Hm_Msgs::add('There is no draft directory configured for this account.', 'warning');
+    if ((!array_key_exists('draft', $specials) || !$specials['draft']) && (!array_key_exists('schedule', $atts) || empty($atts['schedule']))) {
+        Hm_Msgs::add('No draft directory configured for this account. Set it in account settings to save drafts.', 'warning');
         return -1;
     }
     $mailbox = new Hm_Mailbox($imap_profile['id'], $mod->user_config, $session, $imap_profile);
@@ -2083,7 +2111,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $msg = rtrim($msg)."\r\n";
 
     if (! $mailbox->store_message($folder, $msg, false, true)) {
-        Hm_Msgs::add('An error occurred saving the draft message', 'danger');
+        Hm_Msgs::add('Unable to save draft message. Please check your account settings and ensure the draft folder is properly configured.', 'danger');
         return -1;
     }
     

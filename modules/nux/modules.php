@@ -140,7 +140,11 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                         ));
                         $this->session->record_unsaved('SMTP server added');
                     }
-                    Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                    if (isPageConfigured('save')) {
+                        Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                    } else {
+                        Hm_Msgs::add("E-mail account successfully added.");
+                    }
                     Hm_IMAP_List::clean_up();
                     $this->session->del('nux_add_service_details');
                     $this->session->record_unsaved('IMAP server added');
@@ -214,7 +218,11 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     $this->session->record_unsaved('IMAP server added');
                     $this->session->record_unsaved('SMTP server added');
                     $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
-                    Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                    if (isPageConfigured('save')) {
+                        Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                    } else {
+                        Hm_Msgs::add("E-mail account successfully added.");
+                    }
                     $this->session->close_early();
                     $this->out('nux_account_added', true);
                     if ($this->module_is_supported('imap_folders')) {
@@ -574,7 +582,7 @@ class Hm_Output_start_welcome_dialog extends Hm_Output_Module {
         }
         $res = '<div class="nux_welcome mt-3 col-lg-6 col-md-5 col-sm-12"><div class="card"><div class="card-body"><div class="card-title"><h4>'.$this->trans('Welcome to Cypht').'</h4></div>';
         $res .= '<div class="mb-3"><p>'.$this->trans('Add a popular E-mail source quickly and easily').'</p>';
-        $res .= '<a class="mt-3 btn btn-light" href="?page=servers#quick_add_section"><i class="bi bi-person-plus me-3"></i>'.$this->trans('Add an E-mail Account').'</a>';
+        $res .= '<a class="mt-3 btn btn-light text-decoration-none" href="?page=servers#quick_add_section"><i class="bi bi-person-plus me-3"></i>'.$this->trans('Add an E-mail Account').'</a>';
         $res .= '</div>';
         return $res;
     }

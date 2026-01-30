@@ -37,6 +37,22 @@ class Hm_Tags {
         return self::edit($tagId, $tag);
     }
 
+    public static function removeMessage($messageId, $tagId) {
+        $tag = self::get($tagId);
+        if (!$tag) {
+            return false;
+        }
+        foreach ($tag['server'] as $serverId => $folders) {
+            foreach ($folders as $folder => $messages) {
+                $newMessages = array_filter($messages, function($msgId) use ($messageId) {
+                    return $msgId != $messageId;
+                });
+                $tag['server'][$serverId][$folder] = $newMessages;
+            }
+        }
+        return self::edit($tagId, $tag);
+    }
+
     public static function registerFolder($tag_id, $serverId, $folder) {
         $tag = self::get($tag_id);
         if (! isset($tag['server'][$serverId][$folder])) {
@@ -53,7 +69,7 @@ class Hm_Tags {
         return [];
     }
 
-    private static function getTagIdsWithMessage($messageId) {
+    public static function getTagIdsWithMessage($messageId) {
         $tags = self::getAll();
         $tagIds = [];
         foreach ($tags as $tagId => $tag) {

@@ -13,7 +13,7 @@ add_handler('compose', 'smtp_subject_replace', true, 'smtp', 'load_user_data', '
 add_handler('compose', 'load_smtp_servers_from_config', true, 'smtp', 'load_smtp_reply_to_details', 'after');
 add_handler('compose', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_handler('compose', 'process_compose_form_submit', true, 'smtp', 'load_smtp_servers_from_config', 'after');
-add_output('compose', 'compose_title', true, 'smtp', 'content_section_start', 'after');
+add_output('compose', 'compose_title', true, 'smtp', 'version_upgrade_checker', 'after');
 add_output('compose', 'compose_form_start', true, 'smtp', 'compose_title', 'after');
 add_output('compose', 'compose_form_draft_list', true, 'smtp', 'compose_form_start', 'before');
 add_output('compose', 'compose_form_content', true, 'smtp', 'compose_form_start', 'after');
@@ -96,6 +96,7 @@ add_handler('ajax_update_server_pw', 'load_smtp_servers_from_config', true, 'smt
 setup_base_ajax_page('ajax_profiles_status', 'core');
 add_handler('ajax_profiles_status', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_profiles_status', 'profile_status', true, 'smtp', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_profiles_status', 'smtp_supports_dsn', true, 'smtp', 'profile_status', 'after');
 
 /* resumable clear chunks */
 add_handler('ajax_clear_attachment_chunks', 'login', false, 'core');
@@ -164,6 +165,7 @@ return array(
         'sent_msg_id' => array(FILTER_VALIDATE_BOOLEAN, false),
         'enable_attachment_reminder' => array(FILTER_VALIDATE_BOOLEAN, false),
         'scheduled_msg_count' => array(FILTER_VALIDATE_INT, false),
+        'dsn_supported' => array(FILTER_VALIDATE_BOOLEAN, false),
     ),
     'allowed_post' => array(
         'post_archive' => FILTER_VALIDATE_INT,
