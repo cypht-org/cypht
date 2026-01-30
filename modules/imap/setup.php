@@ -339,6 +339,7 @@ return array(
         'do_not_flag_as_read_on_open' => array(FILTER_VALIDATE_BOOLEAN, false),
         'ajax_imap_folders_permissions' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'move_responses' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+        'reload_folders_list' => array(FILTER_VALIDATE_BOOLEAN, false),
     ),
 
     'allowed_get' => array(

@@ -263,6 +263,11 @@ var Hm_Ajax_Request = function() { return {
                     Hm_Folders.update_unread_counts();
                 }
             }
+            
+            if (res.reload_folders_list) {
+                Hm_Folders.update_folder_list(true);
+            }
+
             if (this.callback) {
                 this.callback(res);
             }

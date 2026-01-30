@@ -259,6 +259,7 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
                     $screen_folder = 'Screen emails';
                     if (! count($mailbox->get_folder_status($screen_folder))) {
                         $mailbox->create_folder($screen_folder);
+                        $this->out('reload_folders_list', true);
                     }
                     $form['imap_move_to'] = $parts[0] ."_". $parts[1] ."_".bin2hex($screen_folder);
                     $imap_move_ids = explode(",", $form['imap_move_ids']);
