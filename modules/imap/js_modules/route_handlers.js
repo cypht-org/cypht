@@ -4,6 +4,8 @@ function applyImapMessageListPageHandlers(routeParams) {
     imap_setup_snooze();
     imap_setup_tags();
 
+    setupScreening();
+
     processNextActionDate();
 
     if (window.inlineMessageMessageListAndSearchPageHandler) inlineMessageMessageListAndSearchPageHandler(routeParams);
