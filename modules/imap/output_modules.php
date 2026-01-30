@@ -430,9 +430,36 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $blocked_senders = get_blocked_senders_array($imap_server, $this->get('site_config'), $this->get('user_config'));
                     $sender_blocked = in_array($sender, $blocked_senders);
                     $domain_blocked = in_array($domain, $blocked_senders);
+                    $vendor_detection = $this->get('vendor_detection', array());
+                    $vendor_id = $vendor_detection['vendor_id'] ?? '';
+                    $vendor_name = $vendor_detection['vendor_name'] ?? '';
+                    $platform_blocking_enabled = false;
+                    $site_config = $this->get('site_config');
+                    if ($site_config && method_exists($site_config, 'get')) {
+                        $platform_blocking_enabled = (bool) $site_config->get('enable_platform_blocking', false);
+                    }
+                    $platform_key = $vendor_id ? 'platform:'.$vendor_id : '';
+                    $platform_blocked = $platform_blocking_enabled && $platform_key && in_array($platform_key, $blocked_senders);
+                    $block_target = '';
+                    $block_label = 'Block Sender';
+                    if ($platform_blocked) {
+                        $block_target = 'platform';
+                        $block_label = 'Unblock Platform';
+                    } elseif ($domain_blocked) {
+                        $block_target = 'domain';
+                        $block_label = 'Unblock Domain';
+                    } elseif ($sender_blocked) {
+                        $block_target = 'sender';
+                        $block_label = 'Unblock Sender';
+                    }
                     if(!in_array($sender, $existing_emails)){
-                        $txt .= '<div class="dropdown d-inline-block"><a class="block_sender_link hlink dropdown-toggle text-decoration-none btn btn-sm btn-outline-danger '.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : '"').' href="#" aria-labelledby="dropdownMenuBlockSender" data-bs-toggle="dropdown"><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a>';
-                        $txt .= block_filter_dropdown($this);
+                        $txt .= '<div class="dropdown d-inline-block"><a class="block_sender_link hlink dropdown-toggle text-decoration-none btn btn-sm btn-outline-danger '.($block_target ? '" id="unblock_sender" data-target="'.$block_target.'"' : '"').' href="#" aria-labelledby="dropdownMenuBlockSender" data-bs-toggle="dropdown"><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans($block_label).'</span></a>';
+                        $txt .= block_filter_dropdown($this, null, true, 'block_sender', 'Block', "", array(
+                            'sender' => $sender,
+                            'domain' => $domain,
+                            'vendor_id' => $vendor_id,
+                            'vendor_name' => $vendor_name
+                        ));
                     }
                 } else {
                     $txt .= '<span class="text-decoration-none btn btn-sm btn-outline-danger" data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';

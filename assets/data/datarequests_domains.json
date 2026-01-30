@@ -1,0 +1,27 @@
+{
+    "en": {
+      "base_url": "https://www.datarequests.org"
+    },
+    "fr": {
+      "base_url": "https://www.demandetesdonnees.fr"
+    },
+    "de": {
+      "base_url": "https://www.datenanfragen.de"
+    },
+    "nl": {
+      "base_url": "https://www.gegevensaanvragen.nl"
+    },
+    "es": {
+      "base_url": "https://www.solicituddedatos.es"
+    },
+    "pt": {
+      "base_url": "https://www.pedidodedados.org"
+    },
+    "hr": {
+      "base_url": "https://www.osobnipodaci.org"
+    },
+    "cs": {
+      "base_url": "https://www.zadostioudaje.org"
+    }
+  }
+  

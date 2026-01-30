@@ -746,10 +746,10 @@ var block_unblock_sender = function(msg_uid, detail, scope, action, sender = '',
             {'name': 'sender', 'value': sender},
         ],
         function(res) {
-            if (/^(Sender|Domain) Blocked$/.test(res.router_user_msgs[0].text)) {
+            if (/^(Sender|Domain|Platform) Blocked$/.test(res.router_user_msgs[0].text)) {
                 var title = scope == 'domain'
                     ? 'UNBLOCK DOMAIN'
-                    : 'UNBLOCK SENDER';
+                    : (scope == 'platform' ? 'UNBLOCK PLATFORM' : 'UNBLOCK SENDER');
                 $("#filter_block_txt").html(title);
                 $("#filter_block_txt")
                     .parent()
@@ -757,7 +757,7 @@ var block_unblock_sender = function(msg_uid, detail, scope, action, sender = '',
                     .attr('id', 'unblock_sender')
                     .data('target', scope);
             }
-            if (/^(Sender|Domain) Unblocked$/.test(res.router_user_msgs[0].text)) {
+            if (/^(Sender|Domain|Platform) Unblocked$/.test(res.router_user_msgs[0].text)) {
                 $("#filter_block_txt").html('BLOCK SENDER');
                 $("#filter_block_txt")
                     .parent()
@@ -802,7 +802,9 @@ var imap_message_view_finished = function(msg_uid, detail, listParent, skip_link
         e.preventDefault();
         var scope = $('[name=scope]').val();
         var action = $('[name=block_action]').val();
-        var sender = $('[name=scope]').data('sender');
+        var sender = scope == 'platform'
+            ? $('[name=scope]').data('vendor-id')
+            : $('[name=scope]').data('sender');
         var reject_message = action == 'reject_with_message' ? $('#reject_message_textarea').val() : '';
 
         if (action == 'reject_with_message' && ! reject_message) {
@@ -826,6 +828,8 @@ var imap_message_view_finished = function(msg_uid, detail, listParent, skip_link
         var sender = '';
         if ($(this).data('target') == 'domain') {
             sender = $('[name=scope]').data('domain');
+        } else if ($(this).data('target') == 'platform') {
+            sender = $('[name=scope]').data('vendor-id');
         } else {
             sender = $('[name=scope]').data('sender');
         }
