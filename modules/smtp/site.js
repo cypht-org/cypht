@@ -336,8 +336,16 @@ var copy_text_to_clipboard = function(e) {
 }
 
 var is_valid_recipient = function(recipient) {
-    var valid_regex = /^[\p{L}|\d' ]*(<)?[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*(>)?$/u;
-    return recipient.match(valid_regex);
+    if (!recipient) {
+        return false;
+    }
+    var val = recipient.trim();
+
+    // Support "Name <email@example.com>" format by extracting email from angle brackets
+    var match = val.match(/<([^>]+)>/);
+    var email = match ? match[1].trim() : val;
+
+    return Hm_Utils.is_valid_email(email);
 };
 
 var process_compose_form = function(){
