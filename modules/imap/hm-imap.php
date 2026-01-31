@@ -52,7 +52,7 @@ class Hm_IMAP_List {
         if (self::$use_cache && $cache && is_array($cache)) {
             self::$server_list[$id]['object']->get_connection()->load_cache($cache, 'array');
         }
-        
+
         return self::$server_list[$id]['object']->connect();
     }
 
@@ -75,6 +75,10 @@ class Hm_IMAP_List {
 
     public static function get_mailbox_without_connection($config) {
         $config['type'] = array_key_exists('type', $config) ? $config['type'] : 'imap';
+        if (array_key_exists('user', $config)) {
+            $config['username'] = $config['user'];
+            $config['password'] = "";
+        }
         return new Hm_Mailbox($config['id'], self::$user_config, self::$session, $config);
     }
 }
@@ -268,7 +272,7 @@ if (!class_exists('Hm_IMAP')) {
             $this->get_capability();
             if (!$this->tls) {
                 $this->starttls();
-            } 
+            }
             $scramMechanisms = [
                 'scram-sha-1', 'scram-sha-1-plus',
                 'scram-sha-256', 'scram-sha-256-plus',
@@ -401,7 +405,7 @@ if (!class_exists('Hm_IMAP')) {
         * - Remove rights (using a `-` prefix),
         * - Completely replace existing rights (no prefix).
         *
-        * For more information on ACLs, see RFC 4314: 
+        * For more information on ACLs, see RFC 4314:
         * [Access Control Lists (ACLs) in Internet Message Access Protocol (IMAP)](https://tools.ietf.org/html/rfc4314).
         *
         * @param string $mailbox_name The name of the mailbox for which the ACL is to be set.
@@ -413,7 +417,7 @@ if (!class_exists('Hm_IMAP')) {
         */
         public function set_acl($mailbox_name, $identifier, $rights_modification) {
             $command = "SETACL \"$mailbox_name\" \"$identifier\" \"$rights_modification\"\r\n";
-            
+
             $this->send_command($command);
             $response = $this->get_response();
 
@@ -437,7 +441,7 @@ if (!class_exists('Hm_IMAP')) {
         * This function sends a DELETEACL command to remove any <identifier, rights> pair
         * for the specified identifier from the access control list for the specified mailbox.
         *
-        * For more information on ACLs, see RFC 4314: 
+        * For more information on ACLs, see RFC 4314:
         * [Access Control Lists (ACLs) in Internet Message Access Protocol (IMAP)](https://tools.ietf.org/html/rfc4314).
         *
         * @param string $mailbox The name of the mailbox from which to delete the ACL entry.
@@ -473,7 +477,7 @@ if (!class_exists('Hm_IMAP')) {
         * parses the server's response and maps the raw rights to human-readable
         * permissions using the `map_permissions` function.
         *
-        * For more information on ACLs, see RFC 4314: 
+        * For more information on ACLs, see RFC 4314:
         * [Access Control Lists (ACLs) in Internet Message Access Protocol (IMAP)](https://tools.ietf.org/html/rfc4314).
         *
         * @param string $mailbox_name The name of the mailbox for which to retrieve the ACL.
@@ -482,20 +486,20 @@ if (!class_exists('Hm_IMAP')) {
         *               and the values are human-readable permissions (e.g., 'Read, Write').
         */
         public function get_acl($mailbox_name) {
-            $acl_list = [];        
+            $acl_list = [];
             $command = "GETACL \"$mailbox_name\"\r\n";
             $this->send_command($command);
             $response = $this->get_response();
-        
+
             foreach ($response as $line) {
                 if (preg_match('/^\* ACL ([^\s]+) (.+)$/', $line, $matches)) {
                     $mailbox = $matches[1];
                     $acl_string = $matches[2];
-        
+
                     $acl_parts = explode(' ', $acl_string);
                     for ($i = 1; $i < count($acl_parts); $i += 2) {
                         $user = $acl_parts[$i - 1];
-                        $rights = $acl_parts[$i];      
+                        $rights = $acl_parts[$i];
                         $acl_list[$user] = $this->map_permissions($rights);
                     }
                 }
@@ -727,20 +731,20 @@ if (!class_exists('Hm_IMAP')) {
         function preprocess_folders($result, $mailbox, $delim) {
             $folderPaths = [];
             $processedResult = [];
-        
+
             // Step 1: Extract all folder paths from the array (using the last element in each sub-array)
             foreach ($result as $entry) {
                 if (isset($entry[count($entry) - 1]) && is_string($entry[count($entry) - 1])) {
                     $folderPaths[] = $entry[count($entry) - 1];
                 }
             }
-        
+
             // Step 2: Process each folder to determine if it has subfolders
             foreach ($result as $entry) {
                 if (isset($entry[count($entry) - 1]) && is_string($entry[count($entry) - 1])) {
                     $currentFolder = $entry[count($entry) - 1];
                     $hasChildren = false;
-        
+
                     // Check if any other folder starts with the current folder followed by the delimiter
                     foreach ($folderPaths as $path) {
                         if (strpos($path, $currentFolder . $delim) === 0) {
@@ -748,14 +752,14 @@ if (!class_exists('Hm_IMAP')) {
                             break;
                         }
                     }
-        
+
                     // Add the appropriate flag (\HasChildren or \HasNoChildren)
                     $entry = array_merge(
                         array_slice($entry, 0, 3),
                         [$hasChildren ? "\\HasChildren" : "\\HasNoChildren"],
                         array_slice($entry, 3)
                     );
-        
+
                     // Root folder processing
                     if (empty($mailbox)) {
                         if (strpos($currentFolder, $delim) === false) {
@@ -1038,7 +1042,7 @@ if (!class_exists('Hm_IMAP')) {
                     for ($i=0;$i<$count;$i++) {
                         if ($vals[$i] == 'BODYSTRUCTURE' && !$bodystructure_found) {
                             $bodystructure_found = true;
-                            
+
                             $struct = new Hm_IMAP_Struct(array_slice($vals, $i + 1), $this);
 
                             $calendar_parts = $struct->search(array('type' => 'text', 'subtype' => 'calendar'), true);
@@ -1199,7 +1203,7 @@ if (!class_exists('Hm_IMAP')) {
         * It takes the raw IMAP rights string, such as 'lrws' and converts it into a more
         * understandable format like 'Lookup, Read, Write, Write Seen'.
         *
-        * @param string $rights The string of IMAP rights (e.g., 'lrws'), where each character 
+        * @param string $rights The string of IMAP rights (e.g., 'lrws'), where each character
         *                       represents a specific permission.
         *
         * @return string A comma-separated string of human-readable permissions.
@@ -1220,13 +1224,13 @@ if (!class_exists('Hm_IMAP')) {
                 'c' => 'Create',
                 'd' => 'Delete'
             ];
-        
+
             foreach (str_split($rights_string) as $char) {
                 if (isset($permission_map[$char])) {
                     $permissions[] = $permission_map[$char];
                 }
             }
-        
+
             return implode(', ', $permissions);
         }
 
@@ -2025,7 +2029,7 @@ if (!class_exists('Hm_IMAP')) {
                     }
                 }
             }
-            
+
             return ['status' => $status, 'responses' => $responses];
         }
 
@@ -2572,7 +2576,7 @@ if (!class_exists('Hm_IMAP')) {
                 foreach ($trusted_senders as $sender) {
                     $terms[] = array('FROM', 'NOT '. $sender);
                 }
-                
+
             }
             // Perform a single search call with the combined terms
             if (!empty($terms)) {
@@ -2610,7 +2614,7 @@ if (!class_exists('Hm_IMAP')) {
             } else {
                 $folders = $this->get_mailbox_list($only_subscribed, $level, "*", false);
             }
-            
+
             foreach ($folders as $name => $folder) {
                 $result[$name] = array(
                     'name' => $folder['name'],

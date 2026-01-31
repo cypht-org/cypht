@@ -248,9 +248,37 @@ function applySmtpComposePageHandlers(routeParams) {
             text_to_bubbles(this);
         }
     });
+    $('.compose_to, .compose_cc, .compose_bcc').on('keydown', function(e) {
+        // Handle backspace to select/delete bubbles
+        if(e.which == 8 || e.keyCode == 8) {
+            var $input = $(this);
+            var $bubblesContainer = $input.prev('.bubbles');
+            var $bubbles = $bubblesContainer.find('.bubble');
+            var $selectedBubble = $bubblesContainer.find('.bubble.bubble_selected');
+
+            if ($input.val() === '' && $bubbles.length > 0) {
+                e.preventDefault();
+                if ($selectedBubble.length > 0) {
+                    $(".bubble_dropdown-content").remove();
+                    remove_recipient_from_list($selectedBubble.data('id'));
+                    $selectedBubble.remove();
+                } else {
+                    $bubbles.last().addClass('bubble_selected');
+                }
+            } else if ($input.val() !== '') {
+                $bubblesContainer.find('.bubble_selected').removeClass('bubble_selected');
+            }
+        } else if (e.which !== 13) {
+            // On any other key (except Enter), deselect selected bubble
+            var $input = $(this);
+            var $bubblesContainer = $input.prev('.bubbles');
+            $bubblesContainer.find('.bubble_selected').removeClass('bubble_selected');
+        }
+    });
     $('.compose_to, .compose_cc, .compose_bcc').on('blur', function(e) {
         e.preventDefault();
         text_to_bubbles(this);
+        $(this).prev('.bubbles').find('.bubble_selected').removeClass('bubble_selected');
     });
     $('.compose_subject, .compose_body, .compose_server, .smtp_send_placeholder, .smtp_send_archive').on('focus', function(e) {
         $('.compose_to, .compose_cc, .compose_bcc').each(function() {
@@ -259,6 +287,7 @@ function applySmtpComposePageHandlers(routeParams) {
     });
     $('.compose_to, .compose_cc, .compose_bcc').on('focus', function(e) {
         text_to_bubbles(this);
+        $(this).prev('.bubbles').find('.bubble_selected').removeClass('bubble_selected');
     });
     $('.compose_container').on('click', function() {
         $(this).find('input').focus();

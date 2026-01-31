@@ -447,10 +447,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_start_page_setting() {
         $test = new Output_Test('start_page_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="start_page">First page after login</label></td><td><select class="form-select form-select-sm w-auto" id="start_page" name="start_page"><option selected="selected" value="none">None</option><option value="page=home">Home</option><option value="page=message_list&list_path=combined_inbox">Everything</option><option value="page=message_list&list_path=unread">Unread</option><option value="page=message_list&list_path=flagged">Flagged</option><option value="page=compose">Compose</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="start_page">First page after login</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select class="form-select form-select-sm w-auto" id="start_page" name="start_page"><option selected="selected" value="none">None</option><option value="page=home">Home</option><option value="page=message_list&list_path=combined_inbox">Everything</option><option value="page=message_list&list_path=unread">Unread</option><option value="page=message_list&list_path=flagged">Flagged</option><option value="page=compose">Compose</option></select></div></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('start_page' => 'page=message_list&list_path=unread'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="start_page">First page after login</label></td><td><select class="form-select form-select-sm w-auto" id="start_page" name="start_page"><option value="none">None</option><option value="page=home">Home</option><option value="page=message_list&list_path=combined_inbox">Everything</option><option selected="selected" value="page=message_list&list_path=unread">Unread</option><option value="page=message_list&list_path=flagged">Flagged</option><option value="page=compose">Compose</option></select><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="start_page">First page after login</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select class="form-select form-select-sm w-auto" id="start_page" name="start_page"><option value="none">None</option><option value="page=home">Home</option><option value="page=message_list&list_path=combined_inbox">Everything</option><option selected="selected" value="page=message_list&list_path=unread">Unread</option><option value="page=message_list&list_path=flagged">Flagged</option><option value="page=compose">Compose</option></select><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span></div></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -459,10 +459,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_list_style_setting() {
         $test = new Output_Test('list_style_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="list_style">Message list style</label></td><td><select class="form-select form-select-sm w-auto" id="list_style" name="list_style" data-default-value="email_style"><option selected="selected" value="email_style">Email</option><option value="news_style">News</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="list_style">Message list style</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select class="form-select form-select-sm w-auto" id="list_style" name="list_style" data-default-value="email_style"><option selected="selected" value="email_style">Email</option><option value="news_style">News</option></select></div></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('list_style' => 'email_style'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="list_style">Message list style</label></td><td><select class="form-select form-select-sm w-auto" id="list_style" name="list_style" data-default-value="email_style"><option selected="selected" value="email_style">Email</option><option value="news_style">News</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="list_style">Message list style</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select class="form-select form-select-sm w-auto" id="list_style" name="list_style" data-default-value="email_style"><option selected="selected" value="email_style">Email</option><option value="news_style">News</option></select></div></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -472,10 +472,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('mailto_handler_setting', 'core');
         $test->handler_response = array('user_settings' => array());
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="mailto_handler">Allow handling of mailto links</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="mailto_handler" name="mailto_handler" data-default-value="false" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="mailto_handler">Allow handling of mailto links</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox"  value="1" id="mailto_handler" name="mailto_handler" data-default-value="false" /></div></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('mailto_handler' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="mailto_handler">Allow handling of mailto links</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="mailto_handler" name="mailto_handler" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="mailto_handler">Allow handling of mailto links</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox"  checked="checked" value="1" id="mailto_handler" name="mailto_handler" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span></div></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -485,10 +485,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('no_folder_icon_setting', 'core');
         $test->handler_response = array('user_settings' => array());
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_folder_icons">Hide folder list icons</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="no_folder_icons" name="no_folder_icons" data-default-value="false" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="no_folder_icons">Hide folder list icons</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox"  value="1" id="no_folder_icons" name="no_folder_icons" data-default-value="false" /></div></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('no_folder_icons' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_folder_icons">Hide folder list icons</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="no_folder_icons" name="no_folder_icons" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="no_folder_icons">Hide folder list icons</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox"  checked="checked" value="1" id="no_folder_icons" name="no_folder_icons" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span></div></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -498,10 +498,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('no_password_setting', 'core');
         $test->handler_response = array('user_settings' => array());
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_password_save">Don\'t save account passwords between logins</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="no_password_save" name="no_password_save" data-default-value="false" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="no_password_save">Don\'t save account passwords between logins</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox"  value="1" id="no_password_save" name="no_password_save" data-default-value="false" /></div></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('no_password_save' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_password_save">Don\'t save account passwords between logins</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="no_password_save" name="no_password_save" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="no_password_save">Don\'t save account passwords between logins</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox"  checked="checked" value="1" id="no_password_save" name="no_password_save" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span></div></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -511,10 +511,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('delete_prompt_setting', 'core');
         $test->handler_response = array('user_settings' => array());
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="disable_delete_prompt">Disable prompts when deleting</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="disable_delete_prompt" name="disable_delete_prompt" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="disable_delete_prompt">Disable prompts when deleting</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox"  value="1" id="disable_delete_prompt" name="disable_delete_prompt" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span></div></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('disable_delete_prompt' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="disable_delete_prompt">Disable prompts when deleting</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="disable_delete_prompt" name="disable_delete_prompt" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="disable_delete_prompt">Disable prompts when deleting</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox"  checked="checked" value="1" id="disable_delete_prompt" name="disable_delete_prompt" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span></div></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -759,7 +759,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('language_setting', 'core');
         $test->handler_response = array('language'=> 'en');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="language">Language</label></td><td><select id="language" class="form-select form-select-sm w-auto" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="zh-Hans">Chinese Simplified</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option><option value="zh-TW">Traditional Chinese</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="language">Language</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select id="language" class="form-select form-select-sm w-auto" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="zh-Hans">Chinese Simplified</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option><option value="zh-TW">Traditional Chinese</option></select></div></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -780,10 +780,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_msg_list_icons_setting() {
         $test = new Output_Test('msg_list_icons_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="show_list_icons">Show icons in message lists</label></td><td><input class="form-check-input" type="checkbox"  id="show_list_icons" name="show_list_icons" data-default-value="false" value="1" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="show_list_icons">Show icons in message lists</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox"  id="show_list_icons" name="show_list_icons" data-default-value="false" value="1" /></div></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('show_list_icons' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="show_list_icons">Show icons in message lists</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" id="show_list_icons" name="show_list_icons" data-default-value="false" value="1" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="show_list_icons">Show icons in message lists</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox"  checked="checked" id="show_list_icons" name="show_list_icons" data-default-value="false" value="1" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span></div></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
