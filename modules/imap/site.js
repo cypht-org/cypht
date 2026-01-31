@@ -652,7 +652,9 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
             $('.msg_text').append(res.msg_headers);
             $('.msg_text').append(res.msg_text);
             $('.msg_text').append(res.msg_parts);
-
+            if (res.new_filter) {
+              $("#extra-header-buttons").append(res.new_filter);
+            }
 
             document.title = $('.msg_text .small_header').first().text();
             imap_message_view_finished(uid, detail, listParent);
@@ -913,7 +915,7 @@ var search_selected_for_imap = function() {
         $('.imap_move').on("click", function() { return false; });
         bootstrap.Dropdown.getOrCreateInstance($('.move_to_location')[0]).hide();
         $('.move_to_location').html('');
-    }
+    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 };
 
 var unselect_non_imap_messages = function() {

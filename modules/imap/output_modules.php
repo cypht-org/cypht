@@ -196,6 +196,19 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
  */
 class Hm_Output_filter_message_headers extends Hm_Output_Module {
       protected function output() {
+
+        $mailbox_name = $this->get('mailbox_name');
+        $headers = $this->get('msg_headers', array());
+        $lc_headers = lc_headers($headers);
+
+        $filter_headers = [
+            'from'     => addr_parse($lc_headers['from'] ?? '')['email'] ?? '',
+            'to'       => $lc_headers['to'] ?? '',
+            'subject'  => $lc_headers['subject'] ?? '',
+            'reply-to' => $lc_headers['reply-to'] ?? '',
+        ];
+        
+
         if ($this->get('msg_headers')) {
             $txt = '';
             $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'reply-to', 'cc', 'x-original-bcc', 'flags');
@@ -381,7 +394,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<a class="hlink small_headers text-decoration-none btn btn-sm btn-outline-secondary" href="#">'.$this->trans('Small headers').'</a>';
             $txt .= '</div>';
 
-            $txt .= '<div class="d-flex flex-wrap gap-2">';
+            $txt .= '<div class="d-flex flex-wrap gap-2">';           
             if (!array_key_exists('flags', $lc_headers) || !mb_stristr($lc_headers['flags'], 'draft')) {
                 $txt .= '<a class="reply_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
                 if ($size > 1) {
@@ -438,6 +451,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $txt .= '<span class="text-decoration-none btn btn-sm btn-outline-danger" data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
             }
+
             $txt .= '<a class="hlink text-decoration-none btn btn-sm btn-outline-secondary" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
             $txt .= '</div><span id="extra-header-buttons"></span>';
@@ -447,8 +461,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
             $txt .= '</div></div>';
             $txt .= '</div>';
-
             $this->out('msg_headers', $txt, false);
+            $this->out('filter_headers', $filter_headers, false);
         }
     }
 }
