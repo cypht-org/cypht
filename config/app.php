@@ -640,7 +640,16 @@ return [
     | Handles page layout, login/logout, and the default settings pages. This set
     | is required.
     */
-    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags')),
+    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags,spam_reporting')),
+    /*
+    | ------------------------
+    | Spam Reporting Targets
+    | ------------------------
+    |
+    | List of target adapter class names for spam reporting. Keep empty to disable
+    | all targets by default.
+    */
+    'spam_reporting_targets' => array(),
     // 'modules' => [
     //     /*
     //     |  ----
