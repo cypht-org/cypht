@@ -359,6 +359,7 @@ return array(
     'Move' => false,
     'Move to ...' => false,
     'Copy to ...' => false,
+    'Restore' => false,
     'Removed non-IMAP messages from selection. They cannot be moved or copied' => false,
     'Messages moved' => false,
     'Messages copied' => false,

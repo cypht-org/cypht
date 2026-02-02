@@ -422,7 +422,7 @@ function icon_callback($vals, $style, $output_mod) {
 if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
     $txt = '';
-    $controls = ['read', 'unread', 'flag', 'unflag', 'delete', 'archive', 'junk'];
+    $controls = ['read', 'unread', 'flag', 'unflag', 'delete', 'archive', 'junk', 'restore'];
     $controls = array_filter($controls, function($val) use ($output_mod) {
         if (in_array($val, [$output_mod->get('list_path', ''), strtolower($output_mod->get('core_msg_control_folder', ''))])) {
             return false;
@@ -430,6 +430,12 @@ function message_controls($output_mod) {
         if ($val == 'flag' && $output_mod->get('list_path', '') == 'flagged') {
             return false;
         }
+        $is_trash_folder = $output_mod->get('is_trash_folder', false);
+
+        if ($val == 'restore' && !$is_trash_folder) {
+            return false;
+        }
+
         return true;
     });
 

@@ -1675,3 +1675,13 @@ function is_imap_archive_folder($server_id, $user_config, $current_folder) {
     
     return false;
 }}
+
+if (!hm_exists('is_imap_trash_folder')) {
+    function is_imap_trash_folder($handler, $server_id, $folder) {
+        $specials = get_special_folders($handler, $server_id);
+        if (array_key_exists('trash', $specials) && $specials['trash']) {
+            return $specials['trash'] === $folder;
+        }
+        return false;
+    }
+}
