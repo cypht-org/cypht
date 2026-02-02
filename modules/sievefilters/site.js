@@ -10,56 +10,56 @@ var hm_sieve_condition_fields = function() {
                 description: 'Subject',
                 type: 'string',
                 selected: true,
-                options: ['Contains', 'Matches', 'Regex']
+                options: ['Contains', 'Matches', 'Regex'],
             },
             {
                 name: 'body',
-                description: 'Body',
+                description: 'Message body',
                 type: 'string',
-                options: ['Contains', 'Matches', 'Regex']
+                options: ['Contains', 'Matches', 'Regex'],
             },
             {
                 name: 'size',
                 description: 'Size (KB)',
                 type: 'int',
-                options: ['Over', 'Under']
-            }
+                options: ['Over', 'Under'],
+            },
         ],
-        'Header': [
+        Header: [
             {
                 name: 'to',
-                description: 'To',
+                description: 'Recipient (To)',
                 type: 'string',
                 extra_option: false,
-                options: ['Contains', 'Matches', 'Regex']
+                options: ['Contains', 'Matches', 'Regex'],
             },
             {
                 name: 'from',
-                description: 'From',
+                description: 'Sender (From)',
                 type: 'string',
                 extra_option: false,
-                options: ['Contains', 'Matches', 'Regex']
+                options: ['Contains', 'Matches', 'Regex'],
             },
             {
                 name: 'cc',
-                description: 'CC',
+                description: 'Copied recipient (CC)',
                 type: 'string',
                 extra_option: false,
-                options: ['Contains', 'Matches', 'Regex']
+                options: ['Contains', 'Matches', 'Regex'],
             },
             {
                 name: 'to_or_cc',
-                description: 'To or CC',
+                description: 'Recipient (To or CC)',
                 type: 'string',
                 extra_option: false,
-                options: ['Contains', 'Matches', 'Regex']
+                options: ['Contains', 'Matches', 'Regex'],
             },
             {
                 name: 'bcc',
-                description: 'BCC',
+                description: 'Blind copied recipient (BCC)',
                 type: 'string',
                 extra_option: false,
-                options: ['Contains', 'Matches', 'Regex']
+                options: ['Contains', 'Matches', 'Regex'],
             },
             {
                 name: 'custom',
@@ -67,9 +67,9 @@ var hm_sieve_condition_fields = function() {
                 type: 'string',
                 extra_option: true,
                 extra_option_description: 'Field Name',
-                options: ['Contains', 'Matches', 'Regex']
-            }
-        ]
+                options: ['Contains', 'Matches', 'Regex'],
+            },
+        ],
     };
 };
 
@@ -400,6 +400,31 @@ function sieveFiltersPageHandler() {
     /**************************************************************************************
      *                                    FUNCTIONS
      **************************************************************************************/
+
+    function showErrorMsg(msg, parentClass, fadeTime = null) {
+        let $parent = $(parentClass);
+
+        if (!$parent.data("highlight-added")) {
+            $parent.data("highlight-added", true);
+            $parent.addClass("highlight-active border border-info rounded p-2 bg-light");
+        }
+
+        let $msg = $('<small class="text-info d-block mt-1"></small>').text(msg);
+
+        $parent.append($msg).show();
+
+        if (fadeTime !== null) {
+            setTimeout(function () {
+                $msg.remove();
+
+                if ($parent.data("highlight-added") && $parent.find("small").length === 0) {
+                    $parent.removeClass("highlight-active border border-info rounded p-2 bg-light");
+                    $parent.removeData("highlight-added");
+                }
+            }, fadeTime);
+        }
+    }
+
     function save_filter(imap_account, gen_script = false) {
         let validation_failed = false
         let conditions_parsed = []
@@ -422,7 +447,11 @@ function sieveFiltersPageHandler() {
 
         let idx = 0;
         if (conditions.length === 0) {
-            Hm_Notices.show('You must provide at least one condition', 'warning');
+            showErrorMsg(
+              "You must provide at least one condition",
+              ".sieve-filter-conditions-block",
+              10000
+            );
             return false;
         }
 
@@ -431,7 +460,11 @@ function sieveFiltersPageHandler() {
                 let order = ordinal_number(key + 1);
                 let previous_messages = $('.sys_messages').html();
                 previous_messages += previous_messages ? '<br>': '';
-                Hm_Notices.show('The ' + order + ' condition (' + elem + ') must be provided', 'warning');
+                showErrorMsg(
+                  "The " + order + " condition (" + elem + ") must be provided",
+                  ".sieve-filter-conditions-block",
+                  10000
+                );
                 validation_failed = true;
             }
              conditions_parsed.push(
@@ -460,7 +493,7 @@ function sieveFiltersPageHandler() {
         }).get();
 
         if (actions_type.length === 0) {
-            Hm_Notices.show('You must provide at least one action', 'warning');
+            showErrorMsg('You must provide at least one action', '.sieve-filter-actions-block', 10000);
             return false;
         }
 
@@ -471,7 +504,11 @@ function sieveFiltersPageHandler() {
                 let order = ordinal_number(key + 1);
                 let previous_messages = $('.sys_messages').html();
                 previous_messages += previous_messages ? '<br>': '';
-                Hm_Notices.show('The ' + order + ' action (' + elem + ') must be provided', 'waring');
+                showErrorMsg(
+                  "The " + order + " action (" + elem + ") must be provided",
+                  ".sieve-filter-actions-block",
+                  10000
+                );
                 validation_failed = true;
             }
             actions_parsed.push(
@@ -496,7 +533,7 @@ function sieveFiltersPageHandler() {
             )
         }
         if ($('.modal_sieve_filter_name').val() == "") {
-            Hm_Notices.show('Filter name is required', 'danger');
+            showErrorMsg("Filter name is required", ".sieve-filter-name-group");
             return false;
         }
 
@@ -630,7 +667,7 @@ function sieveFiltersPageHandler() {
         });
         let extra_options = '<td class="col-sm-3"><input type="hidden" class="condition_extra_value form-control form-control-sm" name="sieve_selected_extra_option_value[]" /></td>';
         $('.sieve_list_conditions_modal').append(
-            '                            <tr>' +
+            '                            <tr class="sieve_condition_row">' +
             '                                <td class="col-sm-2">' +
             '                                    <select class="add_condition_sieve_filters form-control form-control-sm" name="sieve_selected_conditions_field[]">' +
             '                                        <optgroup label="Message">' +
@@ -674,12 +711,44 @@ function sieveFiltersPageHandler() {
         );
     }
 
+    function add_filter_match_mode() {
+        let conditionRows = $(".sieve_list_conditions_modal tr").length;
+        if (conditionRows >= 2) {
+            if ($(".sieve_match_mode").length === 0) {
+                $(".sieve_list_conditions_modal").before(
+                  '<div class="sieve_match_mode mb-2">' +
+                    '   <label class="me-2">Match</label>' +
+                    '   <select name="sieve_match_mode" class="modal_sieve_filter_test form-select-sm d-inline w-auto">' +
+                    '       <option value="ALLOF">ALL</option>' +
+                    '       <option value="ANYOF">ANY</option>' +
+                    "   </select>" +
+                    "   of the following rules:" +
+                    "</div>"
+                );
+            }
+        }
+    }
+
     /**
      * Add Condition Button
      */
     $(document).on('click', '.sieve_add_condition_modal_button', function () {
         add_filter_condition();
+        add_filter_match_mode();
     });
+
+    /**
+     * Actions Drag and Drop
+     */
+    const actionsTbody = document.querySelector(".filter_actions_modal_table");
+
+    if (actionsTbody) {
+        new Sortable(actionsTbody, {
+            handle: ".drag-handle",
+            animation: 150,
+            ghostClass: "sortable-ghost",
+        });
+    }
 
     function add_filter_action(default_value = '') {
         let possible_actions_html = '';
@@ -692,21 +761,25 @@ function sieveFiltersPageHandler() {
             possible_actions_html += '<option value="'+value.name+'">' + value.description + '</option>';
         });
         let extra_options = '<td class="col-sm-3"><input type="hidden" class="condition_extra_action_value form-control form-control-sm" name="sieve_selected_extra_action_value[]" /></td>';
-        $('.filter_actions_modal_table').append(
-            '<tr class="border" default_value="'+default_value+'">' +
-            '   <td class="col-sm-3">' +
-            '       <select class="sieve_actions_select form-control form-control-sm" name="sieve_selected_actions[]">' +
-            '          ' + possible_actions_html +
-            '       </select>' +
-            '    </td>' +
-            extra_options +
-            '    <td class="col-sm-5">' +
-            '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
-            '    </input>' +
-            '    <td class="col-sm-1 text-end align-middle">' +
-            '           <a href="#" class="delete_action_modal_button btn btn-sm btn-secondary">Delete</a>' +
-            '    </td>' +
-            '</tr>'
+        $(".filter_actions_modal_table").append(
+            '<tr class="border draggable_action_row" default_value="' +
+                default_value +
+                '">' +
+                '   <td class="col-sm-1 drag-handle" style="cursor: grab;">&#9776;</td>' +
+                '   <td class="col-sm-3">' +
+                '       <select class="sieve_actions_select form-control form-control-sm" name="sieve_selected_actions[]">' +
+                "          " +
+                possible_actions_html +
+                "       </select>" +
+                "    </td>" +
+                extra_options +
+                '    <td class="col-sm-5">' +
+                '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
+                "    </input>" +
+                '    <td class="col-sm-1 text-end align-middle">' +
+                '           <a href="#" class="delete_action_modal_button btn btn-sm btn-secondary">Delete</a>' +
+                "    </td>" +
+            "</tr>"
         );
     }
 
