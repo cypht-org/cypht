@@ -19,18 +19,31 @@ add_handler('ajax_spam_report_preview', 'imap_oauth2_token_check', true, 'imap',
 add_handler('ajax_spam_report_preview', 'spam_report_preview', true, 'spam_reporting', 'imap_oauth2_token_check', 'after');
 add_output('ajax_spam_report_preview', 'spam_report_preview', true, 'spam_reporting');
 
+/* spam report send ajax */
+setup_base_ajax_page('ajax_spam_report_send', 'core');
+add_handler('ajax_spam_report_send', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_spam_report_send', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_spam_report_send', 'spam_report_send', true, 'spam_reporting', 'imap_oauth2_token_check', 'after');
+add_output('ajax_spam_report_send', 'spam_report_send', true, 'spam_reporting');
+
 return array(
     'allowed_pages' => array(
-        'ajax_spam_report_preview'
+        'ajax_spam_report_preview',
+        'ajax_spam_report_send'
     ),
     'allowed_output' => array(
-        'spam_report_targets' => array(FILTER_UNSAFE_RAW, false),
-        'spam_report_preview' => array(FILTER_UNSAFE_RAW, false), // Preview-only raw message data (not rendered or persisted).
-        'spam_report_error' => array(FILTER_UNSAFE_RAW, false)
+        'spam_report_targets' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+        'spam_report_preview' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY), // Preview-only raw message data (not rendered or persisted).
+        'spam_report_error' => array(FILTER_UNSAFE_RAW, false),
+        'spam_report_debug' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+        'spam_report_send_ok' => array(FILTER_VALIDATE_BOOLEAN, false),
+        'spam_report_send_message' => array(FILTER_UNSAFE_RAW, false)
     ),
     'allowed_post' => array(
         'list_path' => FILTER_UNSAFE_RAW,
-        'uid' => FILTER_UNSAFE_RAW
+        'uid' => FILTER_UNSAFE_RAW,
+        'target_id' => FILTER_UNSAFE_RAW,
+        'user_notes' => FILTER_UNSAFE_RAW
     ),
     'allowed_get' => array(
     )

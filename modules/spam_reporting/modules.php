@@ -12,6 +12,7 @@ require_once APP_PATH . 'modules/spam_reporting/functions.php';
 require_once APP_PATH . 'modules/spam_reporting/adapters/ReportTargetInterface.php';
 require_once APP_PATH . 'modules/spam_reporting/adapters/AbstractReportTarget.php';
 require_once APP_PATH . 'modules/spam_reporting/adapters/TargetsRegistry.php';
+require_once APP_PATH . 'modules/spam_reporting/adapters/EmailReportTarget.php';
 
 require_once APP_PATH . 'modules/spam_reporting/handler_modules.php';
 require_once APP_PATH . 'modules/spam_reporting/output_modules.php';
