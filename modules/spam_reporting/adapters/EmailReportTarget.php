@@ -50,26 +50,28 @@ class Hm_Spam_Report_Email_Target extends Hm_Spam_Report_Target_Abstract {
     }
 
     public function is_available(Hm_Spam_Report $report, $user_config) {
-        return (bool) trim((string) $this->to);
+        if (!trim((string) $this->to)) {
+            return false;
+        }
+        $parsed = process_address_fld($this->to);
+        return count($parsed) === 1;
     }
 
     public function build_payload(Hm_Spam_Report $report, array $user_input = array()) {
         $message = $report->get_parsed_message();
         $message_id = $message ? $message->getHeaderValue('Message-ID', '') : '';
-        $subject = $this->subject_prefix;
-        if ($message_id) {
-            $subject .= ' ' . $message_id;
-        }
+        $subject = $message_id ? ($this->subject_prefix . ': ' . $message_id) : $this->subject_prefix;
         $notes = '';
         if (array_key_exists('user_notes', $user_input) && trim((string) $user_input['user_notes'])) {
             $notes = "\r\n\r\nUser notes:\r\n" . trim((string) $user_input['user_notes']);
         }
         $body = "Spam report\r\n\r\n";
-        $body .= "Message-ID: " . $message_id . "\r\n\r\n";
-        $body .= "Headers:\r\n" . $report->get_raw_headers_string() . "\r\n\r\n";
-        $body .= "Body (plain text):\r\n" . (string) $report->body_text;
+        if ($message_id) {
+            $body .= "Message-ID: " . $message_id . "\r\n\r\n";
+        }
+        $body .= "Attached: original message (message/rfc822)";
         $body .= $notes;
-        return new Hm_Spam_Report_Payload($this->to, $subject, $body, 'text/plain');
+        return new Hm_Spam_Report_Payload($this->to, $subject, $body, 'text/plain', array(), $report->raw_message);
     }
 
     public function deliver($payload, $context = null) {
@@ -94,9 +96,26 @@ class Hm_Spam_Report_Email_Target extends Hm_Spam_Report_Target_Abstract {
         $from_name = $context->site_config->get('spam_reporting_sender_name', '');
         $reply_to = $context->site_config->get('spam_reporting_reply_to', '');
 
+        $attachment_dir = $context->site_config->get('attachment_dir') ?: sys_get_temp_dir();
+        $tmp_file = tempnam($attachment_dir, 'spamreport_');
+        if (!$tmp_file) {
+            if ($server_id !== false) {
+                Hm_SMTP_List::del($server_id);
+            }
+            return new Hm_Spam_Report_Result(false, 'Unable to create attachment');
+        }
+        file_put_contents($tmp_file, (string) $payload->raw_message);
+
         $msg = new Hm_MIME_Msg($payload->to, $payload->subject, $payload->body, $from, false, '', '', '', $from_name, $reply_to);
+        $msg->add_attachments(array(array(
+            'filename' => $tmp_file,
+            'type' => 'message/rfc822',
+            'name' => 'original_message.eml',
+            'no_encoding' => true
+        )));
         $msg_content = $msg->get_mime_msg();
         $err = $mailbox->send_message($from, array($payload->to), $msg_content);
+        @unlink($tmp_file);
         if ($server_id !== false) {
             Hm_SMTP_List::del($server_id);
         }
