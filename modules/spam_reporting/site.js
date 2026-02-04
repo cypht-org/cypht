@@ -145,7 +145,11 @@ var spam_reporting_send_report = function() {
         ],
         function(res) {
             if (status.length) {
-                status.text(res.spam_report_send_message || '');
+                if (res.spam_report_send_ok) {
+                    status.text(hm_trans('Report sent'));
+                } else {
+                    status.text(res.spam_report_send_message || '');
+                }
             }
         }
     );

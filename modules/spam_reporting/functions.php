@@ -75,13 +75,15 @@ class Hm_Spam_Report_Payload {
     public $subject;
     public $body;
     public $headers;
+    public $raw_message;
 
-    public function __construct($to, $subject, $body, $content_type = 'text/plain', array $headers = array()) {
+    public function __construct($to, $subject, $body, $content_type = 'text/plain', array $headers = array(), $raw_message = '') {
         $this->to = $to;
         $this->subject = $subject;
         $this->body = $body;
         $this->content_type = $content_type;
         $this->headers = $headers;
+        $this->raw_message = $raw_message;
     }
 }
 
