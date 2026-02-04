@@ -57,5 +57,19 @@ class Hm_Output_spam_report_preview extends Hm_Output_Module {
         if ($this->get('spam_report_error')) {
             $this->out('spam_report_error', $this->get('spam_report_error'));
         }
+        if ($this->get('spam_report_debug')) {
+            $this->out('spam_report_debug', $this->get('spam_report_debug'));
+        }
+    }
+}
+
+/**
+ * Output spam report send JSON
+ * @subpackage spam_reporting/output
+ */
+class Hm_Output_spam_report_send extends Hm_Output_Module {
+    protected function output() {
+        $this->out('spam_report_send_ok', $this->get('spam_report_send_ok', false));
+        $this->out('spam_report_send_message', $this->get('spam_report_send_message', ''));
     }
 }

@@ -650,6 +650,33 @@ return [
     | all targets by default.
     */
     'spam_reporting_targets' => array(),
+    /*
+    | -----------------------------
+    | Spam Reporting SMTP Settings
+    | -----------------------------
+    |
+    | System-level SMTP settings for spam reporting. These must be configured
+    | explicitly and do not use the user's identity.
+    */
+    'spam_reporting_smtp_name' => env('SPAM_REPORTING_SMTP_NAME', 'Spam Reporting'),
+    'spam_reporting_smtp_server' => env('SPAM_REPORTING_SMTP_SERVER', ''),
+    'spam_reporting_smtp_port' => env('SPAM_REPORTING_SMTP_PORT', 587),
+    'spam_reporting_smtp_tls' => env('SPAM_REPORTING_SMTP_TLS', true),
+    'spam_reporting_smtp_user' => env('SPAM_REPORTING_SMTP_USER', ''),
+    'spam_reporting_smtp_pass' => env('SPAM_REPORTING_SMTP_PASS', ''),
+    'spam_reporting_smtp_no_auth' => env('SPAM_REPORTING_SMTP_NO_AUTH', false),
+    'spam_reporting_sender_address' => env('SPAM_REPORTING_SENDER_ADDRESS', ''),
+    'spam_reporting_sender_name' => env('SPAM_REPORTING_SENDER_NAME', ''),
+    'spam_reporting_reply_to' => env('SPAM_REPORTING_REPLY_TO', ''),
+    /*
+    | ----------------------
+    | Spam Reporting Limits
+    | ----------------------
+    |
+    | Conservative per-user rate limits.
+    */
+    'spam_reporting_rate_limit_count' => env('SPAM_REPORTING_RATE_LIMIT_COUNT', 5),
+    'spam_reporting_rate_limit_window' => env('SPAM_REPORTING_RATE_LIMIT_WINDOW', 3600),
     // 'modules' => [
     //     /*
     //     |  ----

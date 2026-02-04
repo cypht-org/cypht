@@ -22,21 +22,38 @@ var spam_reporting_open_modal = function() {
 };
 
 var spam_reporting_render_targets = function(targets) {
-    var container = $('.spam-report-targets-list');
-    if (!container.length) {
+    var select = $('.spam-report-target-select');
+    var empty = $('.spam-report-targets-empty');
+    var sendBtn = $('.spam-report-send');
+    if (!select.length) {
         return;
     }
+    select.empty();
     if (!targets || !targets.length) {
-        container.text(hm_trans('No targets configured'));
+        if (empty.length) {
+            empty.removeClass('d-none');
+        }
+        select.prop('disabled', true);
+        if (sendBtn.length) {
+            sendBtn.prop('disabled', true);
+        }
         return;
     }
-    var list = $('<ul class="list-unstyled mb-0"></ul>');
+    if (empty.length) {
+        empty.addClass('d-none');
+    }
+    var placeholder = $('<option value=""></option>').text(hm_trans('Select target'));
+    select.append(placeholder);
     targets.forEach(function(target) {
-        var item = $('<li></li>');
-        item.text(target.label || target.id);
-        list.append(item);
+        var option = $('<option></option>');
+        option.val(target.id);
+        option.text(target.label || target.id);
+        select.append(option);
     });
-    container.empty().append(list);
+    select.prop('disabled', false);
+    if (sendBtn.length) {
+        sendBtn.prop('disabled', false);
+    }
 };
 
 var spam_reporting_apply_preview = function(preview) {
@@ -59,6 +76,7 @@ var spam_reporting_load_preview = function() {
     console.info('[spam_reporting] loading preview', {uid: uid, listPath: listPath});
     Hm_Ajax.request(
         [
+            {'name': 'page', 'value': 'ajax_spam_report_preview'},
             {'name': 'hm_ajax_hook', 'value': 'ajax_spam_report_preview'},
             {'name': 'list_path', 'value': listPath},
             {'name': 'uid', 'value': uid}
@@ -72,6 +90,13 @@ var spam_reporting_load_preview = function() {
             }
             spam_reporting_render_targets(res.spam_report_targets || []);
             spam_reporting_apply_preview(res.spam_report_preview || {});
+            var status = $('.spam-report-status');
+            if (status.length) {
+                status.text('');
+            }
+            if (res.spam_report_debug) {
+                console.info('[spam_reporting] debug', res.spam_report_debug);
+            }
         }
     );
 };
@@ -88,6 +113,44 @@ var spam_reporting_toggle_html = function() {
     }
 };
 
+var spam_reporting_send_report = function() {
+    var targetId = $('.spam-report-target-select').val();
+    var notes = $('.spam-report-notes').val();
+    var status = $('.spam-report-status');
+    if (!targetId) {
+        if (status.length) {
+            status.text(hm_trans('Please select a target'));
+        }
+        return;
+    }
+    var uid = (typeof getMessageUidParam === 'function') ? getMessageUidParam() : $('.msg_uid').val();
+    var listPath = (typeof getListPathParam === 'function') ? getListPathParam() : '';
+    if (!uid || !listPath) {
+        if (status.length) {
+            status.text(hm_trans('Missing message context'));
+        }
+        return;
+    }
+    if (status.length) {
+        status.text(hm_trans('Sending...'));
+    }
+    Hm_Ajax.request(
+        [
+            {'name': 'page', 'value': 'ajax_spam_report_send'},
+            {'name': 'hm_ajax_hook', 'value': 'ajax_spam_report_send'},
+            {'name': 'list_path', 'value': listPath},
+            {'name': 'uid', 'value': uid},
+            {'name': 'target_id', 'value': targetId},
+            {'name': 'user_notes', 'value': notes}
+        ],
+        function(res) {
+            if (status.length) {
+                status.text(res.spam_report_send_message || '');
+            }
+        }
+    );
+};
+
 var spam_reporting_bound = false;
 var spam_reporting_bind = function() {
     if (spam_reporting_bound) {
@@ -102,6 +165,10 @@ var spam_reporting_bind = function() {
         spam_reporting_open_modal();
     });
     $(document).on('change', '.spam-report-toggle-html', spam_reporting_toggle_html);
+    $(document).on('click', '.spam-report-send', function(e) {
+        e.preventDefault();
+        spam_reporting_send_report();
+    });
 };
 
 window.addEventListener('message-loaded', spam_reporting_bind);
