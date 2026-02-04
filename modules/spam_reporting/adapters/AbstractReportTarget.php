@@ -9,6 +9,9 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 abstract class Hm_Spam_Report_Target_Abstract implements Hm_Spam_Report_Target_Interface {
+    public function configure(array $config) {
+    }
+
     public function capabilities() {
         return array();
     }

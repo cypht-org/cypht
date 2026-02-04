@@ -66,6 +66,58 @@ class Hm_Spam_Report {
 }
 
 /**
+ * Spam report payload container
+ * @subpackage spam_reporting/lib
+ */
+class Hm_Spam_Report_Payload {
+    public $content_type;
+    public $to;
+    public $subject;
+    public $body;
+    public $headers;
+
+    public function __construct($to, $subject, $body, $content_type = 'text/plain', array $headers = array()) {
+        $this->to = $to;
+        $this->subject = $subject;
+        $this->body = $body;
+        $this->content_type = $content_type;
+        $this->headers = $headers;
+    }
+}
+
+/**
+ * Delivery context for report targets
+ * @subpackage spam_reporting/lib
+ */
+class Hm_Spam_Report_Delivery_Context {
+    public $site_config;
+    public $user_config;
+    public $session;
+
+    public function __construct($site_config, $user_config, $session) {
+        $this->site_config = $site_config;
+        $this->user_config = $user_config;
+        $this->session = $session;
+    }
+}
+
+/**
+ * Delivery result container
+ * @subpackage spam_reporting/lib
+ */
+class Hm_Spam_Report_Result {
+    public $ok;
+    public $message;
+    public $details;
+
+    public function __construct($ok, $message = '', array $details = array()) {
+        $this->ok = (bool) $ok;
+        $this->message = $message;
+        $this->details = $details;
+    }
+}
+
+/**
  * Parse a raw MIME message using the existing parser
  * @param string $raw_message
  * @return object|false
@@ -124,6 +176,21 @@ function spam_reporting_build_registry($site_config) {
         foreach ($targets as $class_name) {
             if (is_string($class_name) && class_exists($class_name)) {
                 $registry->register_target(new $class_name());
+            } elseif (is_array($class_name) && array_key_exists('class', $class_name)) {
+                $class = $class_name['class'];
+                if (is_string($class) && class_exists($class)) {
+                    $ref = new ReflectionClass($class);
+                    $ctor = $ref->getConstructor();
+                    if ($ctor && $ctor->getNumberOfParameters() > 0) {
+                        $registry->register_target($ref->newInstance($class_name));
+                    } else {
+                        $target = $ref->newInstance();
+                        if (method_exists($target, 'configure')) {
+                            $target->configure($class_name);
+                        }
+                        $registry->register_target($target);
+                    }
+                }
             }
         }
     }
@@ -147,7 +214,8 @@ function spam_reporting_modal_markup($trans) {
     $modal .= '<div class="modal-body">';
     $modal .= '<div class="spam-report-targets mb-3">';
     $modal .= '<div class="fw-bold mb-2">'.$trans('Targets').'</div>';
-    $modal .= '<div class="spam-report-targets-list text-muted">'.$trans('No targets configured').'</div>';
+    $modal .= '<select class="form-select spam-report-target-select" disabled="disabled"></select>';
+    $modal .= '<div class="spam-report-targets-empty text-muted mt-2">'.$trans('No targets configured').'</div>';
     $modal .= '</div>';
     $modal .= '<div class="spam-report-preview">';
     $modal .= '<div class="fw-bold mb-2">'.$trans('Preview').'</div>';
@@ -155,6 +223,8 @@ function spam_reporting_modal_markup($trans) {
     $modal .= '<textarea class="form-control spam-report-headers" rows="8"></textarea>';
     $modal .= '<label class="form-label mt-3">'.$trans('Plain text body').'</label>';
     $modal .= '<textarea class="form-control spam-report-body" rows="8"></textarea>';
+    $modal .= '<label class="form-label mt-3">'.$trans('Notes').'</label>';
+    $modal .= '<textarea class="form-control spam-report-notes" rows="3"></textarea>';
     $modal .= '<div class="form-check mt-3">';
     $modal .= '<input class="form-check-input spam-report-toggle-html" type="checkbox" id="spam_report_show_html">';
     $modal .= '<label class="form-check-label" for="spam_report_show_html">'.$trans('Show HTML body').'</label>';
@@ -166,10 +236,70 @@ function spam_reporting_modal_markup($trans) {
     $modal .= '</div>';
     $modal .= '</div>';
     $modal .= '<div class="modal-footer">';
+    $modal .= '<div class="spam-report-status text-muted me-auto"></div>';
+    $modal .= '<button type="button" class="btn btn-outline-secondary spam-report-send" disabled="disabled">'.$trans('Send report').'</button>';
     $modal .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$trans('Close').'</button>';
     $modal .= '</div>';
     $modal .= '</div></div></div>';
     return $modal;
+}}
+
+/**
+ * Build a system SMTP mailbox for spam reporting
+ * @param object $site_config
+ * @return array [mailbox, server_id]
+ */
+if (!hm_exists('spam_reporting_get_smtp_mailbox')) {
+function spam_reporting_get_smtp_mailbox($site_config) {
+    $server = $site_config->get('spam_reporting_smtp_server', '');
+    if (!trim((string) $server)) {
+        return array(false, false);
+    }
+    $smtp = array(
+        'name' => $site_config->get('spam_reporting_smtp_name', 'Spam Reporting'),
+        'server' => $server,
+        'type' => 'smtp',
+        'hide' => true,
+        'port' => $site_config->get('spam_reporting_smtp_port', 587),
+        'user' => $site_config->get('spam_reporting_smtp_user', ''),
+        'pass' => $site_config->get('spam_reporting_smtp_pass', ''),
+        'tls' => $site_config->get('spam_reporting_smtp_tls', true),
+    );
+    if ($site_config->get('spam_reporting_smtp_no_auth', false)) {
+        $smtp['no_auth'] = true;
+    }
+    $server_id = Hm_SMTP_List::add($smtp, false);
+    $mailbox = Hm_SMTP_List::connect($server_id, false, $smtp['user'], $smtp['pass'], false);
+    return array($mailbox, $server_id);
+}}
+
+/**
+ * Enforce a per-user rate limit
+ * @param object $session
+ * @param object $site_config
+ * @return array [allowed, retry_after]
+ */
+if (!hm_exists('spam_reporting_rate_limit')) {
+function spam_reporting_rate_limit($session, $site_config, $record = false) {
+    $limit = (int) $site_config->get('spam_reporting_rate_limit_count', 5);
+    $window = (int) $site_config->get('spam_reporting_rate_limit_window', 3600);
+    $now = time();
+    if ($limit <= 0 || $window <= 0) {
+        return array(true, 0);
+    }
+    $log = $session->get('spam_reporting_rate_log', array());
+    $log = array_values(array_filter($log, function($ts) use ($now, $window) {
+        return is_int($ts) && ($now - $ts) < $window;
+    }));
+    if (count($log) >= $limit) {
+        $retry_after = $window - ($now - $log[0]);
+        return array(false, max(0, $retry_after));
+    }
+    if ($record) {
+        $log[] = $now;
+        $session->set('spam_reporting_rate_log', $log);
+    }
+    return array(true, 0);
 }}
 
 /**
