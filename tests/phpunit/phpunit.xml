@@ -142,6 +142,9 @@
       <file>./modules/saved_searches/functions.php</file>
       <file>./modules/saved_searches/class.php</file>
     </testsuite>
+    <testsuite name="modules_spam_reporting">
+      <file>./modules/spam_reporting/functions.php</file>
+    </testsuite>
   </testsuites>
   <source>
     <include>
