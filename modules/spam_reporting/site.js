@@ -28,6 +28,9 @@ var spam_reporting_render_targets = function(targets) {
     if (!select.length) {
         return;
     }
+    if (targets && !Array.isArray(targets)) {
+        targets = Object.values(targets);
+    }
     select.empty();
     if (!targets || !targets.length) {
         if (empty.length) {
