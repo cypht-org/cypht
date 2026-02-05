@@ -14,8 +14,13 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Output_spam_report_action extends Hm_Output_Module {
     protected function output() {
-        $button = '<a class="spam_report_action hlink text-decoration-none btn btn-sm btn-outline-danger" href="#">'.
-            $this->trans('Report spam').'</a>';
+        $attrs = 'class="spam_report_action hlink text-decoration-none btn btn-sm btn-outline-danger" href="#"';
+        $uid = $this->get('msg_text_uid');
+        $listPath = $this->get('msg_list_path');
+        if ($uid !== null && $listPath !== null) {
+            $attrs .= ' data-uid="' . $this->html_safe($uid) . '" data-list-path="' . $this->html_safe($listPath) . '"';
+        }
+        $button = '<a ' . $attrs . '>' . $this->trans('Report spam') . '</a>';
         $this->concat('message_actions_extra', $button);
     }
 }
@@ -53,6 +58,8 @@ class Hm_Output_spam_report_modal_inline extends Hm_Output_Module {
 class Hm_Output_spam_report_preview extends Hm_Output_Module {
     protected function output() {
         $this->out('spam_report_targets', $this->get('spam_report_targets', array()));
+        $this->out('spam_report_suggestion', $this->get('spam_report_suggestion', array()));
+        $this->out('spam_report_platforms', $this->get('spam_report_platforms', array()));
         $this->out('spam_report_preview', $this->get('spam_report_preview', array()));
         if ($this->get('spam_report_error')) {
             $this->out('spam_report_error', $this->get('spam_report_error'));

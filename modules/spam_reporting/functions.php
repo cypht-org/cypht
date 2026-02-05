@@ -200,6 +200,337 @@ function spam_reporting_build_registry($site_config) {
 }}
 
 /**
+ * Normalize a list of strings from config/catalog
+ * @param mixed $input
+ * @return array
+ */
+if (!hm_exists('spam_reporting_normalize_string_list')) {
+function spam_reporting_normalize_string_list($input) {
+    if (!is_array($input)) {
+        return array();
+    }
+    $out = array();
+    foreach ($input as $item) {
+        if (!is_string($item)) {
+            continue;
+        }
+        $trimmed = trim($item);
+        if ($trimmed !== '') {
+            $out[] = $trimmed;
+        }
+    }
+    return array_values(array_unique($out));
+}}
+
+/**
+ * Load reporting platform catalog from disk
+ * @param object $site_config
+ * @return array
+ */
+if (!hm_exists('spam_reporting_load_platform_catalog')) {
+function spam_reporting_load_platform_catalog($site_config) {
+    $path = $site_config->get('spam_reporting_platforms_file', APP_PATH.'data/spam_report_platforms.json');
+    if (!is_string($path) || !trim($path) || !is_file($path)) {
+        return array();
+    }
+    $raw = @file_get_contents($path);
+    if (!is_string($raw) || !trim($raw)) {
+        return array();
+    }
+    $decoded = json_decode($raw, true);
+    if (!is_array($decoded)) {
+        return array();
+    }
+    $platforms = $decoded;
+    if (array_key_exists('platforms', $decoded)) {
+        $platforms = $decoded['platforms'];
+    }
+    if (!is_array($platforms)) {
+        return array();
+    }
+    $clean = array();
+    foreach ($platforms as $platform) {
+        if (!is_array($platform)) {
+            continue;
+        }
+        $id = $platform['id'] ?? '';
+        if (!is_string($id) || !trim($id)) {
+            continue;
+        }
+        $name = $platform['name'] ?? $id;
+        $description = $platform['description'] ?? '';
+        $platform_id = $platform['platform_id'] ?? $id;
+        $clean[] = array(
+            'id' => $id,
+            'platform_id' => (is_string($platform_id) && trim($platform_id)) ? $platform_id : $id,
+            'name' => (is_string($name) && trim($name)) ? $name : $id,
+            'description' => is_string($description) ? $description : '',
+            'methods' => spam_reporting_normalize_string_list($platform['methods'] ?? array()),
+            'required_data' => spam_reporting_normalize_string_list($platform['required_data'] ?? array()),
+            'allowed_data' => spam_reporting_normalize_string_list($platform['allowed_data'] ?? array()),
+            'never_send' => spam_reporting_normalize_string_list($platform['never_send'] ?? array())
+        );
+    }
+    return $clean;
+}}
+
+/**
+ * Load provider-to-platform mapping from disk
+ * @param object $site_config
+ * @return array
+ */
+if (!hm_exists('spam_reporting_load_provider_mapping')) {
+function spam_reporting_load_provider_mapping($site_config) {
+    $path = $site_config->get('spam_reporting_provider_mapping_file', APP_PATH.'data/spam_report_provider_mapping.json');
+    if (!is_string($path) || !trim($path) || !is_file($path)) {
+        return array();
+    }
+    $raw = @file_get_contents($path);
+    if (!is_string($raw) || !trim($raw)) {
+        return array();
+    }
+    $decoded = json_decode($raw, true);
+    if (!is_array($decoded) || !array_key_exists('mappings', $decoded)) {
+        return array();
+    }
+    $mappings = $decoded['mappings'];
+    if (!is_array($mappings)) {
+        return array();
+    }
+    $clean = array();
+    foreach ($mappings as $m) {
+        if (!is_array($m) || empty($m['provider_id']) || empty($m['platform_ids'])) {
+            continue;
+        }
+        $provider_id = trim((string) $m['provider_id']);
+        $platform_ids = spam_reporting_normalize_string_list($m['platform_ids'] ?? array());
+        if (empty($platform_ids)) {
+            continue;
+        }
+        $signals = $m['signals'] ?? array();
+        if (!is_array($signals)) {
+            $signals = array();
+        }
+        $received = spam_reporting_normalize_string_list($signals['received'] ?? array());
+        $auth_results = spam_reporting_normalize_string_list($signals['auth_results'] ?? array());
+        $return_path = spam_reporting_normalize_string_list($signals['return_path'] ?? array());
+        $from_domain = spam_reporting_normalize_string_list($signals['from_domain'] ?? array());
+        $clean[] = array(
+            'provider_id' => $provider_id,
+            'provider_name' => (isset($m['provider_name']) && is_string($m['provider_name'])) ? trim($m['provider_name']) : $provider_id,
+            'platform_ids' => $platform_ids,
+            'signals' => array(
+                'received' => $received,
+                'auth_results' => $auth_results,
+                'return_path' => $return_path,
+                'from_domain' => $from_domain
+            )
+        );
+    }
+    return $clean;
+}}
+
+/**
+ * Extract domains/hosts from message headers for provider detection
+ * Primary: Received, Authentication-Results
+ * Secondary: Return-Path, From
+ * @param object $message parsed MIME message
+ * @return array ['primary' => [...], 'secondary' => [...]]
+ */
+if (!hm_exists('spam_reporting_extract_header_signals')) {
+function spam_reporting_extract_header_signals($message) {
+    $primary = array();
+    $secondary = array();
+    if (!$message || !method_exists($message, 'getRawHeaders')) {
+        return array('primary' => $primary, 'secondary' => $secondary);
+    }
+    $headers = $message->getRawHeaders();
+    $received_vals = array();
+    $auth_vals = '';
+    $return_path_val = '';
+    $from_val = '';
+    foreach ($headers as $h) {
+        if (!is_array($h) || count($h) < 2) {
+            continue;
+        }
+        $name = strtolower(trim($h[0]));
+        $value = $h[1];
+        if ($name === 'received') {
+            $received_vals[] = $value;
+        } elseif ($name === 'authentication-results') {
+            $auth_vals .= ' ' . $value;
+        } elseif ($name === 'return-path') {
+            $return_path_val = $value;
+        } elseif ($name === 'from') {
+            $from_val = $value;
+        }
+    }
+    foreach ($received_vals as $val) {
+        // Received headers are free-form; regex is used here intentionally
+        // to extract by/from hostnames in a best-effort manner.
+        if (preg_match_all('/\b(?:by|from)\s+([a-zA-Z0-9][-a-zA-Z0-9.]*\.[a-zA-Z]{2,})/i', $val, $m)) {
+            foreach ($m[1] as $host) {
+                $h = strtolower(trim($host));
+                if ($h && !in_array($h, $primary, true)) {
+                    $primary[] = $h;
+                }
+            }
+        }
+    }
+    if ($auth_vals !== '' && preg_match_all('/([a-zA-Z0-9][-a-zA-Z0-9.]*\.[a-zA-Z]{2,})/i', $auth_vals, $m)) {
+        foreach ($m[1] as $domain) {
+            $d = strtolower(trim($domain));
+            if ($d && strlen($d) > 4 && !in_array($d, $primary, true)) {
+                $primary[] = $d;
+            }
+        }
+    }
+    if ($return_path_val !== '' && preg_match('/@([a-zA-Z0-9][-a-zA-Z0-9.]*\.[a-zA-Z]{2,})/i', $return_path_val, $m)) {
+        $d = strtolower(trim($m[1]));
+        if ($d && !in_array($d, $secondary, true)) {
+            $secondary[] = $d;
+        }
+    }
+    if ($from_val !== '' && preg_match_all('/@([a-zA-Z0-9][-a-zA-Z0-9.]*\.[a-zA-Z]{2,})/i', $from_val, $m)) {
+        foreach ($m[1] as $domain) {
+            $d = strtolower(trim($domain));
+            if ($d && !in_array($d, $secondary, true)) {
+                $secondary[] = $d;
+            }
+        }
+    }
+    return array('primary' => $primary, 'secondary' => $secondary);
+}}
+
+/**
+ * Check if a domain/host matches any of the signal patterns (substring or exact)
+ * @param string $value
+ * @param array $patterns
+ * @return bool
+ */
+if (!hm_exists('spam_reporting_signal_matches')) {
+function spam_reporting_signal_matches($value, array $patterns) {
+    $v = strtolower(trim($value));
+    if ($v === '') {
+        return false;
+    }
+    foreach ($patterns as $p) {
+        $p = strtolower(trim($p));
+        if ($p === '' || strlen($p) < 3) {
+            continue;
+        }
+        if ($v === $p || strpos($v, $p) !== false || strpos($p, $v) !== false) {
+            return true;
+        }
+    }
+    return false;
+}}
+
+/**
+ * Detect providers from message headers using mapping
+ * Returns array of [provider_id, provider_name, confidence, platform_ids]
+ * @param object $message parsed MIME message
+ * @param array $mappings from spam_reporting_load_provider_mapping
+ * @return array
+ */
+if (!hm_exists('spam_reporting_detect_providers')) {
+function spam_reporting_detect_providers($message, array $mappings) {
+    $signals = spam_reporting_extract_header_signals($message);
+    $primary = $signals['primary'];
+    $secondary = $signals['secondary'];
+    $detected = array();
+    foreach ($mappings as $m) {
+        $score = 0;
+        $recv = $m['signals']['received'] ?? array();
+        $auth = $m['signals']['auth_results'] ?? array();
+        $rp = $m['signals']['return_path'] ?? array();
+        $fd = $m['signals']['from_domain'] ?? array();
+        foreach ($primary as $val) {
+            if (spam_reporting_signal_matches($val, $recv) || spam_reporting_signal_matches($val, $auth)) {
+                $score += 2;
+                break;
+            }
+        }
+        foreach ($secondary as $val) {
+            if (spam_reporting_signal_matches($val, $rp) || spam_reporting_signal_matches($val, $fd)) {
+                $score += 1;
+                break;
+            }
+        }
+        if ($score > 0) {
+            $detected[] = array(
+                'provider_id' => $m['provider_id'],
+                'provider_name' => $m['provider_name'],
+                'confidence' => $score,
+                'platform_ids' => $m['platform_ids']
+            );
+        }
+    }
+    usort($detected, function ($a, $b) {
+        return ($b['confidence'] <=> $a['confidence']) ?: strcasecmp($a['provider_name'], $b['provider_name']);
+    });
+    return $detected;
+}}
+
+/**
+ * Resolve suggested platform_ids to target_ids from available targets
+ * @param array $detected_providers from spam_reporting_detect_providers
+ * @param array $available_targets each with id, platform_id
+ * @return array of target ids in suggestion order
+ */
+if (!hm_exists('spam_reporting_suggested_target_ids')) {
+function spam_reporting_suggested_target_ids(array $detected_providers, array $available_targets) {
+    $platform_to_target = array();
+    foreach ($available_targets as $t) {
+        $pid = isset($t['platform_id']) ? trim((string) $t['platform_id']) : '';
+        if ($pid !== '') {
+            $platform_to_target[$pid] = $t['id'];
+        }
+    }
+    $suggested = array();
+    $seen = array();
+    foreach ($detected_providers as $dp) {
+        foreach ($dp['platform_ids'] as $platform_id) {
+            if (isset($platform_to_target[$platform_id]) && !isset($seen[$platform_to_target[$platform_id]])) {
+                $suggested[] = $platform_to_target[$platform_id];
+                $seen[$platform_to_target[$platform_id]] = true;
+            }
+        }
+    }
+    return $suggested;
+}}
+
+/**
+ * Detect user mailbox provider from IMAP server host (best-effort)
+ * @param string|null $server_id
+ * @param object $site_config
+ * @return string|null provider_id or null
+ */
+if (!hm_exists('spam_reporting_detect_user_mailbox_provider')) {
+function spam_reporting_detect_user_mailbox_provider($server_id, $site_config) {
+    if ($server_id === null || $server_id === '' || !class_exists('Hm_IMAP_List')) {
+        return null;
+    }
+    $server = Hm_IMAP_List::get($server_id, false);
+    if (!is_array($server) || empty($server['server'])) {
+        return null;
+    }
+    $host = strtolower(trim($server['server']));
+    if ($host === '') {
+        return null;
+    }
+    $mappings = spam_reporting_load_provider_mapping($site_config);
+    foreach ($mappings as $m) {
+        $recv = $m['signals']['received'] ?? array();
+        $auth = $m['signals']['auth_results'] ?? array();
+        if (spam_reporting_signal_matches($host, $recv) || spam_reporting_signal_matches($host, $auth)) {
+            return $m['provider_id'];
+        }
+    }
+    return null;
+}}
+
+/**
  * Build the spam report modal markup
  * @param callable $trans translation callback
  * @return string
@@ -216,8 +547,19 @@ function spam_reporting_modal_markup($trans) {
     $modal .= '<div class="modal-body">';
     $modal .= '<div class="spam-report-targets mb-3">';
     $modal .= '<div class="fw-bold mb-2">'.$trans('Targets').'</div>';
+    $modal .= '<div class="spam-report-suggestion-text text-muted small mb-2"></div>';
+    $modal .= '<div class="spam-report-self-report-note text-warning small mb-2"></div>';
     $modal .= '<select class="form-select spam-report-target-select" disabled="disabled"></select>';
-    $modal .= '<div class="spam-report-targets-empty text-muted mt-2">'.$trans('No targets configured').'</div>';
+    $modal .= '<div class="spam-report-targets-empty text-muted mt-2">'.$trans('No reporting targets are configured by the administrator.').'</div>';
+    $modal .= '<div class="spam-report-data-summary mt-2 p-2 bg-light rounded small d-none">';
+    $modal .= '<div class="fw-semibold mb-1">'.$trans('What will be sent').'</div>';
+    $modal .= '<ul class="spam-report-data-checklist list-unstyled mb-0"></ul>';
+    $modal .= '</div>';
+    $modal .= '</div>';
+    $modal .= '<div class="spam-report-platforms mb-3">';
+    $modal .= '<div class="fw-bold mb-2">'.$trans('Reporting platforms').'</div>';
+    $modal .= '<div class="spam-report-platforms-empty text-muted mt-2">'.$trans('No platform catalog loaded').'</div>';
+    $modal .= '<ul class="list-group spam-report-platforms-list"></ul>';
     $modal .= '</div>';
     $modal .= '<div class="spam-report-preview">';
     $modal .= '<div class="fw-bold mb-2">'.$trans('Preview').'</div>';

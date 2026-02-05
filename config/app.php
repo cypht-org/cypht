@@ -651,6 +651,23 @@ return [
     */
     'spam_reporting_targets' => array(),
     /*
+    | -------------------------------
+    | Spam Reporting Platform Catalog
+    | -------------------------------
+    |
+    | JSON catalog of known reporting platforms. This is display-only metadata
+    | and does not affect reporting behavior.
+    */
+    'spam_reporting_platforms_file' => env('SPAM_REPORTING_PLATFORMS_FILE', APP_PATH.'data/spam_report_platforms.json'),
+    /*
+    | ------------------------------------
+    | Spam Reporting Provider Mapping
+    | ------------------------------------
+    |
+    | JSON mapping of provider signals to platform_ids for suggestion logic.
+    */
+    'spam_reporting_provider_mapping_file' => env('SPAM_REPORTING_PROVIDER_MAPPING_FILE', APP_PATH.'data/spam_report_provider_mapping.json'),
+    /*
     | -----------------------------
     | Spam Reporting SMTP Settings
     | -----------------------------

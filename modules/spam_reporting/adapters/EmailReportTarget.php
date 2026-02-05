@@ -11,6 +11,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Spam_Report_Email_Target extends Hm_Spam_Report_Target_Abstract {
     protected $id = 'email_target';
     protected $label = 'Email Target';
+    protected $platform_id = '';
     protected $to = '';
     protected $subject_prefix = 'Spam report';
 
@@ -24,6 +25,9 @@ class Hm_Spam_Report_Email_Target extends Hm_Spam_Report_Target_Abstract {
         }
         if (array_key_exists('label', $config) && is_string($config['label'])) {
             $this->label = $config['label'];
+        }
+        if (array_key_exists('platform_id', $config) && is_string($config['platform_id'])) {
+            $this->platform_id = $config['platform_id'];
         }
         if (array_key_exists('to', $config) && is_string($config['to'])) {
             $this->to = $config['to'];
@@ -39,6 +43,10 @@ class Hm_Spam_Report_Email_Target extends Hm_Spam_Report_Target_Abstract {
 
     public function label() {
         return $this->label;
+    }
+
+    public function platform_id() {
+        return $this->platform_id;
     }
 
     public function capabilities() {
