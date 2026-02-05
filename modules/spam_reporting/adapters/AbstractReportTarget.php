@@ -12,6 +12,10 @@ abstract class Hm_Spam_Report_Target_Abstract implements Hm_Spam_Report_Target_I
     public function configure(array $config) {
     }
 
+    public function platform_id() {
+        return '';
+    }
+
     public function capabilities() {
         return array();
     }

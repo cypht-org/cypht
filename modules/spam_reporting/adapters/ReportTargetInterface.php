@@ -11,6 +11,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 interface Hm_Spam_Report_Target_Interface {
     public function id();
     public function label();
+    public function platform_id();
     public function capabilities();
     public function requirements();
     public function is_available(Hm_Spam_Report $report, $user_config);

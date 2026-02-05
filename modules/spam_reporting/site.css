@@ -1,3 +1,8 @@
 .spam_report_action {
     margin-right: 8px;
 }
+
+.spam-report-platforms-list {
+    max-height: 220px;
+    overflow-y: auto;
+}
