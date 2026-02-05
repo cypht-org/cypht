@@ -14,19 +14,39 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Handler_spam_report_preview extends Hm_Handler_Module {
     public function process() {
+        $post = $this->request->post ?? array();
+        $debug = array(
+            'step' => 'start',
+            'post_keys' => array_keys($post),
+            'list_path_in_post' => isset($post['list_path']) ? $post['list_path'] : '(missing)',
+            'uid_in_post' => isset($post['uid']) ? $post['uid'] : '(missing)',
+        );
+
         list($success, $form) = $this->process_form(array('list_path', 'uid'));
         if (!$success) {
+            $debug['step'] = 'process_form_failed';
+            $debug['form_received'] = $form;
+            $debug['form_count'] = count($form);
             $this->out('spam_report_error', 'Invalid request');
-            $this->out('spam_report_debug', array(
-                'post_keys' => array_keys($this->request->post ?? array()),
-                'post' => $this->request->post ?? array(),
-            ));
+            $this->out('spam_report_debug', $debug);
             return;
         }
 
+        $debug['step'] = 'process_form_ok';
+        $debug['form'] = $form;
+
         list($server_id, $uid, $folder, $msg_id) = get_request_params($form);
+        $debug['get_request_params'] = array(
+            'server_id' => $server_id,
+            'uid' => $uid,
+            'folder' => $folder ? '(set)' : null,
+            'msg_id' => $msg_id,
+        );
+
         if ($server_id === NULL || $folder === NULL || $uid === NULL) {
+            $debug['step'] = 'get_request_params_failed';
             $this->out('spam_report_error', 'Unsupported message source');
+            $this->out('spam_report_debug', $debug);
             return;
         }
 
@@ -40,21 +60,18 @@ class Hm_Handler_spam_report_preview extends Hm_Handler_Module {
             'list_path' => $form['list_path']
         ));
         if (!$report) {
+            $debug['step'] = 'build_report_failed';
             $this->out('spam_report_error', 'Failed to parse message');
-            $this->out('spam_report_debug', array(
-                'list_path' => $form['list_path'],
-                'uid' => $uid
-            ));
+            $this->out('spam_report_debug', $debug);
             return;
         }
         $raw_headers = $report->get_raw_headers_string();
-        $this->out('spam_report_debug', array(
-            'raw_len' => is_string($report->raw_message) ? mb_strlen($report->raw_message) : 0,
-            'headers_len' => is_string($raw_headers) ? mb_strlen($raw_headers) : 0,
-            'body_text_len' => is_string($report->body_text) ? mb_strlen($report->body_text) : 0,
-            'body_html_len' => is_string($report->body_html) ? mb_strlen($report->body_html) : 0,
-            'message_class' => is_object($report->get_parsed_message()) ? get_class($report->get_parsed_message()) : ''
-        ));
+        $debug['step'] = 'success';
+        $debug['raw_len'] = is_string($report->raw_message) ? mb_strlen($report->raw_message) : 0;
+        $debug['headers_len'] = is_string($raw_headers) ? mb_strlen($raw_headers) : 0;
+        $debug['body_text_len'] = is_string($report->body_text) ? mb_strlen($report->body_text) : 0;
+        $debug['body_html_len'] = is_string($report->body_html) ? mb_strlen($report->body_html) : 0;
+        $debug['message_class'] = is_object($report->get_parsed_message()) ? get_class($report->get_parsed_message()) : '';
 
         $registry = spam_reporting_build_registry($this->config);
         $targets = array();
@@ -63,18 +80,74 @@ class Hm_Handler_spam_report_preview extends Hm_Handler_Module {
                 $targets[] = array(
                     'id' => $target->id(),
                     'label' => $target->label(),
+                    'platform_id' => $target->platform_id(),
                     'capabilities' => $target->capabilities(),
                     'requirements' => $target->requirements()
                 );
             }
         }
 
-        $this->out('spam_report_targets', $targets);
-        $this->out('spam_report_preview', array(
+        $message = $report->get_parsed_message();
+        $mappings = spam_reporting_load_provider_mapping($this->config);
+        $detected = $message ? spam_reporting_detect_providers($message, $mappings) : array();
+        $suggested_ids = spam_reporting_suggested_target_ids($detected, $targets);
+
+        $targets_ordered = array();
+        $by_id = array();
+        foreach ($targets as $t) {
+            $by_id[$t['id']] = $t;
+        }
+        foreach ($suggested_ids as $tid) {
+            if (isset($by_id[$tid])) {
+                $targets_ordered[] = $by_id[$tid];
+                unset($by_id[$tid]);
+            }
+        }
+        foreach ($by_id as $t) {
+            $targets_ordered[] = $t;
+        }
+
+        $suggestion = array(
+            'suggested_target_ids' => $suggested_ids,
+            'explanation' => '',
+            'self_report_note' => ''
+        );
+        if (!empty($detected)) {
+            $names = array_map(function ($d) {
+                return $d['provider_name'];
+            }, $detected);
+            $suggestion['explanation'] = 'Suggested because the message appears to come from ' . implode(' or ', array_unique($names)) . '.';
+        } else {
+            $suggestion['explanation'] = 'No specific provider detected; you can choose any reporting platform.';
+        }
+        list($server_id, , , ) = get_request_params($form);
+        $user_provider = spam_reporting_detect_user_mailbox_provider($server_id, $this->config);
+        if ($user_provider && !empty($detected)) {
+            $match = false;
+            foreach ($detected as $d) {
+                if ($d['provider_id'] === $user_provider) {
+                    $match = true;
+                    break;
+                }
+            }
+            if ($match) {
+                $suggestion['self_report_note'] = 'This message appears to originate from the same provider as your mailbox.';
+            }
+        }
+
+        $this->out('spam_report_targets', $targets_ordered);
+        $this->out('spam_report_suggestion', $suggestion);
+        $this->out('spam_report_platforms', spam_reporting_load_platform_catalog($this->config));
+        $preview = array(
             'headers' => $raw_headers,
             'body_text' => $report->body_text ?? '',
             'body_html' => $report->body_html ?? ''
-        ));
+        );
+        $debug['preview_keys'] = array_keys($preview);
+        $debug['preview_headers_len'] = mb_strlen($preview['headers']);
+        $debug['preview_body_text_len'] = mb_strlen($preview['body_text']);
+        $this->out('spam_report_debug', $debug);
+        $this->out('spam_report_preview', $preview);
     }
 }
 

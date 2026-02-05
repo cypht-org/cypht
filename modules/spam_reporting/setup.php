@@ -33,6 +33,8 @@ return array(
     ),
     'allowed_output' => array(
         'spam_report_targets' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+        'spam_report_suggestion' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+        'spam_report_platforms' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'spam_report_preview' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY), // Preview-only raw message data (not rendered or persisted).
         'spam_report_error' => array(FILTER_UNSAFE_RAW, false),
         'spam_report_debug' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
