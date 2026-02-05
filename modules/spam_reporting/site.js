@@ -50,9 +50,10 @@ var spam_reporting_platform_data_summary = function(platform) {
     var allowed = spam_reporting_to_array(platform.allowed_data);
     var never = spam_reporting_to_array(platform.never_send);
     var parts = [];
+    if (allowed.indexOf('ip') >= 0) parts.push(hm_trans('IP address') + ' \u2713');
     if (allowed.indexOf('headers') >= 0) parts.push(hm_trans('Headers') + ' \u2713');
     if (allowed.indexOf('body') >= 0) parts.push(hm_trans('Body') + (req.indexOf('body') >= 0 ? ' \u2713' : ' (' + hm_trans('optional') + ')'));
-    if (allowed.indexOf('user_notes') >= 0) parts.push(hm_trans('User notes') + ' \u2713');
+    if (allowed.indexOf('user_notes') >= 0) parts.push(hm_trans('User notes') + (req.indexOf('user_notes') >= 0 ? ' \u2713' : ' (' + hm_trans('optional') + ')'));
     if (parts.length === 0) return '';
     return parts.join(', ');
 };
@@ -185,6 +186,10 @@ var spam_reporting_update_data_summary = function(targetId) {
         var allowed = spam_reporting_to_array(platform.allowed_data);
         var never = spam_reporting_to_array(platform.never_send);
         var hasItems = false;
+        if (allowed.indexOf('ip') >= 0) {
+            checklistEl.append($('<li></li>').html(hm_trans('IP address') + ' &#x2713;'));
+            hasItems = true;
+        }
         if (allowed.indexOf('headers') >= 0) {
             checklistEl.append($('<li></li>').html(hm_trans('Headers') + ' &#x2713;'));
             hasItems = true;
@@ -195,7 +200,8 @@ var spam_reporting_update_data_summary = function(targetId) {
             hasItems = true;
         }
         if (allowed.indexOf('user_notes') >= 0) {
-            checklistEl.append($('<li></li>').html(hm_trans('User notes') + ' &#x2713;'));
+            var notesLabel = hm_trans('User notes') + (req.indexOf('user_notes') >= 0 ? ' &#x2713;' : ' (' + hm_trans('optional') + ')');
+            checklistEl.append($('<li></li>').html(notesLabel));
             hasItems = true;
         }
         if (never.length) {
@@ -324,6 +330,22 @@ var spam_reporting_send_report = function() {
             status.text(hm_trans('Please select a target'));
         }
         return;
+    }
+    var target = null;
+    for (var i = 0; i < spam_reporting_targets.length; i++) {
+        if (spam_reporting_targets[i].id === targetId) {
+            target = spam_reporting_targets[i];
+            break;
+        }
+    }
+    if (target && target.is_api_target && target.api_service_name) {
+        var consentMsg = hm_trans('This report will be sent to an external service via an API operated by %s.');
+        consentMsg = (consentMsg && consentMsg.indexOf('%s') >= 0)
+            ? consentMsg.replace('%s', target.api_service_name)
+            : 'This report will be sent to an external service via an API operated by ' + target.api_service_name + '.';
+        if (!confirm(consentMsg)) {
+            return;
+        }
     }
     var uid = spam_reporting_current_uid;
     var listPath = spam_reporting_current_list_path;
