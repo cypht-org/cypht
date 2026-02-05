@@ -63,6 +63,17 @@ class Hm_Spam_Report {
     public function get_raw_headers_string() {
         return spam_reporting_format_raw_headers($this->message);
     }
+
+    /**
+     * Get source IPs extracted from Received headers (first-hop)
+     * @return array of IP strings
+     */
+    public function get_source_ips() {
+        if ($this->message) {
+            return spam_reporting_extract_source_ips($this->message);
+        }
+        return array();
+    }
 }
 
 /**
@@ -181,14 +192,15 @@ function spam_reporting_build_registry($site_config) {
             } elseif (is_array($class_name) && array_key_exists('class', $class_name)) {
                 $class = $class_name['class'];
                 if (is_string($class) && class_exists($class)) {
+                    $config = array_merge($class_name, array('_site_config' => $site_config));
                     $ref = new ReflectionClass($class);
                     $ctor = $ref->getConstructor();
                     if ($ctor && $ctor->getNumberOfParameters() > 0) {
-                        $registry->register_target($ref->newInstance($class_name));
+                        $registry->register_target($ref->newInstance($config));
                     } else {
                         $target = $ref->newInstance();
                         if (method_exists($target, 'configure')) {
-                            $target->configure($class_name);
+                            $target->configure($config);
                         }
                         $registry->register_target($target);
                     }
@@ -328,6 +340,53 @@ function spam_reporting_load_provider_mapping($site_config) {
         );
     }
     return $clean;
+}}
+
+/**
+ * Extract source IP addresses from Received headers (first-hop, closest to sender)
+ * Used for IP-based reporting (e.g. AbuseIPDB).
+ * @param object $message parsed MIME message
+ * @return array of IPv4/IPv6 strings, empty if none found
+ */
+if (!hm_exists('spam_reporting_extract_source_ips')) {
+function spam_reporting_extract_source_ips($message) {
+    $ips = array();
+    if (!$message || !method_exists($message, 'getRawHeaders')) {
+        return $ips;
+    }
+    $headers = $message->getRawHeaders();
+    $received_vals = array();
+    foreach ($headers as $h) {
+        if (!is_array($h) || count($h) < 2) {
+            continue;
+        }
+        if (strtolower(trim($h[0])) === 'received') {
+            $received_vals[] = $h[1];
+        }
+    }
+    // Process in reverse order: last Received is closest to sender (first hop)
+    $received_vals = array_reverse($received_vals);
+    foreach ($received_vals as $val) {
+        // Match [1.2.3.4] or (1.2.3.4) or bare IPv4
+        if (preg_match('/\[([0-9a-f.:]+)\]/i', $val, $m) && filter_var($m[1], FILTER_VALIDATE_IP)) {
+            $ips[] = $m[1];
+            break;
+        }
+        if (preg_match('/\(([0-9a-f.:]+)\)/i', $val, $m) && filter_var($m[1], FILTER_VALIDATE_IP)) {
+            $ips[] = $m[1];
+            break;
+        }
+        if (preg_match('/\b(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\b/', $val, $m) && filter_var($m[1], FILTER_VALIDATE_IP)) {
+            $ips[] = $m[1];
+            break;
+        }
+        // IPv6 in brackets
+        if (preg_match('/\[([0-9a-f:]+)\]/i', $val, $m) && filter_var($m[1], FILTER_VALIDATE_IP)) {
+            $ips[] = $m[1];
+            break;
+        }
+    }
+    return array_values(array_unique($ips));
 }}
 
 /**

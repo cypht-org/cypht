@@ -182,4 +182,49 @@ class Hm_Test_Spam_Reporting_Functions extends TestCase {
         $this->assertTrue(spam_reporting_signal_matches('mail.google.com', array('google.com')));
         $this->assertFalse(spam_reporting_signal_matches('example.org', array('gmail.com')));
     }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_extract_source_ips_from_received() {
+        $raw = "From: sender@example.org\r\n".
+            "To: victim@example.org\r\n".
+            "Received: from mail.example.com (mail.example.com [192.168.1.100])\r\n".
+            "Subject: Test\r\n".
+            "MIME-Version: 1.0\r\n".
+            "Content-Type: text/plain\r\n".
+            "\r\nbody\r\n";
+        $report = Hm_Spam_Report::from_raw_message($raw, array());
+        $this->assertNotFalse($report);
+        $ips = $report->get_source_ips();
+        $this->assertNotEmpty($ips);
+        $this->assertContains('192.168.1.100', $ips);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_abuseipdb_target_build_payload_minimal() {
+        $raw = "From: sender@example.org\r\n".
+            "To: victim@example.org\r\n".
+            "Received: from spam.relay.net ([203.0.113.50])\r\n".
+            "Subject: Test\r\n".
+            "MIME-Version: 1.0\r\n".
+            "Content-Type: text/plain\r\n".
+            "\r\nSpam body\r\n";
+        $report = Hm_Spam_Report::from_raw_message($raw, array());
+        $config = new Hm_Mock_Config();
+        $config->set('spam_reporting_abuseipdb_api_key', 'test-key');
+        $target = new Hm_Spam_Report_AbuseIPDB_Target();
+        $target->configure(array('_site_config' => $config));
+
+        $payload = $target->build_payload($report, array('user_notes' => 'Optional note'));
+        $this->assertIsArray($payload);
+        $this->assertSame('203.0.113.50', $payload['ip']);
+        $this->assertArrayHasKey('categories', $payload);
+        $this->assertContains(11, $payload['categories']);
+        $this->assertSame('Optional note', $payload['comment']);
+    }
 }
