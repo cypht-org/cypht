@@ -77,13 +77,19 @@ class Hm_Handler_spam_report_preview extends Hm_Handler_Module {
         $targets = array();
         foreach ($registry->all_targets() as $target) {
             if ($target->is_available($report, $this->user_config)) {
-                $targets[] = array(
+                $t = array(
                     'id' => $target->id(),
                     'label' => $target->label(),
                     'platform_id' => $target->platform_id(),
                     'capabilities' => $target->capabilities(),
                     'requirements' => $target->requirements()
                 );
+                if (method_exists($target, 'is_api_target') && $target->is_api_target()) {
+                    $t['is_api_target'] = true;
+                    $t['api_service_name'] = method_exists($target, 'get_api_service_name')
+                        ? $target->get_api_service_name() : '';
+                }
+                $targets[] = $t;
             }
         }
 
