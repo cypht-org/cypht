@@ -38,6 +38,9 @@ require APP_PATH.'lib/framework.php';
 $environment = Hm_Environment::getInstance();
 $environment->load();
 
+/* check dependencies */
+$environment->check_dependencies();
+
 /* get configuration */
 $config = new Hm_Site_Config_File();
 
