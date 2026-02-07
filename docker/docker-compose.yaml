@@ -7,6 +7,8 @@ services:
       - "3306:3306"
     volumes:
       - ./data/mysql:/var/lib/mysql
+      # Mount the initialization script to create user with Docker network permissions
+      - ./init-db.sh:/docker-entrypoint-initdb.d/01-init-user.sh:ro
     environment:
       - MYSQL_ROOT_PASSWORD=root_password
       - MYSQL_DATABASE=cypht
