@@ -116,7 +116,7 @@ class Hm_Handler_spam_report_preview extends Hm_Handler_Module {
         $registry = spam_reporting_build_registry($this->config);
         $targets = array();
         foreach ($registry->all_targets() as $target) {
-            if ($target->is_available($report, $this->user_config)) {
+            if ($target->is_available($report, $this->user_config, array())) {
                 $t = array(
                     'id' => $target->id(),
                     'label' => $target->label(),
@@ -247,7 +247,7 @@ class Hm_Handler_spam_report_send extends Hm_Handler_Module {
 
         $registry = spam_reporting_build_registry($this->config);
         $target = $registry->get($form['target_id']);
-        if (!$target || !$target->is_available($report, $this->user_config)) {
+        if (!$target || !$target->is_available($report, $this->user_config, array())) {
             $this->out('spam_report_send_ok', false);
             $this->out('spam_report_send_message', 'Target unavailable');
             return;
@@ -260,8 +260,10 @@ class Hm_Handler_spam_report_send extends Hm_Handler_Module {
             return;
         }
 
-        $payload = $target->build_payload($report, array('user_notes' => $notes));
+        $instance_config = array();
+        $payload = $target->build_payload($report, array('user_notes' => $notes), $instance_config);
         $context = new Hm_Spam_Report_Delivery_Context($this->config, $this->user_config, $this->session);
+        $context->instance_config = $instance_config;
         $result = $target->deliver($payload, $context);
         if (!$result || !($result instanceof Hm_Spam_Report_Result) || !$result->ok) {
             $msg = $result && $result instanceof Hm_Spam_Report_Result ? $result->message : 'Send failed';
