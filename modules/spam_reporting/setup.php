@@ -36,6 +36,8 @@ return array(
         'ajax_spam_report_send'
     ),
     'allowed_output' => array(
+        'spam_reporting_configs_for_ui' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+        'spam_reporting_adapter_types' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'spam_report_targets' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'spam_report_suggestion' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'spam_report_platforms' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
@@ -59,7 +61,8 @@ return array(
         'spam_reporting_platform_google_abuse' => FILTER_VALIDATE_INT,
         'spam_reporting_platform_microsoft_abuse' => FILTER_VALIDATE_INT,
         'spam_reporting_platform_yahoo_abuse' => FILTER_VALIDATE_INT,
-        'spam_reporting_platform_zoho_abuse' => FILTER_VALIDATE_INT
+        'spam_reporting_platform_zoho_abuse' => FILTER_VALIDATE_INT,
+        'spam_reporting_target_configurations' => FILTER_UNSAFE_RAW
     ),
     'allowed_get' => array(
     )

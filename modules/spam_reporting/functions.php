@@ -477,6 +477,152 @@ function spam_reporting_resolve_target_id($site_config, $user_config, $target_id
 }}
 
 /**
+ * Configs for settings UI (Phase D): id, adapter_id, label, adapter_type_label, settings_safe.
+ * settings_safe = settings with secret keys removed (never send secrets to client).
+ * @param object $site_config
+ * @param object $user_config
+ * @return array
+ */
+if (!hm_exists('spam_reporting_settings_configs_for_ui')) {
+function spam_reporting_settings_configs_for_ui($site_config, $user_config) {
+    $configs = spam_reporting_load_user_target_configurations($site_config, $user_config);
+    $registry = spam_reporting_build_registry($site_config);
+    $out = array();
+    foreach ($configs as $c) {
+        $adapter = $registry->get($c['adapter_id']);
+        if (!$adapter instanceof Hm_Spam_Report_Target_Interface) {
+            continue;
+        }
+        $schema = $adapter->get_configuration_schema();
+        $settings_safe = array();
+        $settings_form = array();
+        if (is_array($schema)) {
+            foreach ($schema as $key => $meta) {
+                $is_secret = isset($meta['type']) && $meta['type'] === 'secret';
+                if ($is_secret) {
+                    $settings_form[$key] = '__KEEP__';
+                } else {
+                    $v = isset($c['settings'][$key]) ? $c['settings'][$key] : '';
+                    $settings_safe[$key] = $v;
+                    $settings_form[$key] = $v;
+                }
+            }
+        }
+        $out[] = array(
+            'id' => $c['id'],
+            'adapter_id' => $c['adapter_id'],
+            'label' => $c['label'],
+            'adapter_type_label' => $adapter->label(),
+            'settings_safe' => $settings_safe,
+            'settings_form' => $settings_form
+        );
+    }
+    return $out;
+}}
+
+/**
+ * Adapter types for settings UI (Phase D): adapter_id, label, schema (no secret values).
+ * @param object $site_config
+ * @return array
+ */
+if (!hm_exists('spam_reporting_settings_adapter_types')) {
+function spam_reporting_settings_adapter_types($site_config) {
+    $registry = spam_reporting_build_registry($site_config);
+    $out = array();
+    foreach ($registry->all_targets() as $adapter) {
+        $schema = $adapter->get_configuration_schema();
+        if (!is_array($schema) || empty($schema)) {
+            continue;
+        }
+        $out[] = array(
+            'adapter_id' => $adapter->id(),
+            'label' => $adapter->label(),
+            'schema' => $schema
+        );
+    }
+    return $out;
+}}
+
+/**
+ * Merge __KEEP__ in submitted settings with current stored values (Phase D).
+ * @param array $submitted_list each item: id, adapter_id, label, settings
+ * @param array $current_configs from load_user_target_configurations (have settings)
+ * @return array merged list with settings
+ */
+if (!hm_exists('spam_reporting_merge_keep_settings')) {
+function spam_reporting_merge_keep_settings(array $submitted_list, array $current_configs) {
+    $by_id = array();
+    foreach ($current_configs as $c) {
+        $by_id[$c['id']] = $c;
+    }
+    $out = array();
+    foreach ($submitted_list as $entry) {
+        $id = isset($entry['id']) ? trim((string) $entry['id']) : '';
+        $settings = isset($entry['settings']) && is_array($entry['settings']) ? $entry['settings'] : array();
+        if (isset($by_id[$id]['settings'])) {
+            foreach ($by_id[$id]['settings'] as $k => $v) {
+                if (array_key_exists($k, $settings) && $settings[$k] === '__KEEP__') {
+                    $settings[$k] = $v;
+                }
+            }
+        }
+        $out[] = array(
+            'id' => $id,
+            'adapter_id' => isset($entry['adapter_id']) ? trim((string) $entry['adapter_id']) : '',
+            'label' => isset($entry['label']) && is_string($entry['label']) ? trim($entry['label']) : '',
+            'settings' => $settings
+        );
+    }
+    return $out;
+}}
+
+/**
+ * Validate and normalize one config entry for save (Phase D). Returns [ok, errors, normalized_entry].
+ * @param array $entry merged entry (id, adapter_id, label, settings)
+ * @param object $site_config
+ * @return array [bool, array of strings, array|null]
+ */
+if (!hm_exists('spam_reporting_validate_config_entry')) {
+function spam_reporting_validate_config_entry(array $entry, $site_config) {
+    $errors = array();
+    $registry = spam_reporting_build_registry($site_config);
+    $adapter = $registry->get($entry['adapter_id'] ?? '');
+    if (!$adapter instanceof Hm_Spam_Report_Target_Interface) {
+        $errors[] = 'Invalid adapter type';
+        return array(false, $errors, null);
+    }
+    $label = $entry['label'] ?? '';
+    if (!is_string($label) || trim($label) === '') {
+        $errors[] = 'Label is required';
+    }
+    $schema = $adapter->get_configuration_schema();
+    $settings = isset($entry['settings']) && is_array($entry['settings']) ? $entry['settings'] : array();
+    $settings = spam_reporting_whitelist_instance_settings($settings, $adapter);
+    if (is_array($schema)) {
+        foreach ($schema as $key => $meta) {
+            if (!empty($meta['required'])) {
+                $val = isset($settings[$key]) ? $settings[$key] : '';
+                if (!is_string($val)) {
+                    $val = '';
+                }
+                if (trim($val) === '') {
+                    $errors[] = ($meta['label'] ?? $key) . ' is required';
+                }
+            }
+        }
+    }
+    if (!empty($errors)) {
+        return array(false, $errors, null);
+    }
+    return array(true, array(), array(
+        'id' => $entry['id'] !== '' ? $entry['id'] : spam_reporting_generate_instance_id(),
+        'adapter_id' => $entry['adapter_id'],
+        'label' => trim($label),
+        'settings' => $settings
+    ));
+}}
+
+/**
  * Normalize a list of strings from config/catalog
  * @param mixed $input
  * @return array
