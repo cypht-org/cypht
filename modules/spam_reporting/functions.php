@@ -298,6 +298,185 @@ function spam_reporting_build_registry($site_config) {
 }}
 
 /**
+ * Generate a stable unique instance id (Phase C). 16-char hex.
+ * @return string
+ */
+if (!hm_exists('spam_reporting_generate_instance_id')) {
+function spam_reporting_generate_instance_id() {
+    return bin2hex(random_bytes(8));
+}}
+
+/**
+ * Whitelist settings to only keys declared in adapter schema (Phase C).
+ * @param array $settings raw stored settings
+ * @param Hm_Spam_Report_Target_Interface $adapter
+ * @return array
+ */
+if (!hm_exists('spam_reporting_whitelist_instance_settings')) {
+function spam_reporting_whitelist_instance_settings(array $settings, $adapter) {
+    $schema = $adapter->get_configuration_schema();
+    if (!is_array($schema)) {
+        return array();
+    }
+    $allowed_keys = array_keys($schema);
+    $out = array();
+    foreach ($allowed_keys as $key) {
+        if (array_key_exists($key, $settings)) {
+            $out[$key] = $settings[$key];
+        }
+    }
+    return $out;
+}}
+
+/**
+ * Load and normalize user target configurations; whitelist settings by adapter schema (Phase C).
+ * @param object $site_config
+ * @param object $user_config
+ * @return array list of array('id' => string, 'adapter_id' => string, 'label' => string, 'settings' => array)
+ */
+if (!hm_exists('spam_reporting_load_user_target_configurations')) {
+function spam_reporting_load_user_target_configurations($site_config, $user_config) {
+    $raw = $user_config->get('spam_reporting_target_configurations', array());
+    if (!is_array($raw)) {
+        return array();
+    }
+    $registry = spam_reporting_build_registry($site_config);
+    $out = array();
+    foreach ($raw as $entry) {
+        if (!is_array($entry) || empty($entry['id']) || empty($entry['adapter_id'])) {
+            continue;
+        }
+        $id = trim((string) $entry['id']);
+        $adapter_id = trim((string) $entry['adapter_id']);
+        $adapter = $registry->get($adapter_id);
+        if (!$adapter instanceof Hm_Spam_Report_Target_Interface) {
+            continue;
+        }
+        $label = isset($entry['label']) && is_string($entry['label']) ? trim($entry['label']) : $adapter->label();
+        $settings = isset($entry['settings']) && is_array($entry['settings']) ? $entry['settings'] : array();
+        $settings = spam_reporting_whitelist_instance_settings($settings, $adapter);
+        $out[] = array(
+            'id' => $id,
+            'adapter_id' => $adapter_id,
+            'label' => $label,
+            'settings' => $settings
+        );
+    }
+    return $out;
+}}
+
+/**
+ * Build one effective-target descriptor (public fields only); adapter/instance_config added by caller (Phase C).
+ */
+if (!hm_exists('spam_reporting_build_effective_descriptor')) {
+function spam_reporting_build_effective_descriptor($adapter, $id, $label, array $instance_config = array()) {
+    $t = array(
+        'id' => $id,
+        'label' => $label,
+        'platform_id' => $adapter->platform_id(),
+        'capabilities' => $adapter->capabilities(),
+        'requirements' => $adapter->requirements()
+    );
+    if (method_exists($adapter, 'is_api_target') && $adapter->is_api_target()) {
+        $t['is_api_target'] = true;
+        $t['api_service_name'] = method_exists($adapter, 'get_api_service_name')
+            ? $adapter->get_api_service_name() : '';
+    }
+    return $t;
+}}
+
+/**
+ * Build effective targets for the current user (Phase C).
+ * Legacy fallback: one virtual instance per allowed type when no user configs.
+ * When $report is set, only includes targets where is_available(report, user_config, instance_config).
+ * Descriptors include adapter and instance_config (server-side only; do not send to client).
+ * @param object $site_config
+ * @param object $user_config
+ * @param Hm_Spam_Report|null $report
+ * @return array list of full descriptors
+ */
+if (!hm_exists('spam_reporting_get_effective_targets')) {
+function spam_reporting_get_effective_targets($site_config, $user_config, $report = null) {
+    $registry = spam_reporting_build_registry($site_config);
+    $configs = spam_reporting_load_user_target_configurations($site_config, $user_config);
+    $list = array();
+
+    if (empty($configs)) {
+        foreach ($registry->all_targets() as $adapter) {
+            $descriptor = spam_reporting_build_effective_descriptor($adapter, $adapter->id(), $adapter->label(), array());
+            $descriptor['adapter'] = $adapter;
+            $descriptor['instance_config'] = array();
+            if ($report !== null && !$adapter->is_available($report, $user_config, array())) {
+                continue;
+            }
+            $list[] = $descriptor;
+        }
+        return $list;
+    }
+
+    foreach ($configs as $c) {
+        $adapter = $registry->get($c['adapter_id']);
+        if (!$adapter instanceof Hm_Spam_Report_Target_Interface) {
+            continue;
+        }
+        $instance_config = $c['settings'];
+        if ($report !== null && !$adapter->is_available($report, $user_config, $instance_config)) {
+            continue;
+        }
+        $descriptor = spam_reporting_build_effective_descriptor($adapter, $c['id'], $c['label'], $instance_config);
+        $descriptor['adapter'] = $adapter;
+        $descriptor['instance_config'] = $instance_config;
+        $list[] = $descriptor;
+    }
+    return $list;
+}}
+
+/**
+ * Strip server-only fields for UI (Phase C). Never send adapter or instance_config to client.
+ * @param array $effective_targets
+ * @return array public descriptors only
+ */
+if (!hm_exists('spam_reporting_effective_targets_to_public_descriptors')) {
+function spam_reporting_effective_targets_to_public_descriptors(array $effective_targets) {
+    $out = array();
+    $public_keys = array('id', 'label', 'platform_id', 'capabilities', 'requirements', 'is_api_target', 'api_service_name');
+    foreach ($effective_targets as $d) {
+        if (!is_array($d)) {
+            continue;
+        }
+        $row = array();
+        foreach ($public_keys as $k) {
+            if (array_key_exists($k, $d)) {
+                $row[$k] = $d[$k];
+            }
+        }
+        $out[] = $row;
+    }
+    return $out;
+}}
+
+/**
+ * Resolve target_id to (adapter, instance_config) for send (Phase C).
+ * @param object $site_config
+ * @param object $user_config
+ * @param string $target_id
+ * @return array [adapter|null, instance_config]
+ */
+if (!hm_exists('spam_reporting_resolve_target_id')) {
+function spam_reporting_resolve_target_id($site_config, $user_config, $target_id) {
+    if (!is_string($target_id) || $target_id === '') {
+        return array(null, array());
+    }
+    $targets = spam_reporting_get_effective_targets($site_config, $user_config, null);
+    foreach ($targets as $d) {
+        if (isset($d['id']) && $d['id'] === $target_id && isset($d['adapter'], $d['instance_config'])) {
+            return array($d['adapter'], $d['instance_config']);
+        }
+    }
+    return array(null, array());
+}}
+
+/**
  * Normalize a list of strings from config/catalog
  * @param mixed $input
  * @return array
