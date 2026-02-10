@@ -648,10 +648,12 @@ return [
     |
     | Symbolic adapter type IDs that are allowed instance-wide. When this key
     | is set (array), it is the source of truth and spam_reporting_targets is
-    | ignored. Admins do not reference class names. Default allows AbuseIPDB
-    | for backward compatibility; set to [] to disable all types until configured.
+    | ignored. Admins do not reference class names. Set via env SPAM_REPORTING_ALLOWED_TARGET_TYPES
+    | (comma-separated, e.g. abuseipdb,email_target) or leave unset for default. Include both so the
+    | Settings "Add target" dropdown is populated; empty value disables all types.
     */
-    'spam_reporting_allowed_target_types' => array('abuseipdb'),
+    'spam_reporting_allowed_target_types' => array_filter(
+        array_map('trim', explode(',', (string) env('SPAM_REPORTING_ALLOWED_TARGET_TYPES', 'abuseipdb,email_target')))),
     /*
     | ------------------------
     | Spam Reporting Targets (deprecated)
