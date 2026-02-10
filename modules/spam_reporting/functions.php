@@ -177,35 +177,114 @@ function spam_reporting_format_raw_headers($message) {
 }}
 
 /**
- * Build a target registry from config
+ * Adapter type id → PHP class name (internal; not exposed in config).
+ * Admins use only symbolic type IDs via spam_reporting_allowed_target_types.
+ * @return array<string, string> type_id => class name
+ */
+if (!hm_exists('spam_reporting_get_adapter_type_map')) {
+function spam_reporting_get_adapter_type_map() {
+    return array(
+        'abuseipdb' => 'Hm_Spam_Report_AbuseIPDB_Target',
+        'email_target' => 'Hm_Spam_Report_Email_Target',
+    );
+}}
+
+/**
+ * Build allowed adapter type IDs: use new config key if set, else derive from legacy targets.
+ * @param object $site_config
+ * @return array list of adapter type ids
+ */
+if (!hm_exists('spam_reporting_get_allowed_target_types')) {
+function spam_reporting_get_allowed_target_types($site_config) {
+    $allowed = $site_config->get('spam_reporting_allowed_target_types', null);
+    if (is_array($allowed)) {
+        return array_values(array_filter($allowed, 'is_string'));
+    }
+    $targets = $site_config->get('spam_reporting_targets');
+    if (!is_array($targets)) {
+        return array();
+    }
+    $class_to_type = array(
+        'Hm_Spam_Report_AbuseIPDB_Target' => 'abuseipdb',
+        'Hm_Spam_Report_Email_Target' => 'email_target',
+    );
+    $types = array();
+    foreach ($targets as $entry) {
+        $class = null;
+        if (is_string($entry) && $entry !== '') {
+            $class = $entry;
+        } elseif (is_array($entry) && isset($entry['class']) && is_string($entry['class'])) {
+            $class = $entry['class'];
+        }
+        if ($class && isset($class_to_type[$class]) && !in_array($class_to_type[$class], $types, true)) {
+            $types[] = $class_to_type[$class];
+        }
+    }
+    return $types;
+}}
+
+/**
+ * Build a target registry from config.
+ * Uses spam_reporting_allowed_target_types when set (Phase A: type-only, no secrets);
+ * otherwise falls back to legacy spam_reporting_targets (full config, deprecated).
  * @param object $site_config
  * @return Hm_Spam_Report_Targets_Registry
  */
 if (!hm_exists('spam_reporting_build_registry')) {
 function spam_reporting_build_registry($site_config) {
     $registry = new Hm_Spam_Report_Targets_Registry();
-    $targets = $site_config->get('spam_reporting_targets');
-    if (is_array($targets)) {
-        foreach ($targets as $class_name) {
-            if (is_string($class_name) && class_exists($class_name)) {
-                $registry->register_target(new $class_name());
-            } elseif (is_array($class_name) && array_key_exists('class', $class_name)) {
-                $class = $class_name['class'];
-                if (is_string($class) && class_exists($class)) {
-                    $config = array_merge($class_name, array('_site_config' => $site_config));
-                    $ref = new ReflectionClass($class);
-                    $ctor = $ref->getConstructor();
-                    if ($ctor && $ctor->getNumberOfParameters() > 0) {
-                        $registry->register_target($ref->newInstance($config));
-                    } else {
-                        $target = $ref->newInstance();
-                        if (method_exists($target, 'configure')) {
-                            $target->configure($config);
+    $allowed = $site_config->get('spam_reporting_allowed_target_types', null);
+    $use_legacy = !is_array($allowed);
+
+    if ($use_legacy) {
+        $targets = $site_config->get('spam_reporting_targets');
+        if (is_array($targets)) {
+            foreach ($targets as $class_name) {
+                if (is_string($class_name) && class_exists($class_name)) {
+                    $registry->register_target(new $class_name());
+                } elseif (is_array($class_name) && array_key_exists('class', $class_name)) {
+                    $class = $class_name['class'];
+                    if (is_string($class) && class_exists($class)) {
+                        $config = array_merge($class_name, array('_site_config' => $site_config));
+                        $ref = new ReflectionClass($class);
+                        $ctor = $ref->getConstructor();
+                        if ($ctor && $ctor->getNumberOfParameters() > 0) {
+                            $registry->register_target($ref->newInstance($config));
+                        } else {
+                            $target = $ref->newInstance();
+                            if (method_exists($target, 'configure')) {
+                                $target->configure($config);
+                            }
+                            $registry->register_target($target);
                         }
-                        $registry->register_target($target);
                     }
                 }
             }
+        }
+        return $registry;
+    }
+
+    $type_map = spam_reporting_get_adapter_type_map();
+    foreach ($allowed as $type_id) {
+        if (!is_string($type_id) || $type_id === '' || !isset($type_map[$type_id])) {
+            continue;
+        }
+        $class = $type_map[$type_id];
+        if (!class_exists($class)) {
+            continue;
+        }
+        $ref = new ReflectionClass($class);
+        $ctor = $ref->getConstructor();
+        if ($ctor && $ctor->getNumberOfParameters() > 0) {
+            $target = $ref->newInstance(array('_site_config' => $site_config));
+        } else {
+            $target = $ref->newInstance();
+            if (method_exists($target, 'configure')) {
+                $target->configure(array('_site_config' => $site_config));
+            }
+        }
+        if ($target instanceof Hm_Spam_Report_Target_Interface) {
+            $registry->register_target($target);
         }
     }
     return $registry;
@@ -232,6 +311,67 @@ function spam_reporting_normalize_string_list($input) {
         }
     }
     return array_values(array_unique($out));
+}}
+
+/**
+ * Get platforms available for user settings (from loaded targets + catalog)
+ * Used to build dynamic per-platform toggles in Settings.
+ * @param object $site_config
+ * @return array [['platform_id' => string, 'name' => string], ...]
+ */
+if (!hm_exists('spam_reporting_get_available_platforms_for_settings')) {
+function spam_reporting_get_available_platforms_for_settings($site_config) {
+    $registry = spam_reporting_build_registry($site_config);
+    $catalog = spam_reporting_load_platform_catalog($site_config);
+    $by_id = array();
+    foreach ($catalog as $p) {
+        $pid = $p['platform_id'] ?? $p['id'] ?? '';
+        if (is_string($pid) && trim($pid)) {
+            $by_id[$pid] = $p['name'] ?? $pid;
+        }
+    }
+    $seen = array();
+    $out = array();
+    foreach ($registry->all_targets() as $target) {
+        $pid = $target->platform_id();
+        if ($pid && !isset($seen[$pid])) {
+            $seen[$pid] = true;
+            $out[] = array(
+                'platform_id' => $pid,
+                'name' => isset($by_id[$pid]) ? $by_id[$pid] : $target->label()
+            );
+        }
+    }
+    return $out;
+}}
+
+/**
+ * Filter targets by user consent (enabled + allowed_platforms)
+ * @param array $targets from registry
+ * @param object $user_config
+ * @return array filtered targets
+ */
+if (!hm_exists('spam_reporting_filter_targets_by_user_settings')) {
+function spam_reporting_filter_targets_by_user_settings(array $targets, $user_config) {
+    $enabled = $user_config->get('spam_reporting_enabled_setting', false);
+    if (!$enabled) {
+        return array();
+    }
+    $allowed = $user_config->get('spam_reporting_allowed_platforms_setting', array());
+    if (!is_array($allowed)) {
+        $allowed = array();
+    }
+    if (empty($allowed)) {
+        return array();
+    }
+    $out = array();
+    foreach ($targets as $t) {
+        $pid = is_array($t) ? ($t['platform_id'] ?? '') : $t->platform_id();
+        if ($pid && in_array($pid, $allowed, true)) {
+            $out[] = $t;
+        }
+    }
+    return $out;
 }}
 
 /**
