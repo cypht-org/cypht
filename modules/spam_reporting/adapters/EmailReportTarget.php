@@ -57,18 +57,55 @@ class Hm_Spam_Report_Email_Target extends Hm_Spam_Report_Target_Abstract {
         return array('raw_headers', 'body_text');
     }
 
-    public function is_available(Hm_Spam_Report $report, $user_config) {
-        if (!trim((string) $this->to)) {
+    /**
+     * Schema for user-provided instance config (Phase B).
+     * @return array<string, array{type: string, label: string, required: bool}>
+     */
+    public function get_configuration_schema() {
+        return array(
+            'to' => array('type' => 'email', 'label' => 'Destination email', 'required' => true),
+            'label' => array('type' => 'string', 'label' => 'Label', 'required' => true),
+            'subject_prefix' => array('type' => 'string', 'label' => 'Subject prefix', 'required' => false),
+        );
+    }
+
+    /**
+     * Resolve destination/label/prefix: instance_config when non-empty, else configured values.
+     * @param array $instance_config
+     * @return array{to: string, label: string, subject_prefix: string}
+     */
+    private function resolve_instance_values(array $instance_config = array()) {
+        $to = $this->to;
+        $label = $this->label;
+        $prefix = $this->subject_prefix;
+        if (!empty($instance_config)) {
+            if (isset($instance_config['to']) && is_string($instance_config['to'])) {
+                $to = trim($instance_config['to']);
+            }
+            if (isset($instance_config['label']) && is_string($instance_config['label'])) {
+                $label = trim($instance_config['label']);
+            }
+            if (isset($instance_config['subject_prefix']) && is_string($instance_config['subject_prefix'])) {
+                $prefix = trim($instance_config['subject_prefix']);
+            }
+        }
+        return array('to' => $to, 'label' => $label, 'subject_prefix' => $prefix);
+    }
+
+    public function is_available(Hm_Spam_Report $report, $user_config, array $instance_config = array()) {
+        $resolved = $this->resolve_instance_values($instance_config);
+        if (!trim((string) $resolved['to'])) {
             return false;
         }
-        $parsed = process_address_fld($this->to);
+        $parsed = process_address_fld($resolved['to']);
         return count($parsed) === 1;
     }
 
-    public function build_payload(Hm_Spam_Report $report, array $user_input = array()) {
+    public function build_payload(Hm_Spam_Report $report, array $user_input = array(), array $instance_config = array()) {
+        $resolved = $this->resolve_instance_values($instance_config);
         $message = $report->get_parsed_message();
         $message_id = $message ? $message->getHeaderValue('Message-ID', '') : '';
-        $subject = $message_id ? ($this->subject_prefix . ': ' . $message_id) : $this->subject_prefix;
+        $subject = $message_id ? ($resolved['subject_prefix'] . ': ' . $message_id) : $resolved['subject_prefix'];
         $notes = '';
         if (array_key_exists('user_notes', $user_input) && trim((string) $user_input['user_notes'])) {
             $notes = "\r\n\r\nUser notes:\r\n" . trim((string) $user_input['user_notes']);
@@ -79,7 +116,7 @@ class Hm_Spam_Report_Email_Target extends Hm_Spam_Report_Target_Abstract {
         }
         $body .= "Attached: original message (message/rfc822)";
         $body .= $notes;
-        return new Hm_Spam_Report_Payload($this->to, $subject, $body, 'text/plain', array(), $report->raw_message);
+        return new Hm_Spam_Report_Payload($resolved['to'], $subject, $body, 'text/plain', array(), $report->raw_message);
     }
 
     public function deliver($payload, $context = null) {
@@ -89,6 +126,9 @@ class Hm_Spam_Report_Email_Target extends Hm_Spam_Report_Target_Abstract {
         if (!($context instanceof Hm_Spam_Report_Delivery_Context)) {
             return new Hm_Spam_Report_Result(false, 'Missing delivery context');
         }
+        $instance_config = ($context instanceof Hm_Spam_Report_Delivery_Context)
+            ? $context->get_instance_config()
+            : array();
         list($mailbox, $server_id) = spam_reporting_get_smtp_mailbox($context->site_config);
         if (!$mailbox || !$mailbox->authed()) {
             return new Hm_Spam_Report_Result(false, 'SMTP server unavailable');

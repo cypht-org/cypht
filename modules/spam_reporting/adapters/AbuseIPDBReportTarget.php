@@ -37,7 +37,25 @@ class Hm_Spam_Report_AbuseIPDB_Target extends Hm_Spam_Report_Target_Api_Abstract
         return array('ip');
     }
 
-    protected function get_api_key() {
+    /**
+     * Schema for user-provided instance config (Phase B). api_key is secret.
+     * @return array<string, array{type: string, label: string, required: bool}>
+     */
+    public function get_configuration_schema() {
+        return array(
+            'api_key' => array('type' => 'secret', 'label' => 'API Key', 'required' => true),
+        );
+    }
+
+    /**
+     * API key from instance_config when non-empty; else site-level (legacy).
+     * @param array $instance_config
+     * @return string
+     */
+    protected function get_api_key(array $instance_config = array()) {
+        if (!empty($instance_config) && isset($instance_config['api_key']) && trim((string) $instance_config['api_key']) !== '') {
+            return trim((string) $instance_config['api_key']);
+        }
         if (!$this->site_config) {
             return '';
         }
@@ -52,8 +70,8 @@ class Hm_Spam_Report_AbuseIPDB_Target extends Hm_Spam_Report_Target_Api_Abstract
         return 'AbuseIPDB';
     }
 
-    public function is_available(Hm_Spam_Report $report, $user_config) {
-        if ($this->get_api_key() === '') {
+    public function is_available(Hm_Spam_Report $report, $user_config, array $instance_config = array()) {
+        if ($this->get_api_key($instance_config) === '') {
             return false;
         }
         $ips = $report->get_source_ips();
@@ -64,7 +82,7 @@ class Hm_Spam_Report_AbuseIPDB_Target extends Hm_Spam_Report_Target_Api_Abstract
      * Build minimal payload: ip, categories, optional comment only.
      * No headers, body, or user identity.
      */
-    public function build_payload(Hm_Spam_Report $report, array $user_input = array()) {
+    public function build_payload(Hm_Spam_Report $report, array $user_input = array(), array $instance_config = array()) {
         $ips = $report->get_source_ips();
         $ip = !empty($ips) ? $ips[0] : '';
         $comment = '';
@@ -93,7 +111,10 @@ class Hm_Spam_Report_AbuseIPDB_Target extends Hm_Spam_Report_Target_Api_Abstract
         if (!is_array($payload) || empty($payload['ip'])) {
             return new Hm_Spam_Report_Result(false, 'Invalid payload');
         }
-        $api_key = $this->get_api_key();
+        $instance_config = ($context instanceof Hm_Spam_Report_Delivery_Context)
+            ? $context->get_instance_config()
+            : array();
+        $api_key = $this->get_api_key($instance_config);
         if ($api_key === '') {
             return new Hm_Spam_Report_Result(false, 'API key not configured');
         }
