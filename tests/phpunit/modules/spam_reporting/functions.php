@@ -206,6 +206,27 @@ class Hm_Test_Spam_Reporting_Functions extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_filter_targets_by_user_settings() {
+        $targets = array(
+            array('id' => 't1', 'platform_id' => 'abuseipdb'),
+            array('id' => 't2', 'platform_id' => 'spamcop')
+        );
+        $config = new Hm_Mock_Config();
+        $config->set('spam_reporting_enabled_setting', true);
+        $config->set('spam_reporting_allowed_platforms_setting', array('abuseipdb'));
+        $filtered = spam_reporting_filter_targets_by_user_settings($targets, $config);
+        $this->assertCount(1, $filtered);
+        $this->assertSame('abuseipdb', $filtered[0]['platform_id']);
+
+        $config->set('spam_reporting_enabled_setting', false);
+        $filtered = spam_reporting_filter_targets_by_user_settings($targets, $config);
+        $this->assertEmpty($filtered);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_abuseipdb_target_build_payload_minimal() {
         $raw = "From: sender@example.org\r\n".
             "To: victim@example.org\r\n".

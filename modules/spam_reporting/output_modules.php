@@ -10,10 +10,15 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 /**
  * Adds a "Report spam" action to message view controls
+ * Hidden when spam_reporting_enabled_setting is false.
  * @subpackage spam_reporting/output
  */
 class Hm_Output_spam_report_action extends Hm_Output_Module {
     protected function output() {
+        $settings = $this->get('user_settings', array());
+        if (empty($settings['spam_reporting_enabled_setting'])) {
+            return;
+        }
         $attrs = 'class="spam_report_action hlink text-decoration-none btn btn-sm btn-outline-danger" href="#"';
         $uid = $this->get('msg_text_uid');
         $listPath = $this->get('msg_list_path');
@@ -67,6 +72,46 @@ class Hm_Output_spam_report_preview extends Hm_Output_Module {
         if ($this->get('spam_report_debug')) {
             $this->out('spam_report_debug', $this->get('spam_report_debug'));
         }
+    }
+}
+
+/**
+ * Spam Reporting section in General Settings
+ * Dynamic platform list from targets + catalog.
+ * @subpackage spam_reporting/output
+ */
+class Hm_Output_spam_report_settings_section extends Hm_Output_Module {
+    protected function output() {
+        $platforms = $this->get('spam_reporting_available_platforms', array());
+        if (empty($platforms)) {
+            return '';
+        }
+        $settings = $this->get('user_settings', array());
+        $enabled = !empty($settings['spam_reporting_enabled_setting']);
+        $allowed = isset($settings['spam_reporting_allowed_platforms']) && is_array($settings['spam_reporting_allowed_platforms'])
+            ? $settings['spam_reporting_allowed_platforms'] : array();
+
+        $res = '<tr><td data-target=".spam_reporting_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
+            '<i class="bi bi-shield-exclamation fs-5 me-2"></i>'.
+            $this->trans('Spam Reporting').'</td></tr>';
+        $res .= '<tr class="spam_reporting_setting"><td class="d-block d-md-table-cell" colspan="2">';
+        $res .= '<div class="d-flex align-items-center mb-2">';
+        $res .= '<input type="checkbox" class="form-check-input me-2" id="spam_reporting_enabled" name="spam_reporting_enabled" value="1" '.($enabled ? 'checked' : '').'>';
+        $res .= '<label for="spam_reporting_enabled">'.$this->trans('Enable external spam reporting').'</label>';
+        $res .= '</div>';
+        $res .= '<div class="spam-reporting-platform-toggles ms-3">';
+        foreach ($platforms as $p) {
+            $pid = $p['platform_id'];
+            $name = $p['name'];
+            $key = 'spam_reporting_platform_' . $pid;
+            $checked = in_array($pid, $allowed, true) ? ' checked' : '';
+            $res .= '<div class="d-flex align-items-center mb-1">';
+            $res .= '<input type="checkbox" class="form-check-input me-2" id="'.$key.'" name="'.$key.'" value="1" '.$checked.'>';
+            $res .= '<label for="'.$key.'">'.$this->html_safe($name).'</label>';
+            $res .= '</div>';
+        }
+        $res .= '</div></td></tr>';
+        return $res;
     }
 }
 

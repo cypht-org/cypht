@@ -26,6 +26,10 @@ add_handler('ajax_spam_report_send', 'imap_oauth2_token_check', true, 'imap', 'l
 add_handler('ajax_spam_report_send', 'spam_report_send', true, 'spam_reporting', 'imap_oauth2_token_check', 'after');
 add_output('ajax_spam_report_send', 'spam_report_send', true, 'spam_reporting');
 
+/* settings page - spam reporting user preferences */
+add_handler('settings', 'process_spam_report_settings', true, 'spam_reporting', 'save_user_settings', 'before');
+add_output('settings', 'spam_report_settings_section', true, 'spam_reporting', 'default_sort_order_setting', 'after');
+
 return array(
     'allowed_pages' => array(
         'ajax_spam_report_preview',
@@ -45,7 +49,17 @@ return array(
         'list_path' => FILTER_UNSAFE_RAW,
         'uid' => FILTER_UNSAFE_RAW,
         'target_id' => FILTER_UNSAFE_RAW,
-        'user_notes' => FILTER_UNSAFE_RAW
+        'user_notes' => FILTER_UNSAFE_RAW,
+        'spam_reporting_enabled' => FILTER_VALIDATE_INT,
+        'spam_reporting_platform_abuseipdb' => FILTER_VALIDATE_INT,
+        'spam_reporting_platform_spamcop' => FILTER_VALIDATE_INT,
+        'spam_reporting_platform_spamhaus' => FILTER_VALIDATE_INT,
+        'spam_reporting_platform_signal_spam' => FILTER_VALIDATE_INT,
+        'spam_reporting_platform_apwg' => FILTER_VALIDATE_INT,
+        'spam_reporting_platform_google_abuse' => FILTER_VALIDATE_INT,
+        'spam_reporting_platform_microsoft_abuse' => FILTER_VALIDATE_INT,
+        'spam_reporting_platform_yahoo_abuse' => FILTER_VALIDATE_INT,
+        'spam_reporting_platform_zoho_abuse' => FILTER_VALIDATE_INT
     ),
     'allowed_get' => array(
     )

@@ -642,12 +642,24 @@ return [
     */
     'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags,spam_reporting')),
     /*
+    | ------------------------------------------
+    | Spam Reporting Allowed Target Types (Phase A)
+    | ------------------------------------------
+    |
+    | Symbolic adapter type IDs that are allowed instance-wide. When this key
+    | is set (array), it is the source of truth and spam_reporting_targets is
+    | ignored. Admins do not reference class names. Default allows AbuseIPDB
+    | for backward compatibility; set to [] to disable all types until configured.
+    */
+    'spam_reporting_allowed_target_types' => array('abuseipdb'),
+    /*
     | ------------------------
-    | Spam Reporting Targets
+    | Spam Reporting Targets (deprecated)
     | ------------------------
     |
-    | List of target adapter class names for spam reporting. Keep empty to disable
-    | all targets by default.
+    | DEPRECATED: Use spam_reporting_allowed_target_types instead. When
+    | spam_reporting_allowed_target_types is set in config, this key is ignored.
+    | Kept only for backward compatibility when the new key is not set.
     */
     'spam_reporting_targets' => array(
         array('class' => 'Hm_Spam_Report_AbuseIPDB_Target'),
@@ -698,10 +710,12 @@ return [
     'spam_reporting_rate_limit_window' => env('SPAM_REPORTING_RATE_LIMIT_WINDOW', 3600),
     /*
     | ----------------------------------
-    | Spam Reporting AbuseIPDB (Phase 9)
+    | Spam Reporting AbuseIPDB API key (deprecated)
     | ----------------------------------
     |
-    | API key for AbuseIPDB. Stored at site level only. Leave empty to disable.
+    | DEPRECATED: Prefer per-user API key in spam reporting settings (Phase B+).
+    | When using spam_reporting_allowed_target_types, leave empty; users will
+    | configure their own key. Kept for legacy spam_reporting_targets mode only.
     */
     'spam_reporting_abuseipdb_api_key' => env('SPAM_REPORTING_ABUSEIPDB_API_KEY', ''),
     // 'modules' => [
