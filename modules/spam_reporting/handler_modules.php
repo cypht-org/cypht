@@ -9,6 +9,46 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * Process and output spam report user settings (General Settings → Spam Reporting)
+ * @subpackage spam_reporting/handler
+ */
+class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
+    public function process() {
+        $available = spam_reporting_get_available_platforms_for_settings($this->config);
+        $this->out('spam_reporting_available_platforms', $available);
+
+        list($success, $form) = $this->process_form(array('save_settings'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
+        if ($success) {
+            $enabled = array_key_exists('spam_reporting_enabled', $this->request->post)
+                && $this->request->post['spam_reporting_enabled'];
+            $allowed = array();
+            foreach ($available as $p) {
+                $key = 'spam_reporting_platform_' . $p['platform_id'];
+                if (array_key_exists($key, $this->request->post) && $this->request->post[$key]) {
+                    $allowed[] = $p['platform_id'];
+                }
+            }
+            $new_settings['spam_reporting_enabled_setting'] = (bool) $enabled;
+            $new_settings['spam_reporting_allowed_platforms_setting'] = $allowed;
+            $settings['spam_reporting_enabled'] = $enabled;
+            $settings['spam_reporting_allowed_platforms'] = $allowed;
+        } else {
+            $settings['spam_reporting_enabled'] = $this->user_config->get('spam_reporting_enabled_setting', false);
+            $settings['spam_reporting_allowed_platforms'] = $this->user_config->get('spam_reporting_allowed_platforms_setting', array());
+            if (!is_array($settings['spam_reporting_allowed_platforms'])) {
+                $settings['spam_reporting_allowed_platforms'] = array();
+            }
+        }
+
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
+    }
+}
+
+/**
  * Build a spam report preview (AJAX)
  * @subpackage spam_reporting/handler
  */
@@ -92,6 +132,7 @@ class Hm_Handler_spam_report_preview extends Hm_Handler_Module {
                 $targets[] = $t;
             }
         }
+        $targets = spam_reporting_filter_targets_by_user_settings($targets, $this->user_config);
 
         $message = $report->get_parsed_message();
         $mappings = spam_reporting_load_provider_mapping($this->config);
@@ -207,6 +248,13 @@ class Hm_Handler_spam_report_send extends Hm_Handler_Module {
         $registry = spam_reporting_build_registry($this->config);
         $target = $registry->get($form['target_id']);
         if (!$target || !$target->is_available($report, $this->user_config)) {
+            $this->out('spam_report_send_ok', false);
+            $this->out('spam_report_send_message', 'Target unavailable');
+            return;
+        }
+        $enabled = $this->user_config->get('spam_reporting_enabled_setting', false);
+        $allowed = $this->user_config->get('spam_reporting_allowed_platforms_setting', array());
+        if (!$enabled || !is_array($allowed) || !in_array($target->platform_id(), $allowed, true)) {
             $this->out('spam_report_send_ok', false);
             $this->out('spam_report_send_message', 'Target unavailable');
             return;
