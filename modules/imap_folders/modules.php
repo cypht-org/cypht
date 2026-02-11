@@ -354,7 +354,7 @@ class Hm_Output_folders_server_select extends Hm_Output_Module {
             $res .= 'value="'.$this->html_safe($id).'">';
             $res .= $this->html_safe($server['name']);
         }
-        $res .= '</select><label for="imap_server_folder">'.$this->trans('Mail Account').'</label></div></form></div></div>';
+        $res .= '</select><label for="imap_server_folder">'.$this->trans('Mail Account').'</label></div></div></form>';
         $res .= '<input type="hidden" id="server_error" value="'.$this->trans('You must select a mail account first').'" />';
         $res .= '<input type="hidden" id="folder_name_error" value="'.$this->trans('New folder name is required').'" />';
         $res .= '<input type="hidden" id="delete_folder_error" value="'.$this->trans('Folder to delete is required').'" />';
