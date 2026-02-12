@@ -184,6 +184,34 @@ function spam_reporting_format_raw_headers($message) {
 }}
 
 /**
+ * Get normalized email addresses from the message From and Reply-To headers (Phase E).
+ * Used to forbid using the report destination as one of these addresses.
+ * @param Hm_Spam_Report $report
+ * @return array list of lowercase trimmed emails
+ */
+if (!hm_exists('spam_reporting_message_from_reply_to_emails')) {
+function spam_reporting_message_from_reply_to_emails(Hm_Spam_Report $report) {
+    $message = $report->get_parsed_message();
+    if (!$message || !function_exists('process_address_fld')) {
+        return array();
+    }
+    $emails = array();
+    foreach (array('From', 'Reply-To') as $header) {
+        $value = $message->getHeaderValue($header, '');
+        if (!is_string($value) || trim($value) === '') {
+            continue;
+        }
+        $parsed = process_address_fld($value);
+        foreach ($parsed as $addr) {
+            if (!empty($addr['email']) && is_string($addr['email'])) {
+                $emails[] = strtolower(trim($addr['email']));
+            }
+        }
+    }
+    return array_values(array_unique($emails));
+}}
+
+/**
  * Adapter type id → PHP class name (internal; not exposed in config).
  * Admins use only symbolic type IDs via spam_reporting_allowed_target_types.
  * @return array<string, string> type_id => class name
