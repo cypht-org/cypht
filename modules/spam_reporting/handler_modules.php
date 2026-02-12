@@ -17,6 +17,7 @@ class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
         $available = spam_reporting_get_available_platforms_for_settings($this->config);
         $this->out('spam_reporting_available_platforms', $available);
 
+        // Settings UI always gets ALL configs and adapter types (never filter by enabled or allowed_platforms).
         $configs_for_ui = spam_reporting_settings_configs_for_ui($this->config, $this->user_config);
         $adapter_types = spam_reporting_settings_adapter_types($this->config);
         $this->out('spam_reporting_configs_for_ui', $configs_for_ui);
@@ -267,7 +268,9 @@ class Hm_Handler_spam_report_send extends Hm_Handler_Module {
         }
         $enabled = $this->user_config->get('spam_reporting_enabled_setting', false);
         $allowed = $this->user_config->get('spam_reporting_allowed_platforms_setting', array());
-        if (!$enabled || !is_array($allowed) || !in_array($target->platform_id(), $allowed, true)) {
+        $pid = $target->platform_id();
+        $allowed_target = $enabled && is_array($allowed) && (($pid === '' || $pid === null) || in_array($pid, $allowed, true));
+        if (!$allowed_target) {
             $this->out('spam_report_send_ok', false);
             $this->out('spam_report_send_message', 'Target unavailable');
             return;

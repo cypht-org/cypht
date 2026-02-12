@@ -19,11 +19,12 @@ add_handler('ajax_spam_report_preview', 'imap_oauth2_token_check', true, 'imap',
 add_handler('ajax_spam_report_preview', 'spam_report_preview', true, 'spam_reporting', 'imap_oauth2_token_check', 'after');
 add_output('ajax_spam_report_preview', 'spam_report_preview', true, 'spam_reporting');
 
-/* spam report send ajax */
+/* spam report send ajax (smtp required for Email adapter: Hm_SMTP_List) */
 setup_base_ajax_page('ajax_spam_report_send', 'core');
 add_handler('ajax_spam_report_send', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_spam_report_send', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
-add_handler('ajax_spam_report_send', 'spam_report_send', true, 'spam_reporting', 'imap_oauth2_token_check', 'after');
+add_handler('ajax_spam_report_send', 'load_smtp_servers_from_config', true, 'smtp', 'imap_oauth2_token_check', 'after');
+add_handler('ajax_spam_report_send', 'spam_report_send', true, 'spam_reporting', 'load_smtp_servers_from_config', 'after');
 add_output('ajax_spam_report_send', 'spam_report_send', true, 'spam_reporting');
 
 /* settings page - spam reporting user preferences */
