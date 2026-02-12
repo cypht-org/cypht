@@ -32,6 +32,9 @@ function applySettingsPageHandlers(routeParams, hash) {
     $('.reset_default_value_input').on("click", reset_default_value_input);
     $('.reset_default_timezone').on("click", reset_default_timezone);
     if (window.smtpSettingsPageHandler) smtpSettingsPageHandler();
+    if (window.spam_reporting_settings_page_handler) {
+        window.spam_reporting_settings_page_handler();
+    }
 
     $('#settingsSearch').on('input', function () {
         const query = $(this).val().trim().toLowerCase();

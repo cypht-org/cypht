@@ -398,10 +398,14 @@ function spam_reporting_load_user_target_configurations($site_config, $user_conf
  */
 if (!hm_exists('spam_reporting_build_effective_descriptor')) {
 function spam_reporting_build_effective_descriptor($adapter, $id, $label, array $instance_config = array()) {
+    $platform_id = $adapter->platform_id();
+    if (($platform_id === '' || $platform_id === null) && isset($instance_config['platform_id']) && is_string($instance_config['platform_id']) && trim($instance_config['platform_id']) !== '') {
+        $platform_id = trim($instance_config['platform_id']);
+    }
     $t = array(
         'id' => $id,
         'label' => $label,
-        'platform_id' => $adapter->platform_id(),
+        'platform_id' => $platform_id,
         'capabilities' => $adapter->capabilities(),
         'requirements' => $adapter->requirements()
     );
@@ -727,7 +731,12 @@ function spam_reporting_filter_targets_by_user_settings(array $targets, $user_co
     $out = array();
     foreach ($targets as $t) {
         $pid = is_array($t) ? ($t['platform_id'] ?? '') : $t->platform_id();
-        if ($pid && in_array($pid, $allowed, true)) {
+        // Allow targets with no platform_id (e.g. Email adapter instances) so they appear in the modal
+        if ($pid === '' || $pid === null) {
+            $out[] = $t;
+            continue;
+        }
+        if (in_array($pid, $allowed, true)) {
             $out[] = $t;
         }
     }
