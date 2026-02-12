@@ -93,8 +93,9 @@ class Hm_Output_spam_report_settings_section extends Hm_Output_Module {
 
         $configs_for_ui = $this->get('spam_reporting_configs_for_ui', array());
         $adapter_types = $this->get('spam_reporting_adapter_types', array());
-        $configs_json = $this->html_safe(json_encode($configs_for_ui));
-        $adapter_types_json = $this->html_safe(json_encode($adapter_types));
+        // Raw JSON for <script type="application/json"> — do not html_safe (breaks JSON.parse). Only escape </script>.
+        $configs_json = str_replace('</script>', '<\/script>', json_encode($configs_for_ui));
+        $adapter_types_json = str_replace('</script>', '<\/script>', json_encode($adapter_types));
 
         $res = '<tr><td data-target=".spam_reporting_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-shield-exclamation fs-5 me-2"></i>'.
@@ -118,12 +119,10 @@ class Hm_Output_spam_report_settings_section extends Hm_Output_Module {
         $res .= '</div>';
 
         $res .= '<div class="spam-reporting-targets-section mt-3">';
-        $res .= '<div class="fw-bold mb-2">'.$this->trans('Reporting targets').'</div>';
         $res .= '<input type="hidden" name="spam_reporting_target_configurations" id="spam_reporting_target_configurations" value="" />';
         $res .= '<script type="application/json" id="spam_reporting_configs_data">'.$configs_json.'</script>';
         $res .= '<script type="application/json" id="spam_reporting_adapter_types_data">'.$adapter_types_json.'</script>';
         $res .= '<div id="spam_reporting_targets_list" class="mb-2"></div>';
-        $res .= '<button type="button" class="btn btn-sm btn-outline-primary" id="spam_reporting_add_target_btn">'.$this->trans('Add target').'</button>';
 
         $res .= '<div class="modal fade" id="spam_reporting_config_modal" tabindex="-1" aria-hidden="true">';
         $res .= '<div class="modal-dialog"><div class="modal-content">';

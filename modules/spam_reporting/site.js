@@ -444,36 +444,37 @@ var spam_reporting_settings_sync_hidden = function() {
 var spam_reporting_settings_render_list = function() {
     var listEl = document.getElementById('spam_reporting_targets_list');
     if (!listEl) return;
-    if (spam_reporting_settings_configs.length === 0) {
-        listEl.innerHTML = '<div class="text-muted small">' + (typeof hm_trans === 'function' ? hm_trans('No targets configured. Click Add target to create one.') : 'No targets configured. Click Add target to create one.') + '</div>';
-        spam_reporting_settings_sync_hidden();
-        return;
+    var trans = function(key, fallback) { return typeof hm_trans === 'function' ? hm_trans(key) : fallback; };
+    var html = '';
+    if (spam_reporting_settings_adapter_types.length === 0) {
+        html = '<div class="text-muted small">' + trans('No targets configured. Add a configuration from one of the sections below.', 'No targets configured.') + '</div>';
+    } else {
+        spam_reporting_settings_adapter_types.forEach(function(adapter) {
+            var adapterId = (adapter.adapter_id || '').replace(/"/g, '&quot;');
+            var adapterLabel = (adapter.label || adapter.adapter_id || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            var sectionConfigs = spam_reporting_settings_configs.filter(function(c) { return c.adapter_id === adapter.adapter_id; });
+            html += '<div class="spam-reporting-adapter-block mb-3" data-adapter-id="' + adapterId + '">';
+            html += '<div class="fw-bold mb-2">' + adapterLabel + '</div>';
+            if (sectionConfigs.length === 0) {
+                html += '<p class="text-muted small mb-2">' + trans('No configurations yet.', 'No configurations yet.') + '</p>';
+            } else {
+                html += '<table class="table table-sm mb-2"><thead><tr><th>' + trans('Label', 'Label') + '</th><th></th></tr></thead><tbody>';
+                sectionConfigs.forEach(function(c) {
+                    var label = (c.label || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    html += '<tr><td>' + label + '</td><td class="text-end">';
+                    html += '<button type="button" class="btn btn-sm btn-outline-secondary spam-reporting-edit-target me-1" data-id="' + (c.id || '').replace(/"/g, '&quot;') + '">' + trans('Edit', 'Edit') + '</button>';
+                    html += '<button type="button" class="btn btn-sm btn-outline-danger spam-reporting-delete-target" data-id="' + (c.id || '').replace(/"/g, '&quot;') + '">' + trans('Delete', 'Delete') + '</button>';
+                    html += '</td></tr>';
+                });
+                html += '</tbody></table>';
+            }
+            var addBtnLabel = (trans('Add %s configuration', 'Add %s configuration').replace('%s', adapter.label || adapter.adapter_id || '')).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            html += '<button type="button" class="btn btn-sm btn-outline-primary spam-reporting-add-adapter-config" data-adapter-id="' + adapterId + '" data-adapter-label="' + (adapter.label || adapter.adapter_id || '').replace(/"/g, '&quot;') + '">' + addBtnLabel + '</button>';
+            html += '</div>';
+        });
     }
-    var html = '<table class="table table-sm"><thead><tr><th>' + (typeof hm_trans === 'function' ? hm_trans('Label') : 'Label') + '</th><th>' + (typeof hm_trans === 'function' ? hm_trans('Type') : 'Type') + '</th><th></th></tr></thead><tbody>';
-    spam_reporting_settings_configs.forEach(function(c) {
-        var label = (c.label || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        var typeLabel = (c.adapter_type_label || c.adapter_id || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        html += '<tr><td>' + label + '</td><td>' + typeLabel + '</td><td class="text-end">';
-        html += '<button type="button" class="btn btn-sm btn-outline-secondary spam-reporting-edit-target me-1" data-id="' + (c.id || '').replace(/"/g, '&quot;') + '">' + (typeof hm_trans === 'function' ? hm_trans('Edit') : 'Edit') + '</button>';
-        html += '<button type="button" class="btn btn-sm btn-outline-danger spam-reporting-delete-target" data-id="' + (c.id || '').replace(/"/g, '&quot;') + '">' + (typeof hm_trans === 'function' ? hm_trans('Delete') : 'Delete') + '</button>';
-        html += '</td></tr>';
-    });
-    html += '</tbody></table>';
     listEl.innerHTML = html;
     spam_reporting_settings_sync_hidden();
-};
-
-var spam_reporting_settings_modal_show_step1 = function() {
-    var body = document.getElementById('spam_reporting_config_modal_body');
-    var title = document.getElementById('spam_reporting_config_modal_title');
-    if (!body || !title) return;
-    spam_reporting_config_modal_step = 1;
-    spam_reporting_config_modal_editing_id = null;
-    title.textContent = typeof hm_trans === 'function' ? hm_trans('Add target') : 'Add target';
-    var opts = spam_reporting_settings_adapter_types.map(function(t) {
-        return '<option value="' + (t.adapter_id || '').replace(/"/g, '&quot;') + '">' + (t.label || t.adapter_id || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</option>';
-    }).join('');
-    body.innerHTML = '<label class="form-label">' + (typeof hm_trans === 'function' ? hm_trans('Adapter type') : 'Adapter type') + '</label><select class="form-select" id="spam_reporting_config_adapter_select">' + opts + '</select>';
 };
 
 var spam_reporting_settings_modal_show_step2 = function(adapterId, editConfig) {
@@ -493,6 +494,7 @@ var spam_reporting_settings_modal_show_step2 = function(adapterId, editConfig) {
     html += '<input type="text" class="form-control mb-2" id="spam_reporting_config_label" value="' + (editConfig ? (editConfig.label || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : '') + '" placeholder="' + (typeof hm_trans === 'function' ? hm_trans('Label') : 'Label') + '" />';
     for (var key in schema) {
         if (!schema.hasOwnProperty(key)) continue;
+        if (key === 'label') continue;
         var meta = schema[key];
         var label = (meta && meta.label) || key;
         var required = (meta && meta.required) ? ' required' : '';
@@ -530,6 +532,10 @@ var spam_reporting_settings_modal_collect = function(adapterId, editingId) {
     if (!label) return null;
     for (var key in adapter.schema) {
         if (!adapter.schema.hasOwnProperty(key)) continue;
+        if (key === 'label') {
+            settings[key] = label;
+            continue;
+        }
         var input = document.querySelector('.spam-reporting-field[data-key="' + key.replace(/"/g, '\\"') + '"], .spam-reporting-secret-field[data-key="' + key.replace(/"/g, '\\"') + '"]');
         if (input) {
             var v = input.value.trim();
@@ -546,39 +552,45 @@ var spam_reporting_settings_modal_collect = function(adapterId, editingId) {
 var spam_reporting_settings_init = function() {
     var dataEl = document.getElementById('spam_reporting_configs_data');
     var typesEl = document.getElementById('spam_reporting_adapter_types_data');
+    if (typeof console !== 'undefined' && console.log) {
+        console.log('[Spam reporting] settings init: configs_el=' + !!dataEl + ', adapter_types_el=' + !!typesEl);
+    }
     if (!dataEl || !typesEl) return;
     try {
         spam_reporting_settings_configs = JSON.parse(dataEl.textContent || '[]');
         spam_reporting_settings_adapter_types = JSON.parse(typesEl.textContent || '[]');
+        if (typeof console !== 'undefined' && console.log) {
+            console.log('[Spam reporting] parsed adapter_types count=' + spam_reporting_settings_adapter_types.length +
+                ', ids=' + (spam_reporting_settings_adapter_types.map(function(t) { return t.adapter_id; }).join(', ') || '(none)'));
+        }
     } catch (e) {
         spam_reporting_settings_configs = [];
         spam_reporting_settings_adapter_types = [];
+        if (typeof console !== 'undefined' && console.error) {
+            console.error('[Spam reporting] parse error:', e);
+        }
     }
     spam_reporting_settings_configs = spam_reporting_settings_configs.map(function(c) {
         return { id: c.id, adapter_id: c.adapter_id, label: c.label, adapter_type_label: c.adapter_type_label, settings: c.settings_form || c.settings_safe || {} };
     });
     spam_reporting_settings_render_list();
 
-    $('#spam_reporting_add_target_btn').on('click', function() {
-        spam_reporting_settings_modal_show_step1();
+    $(document).on('click', '.spam-reporting-add-adapter-config', function() {
+        var adapterId = $(this).data('adapter-id');
+        var adapterLabel = $(this).data('adapter-label') || adapterId;
+        if (!adapterId) return;
+        spam_reporting_config_modal_adapter_id = adapterId;
+        spam_reporting_config_modal_editing_id = null;
+        var titleEl = document.getElementById('spam_reporting_config_modal_title');
+        if (titleEl) {
+            var addLabel = (typeof hm_trans === 'function' ? hm_trans('Add %s configuration') : 'Add %s configuration').replace('%s', adapterLabel);
+            titleEl.textContent = addLabel;
+        }
+        spam_reporting_settings_modal_show_step2(adapterId, null);
         if (typeof bootstrap !== 'undefined') {
             var modalEl = document.getElementById('spam_reporting_config_modal');
-            if (modalEl) {
-                var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-                modal.show();
-            }
+            if (modalEl) { bootstrap.Modal.getOrCreateInstance(modalEl).show(); }
         }
-        setTimeout(function() {
-            var sel = document.getElementById('spam_reporting_config_adapter_select');
-            if (sel && spam_reporting_settings_adapter_types.length) {
-                spam_reporting_config_modal_adapter_id = sel.value;
-                sel.addEventListener('change', function() {
-                    spam_reporting_config_modal_adapter_id = sel.value;
-                    spam_reporting_settings_modal_show_step2(sel.value, null);
-                });
-                spam_reporting_settings_modal_show_step2(sel.value, null);
-            }
-        }, 100);
     });
 
     $(document).on('click', '.spam-reporting-edit-target', function() {
