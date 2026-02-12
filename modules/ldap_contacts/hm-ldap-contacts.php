@@ -34,6 +34,10 @@ class Hm_LDAP_Contacts extends Hm_Auth_LDAP {
         return @ldap_add($this->fh, $dn, $entry);
     }
 
+    public function error() {
+        return @ldap_error($this->fh);
+    }
+
     public function delete($dn) {
         return @ldap_delete($this->fh, $dn);
     }
