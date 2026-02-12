@@ -549,31 +549,41 @@ var spam_reporting_settings_modal_collect = function(adapterId, editingId) {
     return { id: editingId || '', adapter_id: adapterId, label: label, settings: settings };
 };
 
-var spam_reporting_settings_init = function() {
+var spam_reporting_settings_try_load_from_dom = function() {
     var dataEl = document.getElementById('spam_reporting_configs_data');
     var typesEl = document.getElementById('spam_reporting_adapter_types_data');
-    if (typeof console !== 'undefined' && console.log) {
-        console.log('[Spam reporting] settings init: configs_el=' + !!dataEl + ', adapter_types_el=' + !!typesEl);
-    }
-    if (!dataEl || !typesEl) return;
+    if (!dataEl || !typesEl) return false;
     try {
         spam_reporting_settings_configs = JSON.parse(dataEl.textContent || '[]');
         spam_reporting_settings_adapter_types = JSON.parse(typesEl.textContent || '[]');
-        if (typeof console !== 'undefined' && console.log) {
-            console.log('[Spam reporting] parsed adapter_types count=' + spam_reporting_settings_adapter_types.length +
-                ', ids=' + (spam_reporting_settings_adapter_types.map(function(t) { return t.adapter_id; }).join(', ') || '(none)'));
-        }
     } catch (e) {
         spam_reporting_settings_configs = [];
         spam_reporting_settings_adapter_types = [];
         if (typeof console !== 'undefined' && console.error) {
             console.error('[Spam reporting] parse error:', e);
         }
+        return false;
     }
     spam_reporting_settings_configs = spam_reporting_settings_configs.map(function(c) {
         return { id: c.id, adapter_id: c.adapter_id, label: c.label, adapter_type_label: c.adapter_type_label, settings: c.settings_form || c.settings_safe || {} };
     });
     spam_reporting_settings_render_list();
+    return true;
+};
+
+window.spam_reporting_settings_page_handler = function() {
+    if (typeof spam_reporting_settings_try_load_from_dom === 'function') {
+        spam_reporting_settings_try_load_from_dom();
+    }
+};
+
+var spam_reporting_settings_init = function() {
+    var dataEl = document.getElementById('spam_reporting_configs_data');
+    var typesEl = document.getElementById('spam_reporting_adapter_types_data');
+    if (typeof console !== 'undefined' && console.log) {
+        console.log('[Spam reporting] settings init: configs_el=' + !!dataEl + ', adapter_types_el=' + !!typesEl);
+    }
+    spam_reporting_settings_try_load_from_dom();
 
     $(document).on('click', '.spam-reporting-add-adapter-config', function() {
         var adapterId = $(this).data('adapter-id');
