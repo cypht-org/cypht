@@ -10,7 +10,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 class Hm_Spam_Report_Email_Target extends Hm_Spam_Report_Target_Abstract {
     protected $id = 'email_target';
-    protected $label = 'Email Target';
+    protected $label = 'Email (Spamcop, Gmail, etc.)';
     protected $platform_id = '';
     protected $to = '';
     protected $subject_prefix = 'Spam report';
@@ -98,7 +98,21 @@ class Hm_Spam_Report_Email_Target extends Hm_Spam_Report_Target_Abstract {
             return false;
         }
         $parsed = process_address_fld($resolved['to']);
-        return count($parsed) === 1;
+        if (count($parsed) !== 1) {
+            return false;
+        }
+        // Phase E: forbid using message From/Reply-To as destination
+        $destination = isset($parsed[0]['email']) && is_string($parsed[0]['email'])
+            ? strtolower(trim($parsed[0]['email'])) : '';
+        if ($destination === '') {
+            return false;
+        }
+        $from_reply_to = function_exists('spam_reporting_message_from_reply_to_emails')
+            ? spam_reporting_message_from_reply_to_emails($report) : array();
+        if (in_array($destination, $from_reply_to, true)) {
+            return false;
+        }
+        return true;
     }
 
     public function build_payload(Hm_Spam_Report $report, array $user_input = array(), array $instance_config = array()) {
