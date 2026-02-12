@@ -1180,7 +1180,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 }
                 $this->out('just_saved_credentials', true);
                 if (isPageConfigured('save')) {
-                    Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                    Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='?page=save'>Save Settings</a>.");
                 } else {
                     Hm_Msgs::add("Server saved.");
                 }
