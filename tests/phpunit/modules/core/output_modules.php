@@ -426,10 +426,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('js_data', 'core');
         $test->handler_response = array('disable_delete_prompt' => true);
         $res = $test->run();
-        $this->assertStringContains('var hm_delete_prompt = function() { return true; };', implode($res->output_response));
+        $this->assertStringContainsString('var hm_delete_prompt = function() { return true; };', implode($res->output_response));
         $test->handler_response = array();
         $res = $test->run();
-        $this->assertStringContains('var hm_delete_prompt = function(server_id, folder)', implode($res->output_response));
+        $this->assertStringContainsString('var hm_delete_prompt = function(server_id, folder)', implode($res->output_response));
     }
     /**
      * @preserveGlobalState disabled
