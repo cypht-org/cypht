@@ -1260,7 +1260,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
 
         $folderNotFoundError = false;
         if (!$special_folder && $action_type != 'read' && $action_type != 'unread' && $action_type != 'flag' && $action_type != 'unflag' && $action_type != 'restore') {
-            Hm_Msgs::add(sprintf('No %s folder configured for %s. Please go to <a href="?page=folders&imap_server_id=%s">Folders seetting</a> and configure one', $action_type, $server_details['name'], $server_details['id']), empty($moved) ? 'danger' : 'warning');
+            Hm_Msgs::add(sprintf('No %s folder configured for %s. Please go to <a href="?page=folders&imap_server_id=%s">Folders settings</a> and configure one', $action_type, $server_details['name'], $server_details['id']), empty($moved) ? 'danger' : 'warning');
             $folderNotFoundError = true;
         }
 
