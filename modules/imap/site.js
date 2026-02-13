@@ -114,9 +114,6 @@ var set_message_content = function(path, msg_uid) {
 };
 
 var imap_delete_message = function(state, supplied_uid, supplied_detail) {
-    if (!hm_delete_prompt()) {
-        return false;
-    }
     var uid = getMessageUidParam();
     var detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
     if (supplied_uid) {
@@ -125,6 +122,11 @@ var imap_delete_message = function(state, supplied_uid, supplied_detail) {
     if (supplied_detail) {
         detail = supplied_detail;
     }
+
+    if (!hm_delete_prompt(detail ? detail.server_id : null, detail ? detail.folder : null)) {
+        return false;
+    }
+
     if (detail && uid) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_delete_message'},
