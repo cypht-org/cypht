@@ -652,7 +652,31 @@ class Hm_Output_js_data extends Hm_Output_Module {
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {
-            $res .= 'var hm_delete_prompt = function() { return confirm("'.$this->trans('This action cannot be undone. Are you sure you want to delete this?').'"); };';
+            $res .= 'var hm_delete_prompt = function(server_id, folder) { '.
+                'var specialFolders = hm_special_folders(); '.
+                'var hasTrash = false; '.
+                'var isTrashFolder = false; '.
+                'if (server_id && specialFolders && specialFolders[server_id]) { '.
+                    'var trashFolder = specialFolders[server_id].find(function(f) { return f.type === "trash" && f.label && f.label !== ""; }); '.
+                    'if (trashFolder) { '.
+                        'hasTrash = true; '.
+                        'if (folder && folder === trashFolder.id) { '.
+                            'isTrashFolder = true; '.
+                        '} '.
+                    '} '.
+                '} '.
+                'var msg; '.
+                'if (isTrashFolder) { '.
+                    'msg = "'.$this->trans('WARNING: This will permanently delete the selected message(s). Are you sure?').'"; '.
+                '} else if (hasTrash) { '.
+                    'msg = "'.$this->trans('Move to Trash? (You can empty Trash later to delete permanently)').'"; '.
+                '} else if (server_id) { '.
+                    'msg = "'.$this->trans('WARNING: Trash folder is not configured. This will permanently delete the selected message(s). Are you sure?').'"; '.
+                '} else { '.
+                    'msg = "'.$this->trans('This action cannot be undone. Are you sure you want to delete this?').'"; '.
+                '} '.
+                'return confirm(msg); '.
+            '};';
         }
         else {
             $res .= 'var hm_delete_prompt = function() { return true; };';

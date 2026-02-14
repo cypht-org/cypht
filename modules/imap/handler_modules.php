@@ -953,7 +953,11 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
                 $this->out('imap_delete_error', true);
             }
             else {
-                Hm_Msgs::add('Message deleted');
+                if ($trash_folder && hex2bin($form['folder']) != $trash_folder) {
+                    Hm_Msgs::add('Message moved to Trash');
+                } else {
+                    Hm_Msgs::add('Message deleted');
+                }
                 $this->out('imap_delete_error', false);
             }
         }
