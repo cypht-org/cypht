@@ -75,12 +75,12 @@
 .msg_text_inner {
   min-height: 300px;
   font-family: monospace;
-  padding: 30px;
+  padding: 20px;
 }
 
 .mobile .msg_text_inner {
   width: 100%;
-  padding: 15px;
+  padding: 0px;
   font-family: inherit;
   font-size: 100%;
 }
@@ -389,6 +389,10 @@
 .move_to_location .folders li.m-has-children {
   flex-direction: column;
 }
+.move_to_location .imap_move_folder_link {
+  display: inline-flex; max-width: 200px; vertical-align: top; overflow: hidden;
+}
+.move_to_location .unread_count { padding: 2px 6px; white-space: nowrap; }
 /* .imap_keyword, .imap_sort, .imap_filter { font-size: 75%; float: left; margin-top: 8px; } */
 .imap_keyword {
   width: 120px;
@@ -597,9 +601,6 @@
 
 .fade-in {
   animation-name: fadeIn;
-}
-.inner_list li[class^="imap_"] #main-link {
-    flex-grow: 1;
 }
 .inner_list li[class^="imap_"] .action-link {
     opacity: 0;
