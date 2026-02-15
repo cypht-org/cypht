@@ -1,0 +1,124 @@
+.vendor-detection-row {
+    margin-top: 0.25rem;
+}
+
+.vendor-detection-label {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.vendor-detection-confidence {
+    margin-left: 0.35rem;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.vendor-detection-toggle {
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+    background: none;
+    border: 0;
+    color: #0d6efd;
+    padding: 0;
+    cursor: pointer;
+    max-height: max-content;
+}
+
+.vendor-detection-toggle i {
+    margin-right: 0.2rem;
+}
+
+.vendor-detection-evidence {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.35rem;
+    background: #f8f9fa;
+}
+
+.vendor-detection-evidence.show {
+    display: flex;
+    width: max-content;
+    flex-direction: column !important;
+}
+
+.vendor-detection-evidence-title {
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+.vendor-detection-evidence-item {
+    font-size: 0.85rem;
+    color: #495057;
+    margin-bottom: 0.2rem;
+}
+
+.vendor-detection-evidence-label {
+    font-weight: 600;
+    margin-right: 0.35rem;
+}
+
+.vendor-detection-requests {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    color: #6c757d;
+    flex-direction: column !important;
+    width: fit-content;
+}
+
+.vendor-detection-requests-label {
+    font-weight: 600;
+    margin-right: 0.35rem;
+}
+
+.vendor-detection-request-question {
+    margin-top: 0.35rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+.vendor-detection-request-targets,
+.vendor-detection-request-types {
+    margin-top: 0.35rem;
+}
+
+.vendor-detection-request-option,
+.vendor-detection-request-type {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #495057;
+}
+
+.vendor-detection-request-option input,
+.vendor-detection-request-type input {
+    margin-right: 0.35rem;
+}
+
+.vendor-detection-request-help {
+    margin-left: 1.3rem;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.vendor-detection-request-button.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.vendor-detection-request-link {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+.vendor-detection-request-link:hover {
+    text-decoration: underline;
+}
+
+.vendor-detection-request-sep {
+    margin: 0 0.35rem;
+    color: #9aa1a9;
+}
+
+.vendor-detection-content {
+    display: flex;
+}

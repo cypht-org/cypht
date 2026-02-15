@@ -2,6 +2,10 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+if (!function_exists('vendor_detection_load_registry')) {
+    require_once APP_PATH.'modules/vendor_detection/functions.php';
+}
+
 if (!hm_exists('get_script_modal_content')) {
     function get_script_modal_content()
     {
@@ -341,6 +345,11 @@ if (!hm_exists('default_reject_message')) {
 if (!hm_exists('block_filter')) {
     function block_filter($filter, $user_config, $action, $imap_server_id, $sender, $custom_reject_message = '')
     {
+        if (strpos($sender, 'platform:') === 0) {
+            $vendor_id = substr($sender, strlen('platform:'));
+            return block_filter_platform($filter, $user_config, $action, $imap_server_id, $vendor_id, $custom_reject_message);
+        }
+
         $ret = ['action' => $action];
 
         if (explode('@', $sender)[0] == '*') {
@@ -385,14 +394,17 @@ if (!hm_exists('block_filter')) {
         }
         elseif ($default_behaviour == 'Reject') {
             $filter->addRequirement('reject');
+            if (!isset($reject_message) || $reject_message === '') {
+                $reject_message = 'Blocked by Cypht';
+            }
             $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\RejectFilterAction([$reject_message])
+                new \PhpSieveManager\Filters\Actions\RejectFilterAction(['reason' => $reject_message])
             );
         }
         elseif ($default_behaviour == 'Move') {
             $filter->addRequirement('fileinto');
             $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['Blocked'])
+                new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => 'Blocked'])
             );
         }
 
@@ -406,16 +418,168 @@ if (!hm_exists('block_filter')) {
     }
 }
 
+if (!hm_exists('block_filter_platform')) {
+    function block_filter_platform($filter, $user_config, $action, $imap_server_id, $vendor_id, $custom_reject_message = '') {
+        $ret = ['action' => $action];
+        if (!$vendor_id) {
+            return $ret;
+        }
+        $vendor = vendor_detection_get_vendor_by_id($vendor_id);
+        if (empty($vendor)) {
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                error_log('[sieve_block_debug] platform vendor not found: '.$vendor_id);
+            }
+            return $ret;
+        }
+
+        $criteria = build_platform_block_criteria($vendor);
+        if (empty($criteria)) {
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                error_log('[sieve_block_debug] platform criteria empty for: '.$vendor_id);
+            }
+            return $ret;
+        }
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            error_log('[sieve_block_debug] platform criteria for '.$vendor_id.': '.json_encode($criteria));
+        }
+
+        $custom_condition = new \PhpSieveManager\Filters\Condition(
+            "", 'anyof'
+        );
+        foreach ($criteria as $criterion) {
+            $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+            $cond->contains($criterion);
+            $custom_condition->addCriteria($cond);
+        }
+
+        if ($action == 'default') {
+            $default_behaviour = 'Discard';
+            if ($user_config->get('sieve_block_default_behaviour')) {
+                if (array_key_exists($imap_server_id, $user_config->get('sieve_block_default_behaviour'))) {
+                    $default_behaviour = $user_config->get('sieve_block_default_behaviour')[$imap_server_id];
+                    if ($default_behaviour == 'Reject') {
+                        $reject_message = default_reject_message($user_config, $imap_server_id);
+                    }
+                }
+            }
+        } elseif ($action == 'discard') {
+            $default_behaviour = 'Discard';
+        } elseif ($action == 'reject_default') {
+            $default_behaviour = 'Reject';
+            $reject_message = default_reject_message($user_config, $imap_server_id);
+            $ret['reject_message'] = $reject_message;
+        } elseif ($action == 'reject_with_message') {
+            $default_behaviour = 'Reject';
+            $reject_message = $custom_reject_message;
+            $ret['reject_message'] = $custom_reject_message;
+        } elseif ($action == 'blocked') {
+            $default_behaviour = 'Move';
+        }
+
+        if ($default_behaviour == 'Discard') {
+            $custom_condition->addAction(
+                new \PhpSieveManager\Filters\Actions\DiscardFilterAction()
+            );
+        }
+        elseif ($default_behaviour == 'Reject') {
+            $filter->addRequirement('reject');
+            if (!isset($reject_message) || $reject_message === '') {
+                $reject_message = 'Blocked by Cypht';
+            }
+            $custom_condition->addAction(
+                new \PhpSieveManager\Filters\Actions\RejectFilterAction(['reason' => $reject_message])
+            );
+        }
+        elseif ($default_behaviour == 'Move') {
+            $filter->addRequirement('fileinto');
+            $custom_condition->addAction(
+                new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => 'Blocked'])
+            );
+        }
+
+        $custom_condition->addAction(
+            new \PhpSieveManager\Filters\Actions\StopFilterAction()
+        );
+
+        $filter->setCondition($custom_condition);
+
+        return $ret;
+    }
+}
+
+if (!hm_exists('build_platform_block_criteria')) {
+    function build_platform_block_criteria($vendor) {
+        $criteria = array();
+        $header_values = array();
+        $dkim_domains = vendor_detection_lowercase_list($vendor['dkim_domains'] ?? array());
+        $return_domains = vendor_detection_lowercase_list($vendor['return_path_domains'] ?? array());
+        $received_domains = vendor_detection_lowercase_list($vendor['received_domains'] ?? array());
+        $platform_domains = vendor_detection_lowercase_list($vendor['platform_domains'] ?? array());
+        $header_names = vendor_detection_lowercase_list($vendor['header_names'] ?? array());
+
+        $return_domains = array_unique(array_merge($return_domains, $platform_domains));
+        $received_domains = array_unique(array_merge($received_domains, $platform_domains));
+
+        foreach ($dkim_domains as $domain) {
+            $header_values[] = array('DKIM-Signature', $domain);
+        }
+        foreach ($return_domains as $domain) {
+            $header_values[] = array('Return-Path', $domain);
+        }
+        foreach ($received_domains as $domain) {
+            $header_values[] = array('Received', $domain);
+        }
+        foreach ($header_names as $header_name) {
+            $header_values[] = array($header_name, '');
+        }
+
+        foreach ($header_values as $pair) {
+            $header = $pair[0];
+            $value = $pair[1];
+            if (!$header) {
+                continue;
+            }
+            $key = $header.'|'.$value;
+            if (isset($criteria[$key])) {
+                continue;
+            }
+            $criteria[$key] = '"'.$header.'" ["'.$value.'"]';
+        }
+
+        return array_values($criteria);
+    }
+}
+
 if (!hm_exists('block_filter_dropdown')) {
-    function block_filter_dropdown ($mod, $mailbox_id = null, $with_scope = true, $submit_id = 'block_sender', $submit_title = 'Block', $increment = "") {
+    function block_filter_dropdown ($mod, $mailbox_id = null, $with_scope = true, $submit_id = 'block_sender', $submit_title = 'Block', $increment = "", $block_data = array()) {
         $ret = '<div class="dropdown-menu p-3" id="dropdownMenuBlockSender' .$increment. '">'
             .'<form id="block_sender_form' .$increment. '" >';
         if ($with_scope) {
+            $data_sender = $block_data['sender'] ?? '';
+            $data_domain = $block_data['domain'] ?? '';
+            $data_vendor_id = $block_data['vendor_id'] ?? '';
+            $data_vendor_name = $block_data['vendor_name'] ?? '';
+            $platform_enabled = false;
+            $site_config = $mod->get('site_config');
+            if ($site_config && method_exists($site_config, 'get')) {
+                $platform_enabled = (bool) $site_config->get('enable_platform_blocking', false);
+            }
+
+            $select_attrs = ' data-sender="'.$mod->html_safe($data_sender).'"'.
+                ' data-domain="'.$mod->html_safe($data_domain).'"'.
+                ' data-vendor-id="'.$mod->html_safe($data_vendor_id).'"'.
+                ' data-vendor-name="'.$mod->html_safe($data_vendor_name).'"';
+
             $ret .= '<div class="mb-2">'
                 .   '<label for="blockSenderScope" class="form-label">'.$mod->trans('Who Is Blocked').'</label>'
-                .   '<select name="scope" class="form-select form-select-sm" id="blockSenderScope">'
+                .   '<select name="scope" class="form-select form-select-sm" id="blockSenderScope"'.$select_attrs.'>'
                 .   '<option value="sender">'.$mod->trans('This Sender').'</option>'
-                .   '<option value="domain">'.$mod->trans('Whole domain').'</option></select>'
+                .   '<option value="domain">'.$mod->trans('Whole domain').'</option>';
+            if ($platform_enabled && $data_vendor_id) {
+                $label = $data_vendor_name ? $data_vendor_name : $data_vendor_id;
+                $ret .= '<option value="platform">'.$mod->trans('Platform').': '.$mod->html_safe($label).'</option>';
+            }
+            $ret .= '</select>'
                 .'</div>';
         }
         $ret .= '<div class="mb-2">'
