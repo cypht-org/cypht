@@ -14,11 +14,20 @@ add_output('info', 'feed_ids', true, 'feeds', 'page_js', 'before');
 /* servers page data */
 add_handler('servers', 'load_feeds_from_config',  true, 'feeds', 'load_user_data', 'after');
 add_handler('servers', 'process_add_feed', true, 'feeds', 'load_feeds_from_config', 'after');
-add_handler('servers', 'add_feeds_to_page_data', true, 'feeds', 'process_add_feed', 'after');
+add_handler('servers', 'process_import_opml', true, 'feeds', 'process_add_feed', 'after');
+add_handler('servers', 'add_feeds_to_page_data', true, 'feeds', 'process_import_opml', 'after');
 add_handler('servers', 'save_feeds',  true, 'feeds', 'add_feeds_to_page_data', 'after');
 add_output('servers', 'add_feed_dialog', true, 'feeds', 'server_content_end', 'before');
-add_output('servers', 'display_configured_feeds', true, 'feeds', 'add_feed_dialog', 'after');
+add_output('servers', 'import_opml_dialog', true, 'feeds', 'add_feed_dialog', 'after');
+add_output('servers', 'display_configured_feeds', true, 'feeds', 'import_opml_dialog', 'after');
 add_output('servers', 'feed_ids', true, 'feeds', 'page_js', 'before');
+
+/* AJAX OPML import */
+setup_base_ajax_page('ajax_import_opml', 'core');
+add_handler('ajax_import_opml', 'load_feeds_from_config', true, 'feeds', 'language', 'after');
+add_handler('ajax_import_opml', 'process_import_opml', true, 'feeds', 'load_feeds_from_config', 'after');
+add_handler('ajax_import_opml', 'save_feeds', true, 'feeds', 'process_import_opml', 'after');
+add_output('ajax_import_opml', 'filter_opml_import_result', true, 'feeds');
 
 /* search */
 add_handler('search', 'load_feeds_from_config',  true, 'feeds', 'load_user_data', 'after');
@@ -106,7 +115,8 @@ return array(
         'ajax_feed_item_content',
         'ajax_feed_combined',
         'ajax_feed_debug',
-        'ajax_feed_status'
+        'ajax_feed_status',
+        'ajax_import_opml',
     ),
     'allowed_output' => array(
         'feed_connect_status' => array(FILTER_UNSAFE_RAW, false),
@@ -117,6 +127,7 @@ return array(
         'feed_server_ids' => array(FILTER_UNSAFE_RAW, false),
         'feed_msg_headers' => array(FILTER_UNSAFE_RAW, false),
         'feed_msg_text' => array(FILTER_UNSAFE_RAW, false),
+        'opml_import_result' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
     ),
     'allowed_post' => array(
         'feed_id' => FILTER_UNSAFE_RAW,
@@ -133,5 +144,9 @@ return array(
         'feed_since' => FILTER_UNSAFE_RAW,
         'feed_limit' => FILTER_VALIDATE_INT,
         'feed_search' => FILTER_VALIDATE_INT,
+        'opml_file' => FILTER_UNSAFE_RAW,
+        'import_opml' => FILTER_VALIDATE_INT,
+        'opml_content' => FILTER_UNSAFE_RAW,
+        'file_name' => FILTER_UNSAFE_RAW,
     )
 );

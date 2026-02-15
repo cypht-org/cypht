@@ -9,6 +9,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 require APP_PATH.'modules/feeds/hm-feed.php';
+require APP_PATH.'modules/feeds/handler_modules.php';
 
 /**
  * @subpackage feeds/handler
@@ -505,6 +506,74 @@ class Hm_Handler_load_feed_folders extends Hm_Handler_Module {
             }
         }
         $this->out('feed_folders', $folders);
+    }
+}
+
+/**
+ * @subpackage feeds/output
+ */
+/**
+ * @subpackage feeds/output
+ */
+class Hm_Output_filter_opml_import_result extends Hm_Output_Module {
+    protected function output() {
+        $result = $this->get('opml_import_result');
+        if ($result) {
+            // Output raw data for AJAX response
+            $this->out('opml_import_result', $result);
+
+            if ($result['success']) {
+                $html = '<div class="alert alert-success">';
+                $html .= '<strong>'.$this->trans('Import Successful!').'</strong><br>';
+                $html .= $this->trans('Total feeds processed').': ' . ($result['total'] ?: 0) . '<br>';
+                $html .= $this->trans('Successfully imported').': ' . ($result['imported'] ?: 0) . '<br>';
+                $html .= $this->trans('Skipped').': ' . ($result['skipped'] ?: 0) . '<br>';
+                $html .= $this->trans('Failed').': ' . ($result['failed'] ?: 0) . '</div>';
+
+                if (!empty($result['failed_details'])) {
+                    $html .= '<div class="alert alert-warning mt-2"><strong>'.$this->trans('Failed details').':</strong><ul>';
+                    foreach ($result['failed_details'] as $detail) {
+                        $label = $detail['name'] ?? $detail['url'] ?? 'Unknown feed';
+                        $reason = $detail['error'] ?? 'Unknown error';
+                        $html .= '<li>' . $this->html_safe($label) . ': ' . $this->html_safe($reason) . '</li>';
+                    }
+                    $html .= '</ul></div>';
+                }
+
+                $this->out('opml_import_result_html', $html);
+            } else {
+                $html = '<div class="alert alert-danger">' .
+                    '<strong>'.$this->trans('Import Failed').':</strong> ' . $this->html_safe($result['error'] ?? $result['message'] ?? 'Unknown error') .
+                    '</div>';
+                $this->out('opml_import_result_html', $html);
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage feeds/output
+ */
+class Hm_Output_import_opml_dialog extends Hm_Output_Module {
+    protected function output() {
+        if ($this->format == 'HTML5') {
+            return '<div class="opml_import_section mb-3">
+                        <button type="button" class="btn btn-primary px-3" id="import_opml_btn">
+                            <i class="bi bi-upload"></i> '.$this->trans('Import OPML').'
+                        </button>
+
+                        <div id="opml_import_dialog" class="mt-3" style="display:none;">
+                            <form id="opml_import_form" enctype="multipart/form-data">
+                                <input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
+                                <div class="mb-3">
+                                    <input type="file" name="opml_file" accept=".opml,.xml" class="form-control" />
+                                </div>
+                                <input type="submit" class="btn btn-primary" value="'.$this->trans('Import').'" />
+                            </form>
+                            <div id="opml_import_result" class="mt-3"></div>
+                        </div>
+                    </div>';
+        }
     }
 }
 
