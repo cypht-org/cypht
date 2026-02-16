@@ -1,7 +1,7 @@
 <?php
 
 /**
- * AbuseIPDB API spam report target (Phase 9)
+ * AbuseIPDB API spam report target
  * Reports source IP from email headers. Minimal payload: IP, category, optional comment.
  * @package modules
  * @subpackage spam_reporting
@@ -38,7 +38,7 @@ class Hm_Spam_Report_AbuseIPDB_Target extends Hm_Spam_Report_Target_Api_Abstract
     }
 
     /**
-     * Schema for user-provided instance config (Phase B). api_key is secret.
+     * Schema for user-provided instance config. api_key is secret.
      * @return array<string, array{type: string, label: string, required: bool}>
      */
     public function get_configuration_schema() {

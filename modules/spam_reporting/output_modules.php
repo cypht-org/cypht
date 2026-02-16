@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Spam reporting outputs (Phase 1 stub)
+ * Spam reporting outputs
  * @package modules
  * @subpackage spam_reporting
  */
@@ -82,18 +82,11 @@ class Hm_Output_spam_report_preview extends Hm_Output_Module {
  */
 class Hm_Output_spam_report_settings_section extends Hm_Output_Module {
     protected function output() {
-        $platforms = $this->get('spam_reporting_available_platforms', array());
-        if (empty($platforms)) {
+        $adapter_types = $this->get('spam_reporting_adapter_types', array());
+        if (empty($adapter_types)) {
             return '';
         }
-        $settings = $this->get('user_settings', array());
-        $enabled = !empty($settings['spam_reporting_enabled_setting']);
-        $allowed = isset($settings['spam_reporting_allowed_platforms']) && is_array($settings['spam_reporting_allowed_platforms'])
-            ? $settings['spam_reporting_allowed_platforms'] : array();
-
         $configs_for_ui = $this->get('spam_reporting_configs_for_ui', array());
-        $adapter_types = $this->get('spam_reporting_adapter_types', array());
-        // Raw JSON for <script type="application/json"> — do not html_safe (breaks JSON.parse). Only escape </script>.
         $configs_json = str_replace('</script>', '<\/script>', json_encode($configs_for_ui));
         $adapter_types_json = str_replace('</script>', '<\/script>', json_encode($adapter_types));
 
@@ -101,40 +94,31 @@ class Hm_Output_spam_report_settings_section extends Hm_Output_Module {
             '<i class="bi bi-shield-exclamation fs-5 me-2"></i>'.
             $this->trans('Spam Reporting').'</td></tr>';
         $res .= '<tr class="spam_reporting_setting"><td class="d-block d-md-table-cell" colspan="2">';
-        $res .= '<div class="d-flex align-items-center mb-2">';
+
+        $res .= '<div class="spam-reporting-activation mb-3">';
+        $settings = $this->get('user_settings', array());
+        $enabled = !empty($settings['spam_reporting_enabled_setting']);
+        $res .= '<div class="d-flex align-items-center">';
         $res .= '<input type="checkbox" class="form-check-input me-2" id="spam_reporting_enabled" name="spam_reporting_enabled" value="1" '.($enabled ? 'checked' : '').'>';
         $res .= '<label for="spam_reporting_enabled">'.$this->trans('Enable external spam reporting').'</label>';
-        $res .= '</div>';
-        $res .= '<div class="spam-reporting-platform-toggles ms-3">';
-        foreach ($platforms as $p) {
-            $pid = $p['platform_id'];
-            $name = $p['name'];
-            $key = 'spam_reporting_platform_' . $pid;
-            $checked = in_array($pid, $allowed, true) ? ' checked' : '';
-            $res .= '<div class="d-flex align-items-center mb-1">';
-            $res .= '<input type="checkbox" class="form-check-input me-2" id="'.$key.'" name="'.$key.'" value="1" '.$checked.'>';
-            $res .= '<label for="'.$key.'">'.$this->html_safe($name).'</label>';
-            $res .= '</div>';
-        }
-        $res .= '</div>';
+        $res .= '</div></div>';
 
-        $res .= '<div class="spam-reporting-targets-section mt-3">';
+        $res .= '<div class="spam-reporting-destinations mt-3">';
         $res .= '<input type="hidden" name="spam_reporting_target_configurations" id="spam_reporting_target_configurations" value="" />';
         $res .= '<script type="application/json" id="spam_reporting_configs_data">'.$configs_json.'</script>';
         $res .= '<script type="application/json" id="spam_reporting_adapter_types_data">'.$adapter_types_json.'</script>';
-        $res .= '<div id="spam_reporting_targets_list" class="mb-2"></div>';
+        $res .= '<div id="spam_reporting_service_cards" class="spam-reporting-service-cards"></div>';
+        $res .= '</div>';
 
         $res .= '<div class="modal fade" id="spam_reporting_config_modal" tabindex="-1" aria-hidden="true">';
         $res .= '<div class="modal-dialog"><div class="modal-content">';
-        $res .= '<div class="modal-header"><h5 class="modal-title" id="spam_reporting_config_modal_title">'.$this->trans('Add target').'</h5>';
+        $res .= '<div class="modal-header"><h5 class="modal-title" id="spam_reporting_config_modal_title">'.$this->trans('Configure').'</h5>';
         $res .= '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="'.$this->trans('Close').'"></button></div>';
         $res .= '<div class="modal-body" id="spam_reporting_config_modal_body"></div>';
         $res .= '<div class="modal-footer">';
         $res .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$this->trans('Cancel').'</button>';
         $res .= '<button type="button" class="btn btn-primary" id="spam_reporting_config_modal_save">'.$this->trans('Save').'</button>';
         $res .= '</div></div></div></div>';
-
-        $res .= '</div>';
 
         $res .= '</td></tr>';
         return $res;
