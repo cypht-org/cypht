@@ -643,7 +643,7 @@ return [
     'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags,spam_reporting')),
     /*
     | ------------------------------------------
-    | Spam Reporting Allowed Target Types (Phase A)
+    | Spam Reporting Allowed Target Types
     | ------------------------------------------
     |
     | Symbolic adapter type IDs that are allowed instance-wide. When this key
@@ -656,10 +656,10 @@ return [
         array_map('trim', explode(',', (string) env('SPAM_REPORTING_ALLOWED_TARGET_TYPES', 'abuseipdb,email_target')))),
     /*
     | ------------------------
-    | Spam Reporting Targets (deprecated)
+    | Spam Reporting Targets (to be removed)
     | ------------------------
     |
-    | DEPRECATED: Use spam_reporting_allowed_target_types instead. When
+    | To be removed: Use spam_reporting_allowed_target_types instead. When
     | spam_reporting_allowed_target_types is set in config, this key is ignored.
     | Kept only for backward compatibility when the new key is not set.
     */
@@ -712,10 +712,10 @@ return [
     'spam_reporting_rate_limit_window' => env('SPAM_REPORTING_RATE_LIMIT_WINDOW', 3600),
     /*
     | ----------------------------------
-    | Spam Reporting AbuseIPDB API key (deprecated)
+    | Spam Reporting AbuseIPDB API key (to be removed)
     | ----------------------------------
     |
-    | DEPRECATED: Prefer per-user API key in spam reporting settings (Phase B+).
+    | To be removed: Prefer per-user API key in spam reporting settings.
     | When using spam_reporting_allowed_target_types, leave empty; users will
     | configure their own key. Kept for legacy spam_reporting_targets mode only.
     */

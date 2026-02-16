@@ -19,6 +19,8 @@ class Hm_MIME_Msg {
     private $text_body = '';
     private $html = false;
     private $final_msg = '';
+    /** When true, entire message is message/rfc822 with base64 body (no multipart). Used by SpamCop. */
+    private $primary_rfc822 = false;
 
     /* build mime message data */
     function __construct($to, $subject, $body, $from, $html=false, $cc='', $bcc='', $in_reply_to_id='', $from_name='', $reply_to='', $delivery_receipt='', $schedule='', $profile_id = '') {
@@ -68,6 +70,20 @@ class Hm_MIME_Msg {
         $this->attachments = $files;
     }
 
+    /**
+     * Set the entire message body to a single message/rfc822 part (base64-encoded).
+     * No multipart wrapper, no text/plain intro. Used when the recipient expects
+     * the spam message as the primary body (e.g. SpamCop).
+     * @param string $raw_message full RFC822 message
+     * @param bool $force_base64 ignored for primary body (always base64)
+     */
+    function set_primary_message_rfc822($raw_message, $force_base64 = true) {
+        $this->primary_rfc822 = true;
+        $this->headers['Content-Type'] = 'message/rfc822';
+        $this->headers['Content-Transfer-Encoding'] = 'base64';
+        $this->body = chunk_split(base64_encode($raw_message));
+    }
+
     function process_attachments() {
         $res = '';
         $closing = false;
@@ -75,7 +91,9 @@ class Hm_MIME_Msg {
             $content = Hm_Crypt::plaintext(@file_get_contents($file['filename']), Hm_Request_Key::generate());
             if ($content) {
                 $closing = true;
-                if (array_key_exists('no_encoding', $file) || (array_key_exists('type', $file) && $file['type'] == 'message/rfc822')) {
+                $use_7bit = (array_key_exists('no_encoding', $file) && $file['no_encoding'])
+                    || (array_key_exists('type', $file) && $file['type'] == 'message/rfc822' && empty($file['force_base64']));
+                if ($use_7bit) {
                     $res .= sprintf("\r\n--%s\r\nContent-Type: %s; name=\"%s\"\r\nContent-Description: %s\r\n".
                         "Content-Disposition: attachment; filename=\"%s\"\r\nContent-Transfer-Encoding: 7bit\r\n\r\n%s",
                         $this->boundary, $file['type'], $file['name'], $file['name'], $file['name'], $content);
@@ -97,9 +115,6 @@ class Hm_MIME_Msg {
 
     /* output mime message */
     function get_mime_msg() {
-        if (!empty($this->body)) {
-            $this->prep_message_body();
-        }
         $res = '';
         $headers = '';
         foreach ($this->headers as $name => $val) {
@@ -108,11 +123,19 @@ class Hm_MIME_Msg {
             }
             $headers .= sprintf("%s: %s\r\n", $name, rtrim($this->prep_fld($val, $name)));
         }
+        if ($this->primary_rfc822) {
+            $res = "\r\n" . $this->body;
+            $this->final_msg = $res;
+            return $headers . $res;
+        }
+        if (!empty($this->body)) {
+            $this->prep_message_body();
+        }
         if (!$this->final_msg) {
             if ($this->html) {
                 $res .= $this->text_body;
             }
-            $res .="\r\n".$this->body;
+            $res .= "\r\n" . $this->body;
             if (!empty($this->attachments)) {
                 $res .= $this->process_attachments();
             }
@@ -121,7 +144,7 @@ class Hm_MIME_Msg {
             $res = $this->final_msg;
         }
         $this->final_msg = $res;
-        return $headers.$res;
+        return $headers . $res;
     }
 
     function set_auto_bcc($addr) {

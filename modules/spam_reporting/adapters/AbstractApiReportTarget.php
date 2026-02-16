@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Base adapter for API-based spam report targets (Phase 9)
+ * Base adapter for API-based spam report targets
  * Handles HTTP requests, auth headers, JSON encoding, error handling.
  * @package modules
  * @subpackage spam_reporting
@@ -22,7 +22,7 @@ abstract class Hm_Spam_Report_Target_Api_Abstract extends Hm_Spam_Report_Target_
 
     /**
      * Get API key: from instance_config when non-empty, else from site config (legacy).
-     * @param array $instance_config user-provided instance config (Phase B)
+     * @param array $instance_config user-provided instance config
      * @return string
      */
     abstract protected function get_api_key(array $instance_config = array());
