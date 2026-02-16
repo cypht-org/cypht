@@ -106,7 +106,7 @@ class Hm_Spam_Report_Delivery_Context {
     public $site_config;
     public $user_config;
     public $session;
-    /** @var array User-provided instance configuration (Phase B); empty when not using user config */
+    /** @var array User-provided instance configuration; empty when not using user config */
     public $instance_config = array();
 
     public function __construct($site_config, $user_config, $session) {
@@ -184,7 +184,7 @@ function spam_reporting_format_raw_headers($message) {
 }}
 
 /**
- * Get normalized email addresses from the message From and Reply-To headers (Phase E).
+ * Get normalized email addresses from the message From and Reply-To headers.
  * Used to forbid using the report destination as one of these addresses.
  * @param Hm_Spam_Report $report
  * @return array list of lowercase trimmed emails
@@ -221,6 +221,7 @@ function spam_reporting_get_adapter_type_map() {
     return array(
         'abuseipdb' => 'Hm_Spam_Report_AbuseIPDB_Target',
         'email_target' => 'Hm_Spam_Report_Email_Target',
+        'spamcop_email' => 'Hm_Spam_Report_SpamCop_Email_Target',
     );
 }}
 
@@ -242,6 +243,7 @@ function spam_reporting_get_allowed_target_types($site_config) {
     $class_to_type = array(
         'Hm_Spam_Report_AbuseIPDB_Target' => 'abuseipdb',
         'Hm_Spam_Report_Email_Target' => 'email_target',
+        'Hm_Spam_Report_SpamCop_Email_Target' => 'spamcop_email',
     );
     $types = array();
     foreach ($targets as $entry) {
@@ -260,8 +262,8 @@ function spam_reporting_get_allowed_target_types($site_config) {
 
 /**
  * Build a target registry from config.
- * Uses spam_reporting_allowed_target_types when set (Phase A: type-only, no secrets);
- * otherwise falls back to legacy spam_reporting_targets (full config, deprecated).
+ * Uses spam_reporting_allowed_target_types when set (type-only, no secrets);
+ * otherwise falls back to legacy spam_reporting_targets (full config, to be removed).
  * @param object $site_config
  * @return Hm_Spam_Report_Targets_Registry
  */
@@ -326,7 +328,7 @@ function spam_reporting_build_registry($site_config) {
 }}
 
 /**
- * Generate a stable unique instance id (Phase C). 16-char hex.
+ * Generate a stable unique instance id. 16-char hex.
  * @return string
  */
 if (!hm_exists('spam_reporting_generate_instance_id')) {
@@ -335,7 +337,7 @@ function spam_reporting_generate_instance_id() {
 }}
 
 /**
- * Whitelist settings to only keys declared in adapter schema (Phase C).
+ * Whitelist settings to only keys declared in adapter schema.
  * @param array $settings raw stored settings
  * @param Hm_Spam_Report_Target_Interface $adapter
  * @return array
@@ -357,7 +359,7 @@ function spam_reporting_whitelist_instance_settings(array $settings, $adapter) {
 }}
 
 /**
- * Load and normalize user target configurations; whitelist settings by adapter schema (Phase C).
+ * Load and normalize user target configurations; whitelist settings by adapter schema.
  * @param object $site_config
  * @param object $user_config
  * @return array list of array('id' => string, 'adapter_id' => string, 'label' => string, 'settings' => array)
@@ -394,7 +396,7 @@ function spam_reporting_load_user_target_configurations($site_config, $user_conf
 }}
 
 /**
- * Build one effective-target descriptor (public fields only); adapter/instance_config added by caller (Phase C).
+ * Build one effective-target descriptor (public fields only); adapter/instance_config added by caller.
  */
 if (!hm_exists('spam_reporting_build_effective_descriptor')) {
 function spam_reporting_build_effective_descriptor($adapter, $id, $label, array $instance_config = array()) {
@@ -418,7 +420,7 @@ function spam_reporting_build_effective_descriptor($adapter, $id, $label, array 
 }}
 
 /**
- * Build effective targets for the current user (Phase C).
+ * Build effective targets for the current user.
  * Legacy fallback: one virtual instance per allowed type when no user configs.
  * When $report is set, only includes targets where is_available(report, user_config, instance_config).
  * Descriptors include adapter and instance_config (server-side only; do not send to client).
@@ -464,7 +466,7 @@ function spam_reporting_get_effective_targets($site_config, $user_config, $repor
 }}
 
 /**
- * Strip server-only fields for UI (Phase C). Never send adapter or instance_config to client.
+ * Strip server-only fields for UI. Never send adapter or instance_config to client.
  * @param array $effective_targets
  * @return array public descriptors only
  */
@@ -488,7 +490,7 @@ function spam_reporting_effective_targets_to_public_descriptors(array $effective
 }}
 
 /**
- * Resolve target_id to (adapter, instance_config) for send (Phase C).
+ * Resolve target_id to (adapter, instance_config) for send.
  * @param object $site_config
  * @param object $user_config
  * @param string $target_id
@@ -509,7 +511,7 @@ function spam_reporting_resolve_target_id($site_config, $user_config, $target_id
 }}
 
 /**
- * Configs for settings UI (Phase D): id, adapter_id, label, adapter_type_label, settings_safe.
+ * Configs for settings UI: id, adapter_id, label, adapter_type_label, settings_safe.
  * settings_safe = settings with secret keys removed (never send secrets to client).
  * @param object $site_config
  * @param object $user_config
@@ -553,7 +555,7 @@ function spam_reporting_settings_configs_for_ui($site_config, $user_config) {
 }}
 
 /**
- * Adapter types for settings UI (Phase D): adapter_id, label, schema (no secret values).
+ * Adapter types for settings UI: adapter_id, label, schema (no secret values).
  * @param object $site_config
  * @return array
  */
@@ -576,7 +578,7 @@ function spam_reporting_settings_adapter_types($site_config) {
 }}
 
 /**
- * Merge __KEEP__ in submitted settings with current stored values (Phase D).
+ * Merge __KEEP__ in submitted settings with current stored values.
  * @param array $submitted_list each item: id, adapter_id, label, settings
  * @param array $current_configs from load_user_target_configurations (have settings)
  * @return array merged list with settings
@@ -609,7 +611,7 @@ function spam_reporting_merge_keep_settings(array $submitted_list, array $curren
 }}
 
 /**
- * Validate and normalize one config entry for save (Phase D). Returns [ok, errors, normalized_entry].
+ * Validate and normalize one config entry for save. Returns [ok, errors, normalized_entry].
  * @param array $entry merged entry (id, adapter_id, label, settings)
  * @param object $site_config
  * @return array [bool, array of strings, array|null]
@@ -707,6 +709,27 @@ function spam_reporting_get_available_platforms_for_settings($site_config) {
         }
     }
     return $out;
+}}
+
+/**
+ * Derive allowed_platforms_setting from validated target configs (for settings UI without platform checkboxes).
+ * @param array $configs validated config entries (id, adapter_id, label, settings)
+ * @return array list of platform_id to allow
+ */
+if (!hm_exists('spam_reporting_derive_allowed_platforms_from_configs')) {
+function spam_reporting_derive_allowed_platforms_from_configs(array $configs) {
+    $allowed = array();
+    foreach ($configs as $c) {
+        $adapter_id = isset($c['adapter_id']) ? trim((string) $c['adapter_id']) : '';
+        if ($adapter_id === 'abuseipdb') {
+            $allowed[] = 'abuseipdb';
+        } elseif ($adapter_id === 'spamcop_email') {
+            $allowed[] = 'spamcop';
+        } elseif ($adapter_id === 'email_target') {
+            $allowed[] = '';
+        }
+    }
+    return array_values(array_unique($allowed));
 }}
 
 /**
