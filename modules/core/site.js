@@ -935,9 +935,6 @@ function Message_List() {
     };
 
     this.message_action = function(action_type) {
-        if (action_type == 'delete' && !hm_delete_prompt()) {
-            return false;
-        }
         var msg_list = $('.message_table');
         var selected = [];
         var current_list = self.filter_list();
@@ -946,6 +943,23 @@ function Message_List() {
                 selected.push($(this).val());
             }
         });
+
+        if (action_type == 'delete') {
+            // Extract server_id and folder from first selected message for trash check
+            // Message ID format: imap_serverid_uid_folder
+            var server_id = null;
+            var folder = null;
+            if (selected.length > 0) {
+                var matches = selected[0].match(/^imap_([^_]+)_\d+_(.+)$/);
+                if (matches && matches[1]) {
+                    server_id = matches[1];
+                    folder = matches[2];
+                }
+            }
+            if (!hm_delete_prompt(server_id, folder)) {
+                return false;
+            }
+        }
         if (selected.length > 0) {
             var updated = false;
             Hm_Ajax.request(
