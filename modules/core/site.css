@@ -531,17 +531,38 @@ button {
   padding-top: 5px;
 }
 .checkbox_cell label {
-  display: block;
-  width: 16px;
-  height: 16px;
-  background-color: #eee;
-  border: solid 1px #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background-color: #fff;
+  border: solid 2px #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.checkbox_cell label:hover {
+  border-color: #999;
+  background-color: #f8f9fa;
 }
 .checkbox_cell input[type="checkbox"] {
   display: none;
 }
 .checkbox_cell input[type="checkbox"]:checked + label {
-  background-color: #aaa;
+  background-color: #fff;
+  border-color: #008080;
+}
+.checkbox_cell input[type="checkbox"]:checked + label::after {
+  content: "\F633";
+  font-family: "bootstrap-icons" !important;
+  color: #008080;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .confirm_logout {
   display: none;
@@ -1134,6 +1155,9 @@ div.unseen,
 .mobile .checkbox_cell label {
   width: 20px;
   height: 20px;
+}
+.mobile .checkbox_cell input[type="checkbox"]:checked + label::after {
+  font-size: 16px;
 }
 .mobile .github_para {
   white-space: normal !important;
