@@ -1804,7 +1804,8 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 $name = $auth_server['name'];
             }
             else {
-                $name = $this->config->get('imap_auth_name', 'Default');
+                // Use the username (email address) as the account name instead of static config
+                $name = $auth_server['username'];
             }
             $imap_details = array(
                 'name' => $name,
