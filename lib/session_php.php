@@ -200,6 +200,7 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
             $this->existing = true;
             $this->start($request);
             $this->check_fingerprint($request);
+            $this->restore_long_session($request);
         }
         return $this->is_active();
     }
@@ -251,6 +252,44 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
             $domain = '';
         }
         return array($secure, $path, $domain);
+    }
+
+    /**
+     * Restore long session settings for existing sessions
+     * @param Hm_Request $request request details
+     * @return void
+     */
+    protected function restore_long_session($request) {
+        if ($this->get('long_session_enabled', false)) {
+            $stored_lifetime = $this->get('long_session_lifetime', 0);
+            if ($stored_lifetime > 0) {
+                $this->lifetime = $stored_lifetime;
+                $this->refresh_session_cookie($request);
+            }
+        }
+    }
+
+    /**
+     * Refresh the session cookie with the current lifetime
+     * @param Hm_Request $request request details
+     * @return void
+     */
+    protected function refresh_session_cookie($request) {
+        if ($this->active && $this->session_key) {
+            list($secure, $path, $domain) = $this->set_session_params($request);
+            $params = session_get_cookie_params();
+            // Calculate expiration time: 0 for session-only, or timestamp for long session
+            $expire = ($this->lifetime > 0) ? $this->lifetime : 0;
+            Hm_Functions::setcookie(
+                $this->cname,
+                $this->session_key,
+                $expire,
+                $path,
+                $domain,
+                $secure,
+                true
+            );
+        }
     }
 
     /**

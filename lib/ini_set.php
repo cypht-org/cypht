@@ -33,7 +33,20 @@ if (!$config->get('disable_tls', false)) {
 }
 
 /* gc max lifetime */
-ini_set('session.gc_maxlifetime', 1440);
+if ($config->get('allow_long_session', false)) {
+    // For long sessions, set gc_maxlifetime to match the session duration
+    $long_session_days = intval($config->get('long_session_lifetime', 0));
+    if ($long_session_days > 0) {
+        $gc_lifetime = 60 * 60 * 24 * $long_session_days;
+        ini_set('session.gc_maxlifetime', $gc_lifetime);
+    } else {
+        // Fallback to default if not configured properly
+        ini_set('session.gc_maxlifetime', 1440);
+    }
+} else {
+    // Default: 24 minutes for regular sessions
+    ini_set('session.gc_maxlifetime', 1440);
+}
 
 /* disable trans sid */
 ini_set('session.use_trans_sid', 0);
