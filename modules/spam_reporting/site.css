@@ -1,0 +1,48 @@
+.spam_report_action {
+    margin-right: 8px;
+}
+
+.spam-report-platforms-list {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+/* Service cards (settings) */
+.spam-reporting-service-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.spam-reporting-service-card {
+    min-width: 280px;
+    flex: 1 1 300px;
+}
+
+.spam-reporting-service-card.spam-reporting-card-disabled {
+    opacity: 0.65;
+    pointer-events: none;
+}
+
+.spam-reporting-card-disabled .btn,
+.spam-reporting-card-disabled .list-group-item button {
+    pointer-events: none;
+}
+
+.spam-reporting-status-badge {
+    display: inline-block;
+    padding: 0.2em 0.5em;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.spam-reporting-status-connected {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.spam-reporting-status-disconnected {
+    background-color: #e9ecef;
+    color: #6c757d;
+}

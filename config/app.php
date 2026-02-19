@@ -640,7 +640,86 @@ return [
     | Handles page layout, login/logout, and the default settings pages. This set
     | is required.
     */
-    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags')),
+    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags,spam_reporting')),
+    /*
+    | ------------------------------------------
+    | Spam Reporting Allowed Target Types
+    | ------------------------------------------
+    |
+    | Symbolic adapter type IDs that are allowed instance-wide. When this key
+    | is set (array), it is the source of truth and spam_reporting_targets is
+    | ignored. Admins do not reference class names. Set via env SPAM_REPORTING_ALLOWED_TARGET_TYPES
+    | (comma-separated, e.g. abuseipdb,email_target) or leave unset for default. Include both so the
+    | Settings "Add target" dropdown is populated; empty value disables all types.
+    */
+    'spam_reporting_allowed_target_types' => array_filter(
+        array_map('trim', explode(',', (string) env('SPAM_REPORTING_ALLOWED_TARGET_TYPES', 'abuseipdb,email_target')))),
+    /*
+    | ------------------------
+    | Spam Reporting Targets (to be removed)
+    | ------------------------
+    |
+    | To be removed: Use spam_reporting_allowed_target_types instead. When
+    | spam_reporting_allowed_target_types is set in config, this key is ignored.
+    | Kept only for backward compatibility when the new key is not set.
+    */
+    'spam_reporting_targets' => array(
+        array('class' => 'Hm_Spam_Report_AbuseIPDB_Target'),
+    ),
+    /*
+    | -------------------------------
+    | Spam Reporting Platform Catalog
+    | -------------------------------
+    |
+    | JSON catalog of known reporting platforms. This is display-only metadata
+    | and does not affect reporting behavior.
+    */
+    'spam_reporting_platforms_file' => env('SPAM_REPORTING_PLATFORMS_FILE', APP_PATH.'data/spam_report_platforms.json'),
+    /*
+    | ------------------------------------
+    | Spam Reporting Provider Mapping
+    | ------------------------------------
+    |
+    | JSON mapping of provider signals to platform_ids for suggestion logic.
+    */
+    'spam_reporting_provider_mapping_file' => env('SPAM_REPORTING_PROVIDER_MAPPING_FILE', APP_PATH.'data/spam_report_provider_mapping.json'),
+    /*
+    | -----------------------------
+    | Spam Reporting SMTP Settings
+    | -----------------------------
+    |
+    | System-level SMTP settings for spam reporting. These must be configured
+    | explicitly and do not use the user's identity.
+    */
+    'spam_reporting_smtp_name' => env('SPAM_REPORTING_SMTP_NAME', 'Spam Reporting'),
+    'spam_reporting_smtp_server' => env('SPAM_REPORTING_SMTP_SERVER', ''),
+    'spam_reporting_smtp_port' => env('SPAM_REPORTING_SMTP_PORT', 587),
+    'spam_reporting_smtp_tls' => env('SPAM_REPORTING_SMTP_TLS', true),
+    'spam_reporting_smtp_user' => env('SPAM_REPORTING_SMTP_USER', ''),
+    'spam_reporting_smtp_pass' => env('SPAM_REPORTING_SMTP_PASS', ''),
+    'spam_reporting_smtp_no_auth' => env('SPAM_REPORTING_SMTP_NO_AUTH', false),
+    'spam_reporting_sender_address' => env('SPAM_REPORTING_SENDER_ADDRESS', ''),
+    'spam_reporting_sender_name' => env('SPAM_REPORTING_SENDER_NAME', ''),
+    'spam_reporting_reply_to' => env('SPAM_REPORTING_REPLY_TO', ''),
+    /*
+    | ----------------------
+    | Spam Reporting Limits
+    | ----------------------
+    |
+    | Conservative per-user rate limits.
+    */
+    'spam_reporting_rate_limit_count' => env('SPAM_REPORTING_RATE_LIMIT_COUNT', 5),
+    'spam_reporting_rate_limit_window' => env('SPAM_REPORTING_RATE_LIMIT_WINDOW', 3600),
+    /*
+    | ----------------------------------
+    | Spam Reporting AbuseIPDB API key (to be removed)
+    | ----------------------------------
+    |
+    | To be removed: Prefer per-user API key in spam reporting settings.
+    | When using spam_reporting_allowed_target_types, leave empty; users will
+    | configure their own key. Kept for legacy spam_reporting_targets mode only.
+    */
+    'spam_reporting_abuseipdb_api_key' => env('SPAM_REPORTING_ABUSEIPDB_API_KEY', ''),
     // 'modules' => [
     //     /*
     //     |  ----
