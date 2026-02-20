@@ -14,11 +14,10 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
     public function process() {
+        $manager = new Hm_Spam_Reporting_Manager($this->config, $this->user_config);
         // Settings UI always gets ALL configs and adapter types (never filter by enabled or allowed_platforms).
-        $configs_for_ui = spam_reporting_settings_configs_for_ui($this->config, $this->user_config);
-        $adapter_types = spam_reporting_settings_adapter_types($this->config);
-        $this->out('spam_reporting_configs_for_ui', $configs_for_ui);
-        $this->out('spam_reporting_adapter_types', $adapter_types);
+        $this->out('spam_reporting_configs_for_ui', $manager->getConfigsForUi());
+        $this->out('spam_reporting_adapter_types', $manager->getAdapterTypes());
 
         list($success, $form) = $this->process_form(array('save_settings'));
         $new_settings = $this->get('new_user_settings', array());
@@ -37,11 +36,11 @@ class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
             if (is_string($raw_configs) && $raw_configs !== '') {
                 $decoded = json_decode($raw_configs, true);
                 if (is_array($decoded)) {
-                    $current = spam_reporting_load_user_target_configurations($this->config, $this->user_config);
+                    $current = $manager->loadUserTargetConfigurations();
                     $merged = spam_reporting_merge_keep_settings($decoded, $current);
                     $all_ok = true;
                     foreach ($merged as $entry) {
-                        list($ok, $errs, $norm) = spam_reporting_validate_config_entry($entry, $this->config);
+                        list($ok, $errs, $norm) = $manager->validateConfigEntry($entry);
                         if (!$ok || $norm === null) {
                             $all_ok = false;
                             foreach ($errs as $e) {
@@ -57,7 +56,7 @@ class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
                 }
             }
             $allowed = $all_ok
-                ? spam_reporting_derive_allowed_platforms_from_configs($validated)
+                ? $manager->deriveAllowedPlatformsFromConfigs($validated)
                 : $this->user_config->get('spam_reporting_allowed_platforms_setting', array());
             if (!is_array($allowed)) {
                 $allowed = array();
@@ -142,9 +141,8 @@ class Hm_Handler_spam_report_preview extends Hm_Handler_Module {
         $debug['body_html_len'] = is_string($report->body_html) ? mb_strlen($report->body_html) : 0;
         $debug['message_class'] = is_object($report->get_parsed_message()) ? get_class($report->get_parsed_message()) : '';
 
-        $effective_targets = spam_reporting_get_effective_targets($this->config, $this->user_config, $report);
-        $targets = spam_reporting_filter_targets_by_user_settings($effective_targets, $this->user_config);
-        $targets = spam_reporting_effective_targets_to_public_descriptors($targets);
+        $manager = new Hm_Spam_Reporting_Manager($this->config, $this->user_config);
+        $targets = $manager->getTargets($report);
 
         $message = $report->get_parsed_message();
         $mappings = spam_reporting_load_provider_mapping($this->config);
@@ -257,7 +255,8 @@ class Hm_Handler_spam_report_send extends Hm_Handler_Module {
             return;
         }
 
-        list($target, $instance_config) = spam_reporting_resolve_target_id($this->config, $this->user_config, $form['target_id']);
+        $manager = new Hm_Spam_Reporting_Manager($this->config, $this->user_config);
+        list($target, $instance_config) = $manager->getTargetById($form['target_id']);
         if (!$target instanceof Hm_Spam_Report_Target_Interface) {
             $this->out('spam_report_send_ok', false);
             $this->out('spam_report_send_message', 'Target unavailable');
