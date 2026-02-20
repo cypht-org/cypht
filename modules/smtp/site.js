@@ -74,6 +74,11 @@ var save_compose_state = function(no_files, notice, schedule, callback) {
     if (notice) {
         no_icon = false;
     }
+
+    // Sync editor content to textarea before saving
+    if (window.kindEditor) {
+        kindEditor.sync();
+    }
     var uploaded_files = $("input[name='uploaded_files[]']").map(function(){return $(this).val();}).get();
     var body = $('.compose_body').val();
     var subject = $('.compose_subject').val();
