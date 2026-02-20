@@ -1677,6 +1677,7 @@ pre.msg_source {
 .folder_cell.collapsed .folders { margin-left: 15px !important; }
 .move_to_location .folders { margin-left: 10px !important; }
 .inner_list .unread_count { padding: 0px 6px; }
+.msg_controls { margin-left: 5px; }
 #dropdownMenuForward + ul .forward_link span,
 #contact_info + #contact_popup span { white-space: nowrap; }
 
@@ -1696,13 +1697,20 @@ pre.msg_source {
   background: var(--bs-link-color);
 }
 .total_unread_count, .unread_count { color: #fff; background-color: RGBA(var(--bs-info-rgb), var(--bs-bg-opacity, 1)); }
-.folders a, .unread_link, .logout_link { color: rgba(var(--bs-body-color-rgb), 0.8); }
+.folders a, .unread_link, .logout_link { color: rgba(var(--bs-body-color-rgb), 0.85); }
 .msg_text .js-header_subject { color: var(--bs-body-color) !important; font-size: 1.4rem !important; }
 .plink, .nlink { color: var(--bs-link-color); }
 .plink:hover, .nlink:hover { color: var(--bs-link-hover-color); text-decoration: none; }
 .menu-toggle i.bi { color: var(--bs-link-color); }
-.form-control { border-color: var(--bs-border-color); }
-.form-control::placeholder { color: #888; }
+.form-control, .form-select, .form-check-input {
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  background-color: var(--bs-form-bg); color: var(--bs-body-color);
+}
+.form-control:focus, .form-select:focus {
+  background-color: var(--bs-body-bg); color: var(--bs-body-color);
+}
+.input-group-text { border: var(--bs-border-width) solid var(--bs-border-color); }
+.compose_to { color: inherit; }
 
 /* some mobile changes */
 .mobile .no_mobile { display: none !important; }
