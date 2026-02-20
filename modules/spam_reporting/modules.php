@@ -20,6 +20,7 @@ require_once APP_PATH . 'modules/spam_reporting/adapters/EmailReportTarget.php';
 require_once APP_PATH . 'modules/spam_reporting/adapters/SpamCopEmailReportTarget.php';
 require_once APP_PATH . 'modules/spam_reporting/adapters/AbstractApiReportTarget.php';
 require_once APP_PATH . 'modules/spam_reporting/adapters/AbuseIPDBReportTarget.php';
+require_once APP_PATH . 'modules/spam_reporting/SpamReportingManager.php';
 
 require_once APP_PATH . 'modules/spam_reporting/handler_modules.php';
 require_once APP_PATH . 'modules/spam_reporting/output_modules.php';
