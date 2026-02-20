@@ -22,16 +22,9 @@ class Hm_Spam_Reporting_Manager {
 
     /** Adapter type id => PHP class name */
     private static $adapter_type_map = array(
-        'abuseipdb' => 'Hm_Spam_Report_AbuseIPDB_Target',
-        'email_target' => 'Hm_Spam_Report_Email_Target',
-        'spamcop_email' => 'Hm_Spam_Report_SpamCop_Email_Target',
-    );
-
-    /** Class name => adapter type id (legacy) */
-    private static $class_to_type = array(
-        'Hm_Spam_Report_AbuseIPDB_Target' => 'abuseipdb',
-        'Hm_Spam_Report_Email_Target' => 'email_target',
-        'Hm_Spam_Report_SpamCop_Email_Target' => 'spamcop_email',
+        'abuseipdb' => Hm_Spam_Report_AbuseIPDB_Target::class,
+        'email_target' => Hm_Spam_Report_Email_Target::class,
+        'spamcop_email' => Hm_Spam_Report_SpamCop_Email_Target::class,
     );
 
     public function __construct($site_config, $user_config) {
@@ -40,45 +33,18 @@ class Hm_Spam_Reporting_Manager {
     }
 
     /**
-     * Build adapters from config and store in $this->adapters (adapter_id => adapter).
+     * Build adapters from spam_reporting_allowed_target_types only.
+     * Legacy configuration (spam_reporting_targets) has been removed.
      */
     private function buildAdapters() {
         if ($this->adapters !== null) {
             return;
         }
         $this->adapters = array();
-        $allowed = $this->site_config->get('spam_reporting_allowed_target_types', null);
-        $use_legacy = !is_array($allowed);
-
-        if ($use_legacy) {
-            $targets = $this->site_config->get('spam_reporting_targets');
-            if (!is_array($targets)) {
-                return;
-            }
-            foreach ($targets as $class_name) {
-                $class = null;
-                $config = array('_site_config' => $this->site_config);
-                if (is_string($class_name) && $class_name !== '' && class_exists($class_name)) {
-                    $class = $class_name;
-                } elseif (is_array($class_name) && isset($class_name['class']) && is_string($class_name['class'])) {
-                    $class = $class_name['class'];
-                    if (is_string($class) && class_exists($class)) {
-                        $config = array_merge($class_name, array('_site_config' => $this->site_config));
-                    } else {
-                        $class = null;
-                    }
-                }
-                if (!$class) {
-                    continue;
-                }
-                $target = $this->instantiateAdapter($class, $config);
-                if ($target instanceof Hm_Spam_Report_Target_Interface) {
-                    $this->adapters[$target->id()] = $target;
-                }
-            }
+        $allowed = $this->site_config->get('spam_reporting_allowed_target_types', array());
+        if (!is_array($allowed)) {
             return;
         }
-
         foreach ($allowed as $type_id) {
             if (!is_string($type_id) || $type_id === '' || !isset(self::$adapter_type_map[$type_id])) {
                 continue;
