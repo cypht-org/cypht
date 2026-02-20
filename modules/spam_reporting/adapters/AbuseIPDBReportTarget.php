@@ -48,7 +48,7 @@ class Hm_Spam_Report_AbuseIPDB_Target extends Hm_Spam_Report_Target_Api_Abstract
     }
 
     /**
-     * API key from instance_config when non-empty; else site-level (legacy).
+     * API key from instance_config only. No site-level fallback.
      * @param array $instance_config
      * @return string
      */
@@ -56,10 +56,7 @@ class Hm_Spam_Report_AbuseIPDB_Target extends Hm_Spam_Report_Target_Api_Abstract
         if (!empty($instance_config) && isset($instance_config['api_key']) && trim((string) $instance_config['api_key']) !== '') {
             return trim((string) $instance_config['api_key']);
         }
-        if (!$this->site_config) {
-            return '';
-        }
-        return trim((string) $this->site_config->get('spam_reporting_abuseipdb_api_key', ''));
+        return '';
     }
 
     protected function get_api_base_url() {

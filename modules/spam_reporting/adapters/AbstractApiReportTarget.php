@@ -21,7 +21,7 @@ abstract class Hm_Spam_Report_Target_Api_Abstract extends Hm_Spam_Report_Target_
     }
 
     /**
-     * Get API key: from instance_config when non-empty, else from site config (legacy).
+     * Get API key from instance_config only.
      * @param array $instance_config user-provided instance config
      * @return string
      */
