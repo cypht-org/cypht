@@ -1995,6 +1995,8 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $this->out('images_blacklist', explode(',', $this->user_config->get('images_blacklist_setting')));
 
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+            $details = Hm_IMAP_List::dump($form['imap_server_id']);
+            $mailbox_name = $details['name'];
             if ($mailbox && $mailbox->authed()) {
                 if ($this->user_config->get('unread_on_open_setting', false)) {
                     $mailbox->set_read_only(true);
@@ -2046,6 +2048,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         array('ts' => time(), 'msg_struct' => $msg_struct_current, 'msg_text' => ($save_reply_text ? $msg_text : ''), 'msg_headers' => $msg_headers));
                 }
                 $this->out('is_trash_folder', is_imap_trash_folder($this, $form['imap_server_id'], hex2bin($form['folder'])));
+                $this->out('mailbox_name', $mailbox_name);
             }
         }
     }
