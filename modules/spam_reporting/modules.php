@@ -8,6 +8,10 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+require_once APP_PATH . 'modules/spam_reporting/lib/Hm_Spam_Report.php';
+require_once APP_PATH . 'modules/spam_reporting/lib/Hm_Spam_Report_Payload.php';
+require_once APP_PATH . 'modules/spam_reporting/lib/Hm_Spam_Report_Delivery_Context.php';
+require_once APP_PATH . 'modules/spam_reporting/lib/Hm_Spam_Report_Result.php';
 require_once APP_PATH . 'modules/spam_reporting/functions.php';
 require_once APP_PATH . 'modules/spam_reporting/adapters/ReportTargetInterface.php';
 require_once APP_PATH . 'modules/spam_reporting/adapters/AbstractReportTarget.php';
