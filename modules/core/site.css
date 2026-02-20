@@ -416,8 +416,12 @@ button {
   white-space: nowrap;
 }
 .email_folders .folders > li {
-  overflow: hidden;
+  overflow: inherit;
   text-overflow: ellipsis;
+}
+.email_folders .imap_folder_link {
+    display: inline-block; max-width: calc(var(--nav-size) - 175px);
+    text-overflow: ellipsis; overflow: hidden; vertical-align: sub;
 }
 .inner_list li {
   margin: 2px;
@@ -527,17 +531,38 @@ button {
   padding-top: 5px;
 }
 .checkbox_cell label {
-  display: block;
-  width: 16px;
-  height: 16px;
-  background-color: #eee;
-  border: solid 1px #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background-color: #fff;
+  border: solid 2px #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.checkbox_cell label:hover {
+  border-color: #999;
+  background-color: #f8f9fa;
 }
 .checkbox_cell input[type="checkbox"] {
   display: none;
 }
 .checkbox_cell input[type="checkbox"]:checked + label {
-  background-color: #aaa;
+  background-color: #fff;
+  border-color: #008080;
+}
+.checkbox_cell input[type="checkbox"]:checked + label::after {
+  content: "\F633";
+  font-family: "bootstrap-icons" !important;
+  color: #008080;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .confirm_logout {
   display: none;
@@ -821,6 +846,7 @@ div.unseen,
   font-weight: bold;
   color: #fff;
 }
+.unread_count { margin-left: 7px; }
 .unread_count:empty {
   display: none;
 }
@@ -946,6 +972,10 @@ div.unseen,
 .sys_messages {
   z-index: 1100 !important;
 }
+.sys_messages .alert {
+  color: #333;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 3px 8px !important;
+}
 
 /* mobile */
 .mobile {
@@ -1069,10 +1099,6 @@ div.unseen,
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.mobile .msg_text_inner {
-  font-size: 120%;
-  padding: 10px !important;
-}
 .mobile .list_meta {
   display: none;
 }
@@ -1130,6 +1156,9 @@ div.unseen,
   width: 20px;
   height: 20px;
 }
+.mobile .checkbox_cell input[type="checkbox"]:checked + label::after {
+  font-size: 16px;
+}
 .mobile .github_para {
   white-space: normal !important;
 }
@@ -1168,10 +1197,6 @@ div.unseen,
   padding: 0px !important;
   padding-left: 5px !important;
   width: 92% !important;
-}
-.mobile .toggle_recipients {
-  top: 8px !important;
-  right: 0px !important;
 }
 .mobile .prevnext,
 .mobile .news_cell .subject div img {
@@ -1657,13 +1682,18 @@ pre.msg_source {
 
 /* some theming changes */
 .allow_image_link .btn-light, .definitive_actions .btn-light,
-.content_title .msg_controls .btn-light {
-  color: var(--bs-secondary) !important; border-color: var(--bs-secondary) !important;
-  background: none !important;
+.content_title .msg_controls .btn-light,
+.content_title .msg_controls .btn-secondary,
+.msg_actions .btn-outline-secondary {
+  color: var(--bs-link-color) !important; border-color: var(--bs-link-color) !important;
+  background: var(--bs-body-bg);
 }
 .allow_image_link .btn-light:hover, .definitive_actions .btn-light:hover,
-.content_title .msg_controls .btn-light:hover {
-  color: #fff !important; background: var(--bs-secondary) !important;
+.content_title .msg_controls .btn-light:hover,
+.content_title .msg_controls .btn-secondary:hover,
+.msg_actions .btn-outline-secondary:hover {
+  color: var(--bs-body-bg) !important;
+  background: var(--bs-link-color);
 }
 .total_unread_count, .unread_count { color: #fff; background-color: RGBA(var(--bs-info-rgb), var(--bs-bg-opacity, 1)); }
 .folders a, .unread_link, .logout_link { color: rgba(var(--bs-body-color-rgb), 0.8); }
@@ -1678,6 +1708,7 @@ pre.msg_source {
 .mobile .no_mobile { display: none !important; }
 .mobile .on_mobile { display: block !important; }
 .mobile .move_to_location { right: 0; }
+.mobile .move_to_location .folders { margin-top: 0.5rem; margin-left: 0.5rem !important; }
 .mobile .search_content .p-3 { flex: 1 1 auto; overflow: auto; }
 .mobile .search_form { padding-left: 0; }
 .mobile .folders { margin-top: 1rem; margin-left: 1rem !important; }
@@ -1687,6 +1718,9 @@ pre.msg_source {
 .mobile .reset_factory_button { margin-right: 1rem; }
 .mobile .message_list .list_controls.on_mobile form { display: inline-block; }
 .mobile .mailbox_list_title.hide { display: block; }
+.mobile .toggle_recipients { top: 8px !important; }
+.mobile .msg_text_inner { font-size: 120%; padding: 0px !important; }
+
 
 /* Mobile responsive overrides for Bootstrap classes */
 @media (max-width: 767.98px) {
