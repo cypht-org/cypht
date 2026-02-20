@@ -354,8 +354,6 @@ function copy_kindeditor_assets() {
         return;
     }
 
-    printf("copying KindEditor assets...\n");
-
     // Create the destination directory structure
     if (!is_dir('site/third_party')) {
         mkdir('site/third_party', 0755, true);
