@@ -196,6 +196,16 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
  */
 class Hm_Output_filter_message_headers extends Hm_Output_Module {
       protected function output() {
+        $mailbox_name = $this->get('mailbox_name');
+        $headers = $this->get('msg_headers', array());
+        $lc_headers = lc_headers($headers);
+
+        $filter_headers = [
+            'from'     => addr_parse($lc_headers['from'] ?? '')['email'] ?? '',
+            'to'       => $lc_headers['to'] ?? '',
+            'subject'  => $lc_headers['subject'] ?? '',
+            'reply-to' => $lc_headers['reply-to'] ?? '',
+        ];
         if ($this->get('msg_headers')) {
             $txt = '';
             $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'reply-to', 'cc', 'x-original-bcc', 'flags');
@@ -453,6 +463,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '</div>';
 
             $this->out('msg_headers', $txt, false);
+            $this->out('filter_headers', $filter_headers, false);
         }
     }
 }

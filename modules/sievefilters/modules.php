@@ -1177,6 +1177,100 @@ class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
 /**
  * @subpackage sievefilters/output
  */
+class Hm_Output_sievefilters_title_start extends Hm_Output_Module {
+    protected function output() {
+        $socked_connected = $this->get('socket_connected', false);
+        $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters').'</div>';
+        $res .= '<div class="p-3">';
+        $res .= '<div id="sieve_accounts"></div>';
+        return $res;
+    }
+}
+
+// /**
+//  * @subpackage sievefilters/output
+//  */
+// class Hm_Output_sievefilters_settings_start extends Hm_Output_Module
+// {
+//     protected function output()
+//     {
+
+//         $res = get_classic_filter_modal_content();
+//         $res .= get_script_modal_content();
+//         return $res;
+//     }
+// }
+
+/**
+ * @subpackage sievefilters/output
+ */
+class Hm_Output_new_sieve_filter_for_message_like_this extends Hm_Output_Module {
+    public function output() {
+        $mailbox_name = $this->get('mailbox_name') ?? '';
+        $headers = $this->get('filter_headers', []);
+        
+        $sender = $headers['from'] ?? '';
+        $to = $headers['to'] ?? '';
+        $subject = $headers['subject'] ?? '';
+        $replyTo = $headers['reply-to'] ?? '';
+
+        $res = '<a class="hLink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle me-2" '
+                    . 'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
+                    . $this->trans('Filter similar messages')
+                    . '</a>'
+                    . '<div class="dropdown-menu move_to_location p-3">'
+                    . '<form id="create-filter-form" style="min-width:260px;" account="' . $mailbox_name . '">'
+                    . '<h5>' . $this->trans('Create filter for message matching: ') . '</h5>'
+
+                    // From (enabled, checked by default)
+                    . '<div class="form-check mb-1">'
+                    . '<input class="form-check-input" type="checkbox" id="use_from" checked>'
+                    . '<input type="hidden" name="from" value="' . htmlspecialchars($sender) . '">'
+                    . '<label class="form-check-label small" for="use_from">'
+                    . $this->trans('From:') . ' ' . htmlspecialchars($sender)
+                    . '</label>'
+                    . '</div>'
+
+                    // To (disabled by default)
+                    . '<div class="form-check mb-1">'
+                    . '<input class="form-check-input" type="checkbox" id="use_to" >'
+                    . '<input type="hidden" name="to" value="' . htmlspecialchars($to) . '">'
+                    . '<label class="form-check-label small text-muted" for="use_to">'
+                    . $this->trans('To:') . ' ' . $to
+                    . '</label>'
+                    . '</div>'
+
+                    // Subject (disabled by default)
+                    . '<div class="form-check mb-1">'
+                    . '<input class="form-check-input" type="checkbox" id="use_subject" >'
+                    . '<input type="hidden" name="subject" value="' . htmlspecialchars($subject) . '">'
+                    . '<label class="form-check-label small text-muted" for="use_subject">'
+                    . $this->trans('Subject contains:') . ' ' . $subject
+                    . '</label>'
+                    . '</div>'
+
+                    // Reply-To (disabled by default)
+                    . '<div class="form-check mb-2">'
+                    . '<input class="form-check-input" type="checkbox" id="use_reply" >'
+                    . '<input type="hidden" name="reply-to" value="' . htmlspecialchars($replyTo) . '">'
+                    . '<label class="form-check-label small text-muted" for="use_reply">'
+                    . $this->trans('Reply-To:') . ' ' . $replyTo
+                    . '</label>'
+                    . '</div>'
+
+                    . '<button type="submit" id="create_filter" class="btn btn-primary btn-sm" >'
+                    . $this->trans('Create filter')
+                    . '</button>'
+                    . '</form>'
+                    . '</div>';
+
+                    $this->out('new_filter', $res, false);
+    }
+}
+
+/**
+ * @subpackage sievefilters/output
+ */
 class Hm_Output_blocklist_settings_start extends Hm_Output_Module {
     protected function output() {
         $socked_connected = $this->get('socket_connected', false);

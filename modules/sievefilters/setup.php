@@ -19,7 +19,10 @@ add_handler('ajax_imap_debug', 'sieve_connect', true, 'imap', 'imap_connect', 'a
 
 // sieve filter
 add_output('sieve_filters', 'sievefilters_settings_start', true, 'sievefilters', 'version_upgrade_checker', 'after');
+add_output('sieve_filters', 'sievefilters_title_start', true, 'sievefilters', 'content_section_start', 'after');
 add_output('ajax_hm_folders', 'sievefilters_settings_link', true, 'sievefilters', 'settings_menu_end', 'before');
+add_output('message', 'sievefilters_settings_start', true, 'sievefilters', 'content_section_start', 'after');
+add_output('message', 'sievefilters_settings_link', true, 'sievefilters', 'settings_menu_end', 'before');
 setup_base_ajax_page('ajax_account_sieve_filters', 'core');
 add_handler('ajax_account_sieve_filters', 'settings_load_imap', true, 'sievefilters', 'load_user_data', 'after');
 add_handler('ajax_account_sieve_filters', 'load_account_sieve_filters', true, 'sievefilters', 'settings_load_imap', 'after');
@@ -115,6 +118,7 @@ add_output('ajax_sieve_block_change_behaviour', 'sieve_block_change_behaviour_ou
 
 add_handler('settings', 'process_enable_sieve_filter_setting', true, 'sievefilters', 'save_user_settings', 'before');
 add_output('settings', 'enable_sieve_filter_setting', true, 'sievefilters', 'start_general_settings', 'after');
+add_output('ajax_imap_message_content', 'new_sieve_filter_for_message_like_this', true, 'sievefilters', 'filter_message_headers', 'after');
 
 add_handler('home', 'check_sieve_configuration', true, 'nux','load_imap_servers_from_config', 'after');
 add_output('home', 'display_sieve_misconfig_alert', true, 'nux', 'start_welcome_dialog', 'after');
@@ -145,8 +149,10 @@ return array(
         'ajax_sieve_toggle_script_state',
         'ajax_list_block_sieve',
         'message_list',
+        'message',
         'ajax_account_sieve_filters',
         'ajax_block_account_sieve_filters',
+        'ajax_imap_message_content',
     ),
     'allowed_output' => array(
         'imap_server_ids' => array(FILTER_UNSAFE_RAW, false),
@@ -161,7 +167,8 @@ return array(
         'script_details' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'ajax_list_block_sieve' => array(FILTER_UNSAFE_RAW, false),
         'mailbox' => array(FILTER_UNSAFE_RAW, false),
-        'reload_page' => array(FILTER_VALIDATE_BOOL, false)
+        'reload_page' => array(FILTER_VALIDATE_BOOL, false),
+        'new_filter' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_get' => array(),
     'allowed_post' => array(

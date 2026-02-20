@@ -2,6 +2,13 @@
  * Possible Sieve fields
  * @type {{Message: [{name: string, options: string[], type: string, selected: boolean},{name: string, options: string[], type: string},{name: string, options: string[], type: string}], Header: [{name: string, options: string[], type: string},{name: string, options: string[], type: string},{name: string, options: string[], type: string},{name: string, options: string[], type: string}]}}
  */
+let is_editing_script = false;
+let current_editing_script_name = "";
+// let hm_sieve_current_account = "";
+let current_account;
+let is_editing_filter = false;
+let current_editing_filter_name = '';
+
 var hm_sieve_condition_fields = function() {
     return {
         'Message': [
@@ -73,6 +80,9 @@ var hm_sieve_condition_fields = function() {
     };
 };
 
+  /**************************************************************************************
+     *                                    FUNCTIONS
+     **************************************************************************************/
 var load_sieve_filters = function(pageName) {
     const dataSources = hm_data_sources() ?? [];
     if (dataSources.length) {
@@ -96,6 +106,63 @@ var load_sieve_filters = function(pageName) {
     }
     return false;
 };
+
+function add_filter_match_mode() {
+    let conditionRows = $(".sieve_list_conditions_modal tr").length;
+    if (conditionRows >= 2) {
+        if ($(".sieve_match_mode").length === 0) {
+            $(".sieve_list_conditions_modal").before(
+              '<div class="sieve_match_mode mb-2">' +
+                '   <label class="me-2">Match</label>' +
+                '   <select name="sieve_match_mode" class="modal_sieve_filter_test form-select-sm d-inline w-auto">' +
+                '       <option value="ALLOF">ALL</option>' +
+                '       <option value="ANYOF">ANY</option>' +
+                "   </select>" +
+                "   of the following rules:" +
+                "</div>"
+            );
+        }
+    }
+}
+
+function ordinal_number(n)
+{
+    let ord = 'th';
+
+    if (n % 10 == 1 && n % 100 != 11) {
+        ord = 'st';
+    } else if (n % 10 == 2 && n % 100 != 12) {
+        ord = 'nd';
+    } else if (n % 10 == 3 && n % 100 != 13) {
+        ord = 'rd';
+    }
+
+    return n + ord;
+}
+
+function showErrorMsg(msg, parentClass, fadeTime = null) {
+    let $parent = $(parentClass);
+
+    if (!$parent.data("highlight-added")) {
+        $parent.data("highlight-added", true);
+        $parent.addClass("highlight-active border border-info rounded p-2 bg-light");
+    }
+
+    let $msg = $('<small class="text-info d-block mt-1"></small>').text(msg);
+
+    $parent.append($msg).show();
+
+    if (fadeTime !== null) {
+        setTimeout(function () {
+            $msg.remove();
+
+            if ($parent.data("highlight-added") && $parent.find("small").length === 0) {
+                $parent.removeClass("highlight-active border border-info rounded p-2 bg-light");
+                $parent.removeData("highlight-added");
+            }
+        }, fadeTime);
+    }
+}
 
 /**
  * Possible Sieve actions
@@ -186,246 +253,41 @@ var hm_sieve_possible_actions = function() {
     ];
 };
 
-function blockListPageHandlers() {
-    $(document).on('change', '.select_default_behaviour', function(e) {
-        if ($(this).val() != 'Reject') {
-            $(this).closest('.filter_subblock')
-                .find('.select_default_reject_message')
-                .remove();
+class Hm_Filter_Modal extends Hm_Modal {
+    constructor(current_account) {
+        super({
+            size: "xl",
+            modalId: "myEditFilterModal",
+        });
+        const save_filter = Hm_Filters.save_filter;
+        const modalContent = document.querySelector("#edit_filter_modal");
+        if (modalContent) {
+            this.setContent(modalContent.innerHTML);
+            modalContent.remove();
         } else {
-            $('<input type="text" class="select_default_reject_message form-control" placeholder="'+hm_trans('Reject message')+'" />').insertAfter($(this));
-        }
-    });
-
-    $(document).on('click', '.submit_default_behavior', function(e) {
-        e.preventDefault();
-        let parent = $(this).closest('.filter_subblock');
-        let elem = parent.find('.select_default_behaviour');
-        let submit = $(this);
-
-        const payload = [
-            {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_change_behaviour'},
-            {'name': 'selected_behaviour', 'value': elem.val()},
-            {'name': 'imap_server_id', 'value': elem.attr('imap_account')}
-        ];
-        if (elem.val() == 'Reject') {
-            const reject = parent.find('.select_default_reject_message');
-            payload.push({'name': 'reject_message', 'value': reject.val()});
+            this.setContent("<p>Could not load filter editor</p>");
         }
 
-        submit.attr('disabled', 1);
-        Hm_Ajax.request(
-            payload,
-            function(res) {
-                submit.removeAttr('disabled');
+        this.addFooterBtn("Save", "btn-primary ms-auto", async () => {
+            let result = save_filter(current_account);
+            if (result) {
+                Hm_Notices.show("Filter saved", "success");
+                this.hide();
             }
-        );
-    });
+        });
 
-    $(document).on('click', '.unblock_button', function(e) {
-        e.preventDefault();
-        if (!confirm(hm_trans('Do you want to unblock sender?'))) {
-            return;
-        }
-        let sender = $(this).parent().parent().children().html();
-        let elem = $(this);
-        Hm_Ajax.request(
-            [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_unblock_sender'},
-                {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
-                {'name': 'sender', 'value': sender}
-            ],
-            function(res) {
-                elem.parent().parent().remove();
-                var num_filters = $("#filter_num_" + elem.attr('mailbox_id')).html();
-                num_filters = parseInt(num_filters) - 1;
-                $("#filter_num_" + elem.attr('mailbox_id')).html(num_filters);
+        this.addFooterBtn("Convert to code", "btn-warning", async () => {
+            let result = save_filter(current_account, true);
+            if (result) {
+                Hm_Notices.show("Filter saved", "success");
+                this.hide();
             }
-        );
-    });
-
-    $(document).on('click', '.edit_blocked_behavior', function(e) {
-        e.preventDefault();
-        let parent = $(this).closest('tr');
-        let elem = parent.find('.block_action');
-        let sender = $(this).closest('tr').children().first().html();
-        let scope = sender.startsWith('*@') ? 'domain': 'sender';
-
-        Hm_Ajax.request(
-            [
-                {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_unblock'},
-                {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
-                {'name': 'block_action', 'value': elem.val()},
-                {'name': 'scope', 'value': scope},
-                {'name': 'sender', 'value': sender},
-                {'name': 'reject_message', 'value': $('#reject_message_textarea').val() ?? ''},
-                {'name': 'change_behavior', 'value': true}
-            ],
-            function(res) {
-                if (/^(Sender|Domain) Behavior Changed$/.test(res.router_user_msgs[0].text)) {
-                    window.location = window.location;
-                }
-            }
-        );
-    });
-
-    $(document).on('click', '.block_domain_button', function(e) {
-        e.preventDefault();
-        let sender = $(this).parent().parent().children().html();
-        let elem = $(this);
-        Hm_Ajax.request(
-            [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_domain'},
-                {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
-                {'name': 'sender', 'value': sender}
-            ],
-            function(res) {
-                if (res && res.reload_page) {
-                    window.location = window.location;
-                }
-            }
-        );
-    });
-
-    $(document).on('click', '.edit_email_behavior_submit', function(e) {
-        e.preventDefault();
-        let sender = $(this).parent().parent().children().html();
-        let elem = $(this);
-        Hm_Ajax.request(
-            [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_domain'},
-                {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
-                {'name': 'sender', 'value': sender}
-            ],
-            function(res) {
-                window.location = window.location;
-            }
-        );
-    });
-    
-    $(document).on('click', '.toggle-behavior-dropdown', function(e) {
-        e.preventDefault();
-        var default_val = $(this).data('action');
-        $('#block_sender_form').trigger('reset');
-        $('#reject_message').remove();
-        $('#block_action').val(default_val).trigger('change');
-        $('#edit_blocked_behavior').attr('data-mailbox-id', $(this).attr('mailbox_id'));
-        if (default_val == 'reject_with_message') {
-            $('#reject_message_textarea').val($(this).data('reject-message'));
-        }
-    });
-
-    $(document).off('click', '.sievefilters_accounts_title').on('click', '.sievefilters_accounts_title', function() {
-        if (parseInt($(this).data("num-blocked")) > 0) {
-            $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
-        } else {
-            alert(hm_trans("This action requires at least 1 blocked element."))
-        }
-    });
-    load_sieve_filters('ajax_block_account_sieve_filters');
+        });
+    }
 }
 
-function cleanUpSieveFiltersPage() {
-    bootstrap.Modal.getInstance(document.getElementById('myEditFilterModal')).dispose();
-    bootstrap.Modal.getInstance(document.getElementById('myEditScript')).dispose();
-    document.getElementById('myEditScript').remove();
-    document.getElementById('myEditFilterModal').remove();
-}
-
-function sieveFiltersPageHandler() {
-    let is_editing_script = false;
-    let current_editing_script_name = '';
-    let is_editing_filter = false;
-    let current_editing_filter_name = '';
-    let current_account;
-    /**************************************************************************************
-         *                             BOOTSTRAP SCRIPT MODAL
-         **************************************************************************************/
-    var edit_script_modal = new Hm_Modal({
-        size: 'xl',
-        modalId: 'myEditScript'
-    });
-
-    // set content
-    edit_script_modal.setContent(document.querySelector('#edit_script_modal').innerHTML);
-    $('#edit_script_modal').remove();
-
-    // add a button
-    edit_script_modal.addFooterBtn('Save', 'btn-primary', async function () {
-        save_script(current_account);
-    });
-
-
-    /**************************************************************************************
-     *                             BOOTSTRAP SIEVE FILTER MODAL
-     **************************************************************************************/
-    var edit_filter_modal = new Hm_Modal({
-        size: 'xl',
-        modalId: 'myEditFilterModal',
-    });
-
-    // set content
-    edit_filter_modal.setContent(document.querySelector('#edit_filter_modal').innerHTML);
-    $('#edit_filter_modal').remove();
-
-    // add a button
-    edit_filter_modal.addFooterBtn('Save', 'btn-primary ms-auto', async function () {
-        let result = save_filter(current_account);
-        if (result) {
-            edit_filter_modal.hide();
-        }
-    });
-
-    // add another button
-    edit_filter_modal.addFooterBtn('Convert to code', 'btn-warning', async function () {
-        let result = save_filter(current_account, true);
-        if (result) {
-            edit_filter_modal.hide();
-        }
-    });
-
-
-    function ordinal_number(n)
-    {
-        let ord = 'th';
-
-        if (n % 10 == 1 && n % 100 != 11) {
-            ord = 'st';
-        } else if (n % 10 == 2 && n % 100 != 12) {
-            ord = 'nd';
-        } else if (n % 10 == 3 && n % 100 != 13) {
-            ord = 'rd';
-        }
-
-        return n + ord;
-    }
-
-    /**************************************************************************************
-     *                                    FUNCTIONS
-     **************************************************************************************/
-
-    function showErrorMsg(msg, parentClass, fadeTime = null) {
-        let $parent = $(parentClass);
-
-        if (!$parent.data("highlight-added")) {
-            $parent.data("highlight-added", true);
-            $parent.addClass("highlight-active border border-info rounded p-2 bg-light");
-        }
-
-        let $msg = $('<small class="text-info d-block mt-1"></small>').text(msg);
-
-        $parent.append($msg).show();
-
-        if (fadeTime !== null) {
-            setTimeout(function () {
-                $msg.remove();
-
-                if ($parent.data("highlight-added") && $parent.find("small").length === 0) {
-                    $parent.removeClass("highlight-active border border-info rounded p-2 bg-light");
-                    $parent.removeData("highlight-added");
-                }
-            }, fadeTime);
-        }
-    }
-
-    function save_filter(imap_account, gen_script = false) {
+const Hm_Filters = (function (hm) {
+    hm.save_filter = (imap_account, gen_script = false) => {
         let validation_failed = false
         let conditions_parsed = []
         let actions_parsed = []
@@ -568,7 +430,7 @@ function sieveFiltersPageHandler() {
         return true;
     }
 
-    function save_script(imap_account) {
+    hm.save_script = (imap_account) => {
         if ($('.modal_sieve_script_name').val() === "") {
             Hm_Notices.show('You must provide a name for your script', 'warning');
             return false;
@@ -591,63 +453,7 @@ function sieveFiltersPageHandler() {
         );
     }
 
-    /**************************************************************************************
-     *                                      MODAL EVENTS
-     **************************************************************************************/
-    $(document).off('click').on('click', '.sievefilters_accounts_title', function() {
-        $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
-    });
-
-    $(document).on('click', '.add_filter', function() {
-        edit_filter_modal.setTitle('Add Filter');
-        $('.modal_sieve_filter_priority').val('');
-        $('.modal_sieve_filter_test').val('ALLOF');
-        $('#stop_filtering').prop('checked', false);
-        current_account = $(this).attr('account');
-        edit_filter_modal.open();
-
-        // Reset the form fields when opening the modal
-        $(".modal_sieve_filter_name").val('');
-        $(".modal_sieve_script_priority").val('');
-        $(".sieve_list_conditions_modal").empty();
-        $(".filter_actions_modal_table").empty();
-    });
-    $(document).on('click', '.add_script', function() {
-        edit_script_modal.setTitle('Add Script');
-        $('.modal_sieve_script_textarea').val('');
-        $('.modal_sieve_script_name').val('');
-        $('.modal_sieve_script_priority').val('');
-        is_editing_script = false;
-        current_editing_script_name = '';
-        current_account = $(this).attr('account');
-        edit_script_modal.open();
-    });
-
-    /**
-     * Delete action Button
-     */
-    $(document).on('click', '.delete_else_action_modal_button', function (e) {
-        e.preventDefault();
-        $(this).parent().parent().remove();
-    });
-
-    /**
-     * Delete action Button
-     */
-    $(document).on('click', '.delete_action_modal_button', function (e) {
-        e.preventDefault();
-        $(this).parent().parent().remove();
-    });
-
-    /**
-     * Delete Condition Button
-     */
-    $(document).on('click', '.delete_condition_modal_button', function (e) {
-        e.preventDefault();
-        $(this).parent().parent().remove();
-    });
-
-    function add_filter_condition() {
+    hm.add_filter_condition = () => {
         let header_fields = '';
         let message_fields = '';
 
@@ -711,46 +517,7 @@ function sieveFiltersPageHandler() {
         );
     }
 
-    function add_filter_match_mode() {
-        let conditionRows = $(".sieve_list_conditions_modal tr").length;
-        if (conditionRows >= 2) {
-            if ($(".sieve_match_mode").length === 0) {
-                $(".sieve_list_conditions_modal").before(
-                  '<div class="sieve_match_mode mb-2">' +
-                    '   <label class="me-2">Match</label>' +
-                    '   <select name="sieve_match_mode" class="modal_sieve_filter_test form-select-sm d-inline w-auto">' +
-                    '       <option value="ALLOF">ALL</option>' +
-                    '       <option value="ANYOF">ANY</option>' +
-                    "   </select>" +
-                    "   of the following rules:" +
-                    "</div>"
-                );
-            }
-        }
-    }
-
-    /**
-     * Add Condition Button
-     */
-    $(document).on('click', '.sieve_add_condition_modal_button', function () {
-        add_filter_condition();
-        add_filter_match_mode();
-    });
-
-    /**
-     * Actions Drag and Drop
-     */
-    const actionsTbody = document.querySelector(".filter_actions_modal_table");
-
-    if (actionsTbody) {
-        new Sortable(actionsTbody, {
-            handle: ".drag-handle",
-            animation: 150,
-            ghostClass: "sortable-ghost",
-        });
-    }
-
-    function add_filter_action(default_value = '') {
+    hm.add_filter_action = (default_value = '') =>{
         let possible_actions_html = '';
 
         hm_sieve_possible_actions().forEach(function (value) {
@@ -782,6 +549,78 @@ function sieveFiltersPageHandler() {
             "</tr>"
         );
     }
+
+    return hm;
+})({});
+
+const add_filter_condition = Hm_Filters.add_filter_condition;
+const add_filter_action = Hm_Filters.add_filter_action;
+
+/**************************************************************************************
+*                                      MODAL EVENTS
+**************************************************************************************/
+const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
+    $(document).off('click').on('click', '.sievefilters_accounts_title', function() {
+        $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
+    });
+
+    $(document).on('click', '.add_filter', function() {
+        edit_filter_modal.setTitle('Add Filter');
+        $('.modal_sieve_filter_priority').val('');
+        $('.modal_sieve_filter_test').val('ALLOF');
+        $('#stop_filtering').prop('checked', false);
+        current_account = $(this).attr('account');
+        edit_filter_modal.open();
+
+        // Reset the form fields when opening the modal
+        $(".modal_sieve_filter_name").val('');
+        $(".modal_sieve_script_priority").val('');
+        $(".sieve_list_conditions_modal").empty();
+        $(".filter_actions_modal_table").empty();
+    });
+
+    $(document).on('click', '.add_script', function() {
+        edit_script_modal.setTitle('Add Script');
+        $('.modal_sieve_script_textarea').val('');
+        $('.modal_sieve_script_name').val('');
+        $('.modal_sieve_script_priority').val('');
+        is_editing_script = false;
+        current_editing_script_name = '';
+        current_account = $(this).attr('account');
+        edit_script_modal.open();
+    });
+
+    /**
+     * Delete action Button
+     */
+    $(document).on('click', '.delete_else_action_modal_button', function (e) {
+        e.preventDefault();
+        $(this).parent().parent().remove();
+    });
+
+    /**
+     * Delete action Button
+     */
+    $(document).on('click', '.delete_action_modal_button', function (e) {
+        e.preventDefault();
+        $(this).parent().parent().remove();
+    });
+
+    /**
+     * Delete Condition Button
+     */
+    $(document).on('click', '.delete_condition_modal_button', function (e) {
+        e.preventDefault();
+        $(this).parent().parent().remove();
+    });
+
+    /**
+     * Add Condition Button
+     */
+    $(document).on('click', '.sieve_add_condition_modal_button', function () {
+        add_filter_condition();
+        add_filter_match_mode();
+    });
 
     /**
      * Add Action Button
@@ -819,7 +658,6 @@ function sieveFiltersPageHandler() {
             '</tr>'
         );
     });
-
 
     /**
      * Action change
@@ -1077,6 +915,225 @@ function sieveFiltersPageHandler() {
             }
         );
     });
+
+    /**
+     * Actions Drag and Drop
+     */
+    const actionsTbody = document.querySelector(".filter_actions_modal_table");
+
+    if (actionsTbody) {
+        new Sortable(actionsTbody, {
+            handle: ".drag-handle",
+            animation: 150,
+            ghostClass: "sortable-ghost",
+        });
+    }
+
+    return true;
+};
+
+function blockListPageHandlers() {
+    $(document).on('change', '.select_default_behaviour', function(e) {
+        if ($(this).val() != 'Reject') {
+            $(this).closest('.filter_subblock')
+                .find('.select_default_reject_message')
+                .remove();
+        } else {
+            $('<input type="text" class="select_default_reject_message form-control" placeholder="'+hm_trans('Reject message')+'" />').insertAfter($(this));
+        }
+    });
+
+    $(document).on('click', '.submit_default_behavior', function(e) {
+        e.preventDefault();
+        let parent = $(this).closest('.filter_subblock');
+        let elem = parent.find('.select_default_behaviour');
+        let submit = $(this);
+
+        const payload = [
+            {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_change_behaviour'},
+            {'name': 'selected_behaviour', 'value': elem.val()},
+            {'name': 'imap_server_id', 'value': elem.attr('imap_account')}
+        ];
+        if (elem.val() == 'Reject') {
+            const reject = parent.find('.select_default_reject_message');
+            payload.push({'name': 'reject_message', 'value': reject.val()});
+        }
+
+        submit.attr('disabled', 1);
+        Hm_Ajax.request(
+            payload,
+            function(res) {
+                submit.removeAttr('disabled');
+            }
+        );
+    });
+
+    $(document).on('click', '.unblock_button', function(e) {
+        e.preventDefault();
+        if (!confirm(hm_trans('Do you want to unblock sender?'))) {
+            return;
+        }
+        let sender = $(this).parent().parent().children().html();
+        let elem = $(this);
+        Hm_Ajax.request(
+            [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_unblock_sender'},
+                {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
+                {'name': 'sender', 'value': sender}
+            ],
+            function(res) {
+                elem.parent().parent().remove();
+                var num_filters = $("#filter_num_" + elem.attr('mailbox_id')).html();
+                num_filters = parseInt(num_filters) - 1;
+                $("#filter_num_" + elem.attr('mailbox_id')).html(num_filters);
+            }
+        );
+    });
+
+    $(document).on('click', '.edit_blocked_behavior', function(e) {
+        e.preventDefault();
+        let parent = $(this).closest('tr');
+        let elem = parent.find('.block_action');
+        let sender = $(this).closest('tr').children().first().html();
+        let scope = sender.startsWith('*@') ? 'domain': 'sender';
+
+        Hm_Ajax.request(
+            [
+                {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_unblock'},
+                {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
+                {'name': 'block_action', 'value': elem.val()},
+                {'name': 'scope', 'value': scope},
+                {'name': 'sender', 'value': sender},
+                {'name': 'reject_message', 'value': $('#reject_message_textarea').val() ?? ''},
+                {'name': 'change_behavior', 'value': true}
+            ],
+            function(res) {
+                if (/^(Sender|Domain) Behavior Changed$/.test(res.router_user_msgs[0].text)) {
+                    window.location = window.location;
+                }
+            }
+        );
+    });
+
+    $(document).on('click', '.block_domain_button', function(e) {
+        e.preventDefault();
+        let sender = $(this).parent().parent().children().html();
+        let elem = $(this);
+        Hm_Ajax.request(
+            [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_domain'},
+                {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
+                {'name': 'sender', 'value': sender}
+            ],
+            function(res) {
+                if (res && res.reload_page) {
+                    window.location = window.location;
+                }
+            }
+        );
+    });
+
+    $(document).on('click', '.edit_email_behavior_submit', function(e) {
+        e.preventDefault();
+        let sender = $(this).parent().parent().children().html();
+        let elem = $(this);
+        Hm_Ajax.request(
+            [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_domain'},
+                {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
+                {'name': 'sender', 'value': sender}
+            ],
+            function(res) {
+                window.location = window.location;
+            }
+        );
+    });
+    
+    $(document).on('click', '.toggle-behavior-dropdown', function(e) {
+        e.preventDefault();
+        var default_val = $(this).data('action');
+        $('#block_sender_form').trigger('reset');
+        $('#reject_message').remove();
+        $('#block_action').val(default_val).trigger('change');
+        $('#edit_blocked_behavior').attr('data-mailbox-id', $(this).attr('mailbox_id'));
+        if (default_val == 'reject_with_message') {
+            $('#reject_message_textarea').val($(this).data('reject-message'));
+        }
+    });
+
+    $(document).off('click', '.sievefilters_accounts_title').on('click', '.sievefilters_accounts_title', function() {
+        if (parseInt($(this).data("num-blocked")) > 0) {
+            $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
+        } else {
+            alert(hm_trans("This action requires at least 1 blocked element."))
+        }
+    });
+    load_sieve_filters('ajax_block_account_sieve_filters');
+}
+
+function cleanUpSieveFiltersPage() {
+    bootstrap.Modal.getInstance(document.getElementById('myEditFilterModal')).dispose();
+    bootstrap.Modal.getInstance(document.getElementById('myEditScript')).dispose();
+    document.getElementById('myEditScript').remove();
+    document.getElementById('myEditFilterModal').remove();
+}
+
+function sieveFiltersPageHandler() {
+    // let is_editing_script = false;
+    // let current_editing_script_name = '';
+    // let is_editing_filter = false;
+    // let current_editing_filter_name = '';
+    /**************************************************************************************
+         *                             BOOTSTRAP SCRIPT MODAL
+         **************************************************************************************/
+    var edit_script_modal = new Hm_Modal({
+        size: 'xl',
+        modalId: 'myEditScript'
+    });
+
+    // set content
+    edit_script_modal.setContent(document.querySelector('#edit_script_modal').innerHTML);
+    $('#edit_script_modal').remove();
+
+    // add a button
+    edit_script_modal.addFooterBtn('Save', 'btn-primary', async function () {
+        save_script(current_account);
+    });
+
+
+    /**************************************************************************************
+     *                             BOOTSTRAP SIEVE FILTER MODAL
+     **************************************************************************************/
+    var edit_filter_modal = new Hm_Modal({
+        size: 'xl',
+        modalId: 'myEditFilterModal',
+    });
+
+    // set content
+    edit_filter_modal.setContent(document.querySelector('#edit_filter_modal').innerHTML);
+    $('#edit_filter_modal').remove();
+
+    // add a button
+    edit_filter_modal.addFooterBtn('Save', 'btn-primary ms-auto', async function () {
+        let result = save_filter(current_account);
+        if (result) {
+            edit_filter_modal.hide();
+        }
+    });
+
+    // add another button
+    edit_filter_modal.addFooterBtn('Convert to code', 'btn-warning', async function () {
+        let result = save_filter(current_account, true);
+        if (result) {
+            edit_filter_modal.hide();
+        }
+    });
+
+    /**************************************************************************************
+     * Initialize sieve button events
+     **************************************************************************************/
+    hm_sieve_button_events(edit_filter_modal, edit_script_modal);
+
+    const save_script = Hm_Filters.save_script;
+    const save_filter = Hm_Filters.save_filter;
+
     load_sieve_filters('ajax_account_sieve_filters');
 }
 
@@ -1106,5 +1163,83 @@ $(function () {
         } else {
             $('#reject_message').remove();
         }
+    });
+
+    $(document).on("submit", "#create-filter-form", function (e) {
+        e.preventDefault();
+        current_account = $(this).attr("account");
+
+        const edit_filter_modal = new Hm_Filter_Modal(current_account);
+        hm_sieve_button_events(edit_filter_modal);
+        edit_filter_modal.setTitle("Add Filter for message like this");
+        const add_filter_condition = Hm_Filters.add_filter_condition;
+        const add_filter_action = Hm_Filters.add_filter_action;
+
+        const $form = $(this);
+        const $btn = $form.find("#create_filter").prop("disabled", true);
+        const data = {};
+
+        if ($form.find("#use_from").is(":checked"))
+            data["from"] = $form.find('input[name="from"]').val();
+        if ($form.find("#use_to").is(":checked"))
+            data["to"] = $form.find('input[name="to"]').val();
+        if ($form.find("#use_subject").is(":checked"))
+            data["subject"] = $form.find('input[name="subject"]').val();
+        if ($form.find("#use_reply").is(":checked"))
+            data["reply-to"] = $form.find('input[name="reply-to"]').val();
+
+        if ($.isEmptyObject(data)) {
+            Hm_Notices.show(
+                "Please check at least one condition to create a filter.",
+                "danger"
+            );
+            $btn.prop("disabled", false);
+            return;
+        }
+
+        edit_filter_modal.open();
+
+        const allFields = hm_sieve_condition_fields();
+        const availableFields = [
+            ...allFields.Message.map((f) => f.name),
+            ...allFields.Header.map((f) => f.name),
+        ];
+
+        for (const [key, value] of Object.entries(data)) {
+            // If key is not in available fields, skip it
+            if (!availableFields.includes(key)) {
+            continue;
+            }
+
+            add_filter_condition();
+
+            const $lastRow = $(".sieve_list_conditions_modal tr").last();
+            const $selectField = $lastRow.find(
+                ".add_condition_sieve_filters"
+            );
+            const $selectOp = $lastRow.find(".condition_options");
+            const $inputVal = $lastRow.find(
+                'input[name="sieve_selected_option_value[]"]'
+            );
+            $selectField.val(key);
+            $selectOp.val("Contains");
+            $inputVal.val(value);
+        }
+
+        if (data["reply-to"]) {
+            add_filter_action("autoreply");
+
+            const $lastRow = $(".filter_actions_modal_table tr").last();
+            const $select = $lastRow.find(".sieve_actions_select");
+            $select.val("autoreply").trigger("change");
+
+            // Focus the input field for the message
+            const $input = $lastRow.find(
+                'input[name="sieve_selected_action_value[]"]'
+            );
+            if ($input.length) {
+                $input.focus();
+            }
+        } 
     });
 });

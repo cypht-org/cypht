@@ -159,6 +159,7 @@ add_handler('ajax_imap_message_content', 'save_imap_servers',  true);
 add_handler('ajax_imap_message_content', 'close_session_early',  true, 'core');
 add_output('ajax_imap_message_content', 'filter_message_headers', true);
 add_output('ajax_imap_message_content', 'filter_message_body', true);
+add_output('ajax_imap_message_content', 'filter_message_headers_end', true);
 add_output('ajax_imap_message_content', 'filter_message_struct', true);
 
 /* ajax combined/all/flagged/unread/sent message list pages */
@@ -339,6 +340,9 @@ return array(
         'imap_expanded_folder_formatted' => array(FILTER_UNSAFE_RAW, false),
         'imap_server_ids' => array(FILTER_UNSAFE_RAW, false),
         'imap_server_id' => array(FILTER_UNSAFE_RAW, false),
+        'mailbox_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'filter_headers' => array(FILTER_UNSAFE_RAW, false),
+        'msg_headers_end' => array(FILTER_UNSAFE_RAW, false),
         'combined_inbox_server_ids' => array(FILTER_UNSAFE_RAW, false),
         'imap_delete_error' => array(FILTER_VALIDATE_BOOLEAN, false),
         'move_count' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
