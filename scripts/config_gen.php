@@ -219,7 +219,7 @@ function get_module_assignments($settings) {
                 $js .= file_get_contents($js_module);
             }
         }
-
+        
         $css .= file_get_contents(sprintf("third_party/nprogress.css", 'third_party'));
     }
     return array($js, $css, $filters, $assets);
