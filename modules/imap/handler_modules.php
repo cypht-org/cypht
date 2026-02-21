@@ -1418,7 +1418,8 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
             if($this->get('list_path') == 'snoozed' && !$mailbox->folder_exists('Snoozed')) {
                 continue;
             }
-            $uids = $mailbox->search(hex2bin($folders[$key]), $filter, $terms, $sort, $reverse);
+            $enable_exclude_auto_bcc = $this->user_config->get('enable_exclude_auto_bcc_setting', DEFAULT_SETTING_ENABLE_EXCLUDE_AUTO_BCC);
+            $uids = $mailbox->search(hex2bin($folders[$key]), $filter, $terms, $sort, $reverse, true, $enable_exclude_auto_bcc);
 
             $total = count($uids);
             $uids = array_slice($uids, 0, $limit);
