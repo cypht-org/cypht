@@ -224,6 +224,18 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
         $email_sender = $this->request->post['sender'];
         $factory = get_sieve_client_factory($this->config);
         try {
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                $imap_debug = array_intersect_key($imap_account, array_flip(array(
+                    'name',
+                    'host',
+                    'port',
+                    'tls',
+                    'sieve_config_host',
+                    'sieve_config_port',
+                    'sieve_config_tls'
+                )));
+                error_log('[sieve_block_debug] imap_account: '.json_encode($imap_debug));
+            }
             $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
             $scripts = $client->listScripts();
 
@@ -280,6 +292,9 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
             $client->close();
             $this->out('reload_page', true);
         } catch (Exception $e) {
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                error_log('[sieve_block_debug] sieve init failed: '.$e->getMessage());
+            }
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
         }
@@ -419,7 +434,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
             elseif ($default_behaviour == 'Reject') {
                 $filter->addRequirement('reject');
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\RejectFilterAction([""])
+                    new \PhpSieveManager\Filters\Actions\RejectFilterAction(['reason' => 'Blocked by Cypht'])
                 );
             }
             $custom_condition->addAction(
@@ -470,10 +485,20 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
                 $imap_account = $mailbox;
             }
         }
+        if (empty($imap_account)) {
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                error_log('[sieve_block_debug] missing imap_account for server_id: '.($this->request->post['imap_server_id'] ?? ''));
+            }
+            Hm_Msgs::add('Sieve mailbox not found', 'warning');
+            return;
+        }
         $array_email_sender = [];
         $email_sender = null;
 
-        if (isset($this->request->post['imap_msg_uid']) && !empty($this->request->post['imap_msg_uid'])) {
+        $requested_scope = $this->request->post['scope'] ?? '';
+        if ($requested_scope === 'platform' && !empty($this->request->post['sender'])) {
+            $email_sender = $this->request->post['sender'];
+        } elseif (isset($this->request->post['imap_msg_uid']) && !empty($this->request->post['imap_msg_uid'])) {
             $form['imap_msg_uid'] = $this->request->post['imap_msg_uid'];
             $mailbox = Hm_IMAP_List::get_connected_mailbox($this->request->post['imap_server_id'], $this->cache);
             if (! $mailbox || ! $mailbox->authed()) {
@@ -483,7 +508,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             $msg_header = $mailbox->get_message_headers(hex2bin($this->request->post['folder']), $form['imap_msg_uid']);
             $test_pattern = "/(?:[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/";
             preg_match_all($test_pattern, $msg_header['From'], $email_sender);
-            $email_sender = $email_sender[0][0];
+            $email_sender = $email_sender[0][0] ?? null;
         } elseif (!empty($this->request->post['sender'])) {
             $email_sender = $this->request->post['sender'];
             if (isset($this->request->post['is_screened'])) {
@@ -499,8 +524,33 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
         if (isset($this->request->post['scope']) && $this->request->post['scope'] == 'domain') {
             $email_sender = '*@'.get_domain($email_sender);
             $scope = 'domain';
+        } elseif (isset($this->request->post['scope']) && $this->request->post['scope'] == 'platform') {
+            $platform_blocking_enabled = (bool) $this->config->get('enable_platform_blocking', false);
+            if (!$platform_blocking_enabled) {
+                Hm_Msgs::add('Platform blocking is disabled', 'warning');
+                return;
+            }
+            $vendor_id = $this->request->post['sender'] ?? '';
+            if (strpos($vendor_id, 'platform:') === 0) {
+                $vendor_id = substr($vendor_id, strlen('platform:'));
+            }
+            if (!$vendor_id) {
+                Hm_Msgs::add('Platform not found', 'warning');
+                return;
+            }
+            $email_sender = 'platform:'.$vendor_id;
+            $scope = 'platform';
         }
         $scope_title = ucfirst($scope);
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            error_log('[sieve_block_debug] '.json_encode(array(
+                'scope' => $scope,
+                'email_sender' => $email_sender,
+                'imap_server_id' => $this->request->post['imap_server_id'] ?? '',
+                'imap_msg_uid' => $this->request->post['imap_msg_uid'] ?? '',
+                'block_action' => $this->request->post['block_action'] ?? ''
+            )));
+        }
 
         $factory = get_sieve_client_factory($this->config);
         try {
@@ -603,6 +653,12 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             $header_obj .= "\n# ".base64_encode(json_encode($blocked_senders));
             $header_obj .= "\n# ".base64_encode(json_encode($blocked_list_actions));
             $script_parsed = $header_obj."\n\n".$script_parsed;
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                error_log('[sieve_block_debug] blocked_senders: '.json_encode($blocked_senders));
+                error_log('[sieve_block_debug] blocked_actions: '.json_encode($blocked_list_actions));
+                $preview = substr($script_parsed, 0, 800);
+                error_log('[sieve_block_debug] script_preview: '.str_replace("\n", "\\n", $preview));
+            }
 
             $client->putScript(
                 'blocked_senders',

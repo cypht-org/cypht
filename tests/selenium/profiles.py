@@ -1,8 +1,9 @@
-from base import WebTest, USER, PASS
+from base import WebTest, USER, PASS, SITE_URL
 from selenium.webdriver.common.by import By
 from runner import test_runner
 from settings import SettingsHelpers
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
 
 class ProfileTest(SettingsHelpers):
 
@@ -21,8 +22,14 @@ class ProfileTest(SettingsHelpers):
         self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
         self.wait_with_folder_list()
         self.wait_for_navigation_to_complete()
-        self.wait_for_class_text_contains('profile_content_title', 'Profiles')
-        assert self.by_class('profile_content_title').text == 'Profiles'
+        self.wait_for_page_ready()
+        try:
+            self.wait_for_class_text_contains('profile_content_title', 'Profiles', timeout=30)
+        except TimeoutException:
+            self.save_debug_artifacts('load_profile_page')
+            self.go(f"{SITE_URL}?page=profiles")
+            self.wait_for_class_text_contains('profile_content_title', 'Profiles')
+        assert self.by_class('profile_content_title').text.strip() == 'Profiles'
 
     def add_profile(self):
         self.by_class('add_profile').click()

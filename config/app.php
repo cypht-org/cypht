@@ -640,7 +640,7 @@ return [
     | Handles page layout, login/logout, and the default settings pages. This set
     | is required.
     */
-    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags')),
+    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags,vendor_detection')),
     // 'modules' => [
     //     /*
     //     |  ----
@@ -1356,6 +1356,13 @@ return [
     | Defaults to false
     */
     'default_setting_enable_sieve_filter' => env('DEFAULT_SETTING_ENABLE_SIEVE_FILTER', false),
+
+    /*
+    |
+    | Enable platform/vendor blocking in sieve block sender
+    | Defaults to false
+    */
+    'enable_platform_blocking' => env('ENABLE_PLATFORM_BLOCKING', true),
 
     /*
     | Fancy Login page

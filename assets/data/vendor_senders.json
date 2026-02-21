@@ -1,0 +1,160 @@
+{
+  "confidence_rules": {
+    "high": [
+      "dkim_domain",
+      "header_name",
+      "header_prefix"
+    ],
+    "medium": [
+      "return_path_domain",
+      "received_domain"
+    ],
+    "low": [
+      "from_domain",
+      "reply_to_domain"
+    ]
+  },
+  "vendors": [
+    {
+      "vendor_id": "salesforce",
+      "name": "Salesforce",
+      "platform_domains": [
+        "salesforce.com",
+        "salesforceiq.com",
+        "exacttarget.com",
+        "pardot.com"
+      ],
+      "dkim_domains": [
+        "salesforce.com",
+        "salesforceiq.com",
+        "exacttarget.com",
+        "pardot.com"
+      ],
+      "return_path_domains": [
+        "salesforce.com",
+        "exacttarget.com",
+        "pardot.com"
+      ],
+      "received_domains": [
+        "salesforce.com",
+        "exacttarget.com",
+        "pardot.com"
+      ],
+      "header_names": [
+        "x-sfdc-user",
+        "x-sfdc-lk",
+        "x-exacttarget-messageid"
+      ],
+      "header_prefixes": [
+        "x-sfdc-"
+      ]
+    },
+    {
+      "vendor_id": "amazon_ses",
+      "name": "Amazon SES",
+      "platform_domains": [
+        "amazonses.com"
+      ],
+      "dkim_domains": [
+        "amazonses.com"
+      ],
+      "return_path_domains": [
+        "amazonses.com"
+      ],
+      "received_domains": [
+        "amazonses.com"
+      ],
+      "header_names": [
+        "x-ses-outgoing"
+      ],
+      "header_prefixes": [
+        "x-ses-"
+      ]
+    },
+    {
+      "vendor_id": "sendgrid",
+      "name": "SendGrid",
+      "platform_domains": [
+        "sendgrid.net"
+      ],
+      "dkim_domains": [
+        "sendgrid.net"
+      ],
+      "return_path_domains": [
+        "sendgrid.net"
+      ],
+      "received_domains": [
+        "sendgrid.net"
+      ],
+      "header_names": [
+        "x-sg-eid",
+        "x-sg-id"
+      ],
+      "header_prefixes": [
+        "x-sg-"
+      ]
+    },
+    {
+      "vendor_id": "mailchimp",
+      "name": "Mailchimp",
+      "platform_domains": [
+        "mailchimpapp.net",
+        "mcsv.net"
+      ],
+      "dkim_domains": [
+        "mailchimpapp.net",
+        "mcsv.net"
+      ],
+      "return_path_domains": [
+        "mailchimpapp.net",
+        "mcsv.net"
+      ],
+      "received_domains": [
+        "mailchimpapp.net",
+        "mcsv.net"
+      ],
+      "header_names": [
+        "x-mailchimp-id"
+      ],
+      "header_prefixes": [
+        "x-mailchimp-"
+      ]
+    },
+    {
+      "vendor_id": "microsoft_365",
+      "name": "Microsoft Dynamics / Microsoft 365",
+      "platform_domains": [
+        "onmicrosoft.com",
+        "office365.com",
+        "outlook.com",
+        "protection.outlook.com",
+        "mail.protection.outlook.com",
+        "dynamics.com"
+      ],
+      "dkim_domains": [
+        "onmicrosoft.com",
+        "office365.com",
+        "outlook.com"
+      ],
+      "return_path_domains": [
+        "onmicrosoft.com",
+        "office365.com",
+        "outlook.com"
+      ],
+      "received_domains": [
+        "protection.outlook.com",
+        "mail.protection.outlook.com",
+        "outlook.com",
+        "office365.com"
+      ],
+      "header_names": [
+        "x-ms-exchange-organization-messageid",
+        "x-ms-exchange-organization-authsource",
+        "x-ms-exchange-organization-authas"
+      ],
+      "header_prefixes": [
+        "x-ms-"
+      ]
+    }
+  ]
+}
