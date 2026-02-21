@@ -2362,6 +2362,16 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     $smtp_port = $config->get('default_smtp_port', 465);
     $smtp_tls = $config->get('default_smtp_tls', true);
     Hm_SMTP_List::init($user_config, $session);
+
+    // Check if a default server already exists
+    $default_server_id = false;
+    foreach (Hm_SMTP_List::getAll() as $id => $server) {
+        if (array_key_exists('default', $server) && $server['default']) {
+            $default_server_id = $id;
+            break;
+        }
+    }
+
     $attributes = array(
         'name' => $config->get('default_smtp_name', 'Default'),
         'default' => true,
@@ -2375,8 +2385,15 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     if ($config->get('default_smtp_no_auth', false)) {
         $attributes['no_auth'] = true;
     }
-    Hm_SMTP_List::add($attributes);
-    Hm_Debug::add('Default SMTP server added', 'info');
+
+    if (!$default_server_id) {
+        Hm_SMTP_List::add($attributes);
+        Hm_Debug::add('Default SMTP server added', 'info');
+    } else {
+        // Update existing default server instead of adding a duplicate
+        Hm_SMTP_List::edit($default_server_id, $attributes);
+        Hm_Debug::add('Default SMTP server updated', 'info');
+    }
 }}
 
 /**
