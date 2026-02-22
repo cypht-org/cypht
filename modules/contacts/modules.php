@@ -490,7 +490,7 @@ class Hm_Handler_save_contact extends Hm_Handler_Module
                 $addresses = process_address_fld($addr);
                 $newEmails = array_column($addresses, 'email');
                 $validEmails = array_filter($newEmails, function($email) {
-                    return filter_var($email, FILTER_VALIDATE_EMAIL);
+                    return is_email_address($email, false);
                 });
                 if (empty($validEmails)) {
                     continue;
