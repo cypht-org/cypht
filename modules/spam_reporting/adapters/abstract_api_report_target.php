@@ -28,13 +28,13 @@ abstract class Hm_Spam_Report_Target_Api_Abstract extends Hm_Spam_Report_Target_
     abstract protected function get_api_key(array $instance_config = array());
 
     /**
-     * Get API base URL (subclass defines)
+     * Get API base URL
      * @return string
      */
     abstract protected function get_api_base_url();
 
     /**
-     * Build JSON payload for API (subclass implements)
+     * Build JSON payload for API
      * @param mixed $payload_data from build_payload
      * @return string JSON
      */
@@ -61,34 +61,19 @@ abstract class Hm_Spam_Report_Target_Api_Abstract extends Hm_Spam_Report_Target_
      * @return Hm_Spam_Report_Result
      */
     protected function http_post($url, $body, array $headers) {
-        $ch = curl_init($url);
-        if (!$ch) {
-            return new Hm_Spam_Report_Result(false, 'Failed to initialize request');
-        }
-        curl_setopt_array($ch, array(
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $body,
-            CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_FOLLOWLOCATION => false,
-            CURLOPT_SSL_VERIFYPEER => true
-        ));
-        $response = curl_exec($ch);
-        $http_code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curl_err = curl_error($ch);
-        curl_close($ch);
+        $api = new Hm_API_Curl('json');
+        $decoded = $api->command($url, $headers, array(), $body, 'POST');
+        $http_code = isset($api->last_status) ? (int) $api->last_status : 0;
 
-        if ($response === false || $curl_err !== '') {
-            return new Hm_Spam_Report_Result(false, 'Request failed: ' . ($curl_err ?: 'Unknown error'));
+        if ($http_code === 0) {
+            return new Hm_Spam_Report_Result(false, 'Request failed');
         }
 
-        $decoded = json_decode($response, true);
         if ($http_code >= 200 && $http_code < 300) {
             $msg = isset($decoded['data']['abuseConfidenceScore'])
                 ? 'Report submitted (confidence: ' . $decoded['data']['abuseConfidenceScore'] . '%)'
                 : 'Report submitted';
-            return new Hm_Spam_Report_Result(true, $msg, $decoded);
+            return new Hm_Spam_Report_Result(true, $msg, is_array($decoded) ? $decoded : array());
         }
 
         $err_msg = 'API error';
@@ -101,7 +86,7 @@ abstract class Hm_Spam_Report_Target_Api_Abstract extends Hm_Spam_Report_Target_
     }
 
     /**
-     * Whether this target uses an external API (for consent UI)
+     * Whether this target uses an external API
      * @return bool
      */
     public function is_api_target() {

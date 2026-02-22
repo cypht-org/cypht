@@ -657,8 +657,7 @@ return [
     | Spam Reporting Allowed Target Types
     | ------------------------------------------
     |
-    | Mandatory. Symbolic adapter type IDs allowed instance-wide. Legacy
-    | configuration (spam_reporting_targets, site-level API keys) has been removed.
+    | Mandatory. Symbolic adapter type IDs allowed instance-wide.
     | Set via env SPAM_REPORTING_ALLOWED_TARGET_TYPES (comma-separated, e.g.
     | abuseipdb,email_target,spamcop_email). Empty value = no adapters.
     */

@@ -9,13 +9,13 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
- * Process and output spam report user settings (General Settings → Spam Reporting)
+ * Process and output spam report user settings
  * @subpackage spam_reporting/handler
  */
 class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
     public function process() {
         $manager = new Hm_Spam_Reporting_Manager($this->config, $this->user_config);
-        // Settings UI always gets ALL configs and adapter types (never filter by enabled or allowed_platforms).
+
         $this->out('spam_reporting_configs_for_ui', $manager->getConfigsForUi());
         $this->out('spam_reporting_adapter_types', $manager->getAdapterTypes());
 
@@ -74,6 +74,9 @@ class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
             }));
         }
         $this->out('spam_reporting_save_debug', $save_debug, false);
+        if ($save_debug['save_triggered']) {
+            error_log('[spam_reporting] save_debug: ' . json_encode($save_debug));
+        }
 
         if (!$success) {
             $settings['spam_reporting_enabled'] = $this->user_config->get('spam_reporting_enabled_setting', false);
@@ -89,7 +92,7 @@ class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
 }
 
 /**
- * Build a spam report preview (AJAX)
+ * Build a spam report preview
  * @subpackage spam_reporting/handler
  */
 class Hm_Handler_spam_report_preview extends Hm_Handler_Module {
@@ -221,7 +224,7 @@ class Hm_Handler_spam_report_preview extends Hm_Handler_Module {
 }
 
 /**
- * Send a spam report (AJAX)
+ * Send a spam report
  * @subpackage spam_reporting/handler
  */
 class Hm_Handler_spam_report_send extends Hm_Handler_Module {

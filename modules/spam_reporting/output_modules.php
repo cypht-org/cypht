@@ -77,7 +77,7 @@ class Hm_Output_spam_report_preview extends Hm_Output_Module {
 
 /**
  * Spam Reporting section in General Settings
- * Simple form: enable checkbox + one label/input per service (AbuseIPDB API key, SpamCop fields, custom email textarea).
+ * form markup
  * @subpackage spam_reporting/output
  */
 class Hm_Output_spam_report_settings_section extends Hm_Output_Module {
@@ -178,6 +178,23 @@ class Hm_Output_spam_report_settings_section extends Hm_Output_Module {
         }
 
         $res .= '</div>';
+
+        $save_debug = $this->get('spam_reporting_save_debug', array());
+        if (!empty($save_debug['save_triggered'])) {
+            $res .= '<div class="spam-reporting-save-debug mt-3 p-2 small border rounded bg-light">';
+            $res .= '<strong>Save debug:</strong> ';
+            $res .= 'post_keys=' . (isset($save_debug['post_has_spam_reporting_keys']) ? implode(', ', $save_debug['post_has_spam_reporting_keys']) : '—');
+            $res .= ' | current=' . (isset($save_debug['current_config_count']) ? (string) $save_debug['current_config_count'] : '—');
+            $res .= ' | built=' . (isset($save_debug['built_count']) ? (string) $save_debug['built_count'] : '—');
+            $res .= ' | validated=' . (isset($save_debug['validated_count']) ? (string) $save_debug['validated_count'] : '—');
+            $res .= ' | all_ok=' . (isset($save_debug['all_ok']) ? ($save_debug['all_ok'] ? 'yes' : 'no') : '—');
+            if (!empty($save_debug['validation_errors'])) {
+                $res .= ' | errors=[' . $this->html_safe(implode(', ', $save_debug['validation_errors'])) . ']';
+            }
+            $res .= ' | new_settings_keys=' . (isset($save_debug['new_settings_spam_reporting_keys']) ? implode(', ', $save_debug['new_settings_spam_reporting_keys']) : '—');
+            $res .= '</div>';
+        }
+
         $res .= '</td></tr>';
         return $res;
     }
