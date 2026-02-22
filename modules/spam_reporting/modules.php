@@ -8,18 +8,18 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require_once APP_PATH . 'modules/spam_reporting/lib/Hm_Spam_Report.php';
-require_once APP_PATH . 'modules/spam_reporting/lib/Hm_Spam_Report_Payload.php';
-require_once APP_PATH . 'modules/spam_reporting/lib/Hm_Spam_Report_Delivery_Context.php';
-require_once APP_PATH . 'modules/spam_reporting/lib/Hm_Spam_Report_Result.php';
+require_once APP_PATH . 'modules/spam_reporting/lib/hm-spam-report.php';
+require_once APP_PATH . 'modules/spam_reporting/lib/hm-spam-report-payload.php';
+require_once APP_PATH . 'modules/spam_reporting/lib/hm-spam-report-delivery-context.php';
+require_once APP_PATH . 'modules/spam_reporting/lib/hm-spam-report-result.php';
 require_once APP_PATH . 'modules/spam_reporting/functions.php';
-require_once APP_PATH . 'modules/spam_reporting/adapters/ReportTargetInterface.php';
-require_once APP_PATH . 'modules/spam_reporting/adapters/AbstractReportTarget.php';
-require_once APP_PATH . 'modules/spam_reporting/adapters/EmailReportTarget.php';
-require_once APP_PATH . 'modules/spam_reporting/adapters/SpamCopEmailReportTarget.php';
-require_once APP_PATH . 'modules/spam_reporting/adapters/AbstractApiReportTarget.php';
-require_once APP_PATH . 'modules/spam_reporting/adapters/AbuseIPDBReportTarget.php';
-require_once APP_PATH . 'modules/spam_reporting/SpamReportingManager.php';
+require_once APP_PATH . 'modules/spam_reporting/adapters/report_target_interface.php';
+require_once APP_PATH . 'modules/spam_reporting/adapters/abstract_report_target.php';
+require_once APP_PATH . 'modules/spam_reporting/adapters/email_report_target.php';
+require_once APP_PATH . 'modules/spam_reporting/adapters/spamcop_email_report_target.php';
+require_once APP_PATH . 'modules/spam_reporting/adapters/abstract_api_report_target.php';
+require_once APP_PATH . 'modules/spam_reporting/adapters/abuseipdb_report_target.php';
+require_once APP_PATH . 'modules/spam_reporting/spam_reporting_manager.php';
 
 require_once APP_PATH . 'modules/spam_reporting/handler_modules.php';
 require_once APP_PATH . 'modules/spam_reporting/output_modules.php';

@@ -15,7 +15,7 @@ class Hm_Spam_Report_AbuseIPDB_Target extends Hm_Spam_Report_Target_Api_Abstract
     protected $platform_id = 'abuseipdb';
 
     /** AbuseIPDB category 11 = Email Spam */
-    const CATEGORY_EMAIL_SPAM = 11;
+    const CATEGORY_EMAIL_SPAM = 11; // HDL OTHER CATEGORIES
 
     public function id() {
         return $this->id;
@@ -38,7 +38,7 @@ class Hm_Spam_Report_AbuseIPDB_Target extends Hm_Spam_Report_Target_Api_Abstract
     }
 
     /**
-     * Schema for user-provided instance config. api_key is secret.
+     * Schema for user-provided instance config.
      * @return array<string, array{type: string, label: string, required: bool}>
      */
     public function get_configuration_schema() {
@@ -48,7 +48,7 @@ class Hm_Spam_Report_AbuseIPDB_Target extends Hm_Spam_Report_Target_Api_Abstract
     }
 
     /**
-     * API key from instance_config only. No site-level fallback.
+     * API key from instance_config.
      * @param array $instance_config
      * @return string
      */
@@ -76,7 +76,7 @@ class Hm_Spam_Report_AbuseIPDB_Target extends Hm_Spam_Report_Target_Api_Abstract
     }
 
     /**
-     * Build minimal payload: ip, categories, optional comment only.
+     * Build payload: ip, categories, optional comment.
      * No headers, body, or user identity.
      */
     public function build_payload(Hm_Spam_Report $report, array $user_input = array(), array $instance_config = array()) {
