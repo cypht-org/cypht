@@ -11,7 +11,7 @@ use ZBateson\MailMimeParser\MailMimeParser;
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
- * Parse a raw MIME message using the existing parser
+ * Parse a raw MIME message
  * @param string $raw_message
  * @return object|false
  */
@@ -25,7 +25,7 @@ function spam_reporting_parse_message($raw_message) {
 }}
 
 /**
- * Collect headers as parser objects (no manual parsing)
+ * Collect headers as parser objects
  * @param object $message
  * @return array
  */
@@ -116,7 +116,7 @@ function spam_reporting_whitelist_instance_settings(array $settings, $adapter) {
 }}
 
 /**
- * Build config list from simple form POST (AbuseIPDB key, SpamCop fields, custom emails textarea).
+ * Build config list.
  * @param array $post request post (e.g. $this->request->post)
  * @param array $current_configs from loadUserTargetConfigurations
  * @return array list of entries { id, adapter_id, label, settings } for validation
@@ -162,6 +162,9 @@ function spam_reporting_build_configs_from_simple_form(array $post, array $curre
     }
     if ($spamcop_email !== '') {
         $label = $get('spam_reporting_spamcop_label', 'SpamCop');
+        if ($label === '') {
+            $label = 'SpamCop';
+        }
         $out[] = array(
             'id' => $spamcop_current ? $spamcop_current['id'] : '',
             'adapter_id' => 'spamcop_email',
@@ -191,11 +194,12 @@ function spam_reporting_build_configs_from_simple_form(array $post, array $curre
         if ($to === '') {
             continue;
         }
+        $entry_label = $label !== '' ? $label : $to;
         $out[] = array(
             'id' => '',
             'adapter_id' => 'email_target',
-            'label' => $label !== '' ? $label : $to,
-            'settings' => array('to' => $to, 'subject_prefix' => ''),
+            'label' => $entry_label,
+            'settings' => array('to' => $to, 'label' => $entry_label, 'subject_prefix' => ''),
         );
     }
 
@@ -206,7 +210,7 @@ function spam_reporting_build_configs_from_simple_form(array $post, array $curre
 /**
  * Merge __KEEP__ in submitted settings with current stored values.
  * @param array $submitted_list each item: id, adapter_id, label, settings
- * @param array $current_configs from load_user_target_configurations (have settings)
+ * @param array $current_configs from load_user_target_configurations
  * @return array merged list with settings
  */
 if (!hm_exists('spam_reporting_merge_keep_settings')) {
@@ -411,8 +415,8 @@ function spam_reporting_load_provider_mapping($site_config) {
 }}
 
 /**
- * Extract source IP addresses from Received headers (first-hop, closest to sender)
- * Used for IP-based reporting (e.g. AbuseIPDB).
+ * Extract source IP addresses from Received headers
+ * Used for IP-based reporting.
  * @param object $message parsed MIME message
  * @return array of IPv4/IPv6 strings, empty if none found
  */
@@ -628,7 +632,7 @@ function spam_reporting_suggested_target_ids(array $detected_providers, array $a
 }}
 
 /**
- * Detect user mailbox provider from IMAP server host (best-effort)
+ * Detect user mailbox provider from IMAP server host
  * @param string|null $server_id
  * @param object $site_config
  * @return string|null provider_id or null

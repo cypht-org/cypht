@@ -2,7 +2,7 @@
 
 /**
  * SpamCop email adapter: message/rfc822 attachment must be base64-encoded.
- * SpamCop rejects 7bit/no_encoding; this adapter uses Hm_MIME_Msg with base64.
+ * SpamCop rejects 7bit/no_encoding.
  *
  * @package modules
  * @subpackage spam_reporting
@@ -29,7 +29,7 @@ class Hm_Spam_Report_SpamCop_Email_Target extends Hm_Spam_Report_Email_Target {
     }
 
     /**
-     * SpamCop-specific schema: submission_email (required), subject_prefix (optional).
+     * SpamCop-specific schema
      * @return array<string, array{type: string, label: string, required: bool}>
      */
     public function get_configuration_schema() {
@@ -107,8 +107,8 @@ class Hm_Spam_Report_SpamCop_Email_Target extends Hm_Spam_Report_Email_Target {
     }
 
     /**
-     * Deliver using SMTP; attach message/rfc822 with Content-Transfer-Encoding: base64 (no no_encoding).
-     * Reuses parent flow but passes force_base64 so SpamCop accepts the attachment.
+     * Deliver attach message/rfc822 with Content-Transfer-Encoding: base64 (no no_encoding).
+     * Force base64 so SpamCop accepts the attachment.
      */
     public function deliver($payload, $context = null) {
         if (!($payload instanceof Hm_Spam_Report_Payload)) {

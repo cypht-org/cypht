@@ -392,4 +392,3 @@ var spam_reporting_bind = function() {
 
 window.addEventListener('message-loaded', spam_reporting_bind);
 
-/* Settings page: simple form rendered by PHP (no card/modal JS). */
