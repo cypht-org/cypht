@@ -77,7 +77,7 @@ class Hm_Output_spam_report_preview extends Hm_Output_Module {
 
 /**
  * Spam Reporting section in General Settings
- * Dynamic platform list from targets + catalog.
+ * Simple form: enable checkbox + one label/input per service (AbuseIPDB API key, SpamCop fields, custom email textarea).
  * @subpackage spam_reporting/output
  */
 class Hm_Output_spam_report_settings_section extends Hm_Output_Module {
@@ -87,8 +87,16 @@ class Hm_Output_spam_report_settings_section extends Hm_Output_Module {
             return '';
         }
         $configs_for_ui = $this->get('spam_reporting_configs_for_ui', array());
-        $configs_json = str_replace('</script>', '<\/script>', json_encode($configs_for_ui));
-        $adapter_types_json = str_replace('</script>', '<\/script>', json_encode($adapter_types));
+        $settings = $this->get('user_settings', array());
+        $enabled = !empty($settings['spam_reporting_enabled_setting']);
+
+        $adapter_ids_available = array();
+        foreach ($adapter_types as $at) {
+            $aid = isset($at['adapter_id']) ? $at['adapter_id'] : '';
+            if ($aid !== '') {
+                $adapter_ids_available[$aid] = true;
+            }
+        }
 
         $res = '<tr><td data-target=".spam_reporting_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-shield-exclamation fs-5 me-2"></i>'.
@@ -96,30 +104,80 @@ class Hm_Output_spam_report_settings_section extends Hm_Output_Module {
         $res .= '<tr class="spam_reporting_setting"><td class="d-block d-md-table-cell" colspan="2">';
 
         $res .= '<div class="spam-reporting-activation mb-3">';
-        $settings = $this->get('user_settings', array());
-        $enabled = !empty($settings['spam_reporting_enabled_setting']);
         $res .= '<div class="d-flex align-items-center">';
         $res .= '<input type="checkbox" class="form-check-input me-2" id="spam_reporting_enabled" name="spam_reporting_enabled" value="1" '.($enabled ? 'checked' : '').'>';
         $res .= '<label for="spam_reporting_enabled">'.$this->trans('Enable external spam reporting').'</label>';
         $res .= '</div></div>';
 
         $res .= '<div class="spam-reporting-destinations mt-3">';
-        $res .= '<input type="hidden" name="spam_reporting_target_configurations" id="spam_reporting_target_configurations" value="" />';
-        $res .= '<script type="application/json" id="spam_reporting_configs_data">'.$configs_json.'</script>';
-        $res .= '<script type="application/json" id="spam_reporting_adapter_types_data">'.$adapter_types_json.'</script>';
-        $res .= '<div id="spam_reporting_service_cards" class="spam-reporting-service-cards"></div>';
+
+        if (isset($adapter_ids_available['abuseipdb'])) {
+            $abuseipdb_config = null;
+            foreach ($configs_for_ui as $c) {
+                if (isset($c['adapter_id']) && $c['adapter_id'] === 'abuseipdb') {
+                    $abuseipdb_config = $c;
+                    break;
+                }
+            }
+            $placeholder = $abuseipdb_config ? $this->trans('Leave blank to keep current') : '';
+            $res .= '<div class="mb-3">';
+            $res .= '<label for="spam_reporting_abuseipdb_api_key" class="form-label">'.$this->trans('AbuseIPDB API Key').'</label>';
+            $res .= '<input type="password" class="form-control form-control-sm" id="spam_reporting_abuseipdb_api_key" name="spam_reporting_abuseipdb_api_key" value="" placeholder="'.$this->html_safe($placeholder).'" autocomplete="new-password" />';
+            $res .= '<small class="text-muted">'.$this->trans('Report IP addresses of spam senders. Leave empty to disable.').'</small>';
+            $res .= '</div>';
+        }
+
+        if (isset($adapter_ids_available['spamcop_email'])) {
+            $spamcop_config = null;
+            foreach ($configs_for_ui as $c) {
+                if (isset($c['adapter_id']) && $c['adapter_id'] === 'spamcop_email') {
+                    $spamcop_config = $c;
+                    break;
+                }
+            }
+            $label_val = $spamcop_config && isset($spamcop_config['label']) ? $spamcop_config['label'] : 'SpamCop';
+            $to_val = '';
+            if ($spamcop_config) {
+                if (isset($spamcop_config['settings_form']['submission_email'])) {
+                    $to_val = $spamcop_config['settings_form']['submission_email'];
+                } elseif (isset($spamcop_config['settings_safe']['submission_email'])) {
+                    $to_val = $spamcop_config['settings_safe']['submission_email'];
+                }
+            }
+            $res .= '<div class="mb-3">';
+            $res .= '<label for="spam_reporting_spamcop_label" class="form-label">'.$this->trans('SpamCop label').'</label>';
+            $res .= '<input type="text" class="form-control form-control-sm" id="spam_reporting_spamcop_label" name="spam_reporting_spamcop_label" value="'.$this->html_safe($label_val).'" />';
+            $res .= '<label for="spam_reporting_spamcop_submission_email" class="form-label mt-2">'.$this->trans('SpamCop submission email').'</label>';
+            $res .= '<input type="email" class="form-control form-control-sm" id="spam_reporting_spamcop_submission_email" name="spam_reporting_spamcop_submission_email" value="'.$this->html_safe($to_val).'" />';
+            $res .= '<small class="text-muted">'.$this->trans('Send full message reports to SpamCop. Leave submission email empty to disable.').'</small>';
+            $res .= '</div>';
+        }
+
+        if (isset($adapter_ids_available['email_target'])) {
+            $custom_lines = array();
+            foreach ($configs_for_ui as $c) {
+                if (isset($c['adapter_id']) && $c['adapter_id'] === 'email_target') {
+                    $label = isset($c['label']) ? $c['label'] : '';
+                    $to = '';
+                    if (isset($c['settings_form']['to'])) {
+                        $to = $c['settings_form']['to'];
+                    } elseif (isset($c['settings_safe']['to'])) {
+                        $to = $c['settings_safe']['to'];
+                    }
+                    if ($label !== '' || $to !== '') {
+                        $custom_lines[] = $label . ':' . $to;
+                    }
+                }
+            }
+            $custom_textarea_val = implode("\n", $custom_lines);
+            $res .= '<div class="mb-3">';
+            $res .= '<label for="spam_reporting_custom_emails" class="form-label">'.$this->trans('Custom email destinations').'</label>';
+            $res .= '<textarea class="form-control form-control-sm" id="spam_reporting_custom_emails" name="spam_reporting_custom_emails" rows="4" placeholder="'.$this->html_safe($this->trans('One per line: Label: email@example.com')).'">'.$this->html_safe($custom_textarea_val).'</textarea>';
+            $res .= '<small class="text-muted">'.$this->trans('One line per destination. Format: Label: email@example.com').'</small>';
+            $res .= '</div>';
+        }
+
         $res .= '</div>';
-
-        $res .= '<div class="modal fade" id="spam_reporting_config_modal" tabindex="-1" aria-hidden="true">';
-        $res .= '<div class="modal-dialog"><div class="modal-content">';
-        $res .= '<div class="modal-header"><h5 class="modal-title" id="spam_reporting_config_modal_title">'.$this->trans('Configure').'</h5>';
-        $res .= '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="'.$this->trans('Close').'"></button></div>';
-        $res .= '<div class="modal-body" id="spam_reporting_config_modal_body"></div>';
-        $res .= '<div class="modal-footer">';
-        $res .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$this->trans('Cancel').'</button>';
-        $res .= '<button type="button" class="btn btn-primary" id="spam_reporting_config_modal_save">'.$this->trans('Save').'</button>';
-        $res .= '</div></div></div></div>';
-
         $res .= '</td></tr>';
         return $res;
     }

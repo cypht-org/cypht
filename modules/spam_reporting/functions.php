@@ -116,6 +116,94 @@ function spam_reporting_whitelist_instance_settings(array $settings, $adapter) {
 }}
 
 /**
+ * Build config list from simple form POST (AbuseIPDB key, SpamCop fields, custom emails textarea).
+ * @param array $post request post (e.g. $this->request->post)
+ * @param array $current_configs from loadUserTargetConfigurations
+ * @return array list of entries { id, adapter_id, label, settings } for validation
+ */
+if (!hm_exists('spam_reporting_build_configs_from_simple_form')) {
+function spam_reporting_build_configs_from_simple_form(array $post, array $current_configs) {
+    $out = array();
+    $get = function($key, $default = '') use ($post) {
+        return isset($post[$key]) && is_string($post[$key]) ? trim($post[$key]) : $default;
+    };
+
+    $abuseipdb_key = $get('spam_reporting_abuseipdb_api_key');
+    $abuseipdb_current = null;
+    foreach ($current_configs as $c) {
+        if (isset($c['adapter_id']) && $c['adapter_id'] === 'abuseipdb') {
+            $abuseipdb_current = $c;
+            break;
+        }
+    }
+    if ($abuseipdb_key !== '') {
+        $out[] = array(
+            'id' => $abuseipdb_current ? $abuseipdb_current['id'] : '',
+            'adapter_id' => 'abuseipdb',
+            'label' => 'AbuseIPDB',
+            'settings' => array('api_key' => $abuseipdb_key),
+        );
+    } elseif ($abuseipdb_current) {
+        $out[] = array(
+            'id' => $abuseipdb_current['id'],
+            'adapter_id' => 'abuseipdb',
+            'label' => 'AbuseIPDB',
+            'settings' => array('api_key' => '__KEEP__'),
+        );
+    }
+
+    $spamcop_email = $get('spam_reporting_spamcop_submission_email');
+    $spamcop_current = null;
+    foreach ($current_configs as $c) {
+        if (isset($c['adapter_id']) && $c['adapter_id'] === 'spamcop_email') {
+            $spamcop_current = $c;
+            break;
+        }
+    }
+    if ($spamcop_email !== '') {
+        $label = $get('spam_reporting_spamcop_label', 'SpamCop');
+        $out[] = array(
+            'id' => $spamcop_current ? $spamcop_current['id'] : '',
+            'adapter_id' => 'spamcop_email',
+            'label' => $label,
+            'settings' => array(
+                'label' => $label,
+                'submission_email' => $spamcop_email,
+            ),
+        );
+    }
+
+    $custom_text = $get('spam_reporting_custom_emails');
+    $lines = $custom_text !== '' ? preg_split('/\r\n|\r|\n/', $custom_text, -1, PREG_SPLIT_NO_EMPTY) : array();
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '') {
+            continue;
+        }
+        $colon = strpos($line, ':');
+        if ($colon !== false) {
+            $label = trim(substr($line, 0, $colon));
+            $to = trim(substr($line, $colon + 1));
+        } else {
+            $label = $line;
+            $to = $line;
+        }
+        if ($to === '') {
+            continue;
+        }
+        $out[] = array(
+            'id' => '',
+            'adapter_id' => 'email_target',
+            'label' => $label !== '' ? $label : $to,
+            'settings' => array('to' => $to, 'subject_prefix' => ''),
+        );
+    }
+
+    $merged = spam_reporting_merge_keep_settings($out, $current_configs);
+    return $merged;
+}}
+
+/**
  * Merge __KEEP__ in submitted settings with current stored values.
  * @param array $submitted_list each item: id, adapter_id, label, settings
  * @param array $current_configs from load_user_target_configurations (have settings)
@@ -143,6 +231,49 @@ function spam_reporting_merge_keep_settings(array $submitted_list, array $curren
             'adapter_id' => isset($entry['adapter_id']) ? trim((string) $entry['adapter_id']) : '',
             'label' => isset($entry['label']) && is_string($entry['label']) ? trim($entry['label']) : '',
             'settings' => $settings
+        );
+    }
+    return $out;
+}}
+
+/**
+ * Build configs-for-UI shape from validated entries (id, adapter_id, label, settings).
+ * @param array $validated list of normalized config entries
+ * @param callable $getAdapter function(adapter_id) returns adapter instance or null
+ * @return array same shape as SpamReportingManager::getConfigsForUi()
+ */
+if (!hm_exists('spam_reporting_build_configs_for_ui_from_validated')) {
+function spam_reporting_build_configs_for_ui_from_validated(array $validated, $getAdapter) {
+    $out = array();
+    foreach ($validated as $c) {
+        $adapter_id = isset($c['adapter_id']) ? $c['adapter_id'] : '';
+        $adapter = $getAdapter($adapter_id);
+        if ($adapter === null || !is_object($adapter) || !method_exists($adapter, 'get_configuration_schema')) {
+            continue;
+        }
+        $schema = $adapter->get_configuration_schema();
+        $settings_safe = array();
+        $settings_form = array();
+        $settings = isset($c['settings']) && is_array($c['settings']) ? $c['settings'] : array();
+        if (is_array($schema)) {
+            foreach ($schema as $key => $meta) {
+                $is_secret = isset($meta['type']) && $meta['type'] === 'secret';
+                if ($is_secret) {
+                    $settings_form[$key] = '__KEEP__';
+                } else {
+                    $v = isset($settings[$key]) ? $settings[$key] : '';
+                    $settings_safe[$key] = $v;
+                    $settings_form[$key] = $v;
+                }
+            }
+        }
+        $out[] = array(
+            'id' => isset($c['id']) ? $c['id'] : '',
+            'adapter_id' => $adapter_id,
+            'label' => isset($c['label']) ? $c['label'] : '',
+            'adapter_type_label' => method_exists($adapter, 'label') ? $adapter->label() : $adapter_id,
+            'settings_safe' => $settings_safe,
+            'settings_form' => $settings_form
         );
     }
     return $out;
