@@ -23,37 +23,43 @@ class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
         $new_settings = $this->get('new_user_settings', array());
         $settings = $this->get('user_settings', array());
 
+        $save_debug = array('save_triggered' => $success);
         if ($success) {
             $enabled = array_key_exists('spam_reporting_enabled', $this->request->post)
                 && $this->request->post['spam_reporting_enabled'];
             $new_settings['spam_reporting_enabled_setting'] = (bool) $enabled;
             $settings['spam_reporting_enabled'] = $enabled;
 
-            $raw_configs = isset($this->request->post['spam_reporting_target_configurations'])
-                ? $this->request->post['spam_reporting_target_configurations'] : '';
+            $current = $manager->loadUserTargetConfigurations();
+            $built = spam_reporting_build_configs_from_simple_form($this->request->post, $current);
+            $save_debug['post_has_spam_reporting_keys'] = array_values(array_filter(array_keys($this->request->post), function ($k) {
+                return strpos($k, 'spam_reporting_') === 0;
+            }));
+            $save_debug['current_config_count'] = count($current);
+            $save_debug['built_count'] = count($built);
+
             $validated = array();
-            $all_ok = false;
-            if (is_string($raw_configs) && $raw_configs !== '') {
-                $decoded = json_decode($raw_configs, true);
-                if (is_array($decoded)) {
-                    $current = $manager->loadUserTargetConfigurations();
-                    $merged = spam_reporting_merge_keep_settings($decoded, $current);
-                    $all_ok = true;
-                    foreach ($merged as $entry) {
-                        list($ok, $errs, $norm) = $manager->validateConfigEntry($entry);
-                        if (!$ok || $norm === null) {
-                            $all_ok = false;
-                            foreach ($errs as $e) {
-                                Hm_Msgs::add($e, 'error');
-                            }
-                            break;
-                        }
-                        $validated[] = $norm;
+            $all_ok = true;
+            $validation_errors = array();
+            foreach ($built as $entry) {
+                list($ok, $errs, $norm) = $manager->validateConfigEntry($entry);
+                if (!$ok || $norm === null) {
+                    $all_ok = false;
+                    $validation_errors = array_merge($validation_errors, $errs);
+                    foreach ($errs as $e) {
+                        Hm_Msgs::add($e, 'error');
                     }
-                    if ($all_ok) {
-                        $new_settings['spam_reporting_target_configurations'] = $validated;
-                    }
+                    break;
                 }
+                $validated[] = $norm;
+            }
+            $save_debug['validated_count'] = count($validated);
+            $save_debug['all_ok'] = $all_ok;
+            $save_debug['validation_errors'] = $validation_errors;
+
+            if ($all_ok) {
+                $new_settings['spam_reporting_target_configurations'] = $validated;
+                $this->out('spam_reporting_configs_for_ui', spam_reporting_build_configs_for_ui_from_validated($validated, array($manager, 'getAdapter')), false);
             }
             $allowed = $all_ok
                 ? $manager->deriveAllowedPlatformsFromConfigs($validated)
@@ -63,7 +69,13 @@ class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
             }
             $new_settings['spam_reporting_allowed_platforms_setting'] = $allowed;
             $settings['spam_reporting_allowed_platforms'] = $allowed;
-        } else {
+            $save_debug['new_settings_spam_reporting_keys'] = array_values(array_filter(array_keys($new_settings), function ($k) {
+                return strpos($k, 'spam_reporting_') === 0;
+            }));
+        }
+        $this->out('spam_reporting_save_debug', $save_debug, false);
+
+        if (!$success) {
             $settings['spam_reporting_enabled'] = $this->user_config->get('spam_reporting_enabled_setting', false);
             $settings['spam_reporting_allowed_platforms'] = $this->user_config->get('spam_reporting_allowed_platforms_setting', array());
             if (!is_array($settings['spam_reporting_allowed_platforms'])) {
