@@ -7,6 +7,7 @@ var spam_reporting_platforms = [];
 var spam_reporting_suggestion = {};
 var spam_reporting_current_uid = null;
 var spam_reporting_current_list_path = null;
+var spam_reporting_modal_state = { targets: [], platforms: [], suggestion: {}, uid: null, listPath: null };
 
 var spam_reporting_open_modal = function() {
     var modalEl = document.getElementById('spamReportModal');
@@ -159,10 +160,12 @@ var spam_reporting_update_data_summary = function(targetId) {
         summaryEl.addClass('d-none');
         return;
     }
+    var targets = spam_reporting_modal_state.targets || [];
+    var platforms = spam_reporting_modal_state.platforms || [];
     var target = null;
-    for (var i = 0; i < spam_reporting_targets.length; i++) {
-        if (spam_reporting_targets[i].id === targetId) {
-            target = spam_reporting_targets[i];
+    for (var i = 0; i < targets.length; i++) {
+        if (targets[i].id === targetId) {
+            target = targets[i];
             break;
         }
     }
@@ -172,10 +175,10 @@ var spam_reporting_update_data_summary = function(targetId) {
     }
     var platform = null;
     var pid = target.platform_id || '';
-    if (pid && spam_reporting_platforms.length) {
-        for (var j = 0; j < spam_reporting_platforms.length; j++) {
-            if ((spam_reporting_platforms[j].platform_id || spam_reporting_platforms[j].id) === pid) {
-                platform = spam_reporting_platforms[j];
+    if (pid && platforms.length) {
+        for (var j = 0; j < platforms.length; j++) {
+            if ((platforms[j].platform_id || platforms[j].id) === pid) {
+                platform = platforms[j];
                 break;
             }
         }
@@ -240,6 +243,38 @@ var spam_reporting_apply_preview = function(preview) {
     bodyHtmlEl.val(bodyHtml);
 };
 
+var spam_reporting_apply_response = function(res) {
+    if (!res) {
+        return;
+    }
+    if (res.spam_report_error) {
+        spam_reporting_modal_state.targets = [];
+        spam_reporting_modal_state.platforms = [];
+        spam_reporting_modal_state.suggestion = {};
+        spam_reporting_render_targets([], {}, []);
+        spam_reporting_render_suggestion({});
+        spam_reporting_render_platforms([]);
+        spam_reporting_update_data_summary('');
+        spam_reporting_apply_preview({ headers: res.spam_report_error, body_text: '', body_html: '' });
+    } else {
+        spam_reporting_modal_state.targets = res.spam_report_targets || [];
+        spam_reporting_modal_state.platforms = res.spam_report_platforms || [];
+        spam_reporting_modal_state.suggestion = res.spam_report_suggestion || {};
+        spam_reporting_render_targets(spam_reporting_modal_state.targets, spam_reporting_modal_state.suggestion, spam_reporting_modal_state.platforms);
+        spam_reporting_render_suggestion(spam_reporting_modal_state.suggestion);
+        spam_reporting_render_platforms(spam_reporting_modal_state.platforms);
+        spam_reporting_update_data_summary('');
+        spam_reporting_apply_preview(res.spam_report_preview || {});
+    }
+    var status = $('.spam-report-status');
+    if (status.length) {
+        status.text('');
+    }
+    if (res.spam_report_debug) {
+        console.info('[spam_reporting] debug', res.spam_report_debug);
+    }
+};
+
 var spam_reporting_load_preview = function(uid, listPath) {
     if (uid === undefined || uid === null) {
         uid = (typeof getMessageUidParam === 'function') ? getMessageUidParam() : $('.msg_uid').val();
@@ -253,6 +288,8 @@ var spam_reporting_load_preview = function(uid, listPath) {
     }
     spam_reporting_current_uid = uid;
     spam_reporting_current_list_path = listPath;
+    spam_reporting_modal_state.uid = uid;
+    spam_reporting_modal_state.listPath = listPath;
     var ajaxPayload = [
         {'name': 'page', 'value': 'ajax_spam_report_preview'},
         {'name': 'hm_ajax_hook', 'value': 'ajax_spam_report_preview'},
@@ -267,44 +304,7 @@ var spam_reporting_load_preview = function(uid, listPath) {
                 console.warn('[spam_reporting] DEBUG AJAX callback received null/false - request may have failed');
                 return;
             }
-            var preview = res.spam_report_preview || {};
-            console.info('[spam_reporting] DEBUG preview response', {
-                hasError: !!res.spam_report_error,
-                error: res.spam_report_error,
-                hasPreview: !!res.spam_report_preview,
-                previewKeys: preview ? Object.keys(preview) : [],
-                headersLen: preview && preview.headers ? preview.headers.length : 0,
-                bodyTextLen: preview && preview.body_text ? preview.body_text.length : 0,
-                bodyHtmlLen: preview && preview.body_html ? preview.body_html.length : 0,
-                targetsCount: (res.spam_report_targets || []).length,
-                fullRes: res
-            });
-            if (res.spam_report_error) {
-                spam_reporting_targets = [];
-                spam_reporting_platforms = [];
-                spam_reporting_suggestion = {};
-                spam_reporting_render_targets([], {}, []);
-                spam_reporting_render_suggestion({});
-                spam_reporting_render_platforms([]);
-                spam_reporting_update_data_summary('');
-                spam_reporting_apply_preview({headers: res.spam_report_error, body_text: '', body_html: ''});
-                return;
-            }
-            spam_reporting_targets = res.spam_report_targets || [];
-            spam_reporting_platforms = res.spam_report_platforms || [];
-            spam_reporting_suggestion = res.spam_report_suggestion || {};
-            spam_reporting_render_targets(spam_reporting_targets, spam_reporting_suggestion, spam_reporting_platforms);
-            spam_reporting_render_suggestion(spam_reporting_suggestion);
-            spam_reporting_render_platforms(spam_reporting_platforms);
-            spam_reporting_update_data_summary('');
-            spam_reporting_apply_preview(res.spam_report_preview || {});
-            var status = $('.spam-report-status');
-            if (status.length) {
-                status.text('');
-            }
-            if (res.spam_report_debug) {
-                console.info('[spam_reporting] debug', res.spam_report_debug);
-            }
+            spam_reporting_apply_response(res);
         }
     );
 };
@@ -331,10 +331,11 @@ var spam_reporting_send_report = function() {
         }
         return;
     }
+    var targets = spam_reporting_modal_state.targets || [];
     var target = null;
-    for (var i = 0; i < spam_reporting_targets.length; i++) {
-        if (spam_reporting_targets[i].id === targetId) {
-            target = spam_reporting_targets[i];
+    for (var i = 0; i < targets.length; i++) {
+        if (targets[i].id === targetId) {
+            target = targets[i];
             break;
         }
     }
@@ -347,8 +348,8 @@ var spam_reporting_send_report = function() {
             return;
         }
     }
-    var uid = spam_reporting_current_uid;
-    var listPath = spam_reporting_current_list_path;
+    var uid = spam_reporting_modal_state.uid;
+    var listPath = spam_reporting_modal_state.listPath;
     if (!uid || !listPath) {
         uid = (typeof getMessageUidParam === 'function') ? getMessageUidParam() : $('.msg_uid').val();
         listPath = (typeof getListPathParam === 'function') ? getListPathParam() : '';
