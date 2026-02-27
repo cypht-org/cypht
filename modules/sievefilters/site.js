@@ -613,7 +613,7 @@ const add_filter_action = Hm_Filters.add_filter_action;
  */
 const loadFilterButtonsEvents = () => {
     /**
-     * Delete else action Button
+     * Delete action Button
      */
     $(document).on('click', '.delete_else_action_modal_button', function (e) {
         e.preventDefault();
@@ -656,9 +656,6 @@ const loadFilterButtonsEvents = () => {
 *                                      MODAL EVENTS
 **************************************************************************************/
 const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
-    // Load filter button events
-    loadFilterButtonsEvents();
-
     $(document).off('click', '.sievefilters_accounts_title').on('click', '.sievefilters_accounts_title', function() {
         $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
     });
@@ -1677,7 +1674,6 @@ $(function () {
         current_account = $(this).attr("account");
 
         const edit_filter_modal = new Hm_Filter_Modal(current_account);
-        hm_sieve_button_events(edit_filter_modal);
         edit_filter_modal.setTitle("Add Filter for message like this");
         const add_filter_condition = Hm_Filters.add_filter_condition;
         const add_filter_action = Hm_Filters.add_filter_action;
@@ -2082,7 +2078,7 @@ $(function () {
         });
     }
 
-    // hm_sieve_button_events();  // Removed: this was unbinding all click handlers
+    loadFilterButtonsEvents();
 
     $(document).on('click', '.remove-chip', function () {
         $(this).parent().remove();
