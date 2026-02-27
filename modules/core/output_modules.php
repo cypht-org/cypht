@@ -652,7 +652,31 @@ class Hm_Output_js_data extends Hm_Output_Module {
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {
-            $res .= 'var hm_delete_prompt = function() { return confirm("'.$this->trans('This action cannot be undone. Are you sure you want to delete this?').'"); };';
+            $res .= 'var hm_delete_prompt = function(server_id, folder) { '.
+                'var specialFolders = hm_special_folders(); '.
+                'var hasTrash = false; '.
+                'var isTrashFolder = false; '.
+                'if (server_id && specialFolders && specialFolders[server_id]) { '.
+                    'var trashFolder = specialFolders[server_id].find(function(f) { return f.type === "trash" && f.label && f.label !== ""; }); '.
+                    'if (trashFolder) { '.
+                        'hasTrash = true; '.
+                        'if (folder && folder === trashFolder.id) { '.
+                            'isTrashFolder = true; '.
+                        '} '.
+                    '} '.
+                '} '.
+                'var msg; '.
+                'if (isTrashFolder) { '.
+                    'msg = "'.$this->trans('WARNING: This will permanently delete the selected message(s). Are you sure?').'"; '.
+                '} else if (hasTrash) { '.
+                    'msg = "'.$this->trans('Move to Trash? (You can empty Trash later to delete permanently)').'"; '.
+                '} else if (server_id) { '.
+                    'msg = "'.$this->trans('WARNING: Trash folder is not configured. This will permanently delete the selected message(s). Are you sure?').'"; '.
+                '} else { '.
+                    'msg = "'.$this->trans('This action cannot be undone. Are you sure you want to delete this?').'"; '.
+                '} '.
+                'return confirm(msg); '.
+            '};';
         }
         else {
             $res .= 'var hm_delete_prompt = function() { return true; };';
@@ -714,9 +738,8 @@ class Hm_Output_start_page_setting extends Hm_Output_Module {
         else {
             $start_page = DEFAULT_START_PAGE;
         }
-        $res = '<tr class="general_setting"><td><label for="start_page">'.
-            $this->trans('First page after login').'</label></td>'.
-            '<td><select class="form-select form-select-sm w-auto" id="start_page" name="start_page">';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="start_page">'.
+            $this->trans('First page after login').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select class="form-select form-select-sm w-auto" id="start_page" name="start_page">';
         foreach ($options as $label => $val) {
             $res .= '<option ';
             if ($start_page == $val) {
@@ -727,7 +750,7 @@ class Hm_Output_start_page_setting extends Hm_Output_Module {
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
         }
-        $res .= '</select>'.$reset.'</td></tr>';
+        $res .= '</select>'.$reset.'</div></td></tr>';
         return $res;
     }
 }
@@ -751,9 +774,8 @@ class Hm_Output_default_sort_order_setting extends Hm_Output_Module {
         else {
             $default_sort_order = null;
         }
-        $res = '<tr class="general_setting"><td><label for="default_sort_order">'.
-            $this->trans('Default message sort order').'</label></td>'.
-            '<td><select class="form-select form-select-sm w-auto" id="default_sort_order" name="default_sort_order">';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="default_sort_order">'.
+            $this->trans('Default message sort order').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select class="form-select form-select-sm w-auto" id="default_sort_order" name="default_sort_order">';
         foreach ($options as $val => $label) {
             $res .= '<option ';
             if ($default_sort_order == $val) {
@@ -764,7 +786,7 @@ class Hm_Output_default_sort_order_setting extends Hm_Output_Module {
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
         }
-        $res .= '</select>'.$reset.'</td></tr>';
+        $res .= '</select>'.$reset.'</div></td></tr>';
         return $res;
     }
 }
@@ -788,9 +810,8 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
         else {
             $list_style = DEFAULT_LIST_STYLE;
         }
-        $res = '<tr class="general_setting"><td><label for="list_style">'.
-            $this->trans('Message list style').'</label></td>'.
-            '<td><select class="form-select form-select-sm w-auto" id="list_style" name="list_style" data-default-value="'.DEFAULT_LIST_STYLE.'">';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="list_style">'.
+            $this->trans('Message list style').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select class="form-select form-select-sm w-auto" id="list_style" name="list_style" data-default-value="'.DEFAULT_LIST_STYLE.'">';
         foreach ($options as $val => $label) {
             $res .= '<option ';
             if ($list_style == $val) {
@@ -801,7 +822,7 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
         }
-        $res .= '</select>'.$reset.'</td></tr>';
+        $res .= '</select>'.$reset.'</div></td></tr>';
         return $res;
     }
 }
@@ -820,8 +841,7 @@ class Hm_Output_mailto_handler_setting extends Hm_Output_Module {
             $checked = '';
             $reset = '';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="mailto_handler">'.$this->trans('Allow handling of mailto links').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="mailto_handler" name="mailto_handler" data-default-value="false" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="mailto_handler">'.$this->trans('Allow handling of mailto links').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' value="1" id="mailto_handler" name="mailto_handler" data-default-value="false" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -839,8 +859,7 @@ class Hm_Output_no_folder_icon_setting extends Hm_Output_Module {
             $checked = '';
             $reset = '';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="no_folder_icons">'.$this->trans('Hide folder list icons').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="no_folder_icons" name="no_folder_icons" data-default-value="false" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="no_folder_icons">'.$this->trans('Hide folder list icons').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' value="1" id="no_folder_icons" name="no_folder_icons" data-default-value="false" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -860,8 +879,7 @@ class Hm_Output_no_password_setting extends Hm_Output_Module {
         if(isset($settings['no_password_save']) && $settings['no_password_save'] !== DEFAULT_NO_PASSWORD_SAVE) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="no_password_save">'.$this->trans('Don\'t save account passwords between logins').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="no_password_save" name="no_password_save" data-default-value="'.(DEFAULT_NO_PASSWORD_SAVE ? 'true' : 'false') . '" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="no_password_save">'.$this->trans('Don\'t save account passwords between logins').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' value="1" id="no_password_save" name="no_password_save" data-default-value="'.(DEFAULT_NO_PASSWORD_SAVE ? 'true' : 'false') . '" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -882,8 +900,7 @@ class Hm_Output_delete_prompt_setting extends Hm_Output_Module {
         if(isset($settings['disable_delete_prompt']) && $settings['disable_delete_prompt'] !== DEFAULT_DISABLE_DELETE_PROMPT) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="disable_delete_prompt">'.$this->trans('Disable prompts when deleting').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="disable_delete_prompt" name="disable_delete_prompt" data-default-value="'.(DEFAULT_DISABLE_DELETE_PROMPT ? 'true' : 'false') . '" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="disable_delete_prompt">'.$this->trans('Disable prompts when deleting').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' value="1" id="disable_delete_prompt" name="disable_delete_prompt" data-default-value="'.(DEFAULT_DISABLE_DELETE_PROMPT ? 'true' : 'false') . '" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -901,8 +918,7 @@ class Hm_Output_delete_attachment_setting extends Hm_Output_Module {
         else {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="allow_delete_attachment">'.$this->trans('Allow delete attachment').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="allow_delete_attachment" name="allow_delete_attachment" data-default-value="false" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="allow_delete_attachment">'.$this->trans('Allow delete attachment').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' value="1" id="allow_delete_attachment" name="allow_delete_attachment" data-default-value="false" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -1206,9 +1222,8 @@ class Hm_Output_language_setting extends Hm_Output_Module {
         }
         asort($translated);
         $mylang = $this->get('language', '');
-        $res = '<tr class="general_setting"><td><label for="language">'.
-            $this->trans('Language').'</label></td>'.
-            '<td><select id="language" class="form-select form-select-sm w-auto" name="language">';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="language">'.
+            $this->trans('Language').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select id="language" class="form-select form-select-sm w-auto" name="language">';
         foreach ($translated as $id => $lang) {
             $res .= '<option ';
             if ($id == $mylang) {
@@ -1219,7 +1234,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
             }
             $res .= 'value="'.$id.'">'.$lang.'</option>';
         }
-        $res .= '</select>'.$reset.'</td></tr>';
+        $res .= '</select>'.$reset.'</div></td></tr>';
         return $res;
     }
 }
@@ -1242,8 +1257,8 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
         else {
             $myzone = $this->get('default_timezone','UTC');
         }
-        $res = '<tr class="general_setting"><td><label for="timezone">'.
-            $this->trans('Timezone').'</label></td><td><select class="w-auto form-select form-select-sm" id="timezone" name="timezone">';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="timezone">'.
+            $this->trans('Timezone').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select class="w-auto form-select form-select-sm" id="timezone" name="timezone">';
         foreach ($zones as $zone) {
             $res .= '<option ';
             if ($zone == $myzone) {
@@ -1254,7 +1269,7 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
             }
             $res .= 'value="'.$zone.'">'.$zone.'</option>';
         }
-        $res .= '</select>'.$reset.'</td></tr>';
+        $res .= '</select>'.$reset.'</div></td></tr>';
         return $res;
     }
 }
@@ -1272,9 +1287,8 @@ class Hm_Output_msg_list_icons_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="show_list_icons">'.
-            $this->trans('Show icons in message lists').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="show_list_icons" name="show_list_icons" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="show_list_icons">'.
+            $this->trans('Show icons in message lists').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' id="show_list_icons" name="show_list_icons" data-default-value="false" value="1" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -2292,9 +2306,8 @@ class Hm_Output_warn_for_unsaved_changes_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="warn_for_unsaved_changes">'.
-            $this->trans('Warn for unsaved changes').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="warn_for_unsaved_changes" name="warn_for_unsaved_changes" class="form-check-input" value="1" data-default-value="false" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="warn_for_unsaved_changes">'.
+            $this->trans('Warn for unsaved changes').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' id="warn_for_unsaved_changes" name="warn_for_unsaved_changes" value="1" data-default-value="false" />'.$reset.'</div></td></tr>';
     }
 }
 

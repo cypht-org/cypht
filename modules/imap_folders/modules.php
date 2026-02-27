@@ -354,7 +354,7 @@ class Hm_Output_folders_server_select extends Hm_Output_Module {
             $res .= 'value="'.$this->html_safe($id).'">';
             $res .= $this->html_safe($server['name']);
         }
-        $res .= '</select><label for="imap_server_folder">'.$this->trans('Mail Account').'</label></div></form></div></div>';
+        $res .= '</select><label for="imap_server_folder">'.$this->trans('Mail Account').'</label></div></div></form>';
         $res .= '<input type="hidden" id="server_error" value="'.$this->trans('You must select a mail account first').'" />';
         $res .= '<input type="hidden" id="folder_name_error" value="'.$this->trans('New folder name is required').'" />';
         $res .= '<input type="hidden" id="delete_folder_error" value="'.$this->trans('Folder to delete is required').'" />';
@@ -789,8 +789,7 @@ class Hm_Output_imap_only_subscribed_folders_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label for="only_subscribed_folders">'.
-            $this->trans('Showing subscribed folders only').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="only_subscribed_folders" name="only_subscribed_folders" data-default-value="false" value="1" class="form-check-input" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="only_subscribed_folders">'.
+            $this->trans('Showing subscribed folders only').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' id="only_subscribed_folders" name="only_subscribed_folders" data-default-value="false" value="1" />'.$reset.'</div></td></tr>';
     }
 }

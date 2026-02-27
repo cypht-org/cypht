@@ -402,12 +402,12 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
 
     // Email Address
     $res .= '<div class="form-floating mb-3 form-check-create-profile">';
-    $res .= '<input type="email" required name="profile_address" class="form-control" value="'.$out_mod->html_safe($form_vals['address']).'" placeholder="'.$out_mod->trans('E-mail Address').' *">';
+    $res .= '<input type="text" required name="profile_address" class="form-control" value="'.$out_mod->html_safe($form_vals['address']).'" placeholder="'.$out_mod->trans('E-mail Address').' *">';
     $res .= '<label>'.$out_mod->trans('E-mail Address').' *</label></div>';
 
     // Reply-to
     $res .= '<div class="form-floating mb-3 form-check-create-profile">';
-    $res .= '<input type="email" name="profile_replyto" class="form-control" value="'.$out_mod->html_safe($form_vals['replyto']).'" placeholder="'.$out_mod->trans('Reply-to').' *">';
+    $res .= '<input type="text" name="profile_replyto" class="form-control" value="'.$out_mod->html_safe($form_vals['replyto']).'" placeholder="'.$out_mod->trans('Reply-to').' *">';
     $res .= '<label>'.$out_mod->trans('Reply-to').' *</label></div>';
 
     // IMAP Server

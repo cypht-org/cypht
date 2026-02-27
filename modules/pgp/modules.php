@@ -149,7 +149,7 @@ class Hm_Output_pgp_settings_public_keys extends Hm_Output_Module {
         $res .= '<div class="mb-2"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         $res .= '<label class="form-label" for="public_email">For</label>';
         $res .= '<input required id="public_email" name="public_key_email" placeholder="'.$this->trans('E-mail Address');
-        $res .= '" type="email" class="form-control warn_on_paste"></div> <input type="submit" value="'.$this->trans('Import').'" class="btn btn-primary">';
+        $res .= '" type="text" class="form-control warn_on_paste"></div> <input type="submit" value="'.$this->trans('Import').'" class="btn btn-primary">';
         $res .= '</form>';
         $res .= '<table class="pgp_keys table mt-3"><thead><tr><th>'.$this->trans('Fingerprint').'</th>';
         $res .= '<th>'.$this->trans('E-mail').'</th><th></th></tr>';

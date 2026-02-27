@@ -918,10 +918,9 @@ class Hm_Output_enable_compose_delivery_receipt_setting extends Hm_Output_Module
             $checked = '';
             $reset = '';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_compose_delivery_receipt">'.
-            $this->trans('Enable delivery receipt').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.
-            ' value="1" id="enable_compose_delivery_receipt" name="enable_compose_delivery_receipt" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="enable_compose_delivery_receipt">'.
+            $this->trans('Enable delivery receipt').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.
+            ' value="1" id="enable_compose_delivery_receipt" name="enable_compose_delivery_receipt" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -954,9 +953,8 @@ class Hm_Output_attachment_setting extends Hm_Output_Module {
         if ($size_in_kbs > 0) {
             $size_in_kbs = round(($size_in_kbs / 1024), 2);
         }
-        return '<tr class="general_setting"><td><label>'.
-            $this->trans('Attachment Chunks').'</label></td>'.
-            '<td><small>('.$num_chunks.' Chunks) '.$size_in_kbs.' KB</small> <button id="clear_chunks_button" class="btn btn-light btn-sm border">Clear Chunks</button></td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell align-middle"><label class="mb-1 mb-md-0">'.
+            $this->trans('Attachment Chunks').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2"><small>('.$num_chunks.' Chunks) '.$size_in_kbs.' KB</small><button id="clear_chunks_button" class="btn btn-light btn-sm border">Clear Chunks</button></div></td></tr>';
     }
 }
 
@@ -979,10 +977,9 @@ class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
             $checked = '';
             $reset='';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_attachment_reminder">'.
-            $this->trans('Enable Attachment Reminder').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.
-            ' value="1" id="enable_attachment_reminder" class="form-check-input" name="enable_attachment_reminder" data-default-value="false" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="enable_attachment_reminder">'.
+            $this->trans('Enable Attachment Reminder').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.
+            ' value="1" id="enable_attachment_reminder" name="enable_attachment_reminder" data-default-value="false" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -1386,7 +1383,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
         if (array_key_exists('smtp_compose_type', $settings)) {
             $selected = $settings['smtp_compose_type'];
         }
-        $res = '<tr class="general_setting"><td>'.$this->trans('Outbound mail format').'</td><td><select class="form-select form-select-sm w-auto" name="smtp_compose_type" data-default-value="'.DEFAULT_SMTP_COMPOSE_TYPE.'">';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label>'.$this->trans('Outbound mail format').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select class="form-select form-select-sm w-auto" name="smtp_compose_type" data-default-value="'.DEFAULT_SMTP_COMPOSE_TYPE.'">';
         $res .= '<option ';
         if ($selected == 0) {
             $res .= 'selected="selected" ';
@@ -1402,7 +1399,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
         if ($selected != 0) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
         }
-        $res .= 'value="2">'.$this->trans('Markdown').'</option></select>'.$reset.'</td></tr>';
+        $res .= 'value="2">'.$this->trans('Markdown').'</option></select>'.$reset.'</div></td></tr>';
         return $res;
     }
 }
@@ -1417,13 +1414,13 @@ class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
         if (array_key_exists('smtp_auto_bcc', $settings)) {
             $auto = $settings['smtp_auto_bcc'];
         }
-        $res = '<tr class="general_setting"><td><label class="form-check-label" for="smtp_auto_bcc">'.$this->trans('Always BCC sending address').'</label></td><td><input class="form-check-input" value="1" type="checkbox" name="smtp_auto_bcc" id="smtp_auto_bcc"  data-default-value="false"';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="smtp_auto_bcc">'.$this->trans('Always BCC sending address').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" value="1" type="checkbox" name="smtp_auto_bcc" id="smtp_auto_bcc"  data-default-value="false"';
         $reset = '';
         if ($auto) {
             $res .= ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        $res .= '>'.$reset.'</td></tr>';
+        $res .= '>'.$reset.'</div></td></tr>';
         return $res;
     }
 }
@@ -2365,6 +2362,16 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     $smtp_port = $config->get('default_smtp_port', 465);
     $smtp_tls = $config->get('default_smtp_tls', true);
     Hm_SMTP_List::init($user_config, $session);
+
+    // Check if a default server already exists
+    $default_server_id = false;
+    foreach (Hm_SMTP_List::getAll() as $id => $server) {
+        if (array_key_exists('default', $server) && $server['default']) {
+            $default_server_id = $id;
+            break;
+        }
+    }
+
     $attributes = array(
         'name' => $config->get('default_smtp_name', 'Default'),
         'default' => true,
@@ -2378,8 +2385,15 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     if ($config->get('default_smtp_no_auth', false)) {
         $attributes['no_auth'] = true;
     }
-    Hm_SMTP_List::add($attributes);
-    Hm_Debug::add('Default SMTP server added', 'info');
+
+    if (!$default_server_id) {
+        Hm_SMTP_List::add($attributes);
+        Hm_Debug::add('Default SMTP server added', 'info');
+    } else {
+        // Update existing default server instead of adding a duplicate
+        Hm_SMTP_List::edit($default_server_id, $attributes);
+        Hm_Debug::add('Default SMTP server updated', 'info');
+    }
 }}
 
 /**

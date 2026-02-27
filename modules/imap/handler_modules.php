@@ -259,6 +259,7 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
                     $screen_folder = 'Screen emails';
                     if (! count($mailbox->get_folder_status($screen_folder))) {
                         $mailbox->create_folder($screen_folder);
+                        $this->out('reload_folders_list', true);
                     }
                     $form['imap_move_to'] = $parts[0] ."_". $parts[1] ."_".bin2hex($screen_folder);
                     $imap_move_ids = explode(",", $form['imap_move_ids']);
@@ -552,6 +553,9 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                 if (array_key_exists(strtolower($folder), $spcial_folders)) {
                     $this->out('core_msg_control_folder', $spcial_folders[strtolower($folder)]);
                 }
+
+                $this->out('is_trash_folder', is_imap_trash_folder($this, $parts[1], $folder));
+
                 if (!empty($details)) {
                     if (array_key_exists('folder_label', $this->request->get)) {
                         $folder = $this->request->get['folder_label'];
@@ -559,7 +563,7 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     } else {
                         $folder = hex2bin($parts[2]);
                     }
-                    
+
                     $mailbox = Hm_IMAP_List::get_mailbox_without_connection($details);
                     $label = $mailbox->get_folder_name($folder);
                     if(!$label) {
@@ -949,7 +953,11 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
                 $this->out('imap_delete_error', true);
             }
             else {
-                Hm_Msgs::add('Message deleted');
+                if ($trash_folder && hex2bin($form['folder']) != $trash_folder) {
+                    Hm_Msgs::add('Message moved to Trash');
+                } else {
+                    Hm_Msgs::add('Message deleted');
+                }
                 $this->out('imap_delete_error', false);
             }
         }
@@ -1164,7 +1172,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
-            if (in_array($form['action_type'], array('delete', 'read', 'unread', 'flag', 'unflag', 'archive', 'junk'))) {
+            if (in_array($form['action_type'], array('delete', 'read', 'unread', 'flag', 'unflag', 'archive', 'junk', 'restore'))) {
                 $ids = process_imap_message_ids($form['message_ids']);
                 $errs = 0;
                 $msgs = 0;
@@ -1223,6 +1231,10 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
         $folder_name = hex2bin($folder);
         $special_folder = $this->get_special_folder($action_type, $specials, $server_details);
 
+        if ($action_type == "restore" && !$special_folder) {
+            $special_folder = 'INBOX';
+        }
+
         if ($special_folder && $special_folder != $folder_name) {
             if ($this->user_config->get('original_folder_setting', false)) {
                 $special_folder .= '/' . $folder_name;
@@ -1251,8 +1263,8 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
         }
 
         $folderNotFoundError = false;
-        if (!$special_folder && $action_type != 'read' && $action_type != 'unread' && $action_type != 'flag' && $action_type != 'unflag') {
-            Hm_Msgs::add(sprintf('No %s folder configured for %s. Please go to <a href="?page=folders&imap_server_id=%s">Folders seetting</a> and configure one', $action_type, $server_details['name'], $server_details['id']), empty($moved) ? 'danger' : 'warning');
+        if (!$special_folder && $action_type != 'read' && $action_type != 'unread' && $action_type != 'flag' && $action_type != 'unflag' && $action_type != 'restore') {
+            Hm_Msgs::add(sprintf('No %s folder configured for %s. Please go to <a href="?page=folders&imap_server_id=%s">Folders settings</a> and configure one', $action_type, $server_details['name'], $server_details['id']), empty($moved) ? 'danger' : 'warning');
             $folderNotFoundError = true;
         }
 
@@ -1280,6 +1292,8 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
             $folder = $specials['archive'];
         } elseif ($action_type == 'junk' && array_key_exists('junk', $specials)) {
             $folder = $specials['junk'];
+        } elseif ($action_type == 'restore') {
+            $folder = $specials['inbox'];
         }
         return $folder;
     }
@@ -1394,6 +1408,13 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
         foreach ($ids as $key => $id) {
             $details = Hm_IMAP_List::dump($id);
             $mailbox = Hm_IMAP_List::get_connected_mailbox($id, $this->cache);
+
+            if (!$mailbox || !$mailbox->authed()) {
+                $server_name = isset($details['name']) && $details['name'] ? $details['name'] : $id;
+                Hm_Msgs::add(sprintf('Unable to connect to IMAP server "%s".', $server_name), 'warning');
+                continue;
+            }
+
             if($this->get('list_path') == 'snoozed' && !$mailbox->folder_exists('Snoozed')) {
                 continue;
             }
@@ -1488,7 +1509,7 @@ class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
                     'port' => false,
                     'tls' => false));
                 if (isPageConfigured('save')) {
-                    Hm_Msgs::add("Added server!. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                    Hm_Msgs::add("Added server!. To preserve these settings after logout, please go to <a class='alert-link' href='?page=save'>Save Settings</a>.");
                     $this->session->record_unsaved('JMAP server added');
                 } else {
                     Hm_Msgs::add('Added server!');
@@ -1649,7 +1670,7 @@ class Hm_Handler_save_ews_server extends Hm_Handler_Module {
                 $this->user_config->set('special_imap_folders', $specials);
             }
             if (isPageConfigured('save')) {
-                Hm_Msgs::add("EWS server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                Hm_Msgs::add("EWS server saved. To preserve these settings after logout, please go to <a class='alert-link' href='?page=save'>Save Settings</a>.");
                 $this->session->record_unsaved('EWS server added');
             } else {
                 Hm_Msgs::add('EWS server saved.');
@@ -1783,7 +1804,8 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 $name = $auth_server['name'];
             }
             else {
-                $name = $this->config->get('imap_auth_name', 'Default');
+                // Use the username (email address) as the account name instead of static config
+                $name = $auth_server['username'];
             }
             $imap_details = array(
                 'name' => $name,
@@ -1978,6 +2000,8 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $this->out('images_blacklist', explode(',', $this->user_config->get('images_blacklist_setting')));
 
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+            $details = Hm_IMAP_List::dump($form['imap_server_id']);
+            $mailbox_name = $details['name'];
             if ($mailbox && $mailbox->authed()) {
                 if ($this->user_config->get('unread_on_open_setting', false)) {
                     $mailbox->set_read_only(true);
@@ -2028,6 +2052,8 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $this->session->set(sprintf('reply_details_imap_%s_%s_%s', $form['imap_server_id'], $form['folder'], $form['imap_msg_uid']),
                         array('ts' => time(), 'msg_struct' => $msg_struct_current, 'msg_text' => ($save_reply_text ? $msg_text : ''), 'msg_headers' => $msg_headers));
                 }
+                $this->out('is_trash_folder', is_imap_trash_folder($this, $form['imap_server_id'], hex2bin($form['folder'])));
+                $this->out('mailbox_name', $mailbox_name);
             }
         }
     }
@@ -2214,5 +2240,53 @@ class Hm_Handler_process_setting_ceo_detection_fraud extends Hm_Handler_Module {
         process_site_setting('ceo_use_trusted_contact', $this, 'process_ceo_use_trusted_contact_callback');
         process_site_setting('ceo_suspicious_terms', $this, 'process_ceo_suspicious_terms_callback');
         process_site_setting('ceo_rate_limit', $this, 'process_ceo_amount_limit_callback');
+    }
+}
+
+/**
+ * Restore a message from trash to inbox
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_restore_message extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_msg_uid', 'imap_server_id', 'folder'));
+
+        if (!$success) {
+            return;
+        }
+
+        $restore_result = false;
+        $inbox_folder = 'INBOX';
+        $form_folder = hex2bin($form['folder']);
+        $errors = 0;
+        $status = false;
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+        if ($mailbox && $mailbox->authed()) {
+            $inbox_exists = count($mailbox->get_folder_status($inbox_folder));
+            if (!$inbox_exists) {
+                Hm_Msgs::add('INBOX folder does not exist', 'danger');
+                $errors++;
+            }
+
+            if (!$errors) {
+                $result = $mailbox->message_action($form_folder, 'MOVE', array($form['imap_msg_uid']), $inbox_folder);
+                $status = $result['status'] ?? false;
+            }
+
+            $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_state()));
+        } else {
+            Hm_Msgs::add('Unable to connect to IMAP server', 'danger');
+            $errors++;
+        }
+
+        if ($status) {
+            $restore_result = true;
+            Hm_Msgs::add('Message restored to inbox');
+        } else {
+            Hm_Msgs::add('An error occurred restoring the message', 'danger');
+        }
+
+        $this->save_hm_msgs();
+        $this->out('restore_result', $restore_result);
     }
 }

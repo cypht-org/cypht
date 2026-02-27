@@ -199,11 +199,120 @@ var expand_feed_settings = function() {
     }
 };
 
+var import_opml_action = function(event) {
+    event.preventDefault();
+    var form = $('#opml_import_form');
+    var fileInput = form.find('input[type=file]');
+    var file = fileInput[0].files[0];
+
+    if (!file) {
+        displayImportResult({
+            success: false,
+            message: 'Please select an OPML file to import'
+        });
+        return false;
+    }
+
+    var ext = (file.name || '').toLowerCase();
+    if (!(ext.endsWith('.opml') || ext.endsWith('.xml'))) {
+        displayImportResult({
+            success: false,
+            error: 'Only .opml and .xml files are allowed'
+        });
+        return false;
+    }
+
+    if (file.size > 10485760) {
+        displayImportResult({
+            success: false,
+            error: 'File size exceeds maximum limit of 10MB'
+        });
+        return false;
+    }
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var opmlContent = e.target.result;
+        Hm_Ajax.request(
+            [
+                {'name': 'hm_ajax_hook', 'value': 'ajax_import_opml'}
+            ].concat(form.serializeArray()).concat([
+                {'name': 'opml_file', 'value': opmlContent}
+            ]),
+            function(res) {
+                var payload = (res && res.opml_import_result) ? res.opml_import_result : res;
+                if (!payload || typeof payload.success === 'undefined') {
+                    $('#opml_import_result').html(
+                        '<div class="alert alert-warning">' +
+                        '<strong>Import response was unexpected.</strong> ' +
+                        'Please refresh and retry. ' +
+                        '</div>'
+                    );
+                    if (window.console && console.warn) {
+                        console.warn('Unexpected OPML import response:', res);
+                    }
+                    return;
+                }
+                displayImportResult(payload);
+                if (payload && payload.success && (res.reload_folders || payload.reload_folders)) {
+                    Hm_Utils.set_unsaved_changes(1);
+                    Hm_Folders.reload_folders(true);
+                }
+            },
+            {'import_opml': 1},
+            false,
+            false
+        );
+    };
+    reader.readAsText(file);
+    return false;
+};
+
+var displayImportResult = function(res) {
+    var resultContainer = $('#opml_import_result');
+    if (res.success) {
+        var html = '<div class="alert alert-success">';
+        html += '<strong>Import Successful!</strong><br>';
+        html += 'Total feeds processed: ' + (res.total || 0) + '<br>';
+        html += 'Successfully imported: ' + (res.imported || 0) + '<br>';
+        html += 'Skipped: ' + (res.skipped || 0) + '<br>';
+        html += 'Failed: ' + (res.failed || 0) + '</div>';
+
+        if (res.failed_details && res.failed_details.length > 0) {
+            html += '<div class="alert alert-warning mt-2"><strong>Failed details:</strong><ul>';
+            res.failed_details.forEach(function(item) {
+                var label = item.name || item.url || 'Unknown feed';
+                var reason = item.error || 'Unknown error';
+                html += '<li>' + label + ': ' + reason + '</li>';
+            });
+            html += '</ul></div>';
+        }
+
+        if (res.message) {
+            html += '<div class="mt-2">' + res.message + '</div>';
+        }
+
+        resultContainer.html(html);
+    } else {
+        resultContainer.html('<div class="alert alert-danger">' +
+            '<strong>Import Failed:</strong> ' + (res.error || res.message || 'Unknown error') +
+            '</div>');
+    }
+};
+
 function feedServersPageHandler() {
     $('.feed_delete').on('click', feed_delete_action);
     $('.test_feed_connect').on('click', feed_test_action);
+
+    $('#import_opml_btn').off('click').on('click', function() {
+        $('#opml_import_dialog').toggle();
+    });
+
+    $('#opml_import_form').off('submit').on('submit', import_opml_action);
+
     var dsp = Hm_Utils.get_from_local_storage('.feed_section');
     if (dsp == 'block' || dsp == 'none') {
         $('.feed_section').css('display', dsp);
     }
 }
+

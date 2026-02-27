@@ -66,7 +66,7 @@ return array(
         'ajax_autocomplete_contact'
     ),
     'allowed_post' => array(
-        'contact_email' => FILTER_SANITIZE_EMAIL,
+        'contact_email' => FILTER_UNSAFE_RAW,
         'contact_name' => FILTER_UNSAFE_RAW,
         'contact_phone' => FILTER_UNSAFE_RAW,
         'contact_id' => FILTER_UNSAFE_RAW,

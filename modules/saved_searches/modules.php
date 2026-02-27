@@ -117,7 +117,7 @@ class Hm_Handler_save_search extends Hm_Handler_Module {
                 $this->session->set('user_data', $this->user_config->dump());
                 $this->out('saved_search', true);
                 if (isPageConfigured('save')) {
-                    Hm_Msgs::add("Search saved. To preserve your searches after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.", 'success');
+                    Hm_Msgs::add("Saved search updated. To preserve your searches after logout, please go to <a class='alert-link' href='?page=save'>Save Settings</a>.", 'info');
                 }
                 else {
                     Hm_Msgs::add('Search saved', 'success');
@@ -156,7 +156,7 @@ class Hm_Handler_save_advanced_search extends Hm_Handler_Module {
                 $this->session->set('user_data', $this->user_config->dump());
                 $this->out('saved_advanced_search', true);
                 if (isPageConfigured('save')) {
-                    Hm_Msgs::add("Advanced search saved. To preserve your searches after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.", 'success');
+                    Hm_Msgs::add("Advanced search saved. To preserve your searches after logout, please go to <a class='alert-link' href='?page=save'>Save Settings</a>.", 'success');
                 }
                 else {
                     Hm_Msgs::add('Advanced search saved', 'success');
@@ -210,7 +210,7 @@ class Hm_Handler_update_advanced_search extends Hm_Handler_Module {
                 $this->session->set('user_data', $this->user_config->dump());
                 $this->out('updated_advanced_search', true);
                 if (isPageConfigured('save')) {
-                    Hm_Msgs::add("Advanced search updated. To preserve your searches after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.", 'info');
+                    Hm_Msgs::add("Advanced search updated. To preserve your searches after logout, please go to <a class='alert-link' href='?page=save'>Save Settings</a>.", 'info');
                 }
                 else {
                     Hm_Msgs::add('Advanced search updated', 'info');

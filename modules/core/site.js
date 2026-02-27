@@ -263,6 +263,11 @@ var Hm_Ajax_Request = function() { return {
                     Hm_Folders.update_unread_counts();
                 }
             }
+            
+            if (res.reload_folders_list) {
+                Hm_Folders.update_folder_list(true);
+            }
+
             if (this.callback) {
                 this.callback(res);
             }
@@ -930,9 +935,6 @@ function Message_List() {
     };
 
     this.message_action = function(action_type) {
-        if (action_type == 'delete' && !hm_delete_prompt()) {
-            return false;
-        }
         var msg_list = $('.message_table');
         var selected = [];
         var current_list = self.filter_list();
@@ -941,6 +943,23 @@ function Message_List() {
                 selected.push($(this).val());
             }
         });
+
+        if (action_type == 'delete') {
+            // Extract server_id and folder from first selected message for trash check
+            // Message ID format: imap_serverid_uid_folder
+            var server_id = null;
+            var folder = null;
+            if (selected.length > 0) {
+                var matches = selected[0].match(/^imap_([^_]+)_\d+_(.+)$/);
+                if (matches && matches[1]) {
+                    server_id = matches[1];
+                    folder = matches[2];
+                }
+            }
+            if (!hm_delete_prompt(server_id, folder)) {
+                return false;
+            }
+        }
         if (selected.length > 0) {
             var updated = false;
             Hm_Ajax.request(
@@ -1744,7 +1763,148 @@ var Hm_Utils = {
     },
 
     is_valid_email: function (val) {
-        return /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(val)
+        var email = val.trim();
+        if (!email || email.length > 320) { // RFC 5321: max 320 chars
+            return false;
+        }
+
+        var atIndex = email.lastIndexOf('@');
+        if (atIndex === -1 || atIndex === 0 || atIndex === email.length - 1) {
+            return false;
+        }
+
+        var localPart = email.substring(0, atIndex);
+        var domain = email.substring(atIndex + 1);
+
+        // Validate local part (before @)
+        if (localPart.length === 0 || localPart.length > 64) { // RFC 5321: max 64 chars
+            return false;
+        }
+
+        // Check if local part is quoted
+        if (localPart.startsWith('"') && localPart.endsWith('"')) {
+            // Quoted string - almost anything goes inside quotes (except unescaped quotes and backslashes)
+            var quoted = localPart.slice(1, -1);
+            // Check for unescaped quotes or backslashes
+            if (/(?<!\\)["]/.test(quoted.replace(/\\\\/g, ''))) {
+                return false;
+            }
+        } else {
+            // Unquoted local part - standard rules
+            // Allowed chars: A-Z a-z 0-9 . ! # $ % & ' * + - / = ? ^ _ ` { | } ~
+            // Cannot start or end with dot, no consecutive dots
+            if (/^\.|\.$/i.test(localPart) || /\.\./.test(localPart)) {
+                return false;
+            }
+            if (!/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+$/.test(localPart)) {
+                return false;
+            }
+        }
+
+        // Validate domain (after @)
+        if (domain.length === 0 || domain.length > 255) { // RFC 5321: max 255 chars
+            return false;
+        }
+
+        // Check for domain literal (IP address in brackets)
+        if (domain.startsWith('[') && domain.endsWith(']')) {
+            var literal = domain.slice(1, -1);
+            // IPv4: [192.168.1.1]
+            if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(literal)) {
+                // Validate IPv4 ranges (0-255)
+                var parts = literal.split('.');
+                for (var i = 0; i < parts.length; i++) {
+                    if (parseInt(parts[i], 10) > 255) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            // IPv6: [IPv6:2001:db8::1]
+            if (/^IPv6:/i.test(literal)) {
+                var ipv6 = literal.substring(5);
+
+                // IPv6 validation
+                // Can contain hex digits (0-9, a-f, A-F) and colons
+                // May contain :: to represent consecutive zero groups
+                // Should have 2-8 colon-separated groups (with :: compression)
+
+                if (!ipv6 || !/^[a-fA-F0-9:]+$/.test(ipv6)) {
+                    return false;
+                }
+
+                // Check for valid :: usage (at most one occurrence)
+                var doubleColonCount = (ipv6.match(/::/g) || []).length;
+                if (doubleColonCount > 1) {
+                    return false;
+                }
+
+                // Remove :: for part counting
+                var parts;
+                if (doubleColonCount === 1) {
+                    // With :: compression, we can have fewer than 8 groups
+                    var segments = ipv6.split('::');
+                    var leftParts = segments[0] ? segments[0].split(':') : [];
+                    var rightParts = segments[1] ? segments[1].split(':') : [];
+                    var totalParts = leftParts.length + rightParts.length;
+
+                    // With ::, total parts should be less than 8
+                    if (totalParts >= 8) {
+                        return false;
+                    }
+
+                    parts = leftParts.concat(rightParts);
+                } else {
+                    // No :: compression, must have exactly 8 groups
+                    parts = ipv6.split(':');
+                    if (parts.length !== 8) {
+                        return false;
+                    }
+                }
+
+                // Validate each part (1-4 hex digits)
+                for (var k = 0; k < parts.length; k++) {
+                    if (parts[k] === '') continue; // Empty parts allowed in split artifacts
+                    if (parts[k].length > 4 || !/^[a-fA-F0-9]+$/.test(parts[k])) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+        // Standard domain validation
+        // Allow internationalized domains (Unicode) and standard ASCII
+        // Each label separated by dots, no leading/trailing hyphens in labels
+        var labels = domain.split('.');
+        if (labels.length < 2) { // At least domain.tld
+            return false;
+        }
+
+        for (var j = 0; j < labels.length; j++) {
+            var label = labels[j];
+            if (label.length === 0 || label.length > 63) { // RFC 1035: max 63 chars per label
+                return false;
+            }
+            // Labels cannot start or end with hyphen
+            if (label.startsWith('-') || label.endsWith('-')) {
+                return false;
+            }
+            // Allow alphanumeric, hyphen, and Unicode for IDN
+            if (!/^[a-zA-Z0-9-\u0080-\uFFFF]+$/.test(label)) {
+                return false;
+            }
+        }
+
+        // TLD should have at least 2 chars (most common) or be valid single-char TLD
+        var tld = labels[labels.length - 1];
+        if (tld.length < 1) {
+            return false;
+        }
+
+        return true;
     },
 };
 

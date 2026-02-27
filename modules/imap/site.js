@@ -114,9 +114,6 @@ var set_message_content = function(path, msg_uid) {
 };
 
 var imap_delete_message = function(state, supplied_uid, supplied_detail) {
-    if (!hm_delete_prompt()) {
-        return false;
-    }
     var uid = getMessageUidParam();
     var detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
     if (supplied_uid) {
@@ -125,6 +122,11 @@ var imap_delete_message = function(state, supplied_uid, supplied_detail) {
     if (supplied_detail) {
         detail = supplied_detail;
     }
+
+    if (!hm_delete_prompt(detail ? detail.server_id : null, detail ? detail.folder : null)) {
+        return false;
+    }
+
     if (detail && uid) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_delete_message'},
@@ -653,7 +655,9 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
             $('.msg_text').append(res.msg_text);
             $('.msg_text').append(res.msg_parts);
 
-
+            if (res.new_filter) {
+              $("#extra-header-buttons").append(res.new_filter);
+            }
             document.title = $('.msg_text .small_header').first().text();
             imap_message_view_finished(uid, detail, listParent);
 
@@ -797,6 +801,7 @@ var imap_message_view_finished = function(msg_uid, detail, listParent, skip_link
     $('#move_message').on("click", function(e) { return imap_move_copy(e, 'move', 'message');});
     $('#copy_message').on("click", function(e) { return imap_move_copy(e, 'copy', 'message');});
     $('#archive_message').on("click", function(e) { return imap_archive_message();});
+    $('#restore_message').on("click", function(e) { return imap_restore_message(e);});
     $('#unread_message').on("click", function() { return imap_unread_message(msg_uid, detail);});
     $('#block_sender').on("click", function(e) {
         e.preventDefault();
@@ -1335,6 +1340,41 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
     return false;
 };
 
+var imap_restore_message = function(e, supplied_uid, supplied_detail) {
+    e.preventDefault();
+    var uid = getMessageUidParam();
+    var detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
+    if (supplied_uid) {
+        uid = supplied_uid;
+    }
+    if (supplied_detail) {
+        detail = supplied_detail;
+    }
+    if (detail && uid) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_restore_message'},
+            {'name': 'imap_msg_uid', 'value': uid},
+            {'name': 'imap_server_id', 'value': detail.server_id},
+            {'name': 'folder', 'value': detail.folder}],
+            function(res) {
+                if (res.restore_result) {
+                    if (hm_list_parent() == 'message') {
+                        if (hm_auto_advance_email_enabled()) {
+                            Hm_Utils.redirect("?page=message_list&list_path="+getListPathParam());
+                        } else if (hm_list_parent() == 'search') {
+                            Hm_Utils.redirect("?page=search&list_path="+hm_list_parent());
+                        } else {
+                            Hm_Utils.redirect("?page=message_list&list_path="+hm_list_parent());
+                        }
+                    }
+                }
+            }
+        );
+
+    }
+    return false;
+};
+
 var imap_show_add_contact_popup = function() {
     var popup = document.getElementById("contact_popup");
     popup.classList.toggle("show");
@@ -1374,62 +1414,64 @@ var imap_screen_email = function() {
     }
 };
 
-$('.screen-email-unlike').on("click", function() { imap_screen_email(); return false; });
+function setupScreening() {
+    $('.screen-email-unlike').on("click", function() { imap_screen_email(); return false; });
 
-$('.screen-email-like').on("click", function() {
+    $('.screen-email-like').on("click", function() {
 
-    var list_blocked_senders = (sessionStorage.getItem('list_blocked') !== null) ? JSON.parse(sessionStorage.getItem('list_blocked')) : [];
-    var list_email = [];
-    var list_msg_uid = [];
-    var email_existing_in_blocked_senders = [];
-    $('input[type=checkbox]').each(function() {
-        if (this.checked && this.id.search('imap') != -1) {
-            let email = $('.'+ this.id +' .from').attr("data-title")
-            if (email = email.trim()) {
-                list_email.push(email);
-                if (list_blocked_senders.length > 0) {
-                    list_blocked_senders.forEach((sender, index) => {
-                        if (sender === email) {
-                            email_existing_in_blocked_senders.push(email);
-                            list_msg_uid.push($(this).parent().parent().attr("data-uid"));
-                            delete list_blocked_senders[index];
-                        }
-                    });
+        var list_blocked_senders = (sessionStorage.getItem('list_blocked') !== null) ? JSON.parse(sessionStorage.getItem('list_blocked')) : [];
+        var list_email = [];
+        var list_msg_uid = [];
+        var email_existing_in_blocked_senders = [];
+        $('input[type=checkbox]').each(function() {
+            if (this.checked && this.id.search('imap') != -1) {
+                let email = $('.'+ this.id +' .from').attr("data-title")
+                if (email = email.trim()) {
+                    list_email.push(email);
+                    if (list_blocked_senders.length > 0) {
+                        list_blocked_senders.forEach((sender, index) => {
+                            if (sender === email) {
+                                email_existing_in_blocked_senders.push(email);
+                                list_msg_uid.push($(this).parent().parent().attr("data-uid"));
+                                delete list_blocked_senders[index];
+                            }
+                        });
+                    }
                 }
             }
-        }
-    });
-
-    
-    if (email_existing_in_blocked_senders.length > 0) {
-        var list_html = "<ol>";
-        email_existing_in_blocked_senders.forEach(sender => {
-            sender = sender.trim();
-            list_html += `<li>${sender}</li>`;
-        });
-        list_html += "</ol>";
-        const modal = new Hm_Modal({
-            modalId: 'confirmaAddToTrustContact',
-            title: 'Warning',
-            btnSize: 'sm'
         });
 
-        var modalContentHeadline = "Address mail exists in your Block list";
-        modal.addFooterBtn(hm_trans('Add Emails to Trust contact'), 'btn-warning', handleAddEmail);
-        modal.setContent(modalContentHeadline + list_html + `<p>${hm_trans('If you add these, all will be unblocked.<br>Are you sure you want to add this in your Trust contact?')}</p>`);
-        modal.open();
-        function handleAddEmail() {
-            list_msg_uid.forEach(function(msg_uid) {
-                block_unblock_sender(msg_uid, Hm_Utils.parse_folder_path(hm_list_path()), 'sender', 'unblocked');
+        
+        if (email_existing_in_blocked_senders.length > 0) {
+            var list_html = "<ol>";
+            email_existing_in_blocked_senders.forEach(sender => {
+                sender = sender.trim();
+                list_html += `<li>${sender}</li>`;
             });
-            modal.hide();
+            list_html += "</ol>";
+            const modal = new Hm_Modal({
+                modalId: 'confirmaAddToTrustContact',
+                title: 'Warning',
+                btnSize: 'sm'
+            });
+
+            var modalContentHeadline = "Address mail exists in your Block list";
+            modal.addFooterBtn(hm_trans('Add Emails to Trust contact'), 'btn-warning', handleAddEmail);
+            modal.setContent(modalContentHeadline + list_html + `<p>${hm_trans('If you add these, all will be unblocked.<br>Are you sure you want to add this in your Trust contact?')}</p>`);
+            modal.open();
+            function handleAddEmail() {
+                list_msg_uid.forEach(function(msg_uid) {
+                    block_unblock_sender(msg_uid, Hm_Utils.parse_folder_path(hm_list_path()), 'sender', 'unblocked');
+                });
+                modal.hide();
+                add_email_in_contact_trusted(list_email);
+            };
+        } else {
             add_email_in_contact_trusted(list_email);
-        };
-    } else {
-        add_email_in_contact_trusted(list_email);
-    }
-    return false;
-});
+        }
+        return false;
+    });
+}
 
 $(document).on('click', '[data-bs-dismiss="modal"]', function() {
     $('#shareFolderModal').modal('hide');

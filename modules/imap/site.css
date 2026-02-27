@@ -75,12 +75,12 @@
 .msg_text_inner {
   min-height: 300px;
   font-family: monospace;
-  padding: 30px;
+  padding: 20px;
 }
 
 .mobile .msg_text_inner {
   width: 100%;
-  padding: 15px;
+  padding: 0px;
   font-family: inherit;
   font-size: 100%;
 }
@@ -336,7 +336,6 @@
 }
 .move_to_title {
   padding: 5px 10px;
-  background-color: #fff;
   border-bottom: solid 1px #ede8e6;
 }
 .move_to_title span {
@@ -370,7 +369,6 @@
   left: -5%;
   top: 40px;
   right: 100%;
-  background-color: white;
   border: 0.4px solid #8080807a;
   border-radius: 4px;
   z-index: 50;
@@ -382,7 +380,7 @@
   box-shadow: 0px 5px 10px #8080804a;
 }
 .move_to_location .folders li {
-  display: flex;
+  display: block;
   flex-direction: column;
 }
 .move_to_location .folders .inner_list li {
@@ -391,6 +389,10 @@
 .move_to_location .folders li.m-has-children {
   flex-direction: column;
 }
+.move_to_location .imap_move_folder_link {
+  display: inline-flex; max-width: 200px; vertical-align: top; overflow: hidden;
+}
+.move_to_location .unread_count { padding: 2px 6px; white-space: nowrap; }
 /* .imap_keyword, .imap_sort, .imap_filter { font-size: 75%; float: left; margin-top: 8px; } */
 .imap_keyword {
   width: 120px;
@@ -599,9 +601,6 @@
 
 .fade-in {
   animation-name: fadeIn;
-}
-.inner_list li[class^="imap_"] #main-link {
-    flex-grow: 1;
 }
 .inner_list li[class^="imap_"] .action-link {
     opacity: 0;

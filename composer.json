@@ -59,7 +59,7 @@
         "zbateson/mail-mime-parser": "^3.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.5"
+        "phpunit/phpunit": "^10.5.62"
     },
     "suggest": {
         "ext-pdo": "To use database features, this needs to be installed",

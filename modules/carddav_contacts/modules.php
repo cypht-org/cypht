@@ -333,11 +333,11 @@ class Hm_Output_carddav_contacts_form extends Hm_Output_Module {
             $target .= '</select><br />';
         }
         return '<div class="add_contact_responsive"><form class="add_contact_form" method="POST">'.
-            '<button class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
+            '<button type="button" class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
             '<div class="'.$form_class.'">'.$target.''.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<label class="form-label" for="carddav_email">'.$this->trans('E-mail Address').' *</label>'.
-            '<input required placeholder="'.$this->trans('E-mail Address').'" id="carddav_email" type="email" name="carddav_email" '.
+            '<input required placeholder="'.$this->trans('E-mail Address').'" id="carddav_email" type="text" name="carddav_email" '.
             'value="'.$this->html_safe($email).'" class="form-control" /><br />'.
             '<label class="form-label" for="carddav_fn">'.$this->trans('Full Name').' *</label>'.
             '<input required placeholder="'.$this->trans('Full Name').'" id="carddav_fn" type="text" name="carddav_fn" '.

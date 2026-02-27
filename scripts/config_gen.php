@@ -339,6 +339,43 @@ function append_bootstrap_icons_files() {
     }
 }
 
+/**
+ * Copies KindEditor runtime assets (themes, plugins, lang) to site/ directory.
+ * KindEditor needs these resources at runtime for the HTML compose functionality.
+ *
+ * @return void
+ */
+function copy_kindeditor_assets() {
+    $source = 'third_party/kindeditor';
+    $dest = 'site/third_party/kindeditor';
+
+    if (!is_readable($source)) {
+        printf("WARNING: KindEditor source directory not found at %s\n", $source);
+        return;
+    }
+
+    // Create the destination directory structure
+    if (!is_dir('site/third_party')) {
+        mkdir('site/third_party', 0755, true);
+    }
+
+    if (!is_dir($dest)) {
+        mkdir($dest, 0755, true);
+    }
+
+    // Copy necessary directories and files (excluding the main JS file which is already bundled)
+    $items_to_copy = array('themes', 'plugins', 'lang');
+
+    foreach ($items_to_copy as $item) {
+        $source_path = $source . '/' . $item;
+        if (is_dir($source_path)) {
+            copy_recursive($source_path);
+        }
+    }
+
+    printf("KindEditor assets copied successfully\n");
+}
+
 function process_bootswatch_files() {
     $src = 'site/modules/themes/assets';
     if (! is_dir($src)) {
@@ -381,6 +418,9 @@ function create_production_site($assets, $settings, $hashes) {
     copy('site.css', 'site/site.css');
     copy('site.js', 'site/site.js');
     append_bootstrap_icons_files();
+
+    // Copy KindEditor resources (themes, plugins, lang)
+    copy_kindeditor_assets();
 
     // Copy main assets directory
     if (is_readable('assets/')) {

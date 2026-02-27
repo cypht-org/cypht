@@ -173,29 +173,43 @@ function email_is_active($mod_list) {
 if (!hm_exists('is_email_address')) {
 function is_email_address($val, $allow_local=false) {
     $val = trim($val, "<>");
-    $domain = false;
-    $local = false;
-    if (!trim($val) || mb_strlen($val) > 320) {
+    $val = trim($val);
+
+    if (!$val || mb_strlen($val) > 320) { // RFC 5321: max 320 chars
         return false;
     }
-    if (mb_strpos($val, '@') !== false) {
-        $local = mb_substr($val, 0, mb_strrpos($val, '@'));
-        $domain = mb_substr($val, (mb_strrpos($val, '@') + 1));
+
+    $at_pos = mb_strrpos($val, '@');
+    if ($at_pos === false) {
+        // No @ symbol - only valid if $allow_local is true
+        return $allow_local && validate_local_full($val);
     }
-    else {
-        $local = $val;
+
+    if ($at_pos === 0 || $at_pos === mb_strlen($val) - 1) {
+        return false; // @ at beginning or end
     }
-    if (!$local || (!$allow_local && !$domain)) {
+
+    $local = mb_substr($val, 0, $at_pos);
+    $domain = mb_substr($val, $at_pos + 1);
+
+    if (!$local || mb_strlen($local) > 64) { // RFC 5321: max 64 chars for local part
         return false;
     }
-    else {
-        if ($domain && !validate_domain_full($domain)) {
-            return false;
-        }
-        if (!validate_local_full($local)) {
-            return false;
-        }
+
+    if (!$domain || mb_strlen($domain) > 255) { // RFC 5321: max 255 chars for domain
+        return false;
     }
+
+    // Validate local part
+    if (!validate_local_full($local)) {
+        return false;
+    }
+
+    // Validate domain (supports standard domains and domain literals)
+    if (!validate_domain_full($domain)) {
+        return false;
+    }
+
     return true;
 }}
 
@@ -207,11 +221,99 @@ function is_email_address($val, $allow_local=false) {
  */
 if (!hm_exists('validate_domain_full')) {
 function validate_domain_full($val) {
-    /* check for a dot, max allowed length and standard ASCII characters */
-    if (mb_strpos($val, '.') === false || mb_strlen($val) > 255 || preg_match("/[^A-Z0-9\-\.]/i", $val) ||
-        $val[0] == '-' || $val[(mb_strlen($val) - 1)] == '-') {
+    if (!$val || mb_strlen($val) > 255) { // RFC 5321: max 255 chars
         return false;
     }
+
+    // Check for domain literal (IP address in brackets)
+    if (substr($val, 0, 1) === '[' && substr($val, -1) === ']') {
+        $literal = substr($val, 1, -1);
+
+        // IPv4: [192.168.1.1]
+        if (preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/', $literal)) {
+            // Validate IPv4 ranges (0-255)
+            $parts = explode('.', $literal);
+            foreach ($parts as $part) {
+                if ((int)$part > 255) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // IPv6: [IPv6:2001:db8::1]
+        if (preg_match('/^IPv6:/i', $literal)) {
+            $ipv6 = substr($literal, 5);
+
+            // Basic IPv6 validation
+            if (!$ipv6 || !preg_match('/^[a-fA-F0-9:]+$/', $ipv6)) {
+                return false;
+            }
+
+            // Check for valid :: usage (at most one occurrence)
+            $double_colon_count = substr_count($ipv6, '::');
+            if ($double_colon_count > 1) {
+                return false;
+            }
+
+            // Validate groups
+            if ($double_colon_count === 1) {
+                // With :: compression
+                $segments = explode('::', $ipv6);
+                $left_parts = $segments[0] ? explode(':', $segments[0]) : [];
+                $right_parts = isset($segments[1]) && $segments[1] ? explode(':', $segments[1]) : [];
+                $total_parts = count($left_parts) + count($right_parts);
+
+                if ($total_parts >= 8) {
+                    return false;
+                }
+
+                $parts = array_merge($left_parts, $right_parts);
+            } else {
+                // No :: compression, must have exactly 8 groups
+                $parts = explode(':', $ipv6);
+                if (count($parts) !== 8) {
+                    return false;
+                }
+            }
+
+            // Validate each part (1-4 hex digits)
+            foreach ($parts as $part) {
+                if ($part === '') continue;
+                if (strlen($part) > 4 || !preg_match('/^[a-fA-F0-9]+$/', $part)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false; // Unknown domain literal format
+    }
+
+    // Standard domain validation
+    // Split by dots to get labels
+    $labels = explode('.', $val);
+    if (count($labels) < 2) { // At least domain.tld
+        return false;
+    }
+
+    foreach ($labels as $label) {
+        if (!$label || mb_strlen($label) > 63) { // RFC 1035: max 63 chars per label
+            return false;
+        }
+
+        // Labels cannot start or end with hyphen
+        if (substr($label, 0, 1) === '-' || substr($label, -1) === '-') {
+            return false;
+        }
+
+        // Allow alphanumeric, hyphen, and Unicode for IDN
+        if (!preg_match('/^[a-zA-Z0-9\-\x{0080}-\x{FFFF}]+$/u', $label)) {
+            return false;
+        }
+    }
+
     return true;
 }}
 
@@ -223,20 +325,39 @@ function validate_domain_full($val) {
  */
 if (!hm_exists('validate_local_full')) {
 function validate_local_full($val) {
-    /* check length, "." rules, and for characters > ASCII 127 */
-    if (mb_strlen($val) > 64 || $val[0] == '.' || $val[(mb_strlen($val) -1)] == '.' || mb_strstr($val, '..') ||
-        preg_match('/[^\x00-\x7F]/',$val)) {
+    if (!$val || mb_strlen($val) > 64) { // RFC 5321: max 64 chars
         return false;
     }
-    /* remove escaped characters and quoted strings */
-    $local = preg_replace("/\\\\.{1}/", '', $val);
-    $local = preg_replace("/\"[^\"]+\"/", '', $local);
 
-    /* validate remaining unescaped characters */
-    if (preg_match("/[[:print:]]/", $local) && !preg_match("/[@\\\",\[\]]/", $local)) {
+    // Check if local part is quoted
+    if (substr($val, 0, 1) === '"' && substr($val, -1) === '"') {
+        // Quoted string - almost anything goes inside quotes
+        $quoted = substr($val, 1, -1);
+
+        // Check for unescaped quotes (quotes must be escaped with backslash)
+        // This is a simplified check - proper implementation would need to handle escaped backslashes
+        $temp = str_replace('\\\\', '', $quoted); // Remove escaped backslashes
+        $temp = str_replace('\\"', '', $temp);     // Remove escaped quotes
+        if (strpos($temp, '"') !== false) {
+            return false; // Found unescaped quote
+        }
+
         return true;
     }
-    return false;
+
+    // Unquoted local part - standard rules
+    // Cannot start or end with dot, no consecutive dots
+    if (substr($val, 0, 1) === '.' || substr($val, -1) === '.' || strpos($val, '..') !== false) {
+        return false;
+    }
+
+    // Allow only permitted characters for unquoted local part
+    // A-Z a-z 0-9 . ! # $ % & ' * + - / = ? ^ _ ` { | } ~
+    if (!preg_match('/^[a-zA-Z0-9.!#$%&\'*+\/=?^_`{|}~-]+$/', $val)) {
+        return false;
+    }
+
+    return true;
 }}
 
 /**
@@ -774,19 +895,17 @@ function getSettingsSectionOutput($section, $sectionLabel, $sectionIcon, $settin
         ['type' => $type, 'label' => $label, 'description' => $description] = $setting;
 
         if ($type === 'checkbox') {
-            $input = '<input type="checkbox" id="'.$key.'" name="'.$key.'" '.($value ? 'checked' : '').' class="form-check-input">';
+            $input = '<input type="checkbox" id="'.$key.'" name="'.$key.'" '.($value ? 'checked' : '').' class="form-check-input me-2">';
         } else {
             $input = '<input type="'.$type.'" id="'.$key.'" name="'.$key.'" value="'.$value.'" class="form-control">';
         }
 
         $res .= "<tr class='{$section}_setting'>" .
-        "<td><label for='$key'>$label</label></td>" .
-        "<td>
-            <div>
-                $input
-            </div>
-            <div class='setting_description'>$description</div>
-        </td>" .
+        "<td class='d-block d-md-table-cell'><label for='$key'>$label</label></td>" .
+        "<td class='d-block d-md-table-cell'>" .
+            "<div class='d-flex align-items-center'>$input</div>" .
+            "<div class='setting_description'>$description</div>" .
+        "</td>" .
         "</tr>";
     }
     return $res;

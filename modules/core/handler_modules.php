@@ -637,7 +637,11 @@ class Hm_Handler_stay_logged_in extends Hm_Handler_Module {
         $lifetime = intval($this->config->get('long_session_lifetime', 30));
         list($success, $form) = $this->process_form(array('stay_logged_in'));
         if ($success && $form['stay_logged_in']) {
-            $this->session->lifetime = time()+60*60*24*$lifetime;
+            $lifetime_timestamp = time()+60*60*24*$lifetime;
+            $this->session->lifetime = $lifetime_timestamp;
+            // Store in session so it persists across page loads
+            $this->session->set('long_session_lifetime', $lifetime_timestamp);
+            $this->session->set('long_session_enabled', true);
         }
     }
 }
@@ -1180,7 +1184,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 }
                 $this->out('just_saved_credentials', true);
                 if (isPageConfigured('save')) {
-                    Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
+                    Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='?page=save'>Save Settings</a>.");
                 } else {
                     Hm_Msgs::add("Server saved.");
                 }

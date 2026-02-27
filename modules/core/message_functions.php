@@ -462,7 +462,16 @@ class HTMLToText {
 
     function __construct($html) {
         $doc = new DOMDocument();
-        $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+        libxml_use_internal_errors(true);
+
+        // Check if already valid UTF-8, if not convert it
+        if (!mb_check_encoding($html, 'UTF-8')) {
+            // Try to detect and convert the encoding
+            $html = mb_convert_encoding($html, 'UTF-8', mb_detect_encoding($html, mb_list_encodings(), true));
+        }
+        $doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+        libxml_clear_errors();
+
         if (trim($html) && $doc->hasChildNodes()) {
             $this->parse_nodes($doc->childNodes);
         }
