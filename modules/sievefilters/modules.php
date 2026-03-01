@@ -1188,19 +1188,18 @@ class Hm_Output_sievefilters_title_start extends Hm_Output_Module {
     }
 }
 
-// /**
-//  * @subpackage sievefilters/output
-//  */
-// class Hm_Output_sievefilters_settings_start extends Hm_Output_Module
-// {
-//     protected function output()
-//     {
-
-//         $res = get_classic_filter_modal_content();
-//         $res .= get_script_modal_content();
-//         return $res;
-//     }
-// }
+/**
+ * @subpackage sievefilters/output
+ */
+class Hm_Output_sievefilters_modal_content_start extends Hm_Output_Module
+{
+    protected function output()
+    {
+        $res = get_classic_filter_modal_content();
+        $res .= get_script_modal_content();
+        return $res;
+    }
+}
 
 /**
  * @subpackage sievefilters/output

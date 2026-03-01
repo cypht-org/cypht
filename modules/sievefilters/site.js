@@ -608,50 +608,6 @@ const Hm_Filters = (function (hm) {
 const add_filter_condition = Hm_Filters.add_filter_condition;
 const add_filter_action = Hm_Filters.add_filter_action;
 
-/**
- * Isolated filter button event handlers - reused from hm_sieve_button_events
- */
-const loadFilterButtonsEvents = () => {
-    /**
-     * Delete action Button
-     */
-    $(document).on('click', '.delete_else_action_modal_button', function (e) {
-        e.preventDefault();
-        $(this).parent().parent().remove();
-    });
-
-    /**
-     * Delete action Button
-     */
-    $(document).on('click', '.delete_action_modal_button', function (e) {
-        e.preventDefault();
-        $(this).parent().parent().remove();
-    });
-
-    /**
-     * Delete Condition Button
-     */
-    $(document).on('click', '.delete_condition_modal_button', function (e) {
-        e.preventDefault();
-        $(this).parent().parent().remove();
-    });
-
-    /**
-     * Add Condition Button
-     */
-    $(document).on('click', '.sieve_add_condition_modal_button', function () {
-        add_filter_condition();
-        add_filter_match_mode();
-    });
-
-    /**
-     * Add Action Button
-     */
-    $(document).on('click', '.filter_modal_add_action_btn', function () {
-        add_filter_action();
-    });
-};
-
 /**************************************************************************************
 *                                      MODAL EVENTS
 **************************************************************************************/
@@ -687,9 +643,48 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     });
 
     /**
+     * Delete action Button
+     */
+    $(document).on('click', '.delete_else_action_modal_button', function (e) {
+        e.preventDefault();
+        $(this).parent().parent().remove();
+    });
+
+    /**
+     * Delete action Button
+     */
+    $(document).on('click', '.delete_action_modal_button', function (e) {
+        e.preventDefault();
+        $(this).parent().parent().remove();
+    });
+
+    /**
+     * Delete Condition Button
+     */
+    $(document).on('click', '.delete_condition_modal_button', function (e) {
+        e.preventDefault();
+        $(this).parent().parent().remove();
+    });
+
+    /**
+     * Add Condition Button
+     */
+    $(document).off('click', '.sieve_add_condition_modal_button').on('click', '.sieve_add_condition_modal_button', function () {
+        add_filter_condition();
+        add_filter_match_mode();
+    });
+
+    /**
+     * Add Action Button
+     */
+    $(document).off('click', '.filter_modal_add_action_btn').on('click', '.filter_modal_add_action_btn', function () {
+        add_filter_action();
+    });
+
+    /**
      * Add Else Action Button
      */
-    $(document).on('click', '.filter_modal_add_else_action_btn', function () {
+    $(document).off('click', '.filter_modal_add_else_action_btn').on('click', '.filter_modal_add_else_action_btn', function () {
         let possible_actions_html = '';
 
         hm_sieve_possible_actions().forEach(function (value) {
@@ -1149,10 +1144,8 @@ function createEditFilterModal(save_filter, current_account, options = {}) {
         }
     }
 
-    // set content
     edit_filter_modal.setContent(edit_filter_template_content);
 
-    // add a button
     edit_filter_modal.addFooterBtn(
         hm_trans('Save'),
         'btn-primary ms-auto',
@@ -1164,7 +1157,6 @@ function createEditFilterModal(save_filter, current_account, options = {}) {
         },
     );
 
-    // add another button
     edit_filter_modal.addFooterBtn(
         hm_trans('Convert to code'),
         'btn-warning',
@@ -1191,11 +1183,6 @@ function createEditFilterModal(save_filter, current_account, options = {}) {
 }
 
 function sieveFiltersPageHandler() {
-    // let is_editing_script = false;
-    // let current_editing_script_name = '';
-    // let is_editing_filter = false;
-    // let current_editing_filter_name = '';
-
     const getCurrentAccount = () => current_account;
     const getIsEditingFilter = () => is_editing_filter;
     const getCurrentEditingFilterName = () => current_editing_filter_name;
@@ -1203,7 +1190,6 @@ function sieveFiltersPageHandler() {
     /**************************************************************************************
          *                             BOOTSTRAP SCRIPT MODAL
          **************************************************************************************/
-        // Create save_filter using the shared createSaveFilter function
     const save_filter_inner = createSaveFilter({
         getCurrentAccount,
         getIsEditingFilter,
@@ -1230,35 +1216,6 @@ function sieveFiltersPageHandler() {
     edit_script_modal.addFooterBtn('Save', 'btn-primary', async function () {
         save_script(current_account);
     });
-
-
-    /**************************************************************************************
-     *                             BOOTSTRAP SIEVE FILTER MODAL
-     **************************************************************************************/
-    // var edit_filter_modal = new Hm_Modal({
-    //     size: 'xl',
-    //     modalId: 'myEditFilterModal',
-    // });
-
-    // // set content
-    // edit_filter_modal.setContent(document.querySelector('#edit_filter_modal').innerHTML);
-    // $('#edit_filter_modal').remove();
-
-    // // add a button
-    // edit_filter_modal.addFooterBtn('Save', 'btn-primary ms-auto', async function () {
-    //     let result = save_filter(current_account);
-    //     if (result) {
-    //         edit_filter_modal.hide();
-    //     }
-    // });
-
-    // // add another button
-    // edit_filter_modal.addFooterBtn('Convert to code', 'btn-warning', async function () {
-    //     let result = save_filter(current_account, true);
-    //     if (result) {
-    //         edit_filter_modal.hide();
-    //     }
-    // });
 
     /**************************************************************************************
      * Initialize sieve button events
@@ -1443,14 +1400,18 @@ function dryRunFilterFromModal() {
     // Current approach: Test against visible messages only (fast, no server load)
 
     // Get all visible messages from message table
-    const selectedMessages = [];
+    const selectedMessages = [];    
     $('.message_table tbody tr').each(function () {
         const $row = $(this);
+        const uid = $row.data('uid');
+        
         // Skip rows without data (e.g., header rows or empty rows)
-        if (!$row.data('uid')) return;
+        if (!uid) {
+            return;
+        }
 
         selectedMessages.push({
-            uid: $row.data('uid'),
+            uid: uid,
             from_email: ($row.find('td.from').data('title') || '')
                 .trim()
                 .toLowerCase(),
@@ -1481,13 +1442,14 @@ function dryRunFilterFromModal() {
     });
 
     if (conditions.length === 0) {
-        Hm_Notices.show(
-            hm_trans('Please add at least one condition'),
-            'warning',
+        showErrorMsg(
+            "Please add at least one condition to dry run the filter",
+            ".sieve-filter-conditions-block",
+            10000
         );
         return;
     }
-const testType = $('.modal_sieve_filter_test').val(); // ANYOF or ALLOF
+    const testType = $('.modal_sieve_filter_test').val(); // ANYOF or ALLOF
 
     // Test each message against filter conditions
     const matchedMessages = [];
@@ -1550,7 +1512,7 @@ const testType = $('.modal_sieve_filter_test').val(); // ANYOF or ALLOF
 
     // Display results in a notice or modal section
     let resultHtml =
-        '<div class="dry-run-results mt-3 p-3 border rounded bg-light">';
+        '<div class="dry-run-results mt-3 p-3 border rounded bg-light" style="overflow-wrap: break-word; word-break: break-word; max-width: 100%;">';
     resultHtml +=
         '<div class="d-flex justify-content-between align-items-center mb-2">' +
         '<h6 class="fw-bold mb-0"><i class="bi bi-lightning me-2"></i>' +
@@ -1568,17 +1530,17 @@ const testType = $('.modal_sieve_filter_test').val(); // ANYOF or ALLOF
             '</strong> ' +
             hm_trans('message(s) would match this filter') +
             ':';
-        resultHtml += '<ul class="mb-0 mt-1 small">';
+        resultHtml += '<ul class="mb-0 mt-1 small" style="list-style: none; padding-left: 1rem;">';
         matchedMessages.forEach((msg) => {
-            const truncatedSubject =
-                msg.subject.length > 40
-                    ? msg.subject.substring(0, 40) + '...'
-                    : msg.subject;
+            // Truncate the combined display to max 80 characters
+            const fullLine = msg.from_email + ' - ' + msg.subject;
+            const truncatedLine =
+                fullLine.length > 80
+                    ? fullLine.substring(0, 80) + '...'
+                    : fullLine;
             resultHtml +=
-                '<li>' +
-                escapeHtml(msg.from_email) +
-                ' - ' +
-                escapeHtml(truncatedSubject) +
+                '<li style="overflow-wrap: break-word; word-break: break-word;">' +
+                escapeHtml(truncatedLine) +
                 '</li>';
         });
         resultHtml += '</ul></div>';
@@ -1592,23 +1554,22 @@ const testType = $('.modal_sieve_filter_test').val(); // ANYOF or ALLOF
                 '</strong> ' +
                 hm_trans('message(s) would NOT match') +
                 ':';
-            resultHtml += '<ul class="mb-0 mt-1 small">';
+            resultHtml += '<ul class="mb-0 mt-1 small" style="list-style: none; padding-left: 1rem;">';
             unmatchedMessages.forEach((msg) => {
-                const truncatedSubject =
-                    msg.subject.length > 40
-                        ? msg.subject.substring(0, 40) + '...'
-                        : msg.subject;
+                // Truncate the combined display to max 80 characters
+                const fullLine = msg.from_email + ' - ' + msg.subject;
+                const truncatedLine =
+                    fullLine.length > 80
+                        ? fullLine.substring(0, 80) + '...'
+                        : fullLine;
                 resultHtml +=
-                    '<li>' +
-                    escapeHtml(msg.from_email) +
-                    ' - ' +
-                    escapeHtml(truncatedSubject) +
+                    '<li style="overflow-wrap: break-word; word-break: break-word;">' +
+                    escapeHtml(truncatedLine) +
                     '</li>';
             });
             resultHtml += '</ul></div>';
         }
     } else {
-        // No messages matched - show warning with details of what was tested
         resultHtml +=
             '<div class="alert alert-warning py-2 mb-2">' +
             hm_trans('No messages would match this filter') +
@@ -1746,9 +1707,6 @@ $(function () {
         } 
     });
 
-
-    // ////////////////////////////////////////////////////////////
-    // Handler for existing filter action buttons in Quick Actions dropdown
     $(document).on('click', '.msg_filter_action', function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -1909,77 +1867,74 @@ $(function () {
         const modalContent = `
             <div id="create-filter-form">
                 <input type="hidden" id="custom_action_mailbox" value="${mailbox}">
-    <div class="modal-body">
-      <div class="filter-section mb-4">
-        <h6 class="fw-bold mb-3">From emails</h6>
+                    <div class="modal-body">
+                        <div class="filter-section mb-4">
+                            <h6 class="fw-bold mb-3">From emails</h6>
 
-        <div class="mb-3">
-          <div class="btn-group btn-group-sm subject-filter-teal" role="group" id="from-filter-type">
-            <input type="radio" class="btn-check" name="fromFilterType" id="fromMatches" value="matches" checked>
-            <label class="btn btn-outline-primary" for="fromMatches">
-              <i class="bi bi-check-circle me-1"></i> Matches
-            </label>
+                            <div class="mb-3">
+                            <div class="btn-group btn-group-sm subject-filter-teal" role="group" id="from-filter-type">
+                                <input type="radio" class="btn-check" name="fromFilterType" id="fromMatches" value="matches" checked>
+                                <label class="btn btn-outline-primary" for="fromMatches">
+                                    <i class="bi bi-check-circle me-1"></i> Matches
+                                </label>
 
-            <input type="radio" class="btn-check" name="fromFilterType" id="fromNotMatches" value="not_matches">
-            <label class="btn btn-outline-primary" for="fromNotMatches">
-              <i class="bi bi-x-circle me-1"></i> Does Not Matches
-            </label>
-          </div>
-        </div>
+                                <input type="radio" class="btn-check" name="fromFilterType" id="fromNotMatches" value="not_matches">
+                                <label class="btn btn-outline-primary" for="fromNotMatches">
+                                    <i class="bi bi-x-circle me-1"></i> Does Not Matches
+                                </label>
+                            </div>
+                        </div>
 
-        <div id="from-keywords-section">
-            <div id="filter-from-list" class="chip-container border rounded p-3 mb-3 bg-light"></div>
-            <div class="input-group">
-                <input id="filter-from-input" class="form-control"
-                    placeholder="Add email and press Enter">
-                <div class="input-group-append">
-                <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
+                        <div id="from-keywords-section">
+                            <div id="filter-from-list" class="chip-container border rounded p-3 mb-3 bg-light"></div>
+                                <div class="input-group">
+                                    <input id="filter-from-input" class="form-control" placeholder="Add email and press Enter">
+                                <div class="input-group-append">
+                                    <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted mt-1">Press Enter to add email to filter</small>
+                        </div>
+                    </div>      
+                <hr class="my-4">
+    
+                <div class="filter-section mb-4">
+                    <h6 class="fw-bold mb-3">Subject keywords</h6>
+
+                    <!-- Subject filter type selector -->
+                    <div class="mb-3">
+                        <div class="btn-group btn-group-sm subject-filter-teal" role="group" id="subject-filter-type">
+                            <input type="radio" class="btn-check" name="subjectFilterType" id="subjectContains" value="contains" checked>
+                            <label class="btn btn-outline-primary" for="subjectContains">
+                                <i class="bi bi-check-circle me-1"></i> Contains
+                            </label>
+
+                            <input type="radio" class="btn-check" name="subjectFilterType" id="subjectNotContains" value="not_contains">
+                            <label class="btn btn-outline-primary" for="subjectNotContains">
+                                <i class="bi bi-x-circle me-1"></i> Does Not Contain
+                            </label>
+
+                            <input type="radio" class="btn-check" name="subjectFilterType" id="subjectAny" value="any">
+                            <label class="btn btn-outline-primary" for="subjectAny">
+                                <i class="bi bi-slash-circle me-1"></i> Ignore Subject
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="subject-keywords-section">
+                        <div id="filter-subject-list" class="chip-container border rounded p-3 mb-3 bg-light"></div>
+                            <div class="input-group">
+                                <input id="filter-subject-input" class="form-control" placeholder="Add keyword and press Enter">
+                                <div class="input-group-append">
+                                    <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted mt-1">Press Enter to add keyword to filter</small>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <small class="form-text text-muted mt-1">Press Enter to add email to filter</small>
-        </div>
-      </div>
-      
-      <hr class="my-4">
-      
-      <div class="filter-section mb-4">
-        <h6 class="fw-bold mb-3">Subject keywords</h6>
-
-        <!-- Subject filter type selector -->
-        <div class="mb-3">
-          <div class="btn-group btn-group-sm subject-filter-teal" role="group" id="subject-filter-type">
-            <input type="radio" class="btn-check" name="subjectFilterType" id="subjectContains" value="contains" checked>
-            <label class="btn btn-outline-primary" for="subjectContains">
-              <i class="bi bi-check-circle me-1"></i> Contains
-            </label>
-            
-            <input type="radio" class="btn-check" name="subjectFilterType" id="subjectNotContains" value="not_contains">
-            <label class="btn btn-outline-primary" for="subjectNotContains">
-              <i class="bi bi-x-circle me-1"></i> Does Not Contain
-            </label>
-            
-            <input type="radio" class="btn-check" name="subjectFilterType" id="subjectAny" value="any">
-            <label class="btn btn-outline-primary" for="subjectAny">
-              <i class="bi bi-slash-circle me-1"></i> Ignore Subject
-            </label>
-          </div>
-        </div>
-        
-        <div id="subject-keywords-section">
-          <div id="filter-subject-list" class="chip-container border rounded p-3 mb-3 bg-light"></div>
-          <div class="input-group">
-            <input id="filter-subject-input" class="form-control"
-                   placeholder="Add keyword and press Enter">
-            <div class="input-group-append">
-              <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
-            </div>
-          </div>
-          <small class="form-text text-muted mt-1">Press Enter to add keyword to filter</small>
-        </div>
-      </div>
-    </div>
-  </div>
-`;
+        `;
 
         custom_action_modal.setContent(modalContent);
         custom_action_modal.open();
@@ -2078,7 +2033,7 @@ $(function () {
         });
     }
 
-    loadFilterButtonsEvents();
+    hm_sieve_button_events();
 
     $(document).on('click', '.remove-chip', function () {
         $(this).parent().remove();
