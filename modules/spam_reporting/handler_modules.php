@@ -1,0 +1,314 @@
+<?php
+
+/**
+ * Spam reporting handlers
+ * @package modules
+ * @subpackage spam_reporting
+ */
+
+if (!defined('DEBUG_MODE')) { die(); }
+
+/**
+ * Process and output spam report user settings
+ * @subpackage spam_reporting/handler
+ */
+class Hm_Handler_process_spam_report_settings extends Hm_Handler_Module {
+    public function process() {
+        $manager = new Hm_Spam_Reporting_Manager($this->config, $this->user_config);
+
+        $this->out('spam_reporting_configs_for_ui', $manager->getConfigsForUi());
+        $this->out('spam_reporting_adapter_types', $manager->getAdapterTypes());
+
+        list($success, $form) = $this->process_form(array('save_settings'));
+        $new_settings = $this->get('new_user_settings', array());
+        $settings = $this->get('user_settings', array());
+
+        $save_debug = array('save_triggered' => $success);
+        if ($success) {
+            $enabled = array_key_exists('spam_reporting_enabled', $this->request->post)
+                && $this->request->post['spam_reporting_enabled'];
+            $new_settings['spam_reporting_enabled_setting'] = (bool) $enabled;
+            $settings['spam_reporting_enabled'] = $enabled;
+
+            $current = $manager->loadUserTargetConfigurations();
+            $built = spam_reporting_build_configs_from_simple_form($this->request->post, $current);
+            $save_debug['post_has_spam_reporting_keys'] = array_values(array_filter(array_keys($this->request->post), function ($k) {
+                return strpos($k, 'spam_reporting_') === 0;
+            }));
+            $save_debug['current_config_count'] = count($current);
+            $save_debug['built_count'] = count($built);
+
+            $validated = array();
+            $all_ok = true;
+            $validation_errors = array();
+            foreach ($built as $entry) {
+                list($ok, $errs, $norm) = $manager->validateConfigEntry($entry);
+                if (!$ok || $norm === null) {
+                    $all_ok = false;
+                    $validation_errors = array_merge($validation_errors, $errs);
+                    foreach ($errs as $e) {
+                        Hm_Msgs::add($e, 'error');
+                    }
+                    break;
+                }
+                $validated[] = $norm;
+            }
+            $save_debug['validated_count'] = count($validated);
+            $save_debug['all_ok'] = $all_ok;
+            $save_debug['validation_errors'] = $validation_errors;
+
+            if ($all_ok) {
+                $new_settings['spam_reporting_target_configurations'] = $validated;
+                $this->out('spam_reporting_configs_for_ui', spam_reporting_build_configs_for_ui_from_validated($validated, array($manager, 'getAdapter')), false);
+            }
+            $allowed = $all_ok
+                ? $manager->deriveAllowedPlatformsFromConfigs($validated)
+                : $this->user_config->get('spam_reporting_allowed_platforms_setting', array());
+            if (!is_array($allowed)) {
+                $allowed = array();
+            }
+            $new_settings['spam_reporting_allowed_platforms_setting'] = $allowed;
+            $settings['spam_reporting_allowed_platforms'] = $allowed;
+            $save_debug['new_settings_spam_reporting_keys'] = array_values(array_filter(array_keys($new_settings), function ($k) {
+                return strpos($k, 'spam_reporting_') === 0;
+            }));
+        }
+        $this->out('spam_reporting_save_debug', $save_debug, false);
+        if ($save_debug['save_triggered']) {
+            error_log('[spam_reporting] save_debug: ' . json_encode($save_debug));
+        }
+
+        if (!$success) {
+            $settings['spam_reporting_enabled'] = $this->user_config->get('spam_reporting_enabled_setting', false);
+            $settings['spam_reporting_allowed_platforms'] = $this->user_config->get('spam_reporting_allowed_platforms_setting', array());
+            if (!is_array($settings['spam_reporting_allowed_platforms'])) {
+                $settings['spam_reporting_allowed_platforms'] = array();
+            }
+        }
+
+        $this->out('new_user_settings', $new_settings, false);
+        $this->out('user_settings', $settings, false);
+    }
+}
+
+/**
+ * Build a spam report preview
+ * @subpackage spam_reporting/handler
+ */
+class Hm_Handler_spam_report_preview extends Hm_Handler_Module {
+    public function process() {
+        $post = $this->request->post ?? array();
+        $debug = array(
+            'step' => 'start',
+            'post_keys' => array_keys($post),
+            'list_path_in_post' => isset($post['list_path']) ? $post['list_path'] : '(missing)',
+            'uid_in_post' => isset($post['uid']) ? $post['uid'] : '(missing)',
+        );
+
+        list($success, $form) = $this->process_form(array('list_path', 'uid'));
+        if (!$success) {
+            $debug['step'] = 'process_form_failed';
+            $debug['form_received'] = $form;
+            $debug['form_count'] = count($form);
+            $this->out('spam_report_error', 'Invalid request');
+            $this->out('spam_report_debug', $debug);
+            return;
+        }
+
+        $debug['step'] = 'process_form_ok';
+        $debug['form'] = $form;
+
+        list($server_id, $uid, $folder, $msg_id) = get_request_params($form);
+        $debug['get_request_params'] = array(
+            'server_id' => $server_id,
+            'uid' => $uid,
+            'folder' => $folder ? '(set)' : null,
+            'msg_id' => $msg_id,
+        );
+
+        if ($server_id === NULL || $folder === NULL || $uid === NULL) {
+            $debug['step'] = 'get_request_params_failed';
+            $this->out('spam_report_error', 'Unsupported message source');
+            $this->out('spam_report_debug', $debug);
+            return;
+        }
+
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
+        if (!$mailbox || !$mailbox->authed()) {
+            $this->out('spam_report_error', 'Mailbox unavailable');
+            return;
+        }
+
+        $report = spam_reporting_build_report($mailbox, $folder, $uid, array(
+            'list_path' => $form['list_path']
+        ));
+        if (!$report) {
+            $debug['step'] = 'build_report_failed';
+            $this->out('spam_report_error', 'Failed to parse message');
+            $this->out('spam_report_debug', $debug);
+            return;
+        }
+        $raw_headers = $report->get_raw_headers_string();
+        $debug['step'] = 'success';
+        $debug['raw_len'] = is_string($report->raw_message) ? mb_strlen($report->raw_message) : 0;
+        $debug['headers_len'] = is_string($raw_headers) ? mb_strlen($raw_headers) : 0;
+        $debug['body_text_len'] = is_string($report->body_text) ? mb_strlen($report->body_text) : 0;
+        $debug['body_html_len'] = is_string($report->body_html) ? mb_strlen($report->body_html) : 0;
+        $debug['message_class'] = is_object($report->get_parsed_message()) ? get_class($report->get_parsed_message()) : '';
+
+        $manager = new Hm_Spam_Reporting_Manager($this->config, $this->user_config);
+        $targets = $manager->getTargets($report);
+
+        $message = $report->get_parsed_message();
+        $mappings = spam_reporting_load_provider_mapping($this->config);
+        $detected = $message ? spam_reporting_detect_providers($message, $mappings) : array();
+        $suggested_ids = spam_reporting_suggested_target_ids($detected, $targets);
+
+        $targets_ordered = array();
+        $by_id = array();
+        foreach ($targets as $t) {
+            $by_id[$t['id']] = $t;
+        }
+        foreach ($suggested_ids as $tid) {
+            if (isset($by_id[$tid])) {
+                $targets_ordered[] = $by_id[$tid];
+                unset($by_id[$tid]);
+            }
+        }
+        foreach ($by_id as $t) {
+            $targets_ordered[] = $t;
+        }
+
+        $suggestion = array(
+            'suggested_target_ids' => $suggested_ids,
+            'explanation' => '',
+            'self_report_note' => ''
+        );
+        if (!empty($detected)) {
+            $names = array_map(function ($d) {
+                return $d['provider_name'];
+            }, $detected);
+            $suggestion['explanation'] = 'Suggested because the message appears to come from ' . implode(' or ', array_unique($names)) . '.';
+        } else {
+            $suggestion['explanation'] = 'No specific provider detected; you can choose any reporting platform.';
+        }
+        list($server_id, , , ) = get_request_params($form);
+        $user_provider = spam_reporting_detect_user_mailbox_provider($server_id, $this->config);
+        if ($user_provider && !empty($detected)) {
+            $match = false;
+            foreach ($detected as $d) {
+                if ($d['provider_id'] === $user_provider) {
+                    $match = true;
+                    break;
+                }
+            }
+            if ($match) {
+                $suggestion['self_report_note'] = 'This message appears to originate from the same provider as your mailbox.';
+            }
+        }
+
+        $this->out('spam_report_targets', $targets_ordered);
+        $this->out('spam_report_suggestion', $suggestion);
+        $this->out('spam_report_platforms', spam_reporting_load_platform_catalog($this->config));
+        $preview = array(
+            'headers' => $raw_headers,
+            'body_text' => $report->body_text ?? '',
+            'body_html' => $report->body_html ?? ''
+        );
+        $debug['preview_keys'] = array_keys($preview);
+        $debug['preview_headers_len'] = mb_strlen($preview['headers']);
+        $debug['preview_body_text_len'] = mb_strlen($preview['body_text']);
+        $this->out('spam_report_debug', $debug);
+        $this->out('spam_report_preview', $preview);
+    }
+}
+
+/**
+ * Send a spam report
+ * @subpackage spam_reporting/handler
+ */
+class Hm_Handler_spam_report_send extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('list_path', 'uid', 'target_id'));
+        if (!$success) {
+            $this->out('spam_report_send_ok', false);
+            $this->out('spam_report_send_message', 'Missing required fields');
+            return;
+        }
+        $notes = '';
+        if (array_key_exists('user_notes', $this->request->post)) {
+            $notes = $this->request->post['user_notes'];
+        }
+
+        list($allowed, $retry_after) = spam_reporting_rate_limit($this->session, $this->config, false);
+        if (!$allowed) {
+            $this->out('spam_report_send_ok', false);
+            $this->out('spam_report_send_message', 'Rate limit exceeded. Please try again later.');
+            return;
+        }
+
+        list($server_id, $uid, $folder, $msg_id) = get_request_params($form);
+        if ($server_id === NULL || $folder === NULL || $uid === NULL) {
+            $this->out('spam_report_send_ok', false);
+            $this->out('spam_report_send_message', 'Unsupported message source');
+            return;
+        }
+
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
+        if (!$mailbox || !$mailbox->authed()) {
+            $this->out('spam_report_send_ok', false);
+            $this->out('spam_report_send_message', 'Mailbox unavailable');
+            return;
+        }
+
+        $report = spam_reporting_build_report($mailbox, $folder, $uid, array(
+            'list_path' => $form['list_path']
+        ));
+        if (!$report) {
+            $this->out('spam_report_send_ok', false);
+            $this->out('spam_report_send_message', 'Failed to parse message');
+            return;
+        }
+
+        $manager = new Hm_Spam_Reporting_Manager($this->config, $this->user_config);
+        list($target, $instance_config) = $manager->getTargetById($form['target_id']);
+        if (!$target instanceof Hm_Spam_Report_Target_Interface) {
+            $this->out('spam_report_send_ok', false);
+            $this->out('spam_report_send_message', 'Target unavailable');
+            return;
+        }
+        $enabled = $this->user_config->get('spam_reporting_enabled_setting', false);
+        $allowed = $this->user_config->get('spam_reporting_allowed_platforms_setting', array());
+        $pid = $target->platform_id();
+        $allowed_target = $enabled && is_array($allowed) && (($pid === '' || $pid === null) || in_array($pid, $allowed, true));
+        if (!$allowed_target) {
+            $this->out('spam_report_send_ok', false);
+            $this->out('spam_report_send_message', 'Target unavailable');
+            return;
+        }
+        if (!$target->is_available($report, $this->user_config, $instance_config)) {
+            $this->out('spam_report_send_ok', false);
+            $this->out('spam_report_send_message', 'Target unavailable');
+            return;
+        }
+
+        $payload = $target->build_payload($report, array('user_notes' => $notes), $instance_config);
+        $context = new Hm_Spam_Report_Delivery_Context($this->config, $this->user_config, $this->session);
+        $context->instance_config = is_array($instance_config) ? $instance_config : array();
+        $result = $target->deliver($payload, $context);
+        if (!$result || !($result instanceof Hm_Spam_Report_Result) || !$result->ok) {
+            $msg = $result && $result instanceof Hm_Spam_Report_Result ? $result->message : 'Send failed';
+            $this->out('spam_report_send_ok', false);
+            $this->out('spam_report_send_message', $msg);
+            return;
+        }
+
+        spam_reporting_rate_limit($this->session, $this->config, true);
+        $user = $this->session->get('username', '');
+        $msg_id = $form['list_path'] . ':' . $uid;
+        Hm_Debug::add(sprintf('SPAM_REPORT user=%s target=%s msg=%s', $user, $form['target_id'], $msg_id), 'info');
+
+        $this->out('spam_report_send_ok', true);
+        $this->out('spam_report_send_message', $result->message);
+    }
+}
