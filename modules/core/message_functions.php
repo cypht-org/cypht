@@ -15,14 +15,14 @@
  */
 if (!hm_exists('format_msg_html')) {
 function format_msg_html($str, $images=false) {
-    $str = mb_eregi_replace('</body>', '', $str);
-
     $config = HTMLPurifier_Config::createDefault();
     $config->set('HTML.DefinitionID', 'hm-message');
     $config->set('HTML.DefinitionRev', 1);
     $config->set('Cache.DefinitionImpl', null);
     $config->set('HTML.TargetBlank', true);
     $config->set('HTML.TargetNoopener', true);
+    $config->set('HTML.ForbiddenElements', ['html', 'head', 'body']);
+    $config->set('CSS.AllowTricky', true);
 
     if (!$images) {
         $config->set('URI.DisableExternalResources', true);
