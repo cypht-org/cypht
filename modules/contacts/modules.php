@@ -85,7 +85,9 @@ class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
             $contacts->sort('email_address');
             $results = array_slice($contacts->search(array(
                 'display_name' => $val,
-                'email_address' => $val
+                'email_address' => $val,
+                'nickname' => $val,
+                'company' => $val
             )), 0, 10);
         }
         $this->out('contact_suggestions', $results);
