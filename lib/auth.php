@@ -198,7 +198,7 @@ class Hm_Auth_IMAP extends Hm_Auth {
         list($server, $port, $tls, $sieve_config, $sieve_tls_mode) = get_auth_config($this->site_config, 'imap');
         if (!$user || !$pass || !$server || !$port) {
             Hm_Debug::add($imap->show_debug(true));
-            Hm_Debug::add('Invalid IMAP auth configuration settings');
+            Hm_Debug::add('Invalid IMAP auth configuration settings', 'danger');
             return false;
         }
         $this->imap_settings = ['server' => $server, 'port' => $port,
@@ -282,7 +282,7 @@ class Hm_Auth_LDAP extends Hm_Auth {
             ];
             return $this->connect();
         }
-        Hm_Debug::add('Invalid LDAP auth configuration settings');
+        Hm_Debug::add('Invalid LDAP auth configuration settings', 'danger');
         return false;
     }
 
