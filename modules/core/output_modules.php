@@ -603,8 +603,8 @@ class Hm_Output_content_end extends Hm_Output_Module {
         $res = '</div>';
         if (DEBUG_MODE) {
             $res .= '<span title="'.
-                $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.').
-                '" class="debug_title">'.$this->trans('Debug').'</span>';
+                $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail. Click to toggle debug panel.').
+                '" class="debug_title" onclick="var panel = document.getElementById(\'cypht-debug-panel\'); if (panel) { panel.style.display = (panel.style.display === \'none\' ? \'block\' : \'none\'); }" style="cursor: pointer;">'.$this->trans('Debug').'</span>';
         }
         $res .= '</body></html>';
         return $res;
@@ -2552,3 +2552,5 @@ class Hm_Output_version_upgrade_checker extends Hm_Output_Module {
         ';
     }
 }
+
+
