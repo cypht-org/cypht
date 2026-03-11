@@ -1669,7 +1669,7 @@ class Hm_Handler_load_custom_actions extends Hm_Handler_Module
                     $raw_script = $client->getScript($script_name); // raw content
 
                     // Parse the source from line 3 of the script header
-                    $lines = preg_split('#\r?\n#', $raw_script);
+                    $lines = split_script_lines($raw_script);
                     $source = ''; // default
                     if (isset($lines[3])) {
                         $meta_b64 = str_replace("# ", "", $lines[3]);
@@ -1778,7 +1778,7 @@ class Hm_Handler_sieve_remame_folder extends Hm_Handler_Module
                         $script_parsed = $client->getScript($script_name);
                         $script_parsed = str_replace('"'.$form['folder'].'"', '"'.$form['new_folder'].'"', $script_parsed);
 
-                        $old_actions = base64_decode(preg_split('#\r?\n#', $script_parsed, 0)[2]);
+                        $old_actions = base64_decode(split_script_lines($script_parsed)[2]);
                         $new_actions = base64_encode(str_replace('"'.$form['folder'].'"', '"'.$form['folder'].'"', $old_actions));
                         $script_parsed = str_replace(base64_encode($old_actions), $new_actions, $script_parsed);
                         $client->removeScripts($script_name);
