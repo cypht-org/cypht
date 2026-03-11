@@ -23,6 +23,8 @@ function format_msg_html($str, $images=false) {
     $config->set('Cache.DefinitionImpl', null);
     $config->set('HTML.TargetBlank', true);
     $config->set('HTML.TargetNoopener', true);
+    $config->set('HTML.ForbiddenElements', ['html', 'head']);
+    $config->set('CSS.AllowTricky', true);
 
     if (!$images) {
         $config->set('URI.DisableExternalResources', true);
