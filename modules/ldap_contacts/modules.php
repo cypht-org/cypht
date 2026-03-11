@@ -396,7 +396,9 @@ class Hm_Handler_load_edit_ldap_contact extends Hm_Handler_Module {
             if (!array_key_exists('contact_id', $this->request->get)) $missing[] = 'contact_id';
             if (array_key_exists('contact_source', $this->request->get) && !array_key_exists($this->request->get['contact_source'], $ldap_config)) $missing[] = 'ldap_config_for_source';
             
-            error_log("LDAP Edit: Handler skipped due to missing: " . implode(', ', $missing));
+            if (DEBUG_MODE) {
+                Hm_Debug::add("LDAP Edit: Handler skipped due to missing: " . implode(', ', $missing));
+            }
         }
     }
 }
