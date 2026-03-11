@@ -122,9 +122,17 @@ trait Hm_List {
 
     /**
      * Log all messages
+     * Note: When Monolog is active (via Hm_Logger), messages are already logged
+     * immediately, so we skip the array dump to prevent duplicate logging.
      * @return bool
      */
     public static function show() {
+        // Skip output if Monolog is handling logging
+        if (class_exists('Hm_Logger', false)) {
+            return true;
+        }
+
+        // Legacy fallback: dump all messages as array
         $msgs = array_map(function ($msg) {
             return strtoupper($msg['type']) . ': ' . $msg['text'];
         }, self::$msgs);
@@ -150,7 +158,13 @@ class Hm_Debug {
      * @override
      */
     public static function add($string, $type = 'danger') {
+        // Add to queue (for potential browser display)
         self::self_add($string, $type);
+
+        // Immediately log to Monolog
+        if (class_exists('Hm_Logger')) {
+            Hm_Logger::getInstance()->log($string, $type);
+        }
     }
 
     /**
