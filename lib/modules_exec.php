@@ -234,7 +234,7 @@ class Hm_Module_Exec {
      * @return void
      */
     public function process_module_setup() {
-        if (DEBUG_MODE or $this->site_config->get('debug_log')) {
+        if (DEBUG_MODE) {
             $this->setup_debug_modules();
         }
         else {
