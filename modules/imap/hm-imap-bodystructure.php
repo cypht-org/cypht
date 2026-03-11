@@ -402,11 +402,25 @@ class Hm_IMAP_Struct {
                     $matches++;
                 }
             }
-            foreach ($flds as $name => $fld_val) {
-                if (isset($vals[$name]) && mb_stristr($vals[$name], $fld_val)) {
-                    $matches++;
+
+            $exactMatchFound = array_reduce(array_keys($flds), function ($carry, $key) use ($flds, $vals) {
+                if (isset($vals[$key]) && strcasecmp($vals[$key], $flds[$key]) === 0) {
+                    return $carry + 1;
                 }
+                return $carry;
+            }, 0);
+            $partialMatchFound = array_reduce(array_keys($flds), function ($carry, $key) use ($flds, $vals) {
+                if (isset($vals[$key]) && mb_stristr($vals[$key], $flds[$key])) {
+                    return $carry + 1;
+                }
+            }, 0);
+
+            if ($exactMatchFound) {
+                $matches += $exactMatchFound;
+            } elseif ($partialMatchFound && ! $exactMatchFound) {
+                $matches += $partialMatchFound;
             }
+            
             if (array_key_exists('envelope', $vals)) {
                 $parent = $vals;
             }
