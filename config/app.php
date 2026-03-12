@@ -356,6 +356,17 @@ return [
     'app_name' => env('APP_NAME', 'Cypht'),
 
     /*
+    | ----------
+    | Debug Mode
+    | ----------
+    |
+    | Enable debug mode for development. When enabled, shows debug panel,
+    | outputs verbose logging, and displays detailed error messages.
+    |
+    */
+    'enable_debug' => env('ENABLE_DEBUG', false),
+
+    /*
     | ---------------
     | Force Mobile UI
     | ---------------
@@ -787,8 +798,6 @@ return [
     //     | in "debug mode"
     //     */
     //     'developer',
-
-        'debug_log' => env('DEBUG_LOG', false),
 
     //     /*
     //     | -------

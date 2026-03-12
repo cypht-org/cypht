@@ -33,3 +33,4 @@ lib/hm3/users/
 /docker/data/
 /docker/site/
 venv
+/logs/*.log

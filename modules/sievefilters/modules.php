@@ -1389,7 +1389,9 @@ class Hm_Output_account_sieve_filters extends Hm_Output_Module {
         $res .= '</div></div></div>';
 
         $this->out('sieve_detail_display', $res);
-        error_log('Session after: ' . print_r($_SESSION, true));
+        if (DEBUG_MODE) {
+            Hm_Debug::add('Session after: ' . print_r($_SESSION, true), 'debug');
+        }
     }
 }
 

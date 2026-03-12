@@ -8,9 +8,6 @@ if (mb_strtolower(php_sapi_name()) !== 'cli') {
     die("Must be run from the command line\n");
 }
 
-/* debug mode has to be set to something or include files will die() */
-define('DEBUG_MODE', false);
-
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
@@ -23,6 +20,9 @@ require APP_PATH.'lib/framework.php';
 
 $environment = Hm_Environment::getInstance();
 $environment->load();
+
+/* Define DEBUG_MODE from environment variable */
+define('DEBUG_MODE', filter_var(env('ENABLE_DEBUG', false), FILTER_VALIDATE_BOOLEAN));
 
 /* check for proper php support */
 check_php();
@@ -433,7 +433,6 @@ function create_production_site($assets, $settings, $hashes) {
     $index_file = preg_replace("/ASSETS_PATH', APP_PATH\.'assets\/'/", "ASSETS_PATH', WEB_ROOT.'assets/'", $index_file);
     $index_file = preg_replace("/CACHE_ID', ''/", "CACHE_ID', '".urlencode(Hm_Crypt::unique_id(32))."'", $index_file);
     $index_file = preg_replace("/SITE_ID', ''/", "SITE_ID', '".urlencode(Hm_Crypt::unique_id(64))."'", $index_file);
-    $index_file = preg_replace("/DEBUG_MODE', true/", "DEBUG_MODE', false", $index_file);
     $index_file = preg_replace("/JS_HASH', ''/", "JS_HASH', '".$hashes['js']."'", $index_file);
     $index_file = preg_replace("/CSS_HASH', ''/", "CSS_HASH', '".$hashes['css']."'", $index_file);
     file_put_contents('site/index.php', $index_file);

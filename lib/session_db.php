@@ -162,7 +162,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
             Hm_Debug::add('Session insert params: ' . json_encode($params));
         }
         if (!$res) {
-            Hm_Debug::add('DB SESSION failed to write session data');
+            Hm_Debug::add('DB SESSION failed to write session data', 'danger');
         }
         return $res;
     }
@@ -230,7 +230,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
                     $params = [':hm_id' => $key];
                     break;
                 default:
-                    Hm_Debug::add('DB SESSION: Unsupported db_driver for locking: ' . $this->db_driver);
+                    Hm_Debug::add('DB SESSION: Unsupported db_driver for locking: ' . $this->db_driver, 'danger');
                     return false;
             }   
             $result = Hm_DB::execute($this->dbh, $query, $params, ($this->db_driver == 'sqlite') ? 'modify' : false);
