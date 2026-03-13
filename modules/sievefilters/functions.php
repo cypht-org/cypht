@@ -2,6 +2,13 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+if (!hm_exists('split_script_lines')) {
+    function split_script_lines($script)
+    {
+        return preg_split('#\r?\n#', $script);
+    }
+}
+
 if (!hm_exists('get_script_modal_content')) {
     function get_script_modal_content()
     {
@@ -303,7 +310,7 @@ if (!hm_exists('prepare_sieve_script')) {
     {
         $blocked_list = [];
         if ($script != '') {
-            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[$index]);
+            $base64_obj = str_replace("# ", "", split_script_lines($script)[$index]);
             if ($action == "decode") {
                 $blocked_list = json_decode(str_replace("*", "", base64_decode($base64_obj)), true);
             } else {
@@ -488,7 +495,7 @@ if (!hm_exists('get_blocked_senders')){
             $blocked_list_actions = [];
             $blocked_senders = [];
             if ($current_script != '') {
-                $script_split = preg_split('#\r?\n#', $current_script, 0);
+                $script_split = split_script_lines($current_script);
                 if (!isset($script_split[1])) {
                     return '';
                 }
@@ -590,7 +597,7 @@ if (!hm_exists('get_sieve_linked_mailbox')) {
             $folders = [];
             foreach ($scripts as $s) {
                 $script = $client->getScript($s);
-                $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
+                $base64_obj = str_replace("# ", "", split_script_lines($script)[2]);
                 $obj = json_decode(base64_decode($base64_obj))[0];
                 if ($obj && in_array($obj->action, ['copy', 'move'])) {
                     $folders[$s] = $obj->value;

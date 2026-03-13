@@ -460,6 +460,11 @@ function message_controls($output_mod) {
     if(!empty($output_mod->get('tags'))) {
         $res .= tags_dropdown($output_mod, []);
     }
+
+    if ($output_mod->get('msg_controls_custom_actions')) {
+        $res .= $output_mod->get('msg_controls_custom_actions');
+    }
+
     $res .= '</div>';
     return $res;
 }}
