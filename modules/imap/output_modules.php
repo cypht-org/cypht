@@ -1520,10 +1520,21 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
                                     <input type="text" id="ews_profile_reply_to" name="ews_profile_reply_to" class="txt_fld form-control" value="" placeholder="'.$this->trans('Reply to').'">
                                     <label class="" for="ews_profile_reply_to">'.$this->trans('Reply to').'</label>
                                 </div>
-                                <div class="form-floating mb-2">
-                                    <input type="text" id="ews_profile_signature" name="ews_profile_signature" class="txt_fld form-control" value="" placeholder="'.$this->trans('Signature').'">
+                                ';
+                        $compose_type = $this->get('smtp_compose_type', 0);
+                            if ($compose_type == 1) {
+                                $res .= '<div class="mb-2">
+                                    <label class="form-label" for="ews_profile_signature">'.$this->trans('Signature').'</label>
+                                    <textarea id="ews_profile_signature" name="ews_profile_signature" class="txt_fld form-control html_sig_editor" rows="4" style="min-height: 120px"></textarea>
+                                    <script type="text/javascript">window.HTMLEditor = true;</script>
+                                </div>';
+                            } else {
+                                $res .= '<div class="form-floating mb-2">
+                                    <textarea id="ews_profile_signature" name="ews_profile_signature" class="txt_fld form-control" rows="4" style="min-height: 120px" placeholder="'.$this->trans('Signature').'"></textarea>
                                     <label class="" for="ews_profile_signature">'.$this->trans('Signature').'</label>
-                                </div>
+                                </div>';
+                            }
+                            $res .= '
                                 <div class="form-check">
                                     <input type="hidden" name="ews_profile_is_default" value="0">
                                     <input class="form-check-input me-2" type="checkbox" role="switch" id="ews_profile_is_default" name="ews_profile_is_default" value="1" checked>
