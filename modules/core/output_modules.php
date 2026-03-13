@@ -2469,7 +2469,6 @@ class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
                 $res .= '<div class="mb-2">
                         <label class="form-label" for="srv_setup_stepper_profile_signature">'.$this->trans('Signature').'</label>
                         <textarea id="srv_setup_stepper_profile_signature" name="srv_setup_stepper_profile_signature" class="txt_fld form-control html_sig_editor" rows="4" style="min-height : 120px"></textarea>
-                        <script type="text/javascript">window.HTMLEditor = true;</script>
                     </div>';
             } else {
                 $res .= '<div class="form-floating mb-2">

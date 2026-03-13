@@ -2040,12 +2040,12 @@ var decrease_servers = function(section) {
  * @param {string} storeAs  - window property name to store and guard the editor instance
  */
 var hm_init_sig_editor = function(selector, storeAs) {
-    if (!window.HTMLEditor || typeof KindEditor === 'undefined') {
+    if (typeof KindEditor === 'undefined') {
         return;
     }
-    if (storeAs && window[storeAs]) {
-        return;
-    }
+    // No stale-global guard: K.create() guards internally against double-init on
+    // the same live element, and a guard here would skip init on fresh SPA-injected
+    // textareas that share the selector with a now-stale global.
     KindEditor.ready(function(K) {
         if ($(selector).length) {
             var editor = K.create(selector, {

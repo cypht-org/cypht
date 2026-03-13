@@ -22,6 +22,11 @@ function applyServersPageHandlers() {
     if (window.smtpServersPageHandler) smtpServersPageHandler();
     if (window.imapServersPageHandler) imapServersPageHandler();
     if (window.wpServersPageHandler) wpServersPageHandler();
+
+    return function() {
+        window.stepperSigEditor = null;
+        window.ewsSigEditor = null;
+    };
 }
 
 function applySettingsPageHandlers(routeParams, hash) {
