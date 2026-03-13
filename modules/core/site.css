@@ -319,7 +319,7 @@ td {
   right: 10px;
   margin-right: 37px;
   cursor: pointer;
-  color: #666;
+  color: var(--bs-btn-color);
   font-size: 100%;
 }
 .disabled_link {
@@ -785,7 +785,7 @@ button {
   table-layout: fixed;
   width: 100%;
   min-height: 600px;
-  background: #fff;
+  background: transparent;
   height: 100%;
   margin-right: 20px;
   padding-bottom: 40px;
@@ -1678,8 +1678,10 @@ pre.msg_source {
 .move_to_location .folders { margin-left: 10px !important; }
 .inner_list .unread_count { padding: 0px 6px; }
 .msg_controls { margin-left: 5px; }
+.menu_search.selected_menu { background-color: transparent; }
 #dropdownMenuForward + ul .forward_link span,
 #contact_info + #contact_popup span { white-space: nowrap; }
+#extra-header-buttons { display: inline-block; margin-top: 0.5rem; }
 
 /* some theming changes */
 .allow_image_link .btn-light, .definitive_actions .btn-light,
