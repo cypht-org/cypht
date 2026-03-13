@@ -306,6 +306,7 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
         $sigs = array();
         $profiles = $this->get('profiles', array());
         $smtp_servers = $this->get('smtp_servers', array());
+        $compose_type = $this->get('smtp_compose_type', DEFAULT_SMTP_COMPOSE_TYPE);
 
         foreach ($smtp_servers as $id => $vals) {
             $smtp_profiles = profiles_by_smtp_id($profiles, $vals['id']);
@@ -313,15 +314,24 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
                 foreach ($smtp_profiles as $index => $profile) {
                     if (mb_strlen(trim($profile['sig']))) {
                         $sig = $profile['sig'];
-                        $sig = str_replace(array("\r\n", "\r"), "\n", $sig);
-                        $sig = "\n" . $sig . "\n";
-                        $encoded_sig = json_encode($sig, JSON_UNESCAPED_SLASHES);
+                        if ($compose_type == 1) {
+                            // HTML mode: store signature as-is
+                            $encoded_sig = json_encode($sig, JSON_UNESCAPED_SLASHES);
+                        } else {
+                            // Plain text mode: normalize newlines
+                            $sig = str_replace(array("\r\n", "\r"), "\n", $sig);
+                            $sig = "\n" . $sig . "\n";
+                            $encoded_sig = json_encode($sig, JSON_UNESCAPED_SLASHES);
+                        }
                         $sigs[] = sprintf("\"%s\": %s", $vals['id'].'.'.($index+1), $encoded_sig);
                     }
                 }
             }
         }
         $res .= implode(', ', $sigs).'}</script>';
+        if ($compose_type == 1) {
+            $res .= '<script type="text/javascript">window.sig_is_html = true;</script>';
+        }
         return $res;
     }
 }

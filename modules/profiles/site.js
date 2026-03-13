@@ -30,11 +30,25 @@ function profilesComposePageHandler() {
         if (profile_signatures && profile_signatures[server_id]) {
             var ta = $('.ke-content', $('iframe').contents());
             if (ta.length) {
-                ta.html(ta.html() + profile_signatures[server_id].replace(/\n/g, '<br />'));
+                if (window.sig_is_html) {
+                    ta.html(ta.html() + profile_signatures[server_id]);
+                } else {
+                    ta.html(ta.html() + profile_signatures[server_id].replace(/\n/g, '<br />'));
+                }
             }
             else {
                 ta = $('#compose_body');
-                insert_sig(ta[0], profile_signatures[server_id]);
+                var sig = profile_signatures[server_id];
+                var tmp = document.createElement('div');
+                tmp.innerHTML = sig;
+                var plainSig = (tmp.textContent || tmp.innerText)
+                    .split('\n')
+                    .map(function(l) { return l.trim(); })
+                    .join('\n')
+                    .replace(/\n{2,}/g, '\n')
+                    .trim();
+                sig = '\n' + plainSig + '\n';
+                insert_sig(ta[0], sig);
             }
         } else {
             Hm_Notices.show($('#sign_msg').val(), 'danger');
