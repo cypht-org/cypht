@@ -1,10 +1,16 @@
 .mobile .calendar_month th { max-width: 30px; overflow: hidden; }
-.calendar_month td { width: 14%; height: 120px; text-align: left; padding: 10px; border-bottom: solid 1px #eee; vertical-align: top; border-right: solid 1px #eee; }
-.calendar_week .offmonth, .calendar_month .offmonth { color: #ccc; }
+.calendar_month td { width: 14%; height: 120px; padding: 10px; text-align: left; vertical-align: top; }
+.calendar_month th, .calendar_month td { border: 1px solid var(--bs-border-color) !important; }
+.calendar_week .offmonth, .calendar_month .offmonth { color: var(--bs-border-color); }
 .calendar_week td { width: 14%; height: 600px; text-align: left; padding: 10px; border-bottom: solid 1px #eee; vertical-align: top; border-right: solid 1px #eee; }
 .event_details { cursor: pointer; z-index: 100; display: none; position: absolute; width: 300px; border: solid 1px #ddd; background-color: #fff; padding: 10px; }
 .event_details td { padding: 5px; border: none;  height: auto; }
 .event_detail {
     max-height: 35vh;
     overflow: auto;
+}
+.calendar .today { color: var(--bs-body-color); }
+.calendar .btn-outline-secondary {
+  color: var(--bs-link-color); border-color: var(--bs-link-color);
+  background: var(--bs-body-bg);
 }
