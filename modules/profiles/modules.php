@@ -235,6 +235,17 @@ class Hm_Handler_profile_data extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage profile/handler
+ */
+class Hm_Handler_profile_page_smtp_type extends Hm_Handler_Module {
+    public function process() {
+        $settings = $this->user_config;
+        $compose_type = $settings->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
+        $this->out('smtp_compose_type', $compose_type);
+    }
+}
+
 /**id
  * @subpackage profile/output
  */
