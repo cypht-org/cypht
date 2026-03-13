@@ -444,9 +444,18 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res .= '<label>'.$out_mod->trans('SMTP Server').' *</label></div>';
 
     // Signature
-    $res .= '<div class="form-floating mb-3 form-check-create-profile">';
-    $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control" style="min-height : 120px" placeholder="'.$out_mod->trans('Signature').'">'.$out_mod->html_safe($form_vals['sig']).'</textarea>';
-    $res .= '<label>'.$out_mod->trans('Signature').'</label></div>';
+    $compose_type = $out_mod->get('smtp_compose_type', 0);
+    if ($compose_type == 1) {
+        $res .= '<div class="mb-3 form-check-create-profile">';
+        $res .= '<label class="form-label">'.$out_mod->trans('Signature').'</label>';
+        $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control html_sig_editor" style="min-height : 120px">'.$out_mod->html_safe($form_vals['sig']).'</textarea>';
+        $res .= '<script type="text/javascript">window.HTMLEditor = true;</script>';
+        $res .= '</div>';
+    } else {
+        $res .= '<div class="form-floating mb-3 form-check-create-profile">';
+        $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control" style="min-height : 120px" placeholder="'.$out_mod->trans('Signature').'">'.$out_mod->html_safe($form_vals['sig']).'</textarea>';
+        $res .= '<label>'.$out_mod->trans('Signature').'</label></div>';
+    }
 
     // Remark
     $res .= '<div class="form-floating mb-3 form-check-create-profile">';
