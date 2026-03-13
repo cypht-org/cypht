@@ -160,6 +160,10 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
 
         if (array_key_exists('profile_sig', $this->request->post)) {
             $sig = $this->request->post['profile_sig'];
+            $compose_type = $this->user_config->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
+            if ($compose_type == 1) {
+                $sig = purify_html_sig($sig);
+            }
         }
         if (array_key_exists('profile_rmk', $this->request->post)) {
             $rmk = $this->request->post['profile_rmk'];
