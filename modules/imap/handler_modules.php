@@ -1653,7 +1653,9 @@ class Hm_Handler_save_ews_server extends Hm_Handler_Module {
                 } else {
                     $address = $form['ews_email'];
                 }
-                add_profile($form['ews_profile_name'], $form['ews_profile_signature'], $form['ews_profile_reply_to'], $form['ews_profile_is_default'], $address, $form['ews_server'], $form['ews_email'], $smtp_server_id, $imap_server_id, $this);
+                $compose_type = $this->user_config->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
+                $ews_sig = ($compose_type == 1) ? purify_html_sig($form['ews_profile_signature']) : $form['ews_profile_signature'];
+                add_profile($form['ews_profile_name'], $ews_sig, $form['ews_profile_reply_to'], $form['ews_profile_is_default'], $address, $form['ews_server'], $form['ews_email'], $smtp_server_id, $imap_server_id, $this);
             }
             // auto-assign special folders
             $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);

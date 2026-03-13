@@ -73,6 +73,9 @@ var imapServersPageHandler = function() {
     $('.test_imap_connect').on('click', imap_test_action);
     $('.edit_ews_server_connection').on('click', ews_edit_action);
 
+    ews_init_sig_editor();
+    $('#ews_form form').on('submit', ews_sync_sig);
+
     var dsp = Hm_Utils.get_from_local_storage('.imap_section');
     if (dsp === 'block' || dsp === 'none') {
         $('.imap_section').css('display', dsp);
@@ -84,6 +87,7 @@ var imapServersPageHandler = function() {
 
     $('.ews-btn').on('click', function() {
         $(this).hide().prev().removeClass('d-none');
+        ews_init_sig_editor();
     });
 };
 
@@ -96,10 +100,25 @@ var ews_edit_action = function(event) {
     $('#ews_email').val(details.user);
     $('#ews_password').val('');
     $('#ews_profile_reply_to').val('');
+    if (window.ewsSigEditor) {
+        window.ewsSigEditor.html('');
+    } else {
+        $('#ews_profile_signature').val('');
+    }
     $('#ews_create_profile').trigger("click", true);
     $('#ews_server').val(details.server);
     $('#ews_server_id').val(details.id);
     $('#ews_hide_from_c_page').prop("checked", details.hide);
+};
+
+var ews_init_sig_editor = function() {
+    hm_init_sig_editor('#ews_profile_signature', 'ewsSigEditor');
+};
+
+var ews_sync_sig = function() {
+    if (window.ewsSigEditor) {
+        window.ewsSigEditor.sync();
+    }
 };
 
 var set_message_content = function(path, msg_uid) {

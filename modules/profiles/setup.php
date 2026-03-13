@@ -9,6 +9,7 @@ output_source('profiles');
 setup_base_page('profiles', 'core');
 add_handler('profiles', 'profile_data', true, 'profiles', 'load_user_data', 'after');
 add_handler('profiles', 'profile_edit_data', true, 'profiles', 'profile_data', 'after');
+add_handler('profiles', 'profile_page_smtp_type', true, 'profiles', 'profile_edit_data', 'after');
 add_handler('profiles', 'process_profile_delete', true, 'profiles', 'profile_data', 'after');
 add_handler('profiles', 'process_profile_update', true, 'profiles', 'process_profile_delete', 'after');
 add_output('profiles', 'profile_edit_form', true, 'profiles', 'version_upgrade_checker', 'after');
@@ -24,6 +25,7 @@ add_handler('compose', 'compose_profile_data', true, 'profiles', 'load_smtp_serv
 add_handler('ajax_smtp_save_draft', 'compose_profile_data', true, 'profiles', 'load_smtp_servers_from_config', 'after');
 add_handler('ajax_smtp_attach_file', 'compose_profile_data', true, 'profiles', 'load_smtp_servers_from_config', 'after');
 add_handler('servers', 'compose_profile_data', true, 'profiles', 'load_smtp_servers_from_config', 'after');
+add_handler('servers', 'profile_page_smtp_type', true, 'profiles', 'compose_profile_data', 'after');
 add_handler('ajax_smtp_debug', 'process_smtp_server_data_delete', true, 'profiles','smtp_delete', 'after');
 add_handler('ajax_imap_debug', 'process_imap_server_data_delete', true, 'profiles','imap_delete', 'after');
 
