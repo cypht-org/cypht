@@ -2034,6 +2034,35 @@ var decrease_servers = function(section) {
     }
 };
 
+/**
+ * Initialize a KindEditor instance for a signature textarea in HTML compose mode.
+ * @param {string} selector - CSS selector for the textarea element
+ * @param {string} storeAs  - window property name to store and guard the editor instance
+ */
+var hm_init_sig_editor = function(selector, storeAs) {
+    if (!window.HTMLEditor || typeof KindEditor === 'undefined') {
+        return;
+    }
+    if (storeAs && window[storeAs]) {
+        return;
+    }
+    KindEditor.ready(function(K) {
+        if ($(selector).length) {
+            var editor = K.create(selector, {
+                items: ['bold', 'italic', 'underline', 'strikethrough', 'forecolor',
+                        'hilitecolor', 'fontname', 'fontsize', '|',
+                        'link', 'unlink', '|', 'undo', 'redo'],
+                basePath: 'third_party/kindeditor/',
+                resizeType: 1,
+                minHeight: 100,
+            });
+            if (storeAs) {
+                window[storeAs] = editor;
+            }
+        }
+    });
+};
+
 var hm_spinner = function(type = 'border', size = '') {
     return `<div class="d-flex justify-content-center spinner">
         <div class="spinner-${type} text-dark${size ? ` spinner-${type}-${size}` : ''}" role="status">
