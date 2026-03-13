@@ -462,7 +462,7 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     if ($compose_type == 1) {
         $res .= '<div class="mb-3 form-check-create-profile">';
         $res .= '<label class="form-label">'.$out_mod->trans('Signature').'</label>';
-        $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control html_sig_editor" style="min-height : 120px">'.$out_mod->html_safe($form_vals['sig']).'</textarea>';
+        $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control html_sig_editor" style="min-height : 120px">'.$form_vals['sig'].'</textarea>';
         $res .= '<script type="text/javascript">window.HTMLEditor = true;</script>';
         $res .= '</div>';
     } else {
