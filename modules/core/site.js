@@ -2303,7 +2303,7 @@ function submitSmtpImapServer() {
         { name: 'srv_setup_stepper_imap_sieve_mode_tls', value: $('#srv_setup_stepper_imap_sieve_mode_tls').prop('checked') },
         { name: 'srv_setup_stepper_create_profile', value: $('#srv_setup_stepper_create_profile').prop('checked') },
         { name: 'srv_setup_stepper_profile_is_default', value: $('#srv_setup_stepper_profile_is_default').prop('checked') },
-        { name: 'srv_setup_stepper_profile_signature', value: $('#srv_setup_stepper_profile_signature').val() },
+        { name: 'srv_setup_stepper_profile_signature', value: (function() { if (window.stepperSigEditor) { window.stepperSigEditor.sync(); } return $('#srv_setup_stepper_profile_signature').val(); })() },
         { name: 'srv_setup_stepper_profile_reply_to', value: $('#srv_setup_stepper_profile_reply_to').val() },
         { name: 'srv_setup_stepper_imap_sieve_host', value: $('#srv_setup_stepper_imap_sieve_host').val() },
         { name: 'srv_setup_stepper_only_jmap', value: $('input[name="srv_setup_stepper_only_jmap"]:checked').val() },
@@ -2342,6 +2342,7 @@ function resetQuickSetupForm() {
 
     //Initialize the form
     $("#srv_setup_stepper_profile_reply_to").val('');
+    if (window.stepperSigEditor) { window.stepperSigEditor.html(''); }
     $("#srv_setup_stepper_profile_signature").val('');
     $("#srv_setup_stepper_profile_name").val('');
     $("#srv_setup_stepper_email").val('');

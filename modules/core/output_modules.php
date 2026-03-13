@@ -2463,10 +2463,21 @@ class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
                         <input required type="text" id="srv_setup_stepper_profile_reply_to" name="srv_setup_stepper_profile_reply_to" class="txt_fld form-control" value="" placeholder="'.$this->trans('Reply to').'">
                         <label class="" for="srv_setup_stepper_profile_reply_to">'.$this->trans('Reply to').'</label>
                     </div>
-                    <div class="form-floating mb-2">
+                    ';
+            $compose_type = $this->get('smtp_compose_type', 0);
+            if ($compose_type == 1) {
+                $res .= '<div class="mb-2">
+                        <label class="form-label" for="srv_setup_stepper_profile_signature">'.$this->trans('Signature').'</label>
+                        <textarea id="srv_setup_stepper_profile_signature" name="srv_setup_stepper_profile_signature" class="txt_fld form-control html_sig_editor" rows="4" style="min-height : 120px"></textarea>
+                        <script type="text/javascript">window.HTMLEditor = true;</script>
+                    </div>';
+            } else {
+                $res .= '<div class="form-floating mb-2">
                         <textarea id="srv_setup_stepper_profile_signature" name="srv_setup_stepper_profile_signature" class="txt_fld form-control" rows="4" style="min-height : 120px" placeholder="'.$this->trans('Signature').'"></textarea>
                         <label class="" for="srv_setup_stepper_profile_signature">'.$this->trans('Signature').'</label>
-                    </div>
+                    </div>';
+            }
+            $res .= '
                     <div class="form-check" id="srv_setup_stepper_profile_checkbox_bloc">
                         <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_profile_is_default" checked>
                         <label class="form-check-label" for="srv_setup_stepper_profile_is_default">'.$this->trans('Set this profile default').'</label>
