@@ -754,8 +754,8 @@ function privacy_setting_callback($val, $key, $mod) {
     $setting = Hm_Output_privacy_settings::$settings[$key];
     $key .= '_setting';
     $user_setting = $mod->user_config->get($key);
-    $update = $mod->request->post['update'];
-    $pop = $mod->request->post['pop'];
+    $update = isset($mod->request->post['update']) ? $mod->request->post['update'] : null;
+    $pop = isset($mod->request->post['pop']) ? $mod->request->post['pop'] : null;
 
     if ($update) {
         if ($pop) {
