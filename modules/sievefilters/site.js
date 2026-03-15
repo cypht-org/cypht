@@ -6,6 +6,7 @@ let is_editing_script = false;
 let current_editing_script_name = "";
 // let hm_sieve_current_account = "";
 let current_account;
+let current_account_element;
 let is_editing_filter = false;
 let current_editing_filter_name = '';
 
@@ -174,21 +175,23 @@ var hm_sieve_possible_actions = function() {
             name: 'keep',
             description: 'Deliver (Keep)',
             type: 'none',
-            extra_field: false
+            extra_field: false,
         },
         {
             name: 'copy',
             description: 'Copy email to mailbox',
             placeholder: 'Mailbox Name (Folder)',
             type: 'mailbox',
-            extra_field: false
+            extra_field: false,
+            require: 'fileinto',
         },
         {
             name: 'move',
             description: 'Move email to mailbox',
             placeholder: 'Mailbox Name (Folder)',
             type: 'mailbox',
-            extra_field: false
+            extra_field: false,
+            require: 'fileinto',
         },
         {
             name: 'flag',
@@ -196,7 +199,8 @@ var hm_sieve_possible_actions = function() {
             placeholder: 'Example: SEEN',
             type: 'select',
             values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent'],
-            extra_field: false
+            extra_field: false,
+            require: 'imap4flags',
         },
         {
             name: 'addflag',
@@ -204,7 +208,8 @@ var hm_sieve_possible_actions = function() {
             placeholder: 'Example: SEEN',
             type: 'select',
             values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent'],
-            extra_field: false
+            extra_field: false,
+            require: 'imap4flags',
         },
         {
             name: 'removeflag',
@@ -212,7 +217,8 @@ var hm_sieve_possible_actions = function() {
             placeholder: 'Example: SEEN',
             type: 'select',
             values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent'],
-            extra_field: false
+            extra_field: false,
+            require: 'imap4flags',
         },
         {
             name: 'redirect',
@@ -233,13 +239,14 @@ var hm_sieve_possible_actions = function() {
             description: 'Reject',
             placeholder: 'Reject message',
             type: 'string',
-            extra_field: false
+            extra_field: false,
+            require: 'reject',
         },
         {
             name: 'discard',
             description: 'Discard',
             type: 'none',
-            extra_field: false
+            extra_field: false,
         },
         {
             name: 'autoreply',
@@ -248,10 +255,22 @@ var hm_sieve_possible_actions = function() {
             type: 'text',
             extra_field: true,
             extra_field_type: 'string',
-            extra_field_placeholder: 'Subject'
+            extra_field_placeholder: 'Subject',
+            require: 'vacation'
         }
     ];
 };
+
+var get_account_actions = () => {
+    const extensions = JSON.parse(current_account_element.attr('sieve_extensions'));
+    let possible_actions = hm_sieve_possible_actions();
+
+    possible_actions = possible_actions.filter((value) => {
+        return ! value.hasOwnProperty('require') || extensions.includes(value.require)
+    })
+
+    return possible_actions;
+}
 
 class Hm_Filter_Modal extends Hm_Modal {
     constructor(current_account) {
@@ -519,8 +538,8 @@ const Hm_Filters = (function (hm) {
 
     hm.add_filter_action = (default_value = '') =>{
         let possible_actions_html = '';
-
-        hm_sieve_possible_actions().forEach(function (value) {
+        
+        get_account_actions().forEach(function (value) {
             if (value.selected === true) {
                 possible_actions_html += '<option selected value="'+value.name+'">' + value.description + '</option>';
                 return;
@@ -570,6 +589,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
         $('.modal_sieve_filter_test').val('ALLOF');
         $('#stop_filtering').prop('checked', false);
         current_account = $(this).attr('account');
+        current_account_element = $(this);
         edit_filter_modal.open();
 
         // Reset the form fields when opening the modal
@@ -587,6 +607,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
         is_editing_script = false;
         current_editing_script_name = '';
         current_account = $(this).attr('account');
+        current_account_element = $(this);
         edit_script_modal.open();
     });
 
@@ -635,7 +656,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     $(document).on('click', '.filter_modal_add_else_action_btn', function () {
         let possible_actions_html = '';
 
-        hm_sieve_possible_actions().forEach(function (value) {
+        get_account_actions().forEach(function (value) {
             if (value.selected === true) {
                 possible_actions_html += '<option selected value="'+value.name+'">' + value.description + '</option>';
                 return;
@@ -669,7 +690,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
         let elem_extra = $(this).parent().next().find('.condition_extra_action_value');
         let action_name = $(this).val();
         let selected_action;
-        hm_sieve_possible_actions().forEach(function (action) {
+        get_account_actions().forEach(function (action) {
            if (action_name === action.name) {
                 selected_action = action;
            }
@@ -843,10 +864,10 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
         e.preventDefault();
         let obj = $(this);
         edit_script_modal.setTitle('Edit Script');
-        current_account = $(this).attr('account');
         is_editing_script = true;
         current_editing_script_name = $(this).attr('script_name');
         current_account = $(this).attr('imap_account');
+        current_account_element = $(this);
         $('.modal_sieve_script_name').val($(this).attr('script_name_parsed'));
         $('.modal_sieve_script_priority').val($(this).attr('priority'));
         Hm_Ajax.request(
@@ -867,9 +888,11 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
         e.preventDefault();
         let obj = $(this);
         current_account = $(this).attr('account');
+        current_account_element = $(this);
         is_editing_filter = true;
         current_editing_filter_name = $(this).attr('script_name');
         current_account = $(this).attr('imap_account');
+        current_account_element = $(this);
         // $('#stop_filtering').prop('checked', false);
         $('.modal_sieve_filter_name').val($(this).attr('script_name_parsed'));
         $('.modal_sieve_filter_priority').val($(this).attr('priority'));
