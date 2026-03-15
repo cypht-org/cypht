@@ -1361,7 +1361,7 @@ class Hm_Output_account_sieve_filters extends Hm_Output_Module {
         $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 d-flex justify-content-between border-bottom cursor-pointer">' . $mailbox['name'];
         $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
         $res .= '<div class="sievefilters_accounts filter_block p-3 d-none"><div class="filter_subblock">';
-        $res .= '<button class="add_filter btn btn-primary" account="'.$mailbox['name'].'">Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script btn btn-light border">Add Script</button>';
+        $res .= '<button class="add_filter btn btn-primary" account="'.$mailbox['name'].'"  sieve_extensions=\'' . json_encode($mailbox['sieve_extensions']) . '\'>Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script btn btn-light border">Add Script</button>';
         $res .= '<table class="filter_details table my-3"><tbody>';
         $res .= '<tr><th class="text-secondary fw-light col-sm-1">Priority</th><th class="text-secondary fw-light col-sm-9">Name</th><th class="text-secondary fw-light col-sm-2">Actions</th></tr>';
         $res .= $result['list'];
@@ -1622,7 +1622,14 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
         }
         $accounts = $this->get('imap_accounts');
         if (isset($accounts[$form['imap_server_id']])) {
-            $this->out('mailbox', $accounts[$form['imap_server_id']]);
+            $account = $accounts[$form['imap_server_id']];
+            $client = initialize_sieve_client_factory($this->config, null, $account);
+            $account['sieve_extensions'] = [];
+
+            if ($client) {
+                $account['sieve_extensions'] = $client->getExtensions();
+            }
+            $this->out('mailbox', $account);
             $this->session->close_early();
         }
     }
