@@ -115,7 +115,7 @@ class Hm_Cal_Output {
 
     private function output_month($month) {
         $res = $this->title();
-        $res .= '<div class="m-4 border"><table class="calendar_month">';
+        $res .= '<div class="m-4"><table class="calendar_month">';
         $res .= $this->output_heading();
         foreach ($month as $week) {
             $res .= $this->output_week($week);

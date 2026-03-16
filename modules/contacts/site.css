@@ -116,7 +116,7 @@
 
 @media (min-width: 1024px) {
     .add_contact_responsive {
-        width: 300px;
+        width: 50%;
         margin: 10px 25px;
     }
 }
@@ -323,3 +323,8 @@
 
 .contact-group>ul,
 .contact-group>ul>li {height: 100vh;}
+
+.contact-group { margin: 0 25px 25px; }
+.contact-group > ul { background-color: var(--bs-form-bg); }
+.add_contact_responsive .search_terms { padding-left: 0; }
+.add_contact_responsive .server_title { color: var(--bs-btn-color); }
