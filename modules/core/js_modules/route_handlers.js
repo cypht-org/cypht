@@ -12,6 +12,9 @@ function applyServersPageHandlers() {
         }
     });
 
+    // Init KindEditor for stepper signature field in HTML compose mode
+    hm_init_sig_editor('#srv_setup_stepper_profile_signature', 'stepperSigEditor');
+
     // Optional modules
     if (window.feedServersPageHandler) feedServersPageHandler();
     if (window.githubServersPageHandler) githubServersPageHandler();
@@ -19,6 +22,11 @@ function applyServersPageHandlers() {
     if (window.smtpServersPageHandler) smtpServersPageHandler();
     if (window.imapServersPageHandler) imapServersPageHandler();
     if (window.wpServersPageHandler) wpServersPageHandler();
+
+    return function() {
+        window.stepperSigEditor = null;
+        window.ewsSigEditor = null;
+    };
 }
 
 function applySettingsPageHandlers(routeParams, hash) {

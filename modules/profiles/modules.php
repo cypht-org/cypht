@@ -160,6 +160,10 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
 
         if (array_key_exists('profile_sig', $this->request->post)) {
             $sig = $this->request->post['profile_sig'];
+            $compose_type = $this->user_config->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
+            if ($compose_type == 1) {
+                $sig = purify_html_sig($sig);
+            }
         }
         if (array_key_exists('profile_rmk', $this->request->post)) {
             $rmk = $this->request->post['profile_rmk'];
@@ -235,6 +239,17 @@ class Hm_Handler_profile_data extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage profile/handler
+ */
+class Hm_Handler_profile_page_smtp_type extends Hm_Handler_Module {
+    public function process() {
+        $settings = $this->user_config;
+        $compose_type = $settings->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
+        $this->out('smtp_compose_type', $compose_type);
+    }
+}
+
 /**id
  * @subpackage profile/output
  */
@@ -295,6 +310,7 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
         $sigs = array();
         $profiles = $this->get('profiles', array());
         $smtp_servers = $this->get('smtp_servers', array());
+        $compose_type = $this->get('smtp_compose_type', DEFAULT_SMTP_COMPOSE_TYPE);
 
         foreach ($smtp_servers as $id => $vals) {
             $smtp_profiles = profiles_by_smtp_id($profiles, $vals['id']);
@@ -302,15 +318,24 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
                 foreach ($smtp_profiles as $index => $profile) {
                     if (mb_strlen(trim($profile['sig']))) {
                         $sig = $profile['sig'];
-                        $sig = str_replace(array("\r\n", "\r"), "\n", $sig);
-                        $sig = "\n" . $sig . "\n";
-                        $encoded_sig = json_encode($sig, JSON_UNESCAPED_SLASHES);
+                        if ($compose_type == 1) {
+                            // HTML mode: store signature as-is
+                            $encoded_sig = json_encode($sig, JSON_UNESCAPED_SLASHES);
+                        } else {
+                            // Plain text mode: normalize newlines
+                            $sig = str_replace(array("\r\n", "\r"), "\n", $sig);
+                            $sig = "\n" . $sig . "\n";
+                            $encoded_sig = json_encode($sig, JSON_UNESCAPED_SLASHES);
+                        }
                         $sigs[] = sprintf("\"%s\": %s", $vals['id'].'.'.($index+1), $encoded_sig);
                     }
                 }
             }
         }
         $res .= implode(', ', $sigs).'}</script>';
+        if ($compose_type == 1) {
+            $res .= '<script type="text/javascript">window.sig_is_html = true;</script>';
+        }
         return $res;
     }
 }
@@ -433,9 +458,17 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res .= '<label>'.$out_mod->trans('SMTP Server').' *</label></div>';
 
     // Signature
-    $res .= '<div class="form-floating mb-3 form-check-create-profile">';
-    $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control" style="min-height : 120px" placeholder="'.$out_mod->trans('Signature').'">'.$out_mod->html_safe($form_vals['sig']).'</textarea>';
-    $res .= '<label>'.$out_mod->trans('Signature').'</label></div>';
+    $compose_type = $out_mod->get('smtp_compose_type', 0);
+    if ($compose_type == 1) {
+        $res .= '<div class="mb-3 form-check-create-profile">';
+        $res .= '<label class="form-label">'.$out_mod->trans('Signature').'</label>';
+        $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control html_sig_editor" style="min-height : 120px">'.$form_vals['sig'].'</textarea>';
+        $res .= '</div>';
+    } else {
+        $res .= '<div class="form-floating mb-3 form-check-create-profile">';
+        $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control" style="min-height : 120px" placeholder="'.$out_mod->trans('Signature').'">'.$out_mod->html_safe($form_vals['sig']).'</textarea>';
+        $res .= '<label>'.$out_mod->trans('Signature').'</label></div>';
+    }
 
     // Remark
     $res .= '<div class="form-floating mb-3 form-check-create-profile">';

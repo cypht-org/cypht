@@ -1093,6 +1093,10 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 'srv_setup_stepper_imap_server_id' => $imapServerId,
                 'srv_setup_stepper_smtp_server_id' => $smtpServerId
             ] = $form;
+            $compose_type = $this->user_config->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
+            if ($compose_type == 1) {
+                $profileSignature = purify_html_sig($profileSignature);
+            }
 
             /*
             *  Connect to SMTP server if user wants to send emails

@@ -2034,6 +2034,35 @@ var decrease_servers = function(section) {
     }
 };
 
+/**
+ * Initialize a KindEditor instance for a signature textarea in HTML compose mode.
+ * @param {string} selector - CSS selector for the textarea element
+ * @param {string} storeAs  - window property name to store and guard the editor instance
+ */
+var hm_init_sig_editor = function(selector, storeAs) {
+    if (typeof KindEditor === 'undefined') {
+        return;
+    }
+    // No stale-global guard: K.create() guards internally against double-init on
+    // the same live element, and a guard here would skip init on fresh SPA-injected
+    // textareas that share the selector with a now-stale global.
+    KindEditor.ready(function(K) {
+        if ($(selector).length) {
+            var editor = K.create(selector, {
+                items: ['bold', 'italic', 'underline', 'strikethrough', 'forecolor',
+                        'hilitecolor', 'fontname', 'fontsize', '|',
+                        'link', 'unlink', '|', 'undo', 'redo'],
+                basePath: 'third_party/kindeditor/',
+                resizeType: 1,
+                minHeight: 100,
+            });
+            if (storeAs) {
+                window[storeAs] = editor;
+            }
+        }
+    });
+};
+
 var hm_spinner = function(type = 'border', size = '') {
     return `<div class="d-flex justify-content-center spinner">
         <div class="spinner-${type} text-dark${size ? ` spinner-${type}-${size}` : ''}" role="status">
@@ -2274,7 +2303,7 @@ function submitSmtpImapServer() {
         { name: 'srv_setup_stepper_imap_sieve_mode_tls', value: $('#srv_setup_stepper_imap_sieve_mode_tls').prop('checked') },
         { name: 'srv_setup_stepper_create_profile', value: $('#srv_setup_stepper_create_profile').prop('checked') },
         { name: 'srv_setup_stepper_profile_is_default', value: $('#srv_setup_stepper_profile_is_default').prop('checked') },
-        { name: 'srv_setup_stepper_profile_signature', value: $('#srv_setup_stepper_profile_signature').val() },
+        { name: 'srv_setup_stepper_profile_signature', value: (function() { if (window.stepperSigEditor) { window.stepperSigEditor.sync(); } return $('#srv_setup_stepper_profile_signature').val(); })() },
         { name: 'srv_setup_stepper_profile_reply_to', value: $('#srv_setup_stepper_profile_reply_to').val() },
         { name: 'srv_setup_stepper_imap_sieve_host', value: $('#srv_setup_stepper_imap_sieve_host').val() },
         { name: 'srv_setup_stepper_only_jmap', value: $('input[name="srv_setup_stepper_only_jmap"]:checked').val() },
@@ -2313,6 +2342,7 @@ function resetQuickSetupForm() {
 
     //Initialize the form
     $("#srv_setup_stepper_profile_reply_to").val('');
+    if (window.stepperSigEditor) { window.stepperSigEditor.html(''); }
     $("#srv_setup_stepper_profile_signature").val('');
     $("#srv_setup_stepper_profile_name").val('');
     $("#srv_setup_stepper_email").val('');
