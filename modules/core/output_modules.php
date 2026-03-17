@@ -181,7 +181,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
                 return '<form class="login_form" method="POST">';
             }
             else {
-                return '<form class="logout_form" method="POST">';
+                return '<form class="logout_form" method="POST" action="?page=logout">';
             }
         } else {
             if (!$this->get('router_login_state')) {
@@ -210,7 +210,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
                 return $css.'<div class="form-container"><form class="login_form" method="POST">';
             }
             else {
-                return '<div class="form-container"><form class="logout_form" method="POST">';
+                return '<div class="form-container"><form class="logout_form" method="POST" action="?page=logout">';
             }
         }
     }

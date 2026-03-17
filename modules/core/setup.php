@@ -147,7 +147,7 @@ setup_base_page('notfound');
 add_output('notfound', 'notfound_content', true, 'core', 'version_upgrade_checker', 'after');
 
 /* logout page */
-setup_base_page('logout', 'core', false);
+setup_base_page('logout', 'core');
 add_handler('logout', 'logout', true, 'core');
 add_output('logout', 'logout', true, 'core', 'content_section_start', 'after');
 

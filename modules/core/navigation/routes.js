@@ -1,7 +1,7 @@
 /*
 NOTE: Handlers are registered as strings instead of functions because some modules might not be enabled, making their pages' handler functions unaccessible.
 */
-const modulesRoutes = [
+const routes = [
     {
         page: 'hello_world',
         handler: 'applyHelloWorldPageHandlers'
@@ -85,17 +85,19 @@ const modulesRoutes = [
     {
         page: 'tags',
         handler: 'applyTagsPageHandlers'
+    },
+    {
+        page: 'logout',
+        handler: 'applyLogoutPageHandlers',
+        useLayout: false
     }
 ]
 
 /* 
 Now let's validate and use handlers that are given.
 */
-ROUTES = modulesRoutes.filter(route => typeof(window[route.handler]) === 'function').map(route => ({
+const ROUTES = routes.filter(route => typeof(window[route.handler]) === 'function').map(route => ({
     ...route,
-    handler: window[route.handler]
+    handler: window[route.handler],
+    commonHandler: route.useLayout === false ? window.applyCommonUnwrappedPageHandlers : window.applyCommonWrappedPageHandlers
 }));
-
-
-/* Output routes */
-OUTPUT_BARE_ROUTES = ['logout'];
