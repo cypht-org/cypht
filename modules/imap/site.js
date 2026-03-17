@@ -112,7 +112,7 @@ var ews_edit_action = function(event) {
 };
 
 var ews_init_sig_editor = function() {
-    hm_init_sig_editor('#ews_profile_signature', 'ewsSigEditor');
+    hm_init_sig_editor('#ews_profile_signature.html_sig_editor', 'ewsSigEditor');
 };
 
 var ews_sync_sig = function() {
