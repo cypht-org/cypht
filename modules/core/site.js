@@ -1389,16 +1389,20 @@ var Hm_Folders = {
     },
 
     update_folder_list: function(reset_cache = false) {
+        Hm_Folders.request_folder_list_update(Hm_Folders.update_folder_list_display, reset_cache);
+        return false;
+    },
+
+    request_folder_list_update: function(callback, reset_cache = false) {
         Hm_Ajax.request(
             [
                 {'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'},
                 {'name': 'reset_cache', 'value': reset_cache}
             ],
-            Hm_Folders.update_folder_list_display,
+            callback,
             [],
             true
         );
-        return false;
     },
 
     folder_list_events: function() {
@@ -1487,6 +1491,10 @@ var Hm_Folders = {
 
     unload_folder_list: function() {
         $('.folder_list').html('');
+    },
+
+    folder_list_loaded: function() {
+        return $('.folder_list').html() != '';
     },
 
     toggle_folders_event: function() {

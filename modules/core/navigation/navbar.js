@@ -75,3 +75,17 @@ function showMobileNavbar() {
     $('.hamburger-toggle').hide();
     $('.close-toggle').show();
 }
+
+function updateNavbarDynamicContent() {
+    Hm_Folders.request_folder_list_update(({ formatted_folder_list }) => {
+        const serverSideDynamicContent = ['#js-logout_link'];
+
+        serverSideDynamicContent.forEach(selector => {
+            const newElement = $(formatted_folder_list).find(selector).prop('outerHTML');
+            const currentElement = $(selector);
+            if (newElement) {
+                currentElement.replaceWith(newElement);
+            }
+        });
+    });
+}

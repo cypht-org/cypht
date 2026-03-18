@@ -194,12 +194,20 @@ function applyLogoutPageHandlers() {
 }
 
 function applyCommonWrappedPageHandlers() {
+    if (! hm_is_logged()) return;
+
     /* check for folder reload */
     const reloaded = Hm_Folders.reload_folders();
 
-    /* load folder list */
-    if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
-        Hm_Folders.update_folder_list();
+    if (!Hm_Folders.folder_list_loaded()) {
+        /* load folder list */
+        if ((!reloaded && !Hm_Folders.load_from_local_storage())) {
+            Hm_Folders.update_folder_list();
+        }
+    }
+
+    if (!reloaded) {
+        updateNavbarDynamicContent();
     }
 
     if ($('.cypht-layout nav').hasClass('collapsed')) {
