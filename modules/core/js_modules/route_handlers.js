@@ -12,8 +12,8 @@ function applyServersPageHandlers() {
         }
     });
 
-    // Init KindEditor for stepper signature field in HTML compose mode
-    hm_init_sig_editor('#srv_setup_stepper_profile_signature', 'stepperSigEditor');
+    // Init KindEditor for stepper signature field in HTML compose mode only
+    hm_init_sig_editor('#srv_setup_stepper_profile_signature.html_sig_editor', 'stepperSigEditor');
 
     // Optional modules
     if (window.feedServersPageHandler) feedServersPageHandler();
