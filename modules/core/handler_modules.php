@@ -789,6 +789,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
         if (array_key_exists('logout', $this->request->post) && !$this->session->loaded) {
             $this->session->destroy($this->request);
             Hm_Msgs::add('Session destroyed on logout', 'info');
+            $this->out('redirect_url', '?home');
         }
         elseif (array_key_exists('save_and_logout', $this->request->post)) {
             list($success, $form) = $this->process_form(array('password'));
@@ -811,6 +812,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
                         $this->user_config->save($user, $pass);
                         $this->session->destroy($this->request);
                         Hm_Msgs::add('Saved user data on logout, Session destroyed on logout', 'info');
+                        $this->out('redirect_url', '?home');
                     } catch (Exception $e) {
                         Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
                     }
