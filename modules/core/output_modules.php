@@ -1640,7 +1640,7 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<div class="sidebar-footer">';
-        $res .= '<a class="logout_link" id="js-logout_link" href=\'?page=logout&prompt=true&back_query='. (base64_encode(serialize($this->get('router_get_export')))) .'\' title="'. $this->trans('Logout') .'">';
+        $res .= '<a class="logout_link" id="js-logout_link" href="?page=logout&prompt=true&back_query='. (base64_encode(serialize($this->get('router_get_export')))) .'" title="'. $this->trans('Logout') .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-power menu-icon"></i>';
         }

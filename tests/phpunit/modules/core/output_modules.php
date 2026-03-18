@@ -125,7 +125,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('<form class="login_form" method="POST">'), $res->output_response);
         $test->handler_response = array('router_login_state' => true);
         $res = $test->run();
-        $this->assertEquals(array('<form class="logout_form" method="POST">'), $res->output_response);
+        $this->assertEquals(array('<form class="logout_form" method="POST" action="?page=logout">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -139,7 +139,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     </style><div class="form-container"><form class="login_form" method="POST">'), $res->output_response);
         $test->handler_response = array('router_login_state' => true, 'fancy_login_allowed' => true);
         $res = $test->run();
-        $this->assertEquals(array('<div class="form-container"><form class="logout_form" method="POST">'), $res->output_response);
+        $this->assertEquals(array('<div class="form-container"><form class="logout_form" method="POST" action="?page=logout">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -944,11 +944,18 @@ class Hm_Test_Core_Output_Modules extends TestCase {
      */
     public function test_folder_list_content_end() {
         $test = new Output_Test('folder_list_content_end', 'core');
+        $test->handler_response = array('router_get_export' => array('page' => 'compose'));
         $res = $test->run();
-        $this->assertEquals(array('<div class="sidebar-footer"><a class="logout_link" href="#" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
+        $expectedLogoutBackQuery = base64_encode(serialize(array('page' => 'compose')));
+        $this->assertEquals(array('<div class="sidebar-footer"><a class="logout_link" id="js-logout_link" href="?page=logout&prompt=true&back_query=' . $expectedLogoutBackQuery . '" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
         $test->rtype = 'AJAX';
+
+        $router_get_params = ['page' => 'settings'];
+        $test->handler_response = array('router_get_export' => $router_get_params);
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="sidebar-footer"><a class="logout_link" href="#" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
+
+        $expectedLogoutBackQuery = base64_encode(serialize($router_get_params));
+        $this->assertEquals(array('formatted_folder_list' => '<div class="sidebar-footer"><a class="logout_link" id="js-logout_link" href="?page=logout&prompt=true&back_query=' . $expectedLogoutBackQuery . '" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>', 'router_get_export' => $router_get_params), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
