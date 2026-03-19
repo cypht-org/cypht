@@ -242,7 +242,9 @@ return array(
         'pages' => array(FILTER_VALIDATE_INT, false),
         'folder_status' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'imap_server_id' => array(FILTER_UNSAFE_RAW, false),
-        'imap_service_name' => array(FILTER_UNSAFE_RAW, false)
+        'imap_service_name' => array(FILTER_UNSAFE_RAW, false),
+        'mailbox' => array(FILTER_UNSAFE_RAW, false),
+        'mailbox_name' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_cookie' => array(
         'CYPHTID' => FILTER_UNSAFE_RAW,
@@ -290,6 +292,7 @@ return array(
         'screen_emails' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'prompt' => FILTER_VALIDATE_BOOLEAN,
         'back_query' => FILTER_UNSAFE_RAW,
+        'mailbox_name' => FILTER_UNSAFE_RAW,
     ),
 
     'allowed_post' => array(
