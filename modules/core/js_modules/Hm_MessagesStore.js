@@ -324,6 +324,11 @@ class Hm_MessagesStore {
                     if (ds.type == 'feeds') {
                         cfg.push({ name: "hm_ajax_hook", value: 'ajax_feed_combined' });
                         cfg.push({ name: "feed_server_ids", value: ds.id });
+                    } else if (ds.type == 'custom') {
+                        cfg.push({ name: "hm_ajax_hook", value: ds.hook });
+                        for (const param in ds.params) {
+                            cfg.push({ name: param, value: ds.params[param] });
+                        }
                     } else {
                         cfg.push({ name: "hm_ajax_hook", value: this.path == 'search' ? 'ajax_imap_search' : 'ajax_imap_message_list' });
                         cfg.push({ name: "imap_server_ids", value: ds.id });

@@ -110,8 +110,15 @@ function format_data_sources($array, $output_mod) {
         $objects = array();
         foreach ($sources as $values) {
             $items = array();
+            $custom = array_key_exists('type', $values) && $values['type'] == 'custom';
             foreach ($values as $name => $value) {
-                $items[] = $output_mod->html_safe($name).':"'.$output_mod->html_safe($value).'"';
+                if ($custom && $name == 'params') {
+                    $value_output = json_encode($value);
+                } else {
+                    $value_output = '"'.$output_mod->html_safe($value).'"';
+                }
+
+                $items[] = $output_mod->html_safe($name).':'.$value_output;
             }
             $objects[] = '{'.implode(',', $items).'}';
         }
