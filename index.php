@@ -38,7 +38,7 @@ $glitchtip_dsn = env('GLITCHTIP_DSN', '');
 if ($glitchtip_dsn) {
     \Sentry\init([
         'dsn' => $glitchtip_dsn,
-        'traces_sample_rate' => 0.01,
+        'traces_sample_rate' => env('GLITCHTIP_TRACES_SAMPLE_RATE', 0.01),
     ]);
 }
 
