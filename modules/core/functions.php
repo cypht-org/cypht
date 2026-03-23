@@ -555,8 +555,8 @@ function setup_base_page($name, $source=false, $use_layout=true) {
     add_output($name, 'js_search_data', true, $source);
     add_output($name, 'header_end', false, $source);
     add_output($name, 'msgs', false, $source);
+    add_output($name, 'content_start', false, $source);
     if($use_layout) {
-        add_output($name, 'content_start', false, $source);
         add_output($name, 'login_start', false, $source);
         add_output($name, 'login', false, $source);
         add_output($name, 'login_end', false, $source);
@@ -568,8 +568,8 @@ function setup_base_page($name, $source=false, $use_layout=true) {
         add_output($name, 'content_section_end', true, $source);
         add_output($name, 'modals', true, $source);
         add_output($name, 'save_reminder', true, $source);
-        add_output($name, 'content_end', false, $source, 'page_js', 'after');
     }
+    add_output($name, 'content_end', false, $source, 'page_js', 'after');
     add_output($name, 'page_js', false, $source);
 }}
 

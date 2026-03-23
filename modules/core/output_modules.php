@@ -181,7 +181,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
                 return '<form class="login_form" method="POST">';
             }
             else {
-                return '<form class="logout_form" method="POST">';
+                return '<form class="logout_form" method="POST" action="?page=logout">';
             }
         } else {
             if (!$this->get('router_login_state')) {
@@ -210,7 +210,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
                 return $css.'<div class="form-container"><form class="login_form" method="POST">';
             }
             else {
-                return '<div class="form-container"><form class="logout_form" method="POST">';
+                return '<div class="form-container"><form class="logout_form" method="POST" action="?page=logout">';
             }
         }
     }
@@ -302,6 +302,22 @@ class Hm_Output_login extends Hm_Output_Module {
                 </div>
             </div>';
         }
+    }
+}
+
+class Hm_Output_logout extends Hm_Output_Module {
+    /**
+     * Outputs the logout confirmation markup
+     */
+    protected function output() {
+        $cancelUrl = $this->get('cancel_logout_url', '');
+        return '<div class="d-flex w-100 justify-content-center align-items-center vh-100 p-3 flex-column">
+            <p>Do you really want to end the session?</p>
+            <div class="d-flex gap-2">
+                <a class="btn btn-primary" href="'.$cancelUrl.'" ' . (!$cancelUrl ? 'style="display:none;"' : '') . '>'.$this->trans('No, go back').'</a>
+                <a class="btn btn-danger" href="#" id="confirm-logout">'.$this->trans('Yes, log me out').'</a>
+            </div>
+        </div>';
     }
 }
 
@@ -1624,7 +1640,7 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<div class="sidebar-footer">';
-        $res .= '<a class="logout_link" href="#" title="'. $this->trans('Logout') .'">';
+        $res .= '<a class="logout_link" id="js-logout_link" href="?page=logout&prompt=true&back_query='. (base64_encode(serialize($this->get('router_get_export')))) .'" title="'. $this->trans('Logout') .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-power menu-icon"></i>';
         }

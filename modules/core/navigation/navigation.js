@@ -214,15 +214,14 @@ function renderPage(href) {
 
     const url = new URL(href, window.location.origin);
     const searchParams = url.searchParams;
-    const page = searchParams.get('page');
+    const page = searchParams.get('page') || 'home';
 
-    if (page) {
-        const route = ROUTES.find(route => route.page === page);
-        const routeParams = Object.fromEntries(searchParams.entries());
-        
-        if (route) {
-            const unMountCallback = route.handler(routeParams, url.hash?.substring(1));
-            return unMountCallback;
-        }
+    const route = ROUTES.find(route => route.page === page);
+    const routeParams = Object.fromEntries(searchParams.entries());
+    
+    if (route) {
+        route.commonHandler(routeParams, url.hash?.substring(1));
+        const unMountCallback = route.handler(routeParams, url.hash?.substring(1));
+        return unMountCallback;
     }
 }

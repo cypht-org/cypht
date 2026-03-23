@@ -1389,16 +1389,20 @@ var Hm_Folders = {
     },
 
     update_folder_list: function(reset_cache = false) {
+        Hm_Folders.request_folder_list_update(Hm_Folders.update_folder_list_display, reset_cache);
+        return false;
+    },
+
+    request_folder_list_update: function(callback, reset_cache = false) {
         Hm_Ajax.request(
             [
                 {'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'},
                 {'name': 'reset_cache', 'value': reset_cache}
             ],
-            Hm_Folders.update_folder_list_display,
+            callback,
             [],
             true
         );
-        return false;
     },
 
     folder_list_events: function() {
@@ -1425,7 +1429,6 @@ var Hm_Folders = {
             return false;
         });
         $('.hide_folders').on("click", function() { return Hm_Folders.hide_folder_list(); });
-        $('.logout_link').on("click", function(e) { return Hm_Utils.confirm_logout(); });
         if (hm_search_terms()) {
             $('.search_terms').val(hm_search_terms());
         }
@@ -1484,6 +1487,14 @@ var Hm_Folders = {
             return true;
         }
         return false;
+    },
+
+    unload_folder_list: function() {
+        $('.folder_list').html('');
+    },
+
+    folder_list_loaded: function() {
+        return $('.folder_list').html() != '';
     },
 
     toggle_folders_event: function() {
@@ -1545,7 +1556,7 @@ var Hm_Utils = {
     },
 
     confirm_logout: function() {
-        if (! $('#unsaved_changes').length || $('#unsaved_changes').val() == 0) {
+        if ((! $('#unsaved_changes').length || $('#unsaved_changes').val() == 0) && !$('.save_reminder').length) {
             document.getElementById('logout_without_saving').click();
         }
         else {
@@ -2177,9 +2188,6 @@ $(function() {
     })
     $('.reset_factory_button').on('click', function() { return hm_delete_prompt(); });
 
-    /* check for folder reload */
-    var reloaded = Hm_Folders.reload_folders();
-
     /* setup a few page wide event handlers */
     Hm_Utils.cancel_logout_event();
     Hm_Folders.toggle_folders_event();
@@ -2189,11 +2197,6 @@ $(function() {
 
     /* show any pending notices */
     Hm_Notices.showPendingMessages();
-
-    /* load folder list */
-    if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
-        Hm_Folders.update_folder_list();
-    }
 
     hl_save_link();
     if (hm_mailto()) {

@@ -185,3 +185,39 @@ function applyComposePageHandlers(routeParams) {
         applyContactsAutocompleteComposePageHandlers(routeParams);
     }
 }
+
+function applyLogoutPageHandlers() {
+    $('#confirm-logout').on('click', function(e) {
+        e.preventDefault();
+        Hm_Utils.confirm_logout();
+    });
+}
+
+function applyCommonWrappedPageHandlers() {
+    if (! hm_is_logged()) return;
+
+    /* check for folder reload */
+    const reloaded = Hm_Folders.reload_folders();
+
+    if (!Hm_Folders.folder_list_loaded()) {
+        /* load folder list */
+        if ((!reloaded && !Hm_Folders.load_from_local_storage())) {
+            Hm_Folders.update_folder_list();
+        }
+    }
+
+    if (!reloaded) {
+        updateNavbarDynamicContent();
+    }
+
+    if ($('.cypht-layout nav').hasClass('collapsed')) {
+        document.documentElement.style.setProperty('--nav-size', 'var(--nav-collapsed-size)');
+    } else {
+        document.documentElement.style.setProperty('--nav-size', 'var(--nav-expanded-size)');
+    }
+}
+
+function applyCommonUnwrappedPageHandlers() {
+    Hm_Folders.unload_folder_list();
+    document.documentElement.style.setProperty('--nav-size', '0px');
+}
