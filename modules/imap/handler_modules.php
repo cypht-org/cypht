@@ -2029,6 +2029,12 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 $this->out('simple_msg_part_view', $this->user_config->get('simple_msg_parts_setting', DEFAULT_SIMPLE_MSG_PARTS));
                 $this->out('allow_delete_attachment', $this->user_config->get('allow_delete_attachment_setting', false));
                 if ($msg_struct_current) {
+                    if ($msg_struct_current['type'] == 'application' && $msg_struct_current['subtype'] == 'ms-tnef') {
+                        $msg_text = parse_mstnef($msg_text);
+                        $msg_struct_current['type'] = 'text';
+                        $msg_struct_current['subtype'] = 'html';
+                    }
+
                     $this->out('msg_struct_current', $msg_struct_current);
                 }
                 $this->out('msg_text', $msg_text);

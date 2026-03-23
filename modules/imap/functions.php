@@ -445,6 +445,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
         'imagejpeg',
         'imagepjpeg',
         'imagegif',
+        'applicationms-tnef',
     );
     $icons = array(
         'text' => 'doc',
@@ -1683,5 +1684,62 @@ if (!hm_exists('is_imap_trash_folder')) {
             return $specials['trash'] === $folder;
         }
         return false;
+    }
+}
+
+if (!hm_exists('parse_mstnef')) {
+    function parse_mstnef($tnefBinary) {
+        $part = new Horde_Mime_Part();
+        $part->setType('application/ms-tnef');
+        $part->setName('winmail.dat');
+        $part->setContents($tnefBinary);
+        $viewer = new Horde_Mime_Viewer_Tnef($part);
+        $embedded = $viewer->getEmbeddedMimeParts();
+
+        if (! $embedded) {
+            trigger_error('No embedded parts found in MSTNEF content', E_USER_WARNING);
+            return '';
+        }
+
+        $html = array();
+        $embeddedParts = new Horde_Mime_Part_Iterator($embedded, true);
+        foreach ($embeddedParts as $embeddedPart) {
+            if ($embeddedPart->getPrimaryType() == 'multipart') {
+                continue;
+            }
+
+            $name = $embeddedPart->getName(true) ?: ('part-' . $embeddedPart->getMimeId());
+            $name = basename(str_replace("\0", '', $name));
+            $type = strtolower($embeddedPart->getType());
+            $data = $embeddedPart->getContents();
+            $title = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+
+            if ($type === 'text/html') {
+                $htmlViewer = new Horde_Mime_Viewer_Html($embeddedPart, [
+                    'browser' => new Horde_Browser(),
+                ]);
+                $html[] = $htmlViewer->render('inline')['data'];
+                continue;
+            }
+
+            if ($type === 'text/plain') {
+                $plainViewer = new Horde_Mime_Viewer_Plain($embeddedPart);
+                $html[] = $plainViewer->render('full')['data'];
+                continue;
+            }
+
+            if ($embeddedPart->getPrimaryType() === 'image') {
+                $html[] = '<figure class="tnef_part tnef_image_part"><img alt="' . $title . '" src="data:' . htmlspecialchars($type, ENT_QUOTES, 'UTF-8') . ';base64,' . base64_encode($data) . '"></figure>';
+                continue;
+            }
+
+            $html[] = '<section class="tnef_part tnef_attachment_part"><p>' . htmlspecialchars($type, ENT_QUOTES, 'UTF-8') . ' (' . strlen($data) . ' bytes)</p><pre>' . htmlspecialchars($data, ENT_QUOTES, 'UTF-8') . '</pre></section>';
+        }
+
+        if (!$html) {
+            return '<div class="tnef_part tnef_empty_part">No renderable content found in this TNEF payload.</div>';
+        }
+
+        return '<div class="tnef_parts">' . implode('', $html) . '</div>';
     }
 }
