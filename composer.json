@@ -51,6 +51,7 @@
         "league/commonmark": "^2.8.1",
         "monolog/monolog": "^3.0",
         "php": ">=8.1",
+        "sentry/sdk": "^4.0",
         "symfony/dotenv": "^6.4",
         "symfony/yaml": "~6.4.3",
         "thomaspark/bootswatch": "^5.3",

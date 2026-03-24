@@ -32,6 +32,16 @@ require APP_PATH.'lib/framework.php';
 $environment = Hm_Environment::getInstance();
 $environment->load();
 
+/* initialize glitchtip to capture errors */
+$glitchtip_dsn = env('GLITCHTIP_DSN', '');
+
+if ($glitchtip_dsn) {
+    \Sentry\init([
+        'dsn' => $glitchtip_dsn,
+        'traces_sample_rate' => env('GLITCHTIP_TRACES_SAMPLE_RATE', 0.01),
+    ]);
+}
+
 define('DEBUG_MODE', filter_var(env('ENABLE_DEBUG', false), FILTER_VALIDATE_BOOLEAN));
 
 /* show all warnings in debug mode */
