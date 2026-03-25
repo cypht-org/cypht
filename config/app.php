@@ -1373,4 +1373,7 @@ return [
     'fancy_login' => env('FANCY_LOGIN', false),
 
     'js_exclude_deps' => env('JS_EXCLUDE_DEPS', ''),
+
+    'enable_mstnef_viewer' => env('ENABLE_MSTNEF_VIEWER', false),
+    'unrtf_path' => env('UNRTF_PATH', '/usr/bin/unrtf'),
 ];

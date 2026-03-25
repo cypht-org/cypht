@@ -1688,7 +1688,7 @@ if (!hm_exists('is_imap_trash_folder')) {
 }
 
 if (!hm_exists('parse_mstnef')) {
-    function parse_mstnef($tnefBinary) {
+    function parse_mstnef($tnefBinary, $unrtfPath) {
         $part = new Horde_Mime_Part();
         $part->setType('application/ms-tnef');
         $part->setName('winmail.dat');
@@ -1718,22 +1718,31 @@ if (!hm_exists('parse_mstnef')) {
                 $htmlViewer = new Horde_Mime_Viewer_Html($embeddedPart, [
                     'browser' => new Horde_Browser(),
                 ]);
-                $html[] = $htmlViewer->render('inline')['data'];
+                $result = $htmlViewer->render('inline');
+                $html[] = $result[$embeddedPart->getMimeId()]['data'];
                 continue;
             }
 
             if ($type === 'text/plain') {
                 $plainViewer = new Horde_Mime_Viewer_Plain($embeddedPart);
-                $html[] = $plainViewer->render('full')['data'];
+                $result = $plainViewer->render('inline');
+                $html[] = $result[$embeddedPart->getMimeId()]['data'];
+                continue;
+            }
+
+            if ($type === 'application/rtf') {
+                $rtfViewer = new Horde_Mime_Viewer_Rtf($embeddedPart, [
+                    'location' => $unrtfPath,
+                ]);
+                $result = $rtfViewer->render('full');
+                $html[] = $result[$embeddedPart->getMimeId()]['data'];
                 continue;
             }
 
             if ($embeddedPart->getPrimaryType() === 'image') {
-                $html[] = '<figure class="tnef_part tnef_image_part"><img alt="' . $title . '" src="data:' . htmlspecialchars($type, ENT_QUOTES, 'UTF-8') . ';base64,' . base64_encode($data) . '"></figure>';
+                $html[] = '<img alt="' . $title . '" src="data:' . htmlspecialchars($type, ENT_QUOTES, 'UTF-8') . ';base64,' . base64_encode($data) . '">';
                 continue;
             }
-
-            $html[] = '<section class="tnef_part tnef_attachment_part"><p>' . htmlspecialchars($type, ENT_QUOTES, 'UTF-8') . ' (' . strlen($data) . ' bytes)</p><pre>' . htmlspecialchars($data, ENT_QUOTES, 'UTF-8') . '</pre></section>';
         }
 
         if (!$html) {
