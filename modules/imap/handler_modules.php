@@ -2028,6 +2028,8 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 $this->out('use_message_part_icons', $this->user_config->get('msg_part_icons_setting', false));
                 $this->out('simple_msg_part_view', $this->user_config->get('simple_msg_parts_setting', DEFAULT_SIMPLE_MSG_PARTS));
                 $this->out('allow_delete_attachment', $this->user_config->get('allow_delete_attachment_setting', false));
+                $this->out('enable_mstnef_viewer', $this->config->get('enable_mstnef_viewer', false));
+                
                 if ($msg_struct_current) {
                     if ($msg_struct_current['type'] == 'application' && $msg_struct_current['subtype'] == 'ms-tnef') {
                         $msg_text = parse_mstnef($msg_text, $this->config->get('unrtf_path'));

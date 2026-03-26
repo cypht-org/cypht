@@ -445,8 +445,12 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
         'imagejpeg',
         'imagepjpeg',
         'imagegif',
-        'applicationms-tnef',
     );
+
+    if ($output_mod->get('enable_mstnef_viewer')) {
+        $allowed[] = 'applicationms-tnef';
+    }
+
     $icons = array(
         'text' => 'doc',
         'image' => 'camera',
