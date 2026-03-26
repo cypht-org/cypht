@@ -1697,7 +1697,7 @@ if (!hm_exists('parse_mstnef')) {
         $embedded = $viewer->getEmbeddedMimeParts();
 
         if (! $embedded) {
-            trigger_error('No embedded parts found in MSTNEF content', E_USER_WARNING);
+            Hm_Debug::add('No embedded parts found in MSTNEF content');
             return '';
         }
 
