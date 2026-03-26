@@ -84,7 +84,7 @@
         "optimize-autoloader": true,
         "allow-plugins": {
             "endroid/installer": false,
-            "horde/horde-installer-plugin": true
+            "horde/horde-installer-plugin": false
         }
     },
     "scripts": {
