@@ -2011,7 +2011,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 else {
                     $mailbox->set_read_only($prefetch);
                 }
-                list($msg_struct, $msg_struct_current, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($form['folder']), $form['imap_msg_uid'], $part, $this->user_config->get('text_only_setting', false));
+                list($msg_struct, $msg_struct_current, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($form['folder']), $form['imap_msg_uid'], $part, $this->user_config->get('text_only_setting', false), $this->config->get('enable_mstnef_viewer'));
                 $save_reply_text = false;
                 if ($part == 0 || (isset($msg_struct_current['type']) && mb_strtolower($msg_struct_current['type'] == 'text'))) {
                     $save_reply_text = true;
