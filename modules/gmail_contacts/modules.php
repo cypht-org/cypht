@@ -65,10 +65,35 @@ function parse_people_api_contacts($response, $source) {
 /**
  * @subpackage gmail_contacts/functions
  */
+if (!hm_exists('normalize_gmail_session_contacts')) {
+function normalize_gmail_session_contacts($contacts) {
+    $results = array();
+    foreach ($contacts as $contact) {
+        if (!is_array($contact) || !array_key_exists('email_address', $contact)) {
+            continue;
+        }
+        if (!array_key_exists('display_name', $contact)) {
+            $contact['display_name'] = '';
+        }
+        if (!array_key_exists('phone_number', $contact)) {
+            $contact['phone_number'] = '';
+        }
+        $contact['source'] = 'gmail';
+        $contact['type'] = 'gmail';
+        $results[] = $contact;
+    }
+    return $results;
+}}
+
+/**
+ * @subpackage gmail_contacts/functions
+ */
 if (!hm_exists('fetch_gmail_contacts')) {
 function fetch_gmail_contacts($config, $contact_store, $session=false, $max_google_contacts_number = 500) {
     if ($session && $session->get('gmail_contacts') && is_array($session->get('gmail_contacts')) && count($session->get('gmail_contacts')) > 0) {
-        $contact_store->import($session->get('gmail_contacts'));
+        $cached_contacts = normalize_gmail_session_contacts($session->get('gmail_contacts'));
+        $contact_store->import($cached_contacts);
+        $session->set('gmail_contacts', $cached_contacts);
         return $contact_store;
     }
     $all_contacts = array();
