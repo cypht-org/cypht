@@ -156,6 +156,8 @@ function applyMessageListPageHandlers(routeParams) {
         Hm_Message_List.sort($(this).val());
     });
 
+    if (window.handleSieveCustomAction) handleSieveCustomAction();
+
     // TODO: Refactor this handler to be more modular(applicable only for the imap list type)
     return applyImapMessageListPageHandlers(routeParams);
 }
