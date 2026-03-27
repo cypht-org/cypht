@@ -64,6 +64,7 @@ function interface_langs() {
         'nl' => 'Dutch',
         'ja' => 'Japanese',
         'hu' => 'Hungarian',
+        'pl' => 'Polish',
         'pt-BR' => 'Brazilian Portuguese',
         'az' => 'Azerbaijani',
         'zh-Hans' => 'Chinese Simplified',
