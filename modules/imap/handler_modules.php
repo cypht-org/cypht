@@ -518,6 +518,30 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
 }
 
 /**
+ * Stream a file from the attachment directory to the browser (usually attachments found in MSTNEF messages)
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_download_attachment extends Hm_Handler_Module {
+    /**
+     * Download a file from the attachment directory
+     */
+    public function process() {
+        if (array_key_exists('download_attachment', $this->request->get) && $file = $this->request->get['download_attachment']) {
+            $filepath = $this->config->get('attachment_dir') . DIRECTORY_SEPARATOR . "message_" . $this->request->get['imap_msg_uid'] . DIRECTORY_SEPARATOR . $file;
+            trigger_error('Attempting to download attachment from path: ' . $filepath, E_USER_NOTICE);
+            if (file_exists($filepath)) {
+                header('Content-Disposition: attachment; filename="' . basename($filepath) . '"');
+                header('Content-Type: application/octet-stream');
+                header('Content-Transfer-Encoding: binary');
+                readfile($filepath);
+                Hm_Functions::cease();
+            }
+            Hm_Msgs::add('An Error occurred trying to download the attachment', 'danger');
+        }
+    }
+}
+
+/**
  * Process the list_path input argument
  * @subpackage imap/handler
  */
@@ -2032,7 +2056,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 
                 if ($msg_struct_current) {
                     if ($msg_struct_current['type'] == 'application' && $msg_struct_current['subtype'] == 'ms-tnef') {
-                        $msg_text = parse_mstnef($msg_text, $this->config->get('unrtf_path'));
+                        $msg_text = parse_mstnef($msg_text, $this->config->get('attachment_dir'), $form['imap_msg_uid']);
                         $msg_struct_current['type'] = 'text';
                         $msg_struct_current['subtype'] = 'html';
                     }

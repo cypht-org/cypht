@@ -1692,67 +1692,60 @@ if (!hm_exists('is_imap_trash_folder')) {
 }
 
 if (!hm_exists('parse_mstnef')) {
-    function parse_mstnef($tnefBinary, $unrtfPath) {
-        $part = new Horde_Mime_Part();
-        $part->setType('application/ms-tnef');
-        $part->setName('winmail.dat');
-        $part->setContents($tnefBinary);
-        $viewer = new Horde_Mime_Viewer_Tnef($part);
-        $embedded = $viewer->getEmbeddedMimeParts();
-
-        if (! $embedded) {
-            Hm_Debug::add('No embedded parts found in MSTNEF content');
-            return '';
+    function parse_mstnef($tnefBinary, $attachmentDir, $msgId) {
+        if (! is_writable($attachmentDir)) {
+            return '<div class="alert alert-danger" rol="alert">Unable to parse TNEF message. Please ensure that "attachment_dir" is configured in your environmment and is writable!</div>';
         }
 
-        $html = array();
-        $embeddedParts = new Horde_Mime_Part_Iterator($embedded, true);
-        foreach ($embeddedParts as $embeddedPart) {
-            if ($embeddedPart->getPrimaryType() == 'multipart') {
-                continue;
-            }
+        $filename = $attachmentDir . DIRECTORY_SEPARATOR . 'message_' . $msgId . '.dat';
+        file_put_contents($filename, $tnefBinary);
 
-            $name = $embeddedPart->getName(true) ?: ('part-' . $embeddedPart->getMimeId());
-            $name = basename(str_replace("\0", '', $name));
-            $type = strtolower($embeddedPart->getType());
-            $data = $embeddedPart->getContents();
-            $title = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+        $unpackDir = $attachmentDir . DIRECTORY_SEPARATOR . 'message_' . $msgId;
 
-            if ($type === 'text/html') {
-                $htmlViewer = new Horde_Mime_Viewer_Html($embeddedPart, [
-                    'browser' => new Horde_Browser(),
-                ]);
-                $result = $htmlViewer->render('inline');
-                $html[] = $result[$embeddedPart->getMimeId()]['data'];
-                continue;
-            }
+        if (! file_exists($unpackDir)) {
+            mkdir($unpackDir);
+        }
 
-            if ($type === 'text/plain') {
-                $plainViewer = new Horde_Mime_Viewer_Plain($embeddedPart);
-                $result = $plainViewer->render('inline');
-                $html[] = $result[$embeddedPart->getMimeId()]['data'];
-                continue;
-            }
+        $tnefParserOutput = shell_exec("tnef -f $filename -C $unpackDir --save-body");
+        if ($tnefParserOutput) {
+            Hm_Debug::add("Failed to parse TNEF message. Details: " . $tnefParserOutput);
+            return '<div class="alert alert-danger" rol="alert">Unable to parse TNEF message. Please check the log output for more details.</div>';
+        }
 
-            if ($type === 'application/rtf') {
-                $rtfViewer = new Horde_Mime_Viewer_Rtf($embeddedPart, [
-                    'location' => $unrtfPath,
-                ]);
-                $result = $rtfViewer->render('full');
-                $html[] = $result[$embeddedPart->getMimeId()]['data'];
-                continue;
-            }
+        unlink($filename);
 
-            if ($embeddedPart->getPrimaryType() === 'image') {
-                $html[] = '<img alt="' . $title . '" src="data:' . htmlspecialchars($type, ENT_QUOTES, 'UTF-8') . ';base64,' . base64_encode($data) . '">';
-                continue;
+        $bodyOutput = null;
+        $attachmentsOutput = '';
+        foreach (glob($unpackDir . DIRECTORY_SEPARATOR . '*') as $file) {
+            if (is_file($file)) {
+                $fileInfo = pathinfo($file);
+                $mimeType = mime_content_type($file);
+
+                if (strtolower($fileInfo['extension']) === 'rtf') {
+                    $bodyOutput = shell_exec("unrtf --html $file");
+                    if (! $bodyOutput) {
+                        Hm_Debug::add("Failed to parse RTF body from TNEF message. Details: " . $bodyOutput);
+                        $bodyOutput = '<div class="alert alert-danger" rol="alert">Unable to parse RTF body from TNEF message. Please check the log output for more details.</div>';
+                    }
+
+                    unlink($file);
+                } elseif (strpos($mimeType, 'image/') === 0) {
+                    // display images
+                    $base64Data = base64_encode(file_get_contents($file));
+                    $attachmentsOutput .= '<div><img src="data:' . $mimeType . ';base64,' . $base64Data . '" alt="' . htmlspecialchars($fileInfo['basename']) . '" class="img-fluid"></div>';
+                    unlink($file);
+                } else {
+                    // other attachments
+                    $fileUrl = "?page=message&imap_msg_uid=$msgId&download_attachment=" . urlencode($fileInfo['basename']);
+                    $attachmentsOutput .= '<div class="download_link">
+                    <a href="#" data-src="' . $fileUrl . '" class="btn btn-sm btn-link">
+                        ' . htmlspecialchars($fileInfo['basename']) . '
+                    </a>
+                    </div>';
+                }
             }
         }
 
-        if (!$html) {
-            return '<div class="tnef_part tnef_empty_part">No renderable content found in this TNEF payload.</div>';
-        }
-
-        return '<div class="tnef_parts">' . implode('', $html) . '</div>';
+        return $bodyOutput . $attachmentsOutput;
     }
 }

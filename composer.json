@@ -60,11 +60,7 @@
         "twbs/bootstrap": "^5.3",
         "twbs/bootstrap-icons": "^1.11",
         "webklex/composer-info": "^0.0.1",
-        "zbateson/mail-mime-parser": "^3.0",
-        "horde/mime_viewer": "3.0.0alpha7",
-        "horde/date": "^3",
-        "horde/mapi": "^2",
-        "horde/icalendar": "^3"
+        "zbateson/mail-mime-parser": "^3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5.62"
@@ -83,8 +79,7 @@
         },
         "optimize-autoloader": true,
         "allow-plugins": {
-            "endroid/installer": false,
-            "horde/horde-installer-plugin": false
+            "endroid/installer": false
         }
     },
     "scripts": {

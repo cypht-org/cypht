@@ -80,12 +80,6 @@ foreach (array('user_settings_dir', 'attachment_dir') as $dir) {
     }
 }
 
-$enable_mstnef_viewer = $config->get('enable_mstnef_viewer');
-$unrtf_path = $config->get('unrtf_path');
-if ($enable_mstnef_viewer && is_readable($unrtf_path)) {
-    $base .= PATH_SEPARATOR.$unrtf_path;
-}
-
 if (!$disabled) {
     ini_set('open_basedir', $base);
 }
