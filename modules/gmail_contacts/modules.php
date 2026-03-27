@@ -94,7 +94,7 @@ function fetch_gmail_contacts($config, $contact_store, $session=false, $max_goog
                 }
                 $response = gmail_contacts_request($server['pass'], $url);
                 Hm_Debug::add(sprintf('Gmail People API request for server id %s, page_token: %s', $id, $page_token ? 'yes' : 'none'), 'info');
-                $contacts = parse_people_api_contacts($response, $server['name']);
+                $contacts = parse_people_api_contacts($response, 'gmail');
                 Hm_Debug::add(sprintf('Gmail People API returned %d contacts for server id %s', count($contacts), $id), 'info');
                 if (count($contacts) > 0) {
                     $contact_store->import($contacts);
