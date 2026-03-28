@@ -2,13 +2,16 @@
  * Possible Sieve fields
  * @type {{Message: [{name: string, options: string[], type: string, selected: boolean},{name: string, options: string[], type: string},{name: string, options: string[], type: string}], Header: [{name: string, options: string[], type: string},{name: string, options: string[], type: string},{name: string, options: string[], type: string},{name: string, options: string[], type: string}]}}
  */
-let is_editing_script = false;
-let current_editing_script_name = "";
-// let hm_sieve_current_account = "";
-let current_account;
-let current_account_element;
-let is_editing_filter = false;
-let current_editing_filter_name = '';
+
+// Prefer variables declared with var for better function scope handling,
+// as some of these cause runtime errors in Tiki on conflicting names
+var is_editing_script = false;
+var current_editing_script_name = "";
+// var hm_sieve_current_account = "";
+var current_account;
+var current_account_element;
+var is_editing_filter = false;
+var current_editing_filter_name = '';
 
 var hm_sieve_condition_fields = function() {
     return {
@@ -1312,26 +1315,6 @@ function populateFilterFromDraft(filterDraft) {
     }
 }
 
-function renderChips(container, values, type = 'email') {
-    const $c = $(container).empty();
-    const chipClass = type === 'email' ? 'email-chip' : 'keyword-chip';
-
-    values.forEach((val) => {
-        const chip = $(`<div class="chip" data-value="${val}">
-                <span ${chipClass}">
-                    ${val}
-                </span>
-                <button type="button" class="chip-remove" aria-label="Remove">
-                    x
-                </button>
-            </div>
-        `);
-
-        chip.find('.chip-remove').on('click', () => chip.remove());
-        $c.append(chip);
-    });
-}
-
 function collectChips(container) {
     return $(container)
         .find('.chip')
@@ -1339,12 +1322,11 @@ function collectChips(container) {
         .get();
 }
 
-let custom_action_modal;
 let current_mailbox_for_filter;
 let edit_filter_modal_for_custom_actions;
 let edit_filter_template_content;
 
-function createFilterFromList() {
+function createFilterFromList(launcherModal) {
     const froms = collectChips('#filter-from-list');
     const subjects = collectChips('#filter-subject-list');
 
@@ -1403,7 +1385,7 @@ function createFilterFromList() {
         { isFromMessageList: true },
     );
     edit_filter_modal_for_custom_actions.open();
-    custom_action_modal.hide();
+    launcherModal.hide();
 
     // Remove any previous dry run results
     $('.dry-run-results').remove();
@@ -1628,22 +1610,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-custom_action_modal = new Hm_Modal({
-    size: 'xl',
-    modalId: 'myCustomActionModal',
-});
-
-custom_action_modal.setTitle(hm_trans('Setup Filter from selected messages'));
-
-custom_action_modal.addFooterBtn(
-    hm_trans('Build Filter'),
-    'btn-primary ms-auto',
-    async function () {
-        createFilterFromList();
-        custom_action_modal.hide();
-    },
-);
-
 $(function () {
     $(document).on('change', '#block_action', function(e) {
         if ($(this).val() == 'reject_with_message') {
@@ -1845,216 +1811,6 @@ $(function () {
             },
         );
     });
-
-    $(document).on('click', '#add_custom_action_button', function (e) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        e.stopPropagation();
-
-        const mailbox = $(this).attr('account');
-        current_mailbox_for_filter = mailbox;
-
-        const selected = [];
-
-        console.log('Selected messages for filter creation:');
-        $('.message_table input[type=checkbox]:checked').each(function () {
-            const $row = $(this).closest('tr');
-
-            selected.push({
-                // imap_id: this.value,
-                uid: $row.data('uid'),
-                message_id: $row.data('msg-id'),
-                from_email: ($row.find('td.from').data('title') || '').trim(),
-                subject: $row.find('td.subject a').attr('title') || '',
-            });
-        });
-
-        function extractKeywords(subject) {
-            return subject
-                .toLowerCase()
-                .replace(/[^\w\s]/g, '')
-                .split(/\s+/)
-                .filter((w) => w.length > 3); // ignore small words
-        }
-
-        const fromEmails = [
-            ...new Set(selected.map((m) => m.from_email).filter(Boolean)),
-        ];
-
-        const subjectKeywords = [
-            ...new Set(
-                selected.flatMap((m) => extractKeywords(m.subject || '')),
-            ),
-        ];
-
-        const modalContent = `
-            <div id="create-filter-form">
-                <input type="hidden" id="custom_action_mailbox" value="${mailbox}">
-                    <div class="modal-body">
-                        <div class="filter-section mb-4">
-                            <h6 class="fw-bold mb-3">From emails</h6>
-
-                            <div class="mb-3">
-                            <div class="btn-group btn-group-sm subject-filter-teal" role="group" id="from-filter-type">
-                                <input type="radio" class="btn-check" name="fromFilterType" id="fromMatches" value="matches" checked>
-                                <label class="btn btn-outline-primary" for="fromMatches">
-                                    <i class="bi bi-check-circle me-1"></i> Matches
-                                </label>
-
-                                <input type="radio" class="btn-check" name="fromFilterType" id="fromNotMatches" value="not_matches">
-                                <label class="btn btn-outline-primary" for="fromNotMatches">
-                                    <i class="bi bi-x-circle me-1"></i> Does Not Matches
-                                </label>
-                            </div>
-                        </div>
-
-                        <div id="from-keywords-section">
-                            <div id="filter-from-list" class="chip-container border rounded p-3 mb-3 bg-light"></div>
-                                <div class="input-group">
-                                    <input id="filter-from-input" class="form-control" placeholder="Add email and press Enter">
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
-                                </div>
-                            </div>
-                            <small class="form-text text-muted mt-1">Press Enter to add email to filter</small>
-                        </div>
-                    </div>      
-                <hr class="my-4">
-    
-                <div class="filter-section mb-4">
-                    <h6 class="fw-bold mb-3">Subject keywords</h6>
-
-                    <!-- Subject filter type selector -->
-                    <div class="mb-3">
-                        <div class="btn-group btn-group-sm subject-filter-teal" role="group" id="subject-filter-type">
-                            <input type="radio" class="btn-check" name="subjectFilterType" id="subjectContains" value="contains" checked>
-                            <label class="btn btn-outline-primary" for="subjectContains">
-                                <i class="bi bi-check-circle me-1"></i> Contains
-                            </label>
-
-                            <input type="radio" class="btn-check" name="subjectFilterType" id="subjectNotContains" value="not_contains">
-                            <label class="btn btn-outline-primary" for="subjectNotContains">
-                                <i class="bi bi-x-circle me-1"></i> Does Not Contain
-                            </label>
-
-                            <input type="radio" class="btn-check" name="subjectFilterType" id="subjectAny" value="any">
-                            <label class="btn btn-outline-primary" for="subjectAny">
-                                <i class="bi bi-slash-circle me-1"></i> Ignore Subject
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="subject-keywords-section">
-                        <div id="filter-subject-list" class="chip-container border rounded p-3 mb-3 bg-light"></div>
-                            <div class="input-group">
-                                <input id="filter-subject-input" class="form-control" placeholder="Add keyword and press Enter">
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="bi bi-plus-circle"></i></span>
-                                </div>
-                            </div>
-                            <small class="form-text text-muted mt-1">Press Enter to add keyword to filter</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        custom_action_modal.setContent(modalContent);
-        custom_action_modal.open();
-        renderChips('#filter-from-list', fromEmails);
-        renderChips('#filter-subject-list', subjectKeywords);
-
-        attachChipHandlers();
-    });
-
-    function attachChipHandlers() {
-        $('.chip-remove')
-            .off('click')
-            .on('click', function () {
-                $(this).closest('.chip').remove();
-            });
-
-        $('#filter-from-input')
-            .off('keydown')
-            .on('keydown', function (e) {
-                if (e.key === 'Enter' && this.value.trim()) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    const chip = $(`
-        <span class="chip">
-          ${this.value.trim()}
-          <button type="button" class="chip-remove">×</button>
-        </span>
-      `);
-                    chip.find('.chip-remove').on('click', function () {
-                        $(this).closest('.chip').remove();
-                    });
-                    $('#filter-from-list').append(chip);
-                    this.value = '';
-                }
-            });
-
-        // Similar for filter-subject-input
-        $('#filter-subject-input')
-            .off('keydown')
-            .on('keydown', function (e) {
-                if (e.key === 'Enter' && this.value.trim()) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    const chip = $(`
-        <span class="chip">
-          ${this.value.trim().toLowerCase()}
-          <button type="button" class="chip-remove">×</button>
-        </span>
-      `);
-                    chip.find('.chip-remove').on('click', function () {
-                        $(this).closest('.chip').remove();
-                    });
-                    $('#filter-subject-list').append(chip);
-                    this.value = '';
-                }
-            });
-
-        $(document).on(
-            'change',
-            "input[name='subjectFilterType']",
-            function () {
-                const subjectKeywordsSection = $('#subject-keywords-section');
-                const subjectInput = $('#filter-subject-input');
-                if ($(this).val() === 'any') {
-                    subjectKeywordsSection.hide();
-                    subjectInput.prop('disabled', true);
-                } else {
-                    subjectKeywordsSection.show();
-                    subjectInput.prop('disabled', false);
-
-                    const placeholder =
-                        $(this).val() === 'contains'
-                            ? 'Add keyword and press Enter'
-                            : 'Add keyword to exclude and press Enter';
-                    subjectInput.attr('placeholder', placeholder);
-                }
-            },
-        );
-
-        $(document).on('change', "input[name='fromFilterType']", function () {
-            const fromKeywordsSection = $('#from-keywords-section');
-            const fromInput = $('#filter-from-input');
-            if ($(this).val() === 'any') {
-                fromKeywordsSection.hide();
-                fromInput.prop('disabled', true);
-            } else {
-                fromKeywordsSection.show();
-                fromInput.prop('disabled', false);
-
-                const placeholder =
-                    $(this).val() === 'matches'
-                        ? 'Add keyword and press Enter'
-                        : 'Add keyword to exclude and press Enter';
-                fromInput.attr('placeholder', placeholder);
-            }
-        });
-    }
 
     hm_sieve_button_events();
 
