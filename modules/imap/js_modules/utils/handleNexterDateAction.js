@@ -45,9 +45,21 @@ function processNextActionDate(e) {
                 { 'name': 'imap_snooze_ids', 'value': ids },
                 { 'name': 'imap_snooze_until', 'value': $(this).val() }
             ],
-            function (res) {
-                if (res.snoozed_messages > 0) {
-                    reload_and_redirect();
+            async function (res) {
+                const snoozedMessages = Object.values(res['snoozed_messages']);
+                if (snoozedMessages.length) {
+                    const path = getParam("list_parent") || getListPathParam();
+                    const store = new Hm_MessagesStore(path, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
+                    await store.load(false, true, true);
+
+                    snoozedMessages.forEach((msg) => {
+                        store.removeRow(msg);
+                    });
+                    if (getPageNameParam() == 'message_list') {
+                        display_imap_mailbox(store.rows, store.list, store);
+                    }
+
+                    Hm_Folders.reload_folders(true);
                 }
             }
         );

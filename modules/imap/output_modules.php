@@ -1325,7 +1325,7 @@ class Hm_Output_snooze_msg_control extends Hm_Output_Module {
         }
 
         $parts = explode('_', $this->get('list_path'));
-        $unsnooze = $parts[0] == 'imap' && hex2bin($parts[2]) == 'Snoozed';
+        $unsnooze = ($parts[0] == 'imap' && hex2bin($parts[2]) == 'Snoozed') || $this->get('list_path') == 'snoozed';
         $res = snooze_dropdown($this, $unsnooze);
         $this->concat('msg_controls_extra', $res);
     }
