@@ -571,7 +571,7 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                             $paths = explode("_", $path);
                             $short_path = $paths[0] . "_" . $paths[1] . "_";
                             $cached_folders = $this->cache->get('imap_folders_'.$short_path, true);
-                            $label = !empty($cached_folders[$folder]['name']) ? $cached_folders[$folder]['name'] : '';
+                            $label = !empty($cached_folders['folders'][$folder]['name']) ? $cached_folders['folders'][$folder]['name'] : '';
                         } else {
                             Hm_Msgs::add('Folder name loaded directly from the server. This may be slower. Enable session caching for better performance.', 'warning');
                             if (isset($details['type']) && $details['type'] === 'ews') {
