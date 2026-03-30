@@ -56,6 +56,8 @@ function build_config() {
         /* check all PHP dependencies (fatal framework deps + module/settings-specific) */
         check_dependencies($settings);
 
+        read_mstnef_viewer_config($settings);
+
         /* determine compression commands */
         list($js_compress, $css_compress) = compress_methods($settings);
 
@@ -281,6 +283,39 @@ function check_dependencies($settings) {
     }
 
     printf("%s\n\n", str_repeat('-', 72));
+}
+
+/**
+ * Check if a required executable dependency is available for use in shell.
+ * 
+ * @param string $dependency Name of the executable to check
+ * @return bool True if the executable is found, false otherwise
+ */
+function check_executable_dependency($dependency) {
+    if (PHP_OS_FAMILY == 'Windows') {
+        exec("where " . escapeshellarg($dependency) . " >null 2>&1", $output, $resultCode);
+    } else {
+        exec("which " . escapeshellarg($dependency) . " 2>/dev/null", $output, $resultCode);
+    }
+
+    return $resultCode === 0;
+}
+
+function read_mstnef_viewer_config($settings) {
+    if ($settings['enable_mstnef_viewer']) {
+        if (! check_executable_dependency('tnef')) {
+            printf("\n%s\n", str_repeat('-', 72));
+            printf("ERROR: 'tnef' executable not found. Please install `tnef` cli tool or disable 'enable_mstnef_viewer' to continue.\n");
+            printf("\n%s\n", str_repeat('-', 72));
+            exit(1);
+        }
+        if (! check_executable_dependency('unrtf')) {
+            printf("\n%s\n", str_repeat('-', 72));
+            printf("ERROR: 'unrtf' executable not found. Please install `unrtf` cli tool or disable 'enable_mstnef_viewer' to continue.\n");
+            printf("\n%s\n", str_repeat('-', 72));
+            exit(1);
+        }
+    }
 }
 
 /**
