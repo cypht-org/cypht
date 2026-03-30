@@ -2674,8 +2674,7 @@ function setupActionSnooze(callback) {
         e.preventDefault();
         $('.nexter_input_snooze').val($(this).attr('data-value')).trigger('change');
 
-        const dropdownElement = document.getElementById('dropdownMenuSnooze');
-        const dropdown = bootstrap.Dropdown.getOrCreateInstance(dropdownElement);
+        const dropdown = bootstrap.Dropdown.getOrCreateInstance($('#dropdownMenuSnooze')[0]);
         dropdown.toggle();
     });
     $(document).on('input', '.nexter_input_date_snooze', function (e) {
