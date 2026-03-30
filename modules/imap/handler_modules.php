@@ -527,13 +527,37 @@ class Hm_Handler_imap_download_attachment extends Hm_Handler_Module {
      */
     public function process() {
         if (array_key_exists('download_attachment', $this->request->get) && $file = $this->request->get['download_attachment']) {
-            $filepath = $this->config->get('attachment_dir') . DIRECTORY_SEPARATOR . "message_" . $this->request->get['imap_msg_uid'] . DIRECTORY_SEPARATOR . $file;
-            trigger_error('Attempting to download attachment from path: ' . $filepath, E_USER_NOTICE);
+            $server_id = $this->request->get['imap_server_id'];
+            $uid = $this->request->get['imap_msg_uid'];
+            $folder = $this->request->get['imap_folder'];
+            $msg_part = $this->request->get['imap_msg_part'];
+
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
+
+            if (! $mailbox || ! $mailbox->authed()) {
+                Hm_Msgs::add('An Error occurred trying to download the attachment', 'danger');
+                return;
+            }
+
+            list(,, $msg_text) = $mailbox->get_structured_message(hex2bin($folder), $uid, $msg_part, $this->user_config->get('text_only_setting', false), true);
+
+            $filepath = parse_mstnef([
+                'tnefBinary' => $msg_text,
+                'attachmentDir' => $this->config->get('attachment_dir'),
+                'msgUid' => $uid,
+                'msgPart' => $msg_part,
+                'imapServerId' => $server_id,
+                'folder' => $folder,
+                'returnFile' => $file
+            ]);
+
             if (file_exists($filepath)) {
                 header('Content-Disposition: attachment; filename="' . basename($filepath) . '"');
                 header('Content-Type: application/octet-stream');
                 header('Content-Transfer-Encoding: binary');
-                readfile($filepath);
+
+                unlink($filepath);
+
                 Hm_Functions::cease();
             }
             Hm_Msgs::add('An Error occurred trying to download the attachment', 'danger');
@@ -2056,7 +2080,16 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 
                 if ($msg_struct_current) {
                     if ($msg_struct_current['type'] == 'application' && $msg_struct_current['subtype'] == 'ms-tnef') {
-                        $msg_text = parse_mstnef($msg_text, $this->config->get('attachment_dir'), $form['imap_msg_uid']);
+                        $msg_text = parse_mstnef([
+                            'tnefBinary' => $msg_text,
+                            'attachmentDir' => $this->config->get('attachment_dir'),
+                            'msgUid' => $form['imap_msg_uid'],
+                            'msgPart' => $part,
+                            'imapServerId' => $form['imap_server_id'],
+                            'folder' => $form['folder'],
+                            'returnFile' => false
+                        ]);
+
                         $msg_struct_current['type'] = 'text';
                         $msg_struct_current['subtype'] = 'html';
                     }
