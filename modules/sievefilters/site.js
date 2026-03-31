@@ -638,7 +638,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
         $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
     });
 
-    $(document).on('click', '.add_filter', function() {
+    $(document).off('click', '.add_filter').on('click', '.add_filter', function() {
         edit_filter_modal.setTitle('Add Filter');
         $('.modal_sieve_filter_priority').val('');
         $('.modal_sieve_filter_test').val('ALLOF');
@@ -654,7 +654,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
         $(".filter_actions_modal_table").empty();
     });
 
-    $(document).on('click', '.add_script', function() {
+    $(document).off('click', '.add_script').on('click', '.add_script', function() {
         edit_script_modal.setTitle('Add Script');
         $('.modal_sieve_script_textarea').val('');
         $('.modal_sieve_script_name').val('');
@@ -669,7 +669,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Delete action Button
      */
-    $(document).on('click', '.delete_else_action_modal_button', function (e) {
+    $(document).off('click', '.delete_else_action_modal_button').on('click', '.delete_else_action_modal_button', function (e) {
         e.preventDefault();
         $(this).parent().parent().remove();
     });
@@ -677,7 +677,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Delete action Button
      */
-    $(document).on('click', '.delete_action_modal_button', function (e) {
+    $(document).off('click', '.delete_action_modal_button').on('click', '.delete_action_modal_button', function (e) {
         e.preventDefault();
         $(this).parent().parent().remove();
     });
@@ -685,7 +685,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Delete Condition Button
      */
-    $(document).on('click', '.delete_condition_modal_button', function (e) {
+    $(document).off('click', '.delete_condition_modal_button').on('click', '.delete_condition_modal_button', function (e) {
         e.preventDefault();
         $(this).parent().parent().remove();
     });
@@ -738,7 +738,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Action change
      */
-    $(document).on('change', '.sieve_actions_select', function () {
+    $(document).off('change', '.sieve_actions_select').on('change', '.sieve_actions_select', function () {
         let tr_elem = $(this).parent().parent();
         console.log(tr_elem.attr('default_value'));
         let elem = $(this).parent().next().next();
@@ -809,7 +809,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Condition type change
      */
-    $(document).on('change', '.add_condition_sieve_filters', function () {
+    $(document).off('change', '.add_condition_sieve_filters').on('change', '.add_condition_sieve_filters', function () {
         let condition_name = $(this).val();
         let elem = $(this).parent().next().next().find('.condition_options');
         let elem_extra = $(this).parent().next().find('.condition_extra_value');
@@ -855,7 +855,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Delete filter event
      */
-    $(document).on('click', '.delete_filter', function (e) {
+    $(document).off('click', '.delete_filter').on('click', '.delete_filter', function (e) {
         e.preventDefault();
         if (!confirm('Do you want to delete filter?')) {
             return;
@@ -876,7 +876,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Toggle Filter
      */
-    $('.toggle_filter').on('change', function () {
+    $('.toggle_filter').off('change').on('change', function () {
         const checkbox = $(this);
         Hm_Ajax.request(
             [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_toggle_script_state'},
@@ -894,7 +894,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Delete script event
      */
-    $(document).on('click', '.delete_script', function (e) {
+    $(document).off('click', '.delete_script').on('click', '.delete_script', function (e) {
         e.preventDefault();
         if (!confirm('Do you want to delete script?')) {
             return;
@@ -915,7 +915,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Edit script event
      */
-    $(document).on('click', '.edit_script', function (e) {
+    $(document).off('click', '.edit_script').on('click', '.edit_script', function (e) {
         e.preventDefault();
         let obj = $(this);
         edit_script_modal.setTitle('Edit Script');
@@ -939,7 +939,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Edit filter event
      */
-    $(document).on('click', '.edit_filter', function (e) {
+    $(document).off('click', '.edit_filter').on('click', '.edit_filter', function (e) {
         e.preventDefault();
         let obj = $(this);
         current_account = $(this).attr('account');
