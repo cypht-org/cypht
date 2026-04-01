@@ -193,12 +193,10 @@ class Hm_Dispatch {
      * @return void
      */
     private function load_site_lib() {
-        if (!is_array($this->site_config->get_modules()) || !in_array('site', $this->site_config->get_modules(), true)) {
-            return;
-        }
-        if (is_readable(APP_PATH.'modules/site/lib.php')) {
+        $site_module = basename($this->site_config->get('site_module_path'));
+        if (is_readable(APP_PATH. "modules/$site_module/lib.php")) {
             Hm_Debug::add('Including site module set lib.php', 'info');
-            require APP_PATH.'modules/site/lib.php';
+            require_once APP_PATH . "modules/$site_module/lib.php";
         }
     }
 
