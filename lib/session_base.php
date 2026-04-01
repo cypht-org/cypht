@@ -422,7 +422,7 @@ class Hm_Session_Setup {
                 $session_class = 'Hm_Redis_Session';
                 break;
             case 'custom':
-                $session_class = $this->config->get('session_class', 'Custom_Session');
+                $session_class = 'Hm_Custom_Session';
                 break;
         }
         return (isset($session_class) && class_exists($session_class))
@@ -472,9 +472,8 @@ class Hm_Session_Setup {
      * @return string|false
      */
     private function custom_auth() {
-        $custom_auth_class = $this->config->get('auth_class', 'Custom_Auth');
-        if ($this->auth_type == 'custom' && Hm_Functions::class_exists($custom_auth_class)) {
-            return $custom_auth_class;
+        if ($this->auth_type == 'custom') {
+            return 'Hm_Custom_Auth';
         }
         return false;
     }

@@ -519,21 +519,18 @@ class Hm_Site_Config_File extends Hm_Config {
  */
 function load_user_config_object($config) {
     $type = $config->get('user_config_type', 'file');
-    if (mb_strstr($type, ':')) {
-        list($type, $class) = explode(':', $type);
-    }
     switch ($type) {
         case 'DB':
             $user_config = new Hm_User_Config_DB($config);
             Hm_Debug::add("Using DB user configuration", 'info');
             break;
         case 'custom':
-            if (class_exists($class)) {
-                $user_config = new $class($config);
-                Hm_Debug::add("Using custom user configuration: {$class}", 'info');
+            if (class_exists('Hm_Custom_User_Config')) {
+                $user_config = new Hm_Custom_User_Config($config);
+                Hm_Debug::add("Using custom user configuration: Hm_Custom_User_Config", 'info');
                 break;
             } else {
-                Hm_Debug::add("User configuration class does not exist: {$class}");
+                Hm_Debug::add("User configuration class does not exist: Hm_Custom_User_Config");
             }
         default:
             $user_config = new Hm_User_Config_File($config);
