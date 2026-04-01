@@ -622,15 +622,6 @@ return [
     'disable_fingerprint' => env('DISABLE_FINGERPRINT', false),
 
     /*
-    | You can create your own custom authentication and session classes using the
-    | site module set, however you might want those classes located somewhere else
-    | outside of the Cypht code base. By setting session_type and auth_type to custom,
-    | you can control what class is used with the following settings
-    */
-    'auth_class' => env('AUTH_CLASS'),
-    'session_class' => env('SESSION_CLASS'),
-
-    /*
     | -----------------------------------------------------------------------------
     | Modules
     | -----------------------------------------------------------------------------
@@ -1374,7 +1365,9 @@ return [
 
     'js_exclude_deps' => env('JS_EXCLUDE_DEPS', ''),
 
+    'enable_mstnef_viewer' => env('ENABLE_MSTNEF_VIEWER', false),
+
     'page_param_name' => env('PAGE_PARAM_NAME', 'page'),
   
-    'enable_mstnef_viewer' => env('ENABLE_MSTNEF_VIEWER', false),
+    'site_module_path' => env('SITE_MODULE_PATH', ''),
 ];

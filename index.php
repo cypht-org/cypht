@@ -50,7 +50,17 @@ if (DEBUG_MODE) {
 }
 
 /* get configuration */
-$config = new Hm_Site_Config_File();
+if (env('CONFIG_TYPE') == 'custom') {
+    $site_module = basename(env('SITE_MODULE_PATH', ''));
+    if (is_readable(APP_PATH. "modules/$site_module/lib.php")) {
+        require_once APP_PATH . "modules/$site_module/lib.php";
+        $config = new Hm_Custom_Site_Config();
+    }
+}
+
+if (! isset($config)) {
+    $config = new Hm_Site_Config_File();
+}
 
 /* set default TZ */
 date_default_timezone_set($config->get('default_setting_timezone', 'UTC'));
