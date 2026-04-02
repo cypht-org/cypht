@@ -417,10 +417,19 @@ class Hm_Cache {
      */
     public function __construct($config, $session) {
         $this->session = $session;
-        if (!$this->check_redis($config) && !$this->check_memcache($config)) {
+        if (!$this->check_custom($config) && !$this->check_redis($config) && !$this->check_memcache($config)) {
             $this->check_session($config);
         }
         Hm_Debug::add(sprintf('CACHE backend using: %s', $this->type), 'info');
+    }
+
+    protected function check_custom($config) {
+        if ($config->get('enable_custom_cache', false)) {
+            $this->type = 'custom';
+            $this->backend = new Hm_Custom_Cache();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -603,6 +612,10 @@ class Hm_Cache {
         return $default;
     }
 
+    protected function custom_get($key, $default) {
+        return $this->backend->get($this->key_hash($key), $default);
+    }
+
     /*
      * @param string $key key to make the hash unique
      * @return string
@@ -661,20 +674,6 @@ class Hm_Cache_Setup {
      * @return object
      */
     public function setup_cache() {
-        $cache_class = $this->get_cache_class();
-        Hm_Debug::add(sprintf('Using %s for cache', $cache_class), 'info');
-        return new $cache_class($this->config, $this->session);
-    }
-
-    /**
-     * @return string
-     */
-    private function get_cache_class() {
-        $custom_cache_class = $this->config->get('cache_class', 'Custom_Cache');
-        $cache_class = 'Hm_Cache';
-        if (class_exists($custom_cache_class)) {
-            $cache_class = $custom_cache_class;
-        }
-        return $cache_class;
+        return new Hm_Cache($this->config, $this->session);
     }
 }
