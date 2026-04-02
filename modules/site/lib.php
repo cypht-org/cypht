@@ -10,7 +10,7 @@ require_once 'lib/config.php';
 require_once 'lib/environment.php';
 
 /**
- * Custom session class. To use this, you must set the SESSION_TYPE environment variable to 'CUSTOM'.
+ * Custom session class. To use this, you must set the SESSION_TYPE environment variable to 'custom'.
  */
 class Hm_Custom_Session extends Hm_Session {
 

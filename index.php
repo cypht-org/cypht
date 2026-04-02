@@ -50,7 +50,7 @@ if (DEBUG_MODE) {
 }
 
 /* get configuration */
-if (env('CONFIG_TYPE') == 'custom') {
+if (env('SITE_CONFIG_TYPE') == 'custom') {
     $site_module = basename(env('SITE_MODULE_PATH', ''));
     if (is_readable(APP_PATH. "modules/$site_module/lib.php")) {
         require_once APP_PATH . "modules/$site_module/lib.php";
