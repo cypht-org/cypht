@@ -197,6 +197,8 @@ class Hm_Dispatch {
         if (is_readable(APP_PATH. "modules/$site_module/lib.php")) {
             Hm_Debug::add('Including site module set lib.php', 'info');
             require_once APP_PATH . "modules/$site_module/lib.php";
+
+            $this->site_config->set('modules', array_merge($this->site_config->get('modules', []), [$site_module]));
         }
     }
 
