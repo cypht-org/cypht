@@ -411,7 +411,7 @@ class Hm_Session_Setup {
      * @return string
      */
     private function get_session_class() {
-        switch ($this->session_type) {
+        switch (strtoupper($this->session_type)) {
             case 'DB':
                 $session_class = 'Hm_DB_Session';
                 break;
@@ -472,7 +472,7 @@ class Hm_Session_Setup {
      * @return string|false
      */
     private function custom_auth() {
-        if ($this->auth_type == 'custom') {
+        if (strtolower($this->auth_type) == 'custom') {
             return 'Hm_Custom_Auth';
         }
         return false;

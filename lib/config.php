@@ -519,8 +519,8 @@ class Hm_Site_Config_File extends Hm_Config {
  */
 function load_user_config_object($config) {
     $type = $config->get('user_config_type', 'file');
-    switch ($type) {
-        case 'DB':
+    switch (strtolower($type)) {
+        case 'db':
             $user_config = new Hm_User_Config_DB($config);
             Hm_Debug::add("Using DB user configuration", 'info');
             break;
