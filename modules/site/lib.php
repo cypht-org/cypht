@@ -9,7 +9,10 @@ require_once 'lib/cache.php';
 require_once 'lib/config.php';
 require_once 'lib/environment.php';
 
-class Hm_Custom_Session extends Hm_PHP_Session {
+/**
+ * Custom session class. To use this, you must set the SESSION_TYPE environment variable to 'CUSTOM'.
+ */
+class Hm_Custom_Session extends Hm_Session {
 
     public function check($request, $user = false, $pass = false, $fingerprint = true)
     {
