@@ -421,7 +421,7 @@ class Hm_Session_Setup {
             case 'REDIS':
                 $session_class = 'Hm_Redis_Session';
                 break;
-            case 'custom':
+            case 'CUSTOM':
                 $session_class = 'Hm_Custom_Session';
                 break;
         }
