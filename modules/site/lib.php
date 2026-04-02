@@ -63,21 +63,24 @@ class Hm_Custom_Auth extends Hm_Auth {
     }
 }
 
-class Hm_Custom_Cache extends Hm_Cache {
+/**
+ * Custom cache class. To use this, you must set the ENABLE_CUSTOM_CACHE environment variable to true.
+ */
+class Hm_Custom_Cache extends Hm_Noop_Cache {
 
-    public function get($key, $default = false, $session = false)
+    public function get($key, $default = false)
     {
-        return parent::get($key, $default, $session);
+        return $default;
     }
 
-    public function set($key, $val, $lifetime = 600, $session = false)
+    public function set($key, $val, $lifetime, $crypt_key)
     {
-        return parent::set($key, $val, $lifetime, $session);
+        return parent::set($key, $val, $lifetime, $crypt_key);
     }
 
-    public function del($key, $session = false)
+    public function del($key)
     {
-        return parent::del($key, $session);
+        return parent::del($key);
     }
 }
 
@@ -101,6 +104,9 @@ class Hm_Custom_Site_Config extends Hm_Config {
     }
 }
 
+/**
+ * Custom user configuration class. To use this, you must set the USER_CONFIG_TYPE environment variable to 'custom'.
+ */
 class Hm_Custom_User_Config extends Hm_Config {
     private $site_config;
 

@@ -442,12 +442,11 @@ return [
     |
     |
     | 'allow_session_cache' => env('ALLOW_SESSION_CACHE', false),
-    | 'cache_class' => env('CACHE_CLASS')
     */
 
     'allow_session_cache' => env('ALLOW_SESSION_CACHE', false),
 
-    'cache_class' => env('CACHE_CLASS'),
+    'enable_custom_cache' => env('ENABLE_CUSTOM_CACHE', false),
     /*
     | -------------
     | Redis Support
