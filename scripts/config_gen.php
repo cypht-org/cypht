@@ -96,6 +96,11 @@ function process_site_module(&$settings) {
                 unlink($link_path);
             }
 
+            // ensure it's absolute path
+            if ($site_module_path[0] !== '/') {
+                $site_module_path = realpath(APP_PATH . $site_module_path);
+            }
+
             symlink($site_module_path, $link_path);
 
             if (file_exists($link_path)) {
