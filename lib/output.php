@@ -46,10 +46,10 @@ class Hm_Output_HTTP extends Hm_Output {
 
     /**
      * Send HTTP headers
-     * @param array $headers headers to send
      * @return void
      */
-    protected function output_headers($headers) {
+    protected function output_headers() {
+        $headers = $this->data['http_headers'] ?? [];
         foreach ($headers as $name => $value) {
             Hm_Functions::header($name.': '.$value);
         }
@@ -57,18 +57,18 @@ class Hm_Output_HTTP extends Hm_Output {
 
     /**
      * Send response content to the browser
-     * @param mixed $content data to send
-     * @param array $headers HTTP headers to set
      * @return void
      */
     protected function output_content() {
-        $this->output_headers($this->data['headers'] ?? []);
+        $this->output_headers();
         ob_end_clean();
 
         echo $this->get_content($this->content);
     }
 
     public function get_content() {
+        $this->output_headers();
+        
         // Append debug panel if DEBUG_MODE is enabled and it's an HTML response
         if (DEBUG_MODE && is_string($this->content) && stripos($this->content, '</body>') !== false) {
             $debug_panel = $this->get_debug_panel_html();
