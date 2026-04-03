@@ -12,7 +12,7 @@
  * CACHE_ID   unique string to bust js/css browser caching for a new build
  * SITE_ID    random site id used for page keys
  */
-define('APP_PATH', '');
+define('APP_PATH', dirname(__FILE__).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
 define('CONFIG_PATH', APP_PATH.'config/');
 define('WEB_ROOT', '');
@@ -26,7 +26,11 @@ define('ASSETS_PATH', APP_PATH.'assets/');
 /* don't let anything output content until we are ready */
 ob_start();
 
-require VENDOR_PATH.'autoload.php';
+// Only require the autoloader if it exists, usually in cases where Cypht is not being used as a library.
+if (file_exists(VENDOR_PATH.'autoload.php')) {
+    require VENDOR_PATH.'autoload.php';
+}
+
 /* get includes */
 require APP_PATH.'lib/framework.php';
 $environment = Hm_Environment::getInstance();
@@ -78,7 +82,7 @@ if (DEBUG_MODE) {
 }
 
 /* process the request */
-new Hm_Dispatch($config);
+$dispatcher = new Hm_Dispatch($config);
 
 if (empty($config)) {
     $config = new Hm_Site_Config_File();
