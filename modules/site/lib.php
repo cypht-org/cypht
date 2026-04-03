@@ -1,14 +1,4 @@
 <?php
-
-/** 
- * Overwrite these paths to the Cypht lib location in your setup.
- */
-require_once 'lib/session_php.php';
-require_once 'lib/auth.php';
-require_once 'lib/cache.php';
-require_once 'lib/config.php';
-require_once 'lib/environment.php';
-
 /**
  * Custom session class. To use this, you must set the SESSION_TYPE environment variable to 'custom'.
  */
