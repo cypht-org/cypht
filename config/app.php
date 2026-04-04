@@ -1408,4 +1408,6 @@ return [
     'site_module_path' => env('SITE_MODULE_PATH', ''),
 
     'dispatch_response_mode' => env('DISPATCH_RESPONSE_MODE', 'render'),
+
+    'web_root' => env('WEB_ROOT', ''),
 ];
