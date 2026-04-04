@@ -82,10 +82,9 @@ if (DEBUG_MODE) {
     Hm_Debug::load_page_stats();
 }
 
-$dispatcher;
 $config->setInitCallback(function($config) {
     // /* process the request */
-    $dispatcher = new Hm_Dispatch($config);
+    return new Hm_Dispatch($config);
 });
 
 if (! is_a($config, 'Hm_Custom_Site_Config')) {
