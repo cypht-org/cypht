@@ -82,8 +82,15 @@ if (DEBUG_MODE) {
     Hm_Debug::load_page_stats();
 }
 
-/* process the request */
-$dispatcher = new Hm_Dispatch($config);
+$dispatcher;
+$config->setInitCallback(function($config) {
+    // /* process the request */
+    $dispatcher = new Hm_Dispatch($config);
+});
+
+if (! is_a($config, 'Hm_Custom_Site_Config')) {
+    $config->triggerInit();
+} // Let custom site configs trigger their own init when ready
 
 if (empty($config)) {
     $config = new Hm_Site_Config_File();
