@@ -15,7 +15,6 @@
 define('APP_PATH', dirname(__FILE__).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
 define('CONFIG_PATH', APP_PATH.'config/');
-define('WEB_ROOT', '');
 define('ASSETS_THEMES_ROOT', '');
 define('CACHE_ID', '');
 define('SITE_ID', '');
@@ -70,6 +69,8 @@ if (! isset($config)) {
 date_default_timezone_set($config->get('default_setting_timezone', 'UTC'));
 /* set the default since and per_source values */
 $environment->define_default_constants($config);
+
+define('WEB_ROOT', $config->get('web_root', ''));
 
 /* setup ini settings */
 if (!$config->get('disable_ini_settings')) {
