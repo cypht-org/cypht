@@ -484,7 +484,7 @@ class Hm_Site_Config_File extends Hm_Config {
      */
     public function triggerInit() {
         if (is_callable($this->initCallback)) {
-            call_user_func($this->initCallback, $this);
+            return call_user_func($this->initCallback, $this);
         }
     }
 
