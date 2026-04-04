@@ -166,10 +166,6 @@ function check_dependencies($settings) {
             ['type' => 'extension', 'name' => 'simplexml',
              'label' => 'SimpleXML extension (required for CardDAV vCard parsing)'],
         ],
-        'gmail_contacts' => [
-            ['type' => 'function', 'name' => 'xml_parser_create',
-             'label' => 'XML extension (required for Gmail Contacts XML parsing)'],
-        ],
         'feeds' => [
             ['type' => 'function', 'name' => 'xml_parser_create',
              'label' => 'XML extension (required for parsing RSS/Atom feeds)'],
