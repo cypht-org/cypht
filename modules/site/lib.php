@@ -80,7 +80,7 @@ class Hm_Custom_Cache extends Hm_Noop_Cache {
 /**
  * Custom site configuration class. To use this, you must set the SITE_CONFIG_TYPE environment variable to 'custom'.
  */
-class Hm_Custom_Site_Config extends Hm_Config {
+class Hm_Custom_Site_Config extends Hm_Site_Config_File {
     public function get($name, $default = false)
     {
         return parent::get($name, $default);
@@ -91,9 +91,9 @@ class Hm_Custom_Site_Config extends Hm_Config {
         return parent::set($name, $value);
     }
 
-    public function load($source, $key)
+    public function load($all_configs, $key)
     {
-        throw new \Exception('Not implemented');
+        return parent::load($all_configs, $key);
     }
 }
 
