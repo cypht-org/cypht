@@ -470,11 +470,26 @@ class Hm_Site_Config_File extends Hm_Config {
 
     public $user_defaults = [];
 
+    protected $initCallback;
+
     /**
      * @param array $all_configs
      */
     public function __construct($all_configs = []) {
         $this->load(empty($all_configs) ? merge_config_files(APP_PATH.'config') : $all_configs, false);
+    }
+
+    /**
+     * Trigger the init callback if it exists. This is used to allow dynamic configuration of the site before any request handling occurs.
+     */
+    public function triggerInit() {
+        if (is_callable($this->initCallback)) {
+            call_user_func($this->initCallback, $this);
+        }
+    }
+
+    public function setInitCallback($callback) {
+        $this->initCallback = $callback;
     }
 
     /**
