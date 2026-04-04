@@ -1500,7 +1500,7 @@ function snooze_dropdown($output, $unsnooze = false) {
     $values = nexter_formats();
 
     $txt = '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-bs-auto-close="outside">'.$output->trans('Snooze').'</a>
+                <a class="hlink text-decoration-none btn btn-sm btn-light dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-bs-auto-close="outside">'.$output->trans('Snooze').'</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
     foreach ($values as $format) {
         $labels = get_scheduled_date($format, true);
@@ -1525,7 +1525,7 @@ function tags_dropdown($context) {
 
     $folders = $context->get('tags', array());
     $txt = '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" href="#" aria-expanded="true">'.$context->trans('Tags').'</a>
+                <a class="hlink text-decoration-none btn btn-sm btn-light dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" href="#" aria-expanded="true">'.$context->trans('Tags').'</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuTag">';
 
     foreach ($folders as $folder) {

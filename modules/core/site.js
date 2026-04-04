@@ -2673,6 +2673,9 @@ function setupActionSnooze(callback) {
     $(document).on('click', '.nexter_date_helper_snooze', function (e) {
         e.preventDefault();
         $('.nexter_input_snooze').val($(this).attr('data-value')).trigger('change');
+
+        const dropdown = bootstrap.Dropdown.getOrCreateInstance($('#dropdownMenuSnooze')[0]);
+        dropdown.toggle();
     });
     $(document).on('input', '.nexter_input_date_snooze', function (e) {
         var now = new Date();
