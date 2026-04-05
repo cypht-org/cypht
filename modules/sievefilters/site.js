@@ -472,6 +472,7 @@ const Hm_Filters = (function (hm) {
                 {'name': 'conditions_json', 'value': JSON.stringify(conditions_parsed)},
                 {'name': 'actions_json', 'value': JSON.stringify(actions_parsed)},
                 {'name': 'filter_test_type', 'value': $('.modal_sieve_filter_test').val()},
+                {'name': 'filter_source', 'value': getPageNameParam()},
                 {'name': 'gen_script', 'value': gen_script},
             ],
             function(res) {
@@ -1513,7 +1514,7 @@ function dryRunFilterFromModal() {
     resultHtml +=
         '<div class="d-flex justify-content-between align-items-center mb-2">' +
         '<h6 class="fw-bold mb-0"><i class="bi bi-lightning me-2"></i>' +
-        hm_trans('Dry Run Results') +
+        hm_trans('Filter Match Preview for Visible Messages') +
         '</h6>' +
         '<button type="button" class="btn btn-sm btn-outline-secondary dry-run-close" aria-label="Close">' +
         '<i class="bi bi-x"></i>' +
