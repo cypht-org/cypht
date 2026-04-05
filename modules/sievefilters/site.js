@@ -1640,10 +1640,9 @@ $(function () {
             data["reply-to"] = $form.find('input[name="reply-to"]').val();
 
         if ($.isEmptyObject(data)) {
-            showErrorMsg(
+            Hm_Notices.show(
                 "Please check at least one condition to create a filter.",
-                "#create-filter-form",
-                10000
+                "#create-filter-form"
             );
             return;
         }
