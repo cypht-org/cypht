@@ -13,7 +13,6 @@
  * SITE_ID    random site id used for page keys
  */
 define('APP_PATH', dirname(__FILE__).'/');
-define('VENDOR_PATH', APP_PATH.'vendor/');
 define('CONFIG_PATH', APP_PATH.'config/');
 define('ASSETS_THEMES_ROOT', '');
 define('CACHE_ID', '');
@@ -25,13 +24,13 @@ define('ASSETS_PATH', APP_PATH.'assets/');
 /* don't let anything output content until we are ready */
 ob_start();
 
-// Only require the autoloader if it exists, usually in cases where Cypht is not being used as a library.
-if (file_exists(VENDOR_PATH.'autoload.php')) {
-    require VENDOR_PATH.'autoload.php';
-}
-
 /* get includes */
 require APP_PATH.'lib/framework.php';
+
+Hm_Functions::define_vendor_path();
+
+require VENDOR_PATH.'autoload.php';
+
 $environment = Hm_Environment::getInstance();
 $environment->load();
 
@@ -70,7 +69,7 @@ date_default_timezone_set($config->get('default_setting_timezone', 'UTC'));
 /* set the default since and per_source values */
 $environment->define_default_constants($config);
 
-define('WEB_ROOT', $config->get('web_root', ''));
+define('WEB_ROOT', $config->get('web_root'));
 
 /* setup ini settings */
 if (!$config->get('disable_ini_settings')) {
