@@ -250,6 +250,15 @@ if (!class_exists('Hm_Functions')) {
         public static function stream_socket_enable_crypto($socket, $type) {
             return stream_socket_enable_crypto($socket, true, $type);
         }
+
+        public static function define_vendor_path() {
+            if (file_exists(APP_PATH.'vendor/')) {
+                define('VENDOR_PATH', APP_PATH.'vendor/');
+            } else {
+                // When installed via composer, the vendor path is generally two levels up from APP_PATH.
+                define('VENDOR_PATH', APP_PATH . '../../');
+            }
+        }
     }
 }
 
