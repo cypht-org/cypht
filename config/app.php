@@ -1410,4 +1410,6 @@ return [
     'dispatch_response_mode' => env('DISPATCH_RESPONSE_MODE', 'render'),
 
     'web_root' => env('WEB_ROOT', ''),
+
+    'enable_custom_sieve_factory' => env('ENABLE_CUSTOM_SIEVE_FACTORY', false)
 ];

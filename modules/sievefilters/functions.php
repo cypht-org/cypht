@@ -290,8 +290,8 @@ if (!hm_exists('generate_filter_name')) {
 if (!hm_exists('get_sieve_client_factory')) {
     function get_sieve_client_factory($site_config)
     {
-        if (!is_null($site_config) && isset($site_config) && $factory_class = $site_config->get('sieve_client_factory')) {
-            return new $factory_class;
+        if (!is_null($site_config) && isset($site_config) && $site_config->get('enable_custom_sieve_factory')) {
+            return new Hm_Custom_Sieve_Client_Factory;
         } else {
             return new Hm_Sieve_Client_Factory;
         }
