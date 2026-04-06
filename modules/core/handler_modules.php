@@ -564,6 +564,42 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
     }
 }
 
+
+class Hm_Handler_save_auto_save_settings extends Hm_Handler_Module {
+    /**
+     * save new site settings to the session
+     */
+    public function process() {
+       
+        $current_settings = $this->session->get('user_settings', array());
+
+        $path = $this->config->get('user_settings_dir', false);
+        $new_settings = $this->get('new_user_settings', array());
+
+        die(var_dump($this->user_config->get('username'), $path));
+
+        $pages = $this->session->get('saved_pages', array());
+        if (!empty($pages)) {
+            // $this->user_config->set('saved_pages', $pages);
+        }
+        
+        $saved_count = 0;
+
+        if (!empty($current_settings)) {
+            foreach ($current_settings as $name => $value) {
+                $this->user_config->set($name, $value);
+                $saved_count++;
+            }
+
+            die($saved_count);
+        }
+        
+        $this->out('auto_save_status', 'success');
+        $this->out('auto_save_timestamp', time());
+    }
+}
+
+
 /**
  * Do reset factory from the settings page to the session
  * @subpackage core/handler

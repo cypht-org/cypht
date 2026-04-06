@@ -203,6 +203,10 @@ setup_base_ajax_page('ajax_combined_message_list', 'core');
 add_handler('ajax_combined_message_list', 'load_user_data', true, 'core');
 add_output('ajax_combined_message_list', 'combined_message_list', true, 'core');
 
+/* send delayed auto save settings */
+setup_base_ajax_page('ajax_save_auto_save_settings', 'core');
+add_handler('ajax_save_auto_save_settings', 'save_auto_save_settings', true, 'core');
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -225,6 +229,7 @@ return array(
         'ajax_privacy_settings',
         'ajax_combined_message_list',
         'logout',
+        'ajax_save_auto_save_settings',
     ),
     'allowed_output' => array(
         'date' => array(FILTER_UNSAFE_RAW, false),

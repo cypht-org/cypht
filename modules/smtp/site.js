@@ -508,8 +508,40 @@ $(function() {
             );
         }
 
+        let autoSaveSettings = function () {
+
+            if (window.autoSaveInProgress) {
+                console.log('Auto-save already in progress, skipping...');
+                return;
+            }
+            
+            window.autoSaveInProgress = true;
+            
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_save_auto_save_settings'}],
+                function(res) {
+                    window.autoSaveInProgress = false;
+                    if (res.auto_save_status === 'success') {
+                        console.log('Auto-save completed:', res.auto_save_count, 'settings at', new Date(res.auto_save_timestamp * 1000));
+                    } else {
+                        console.warn('Auto-save failed:', res);
+                    }
+                },
+                function(err) {
+                    window.autoSaveInProgress = false;
+                    console.error('Auto-save request failed:', err);
+                }
+            );
+
+            
+        }
+
         sendScheduledMessages();
-        setInterval(sendScheduledMessages, 60000);
+        
+        setInterval(function() {
+            sendScheduledMessages();
+            autoSaveSettings();
+        }, 60000);
         window.onbeforeunload = (e) => {
             if (scheduled_msg_count > 0 && e.currentTarget.location.hostname !== document.location.hostname) {
                 return sprintf(hm_trans("You have %d scheduled messages that won\'t be executed if you quit"), scheduled_msg_count);
