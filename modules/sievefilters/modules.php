@@ -1033,6 +1033,7 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
             save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
             $client->close();
+            Hm_Msgs::add('Filter saved');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
@@ -1070,6 +1071,8 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
                 $script_name,
                 $this->request->post['script']
             );
+            $client->close();
+            Hm_Msgs::add('Script saved');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
@@ -1635,6 +1638,33 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
     }
 }
 
+class Hm_Handler_load_mailbox_name extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+        $imap_server_id = null;
+        if (array_key_exists('list_path', $this->request->get)) {
+            $path = $this->request->get['list_path'];
+            if (preg_match("/^imap_(\w+)_(.+)$/", $path, $matches)) {
+                $imap_server_id = $matches[1];
+            }
+        }
+
+        if ($imap_server_id === null) {
+            return;
+        }
+
+        $imap_servers = $this->user_config->get('imap_servers');
+        if (!isset($imap_servers[$imap_server_id]['name'])) {
+            return;
+        }
+
+        $this->out('mailbox_name', $imap_servers[$imap_server_id]['name']);
+    }
+}
+
 class Hm_Handler_load_custom_actions extends Hm_Handler_Module
 {
     public function process()
@@ -1683,11 +1713,6 @@ class Hm_Handler_load_custom_actions extends Hm_Handler_Module
                     if (isset($lines[3])) {
                         $meta_b64 = str_replace("# ", "", $lines[3]);
                         $source = base64_decode($meta_b64);
-                    }
-
-                    // Only include filters created from message_list
-                    if ($source !== 'message_list') {
-                        continue;
                     }
 
                     $exp_name = explode('-', $script_name);

@@ -126,6 +126,8 @@ function add_filter_match_mode() {
                 "</div>"
             );
         }
+    } else {
+        $(".sieve_match_mode").remove();
     }
 }
 
@@ -264,8 +266,24 @@ var hm_sieve_possible_actions = function() {
     ];
 };
 
+var find_account_element = function(account_name) {
+    const accountElement = $('.add_filter, .edit_filter, .edit_script').filter(function () {
+        return $(this).attr('account') === account_name ||
+            $(this).attr('imap_account') === account_name;
+    }).first();
+
+    return accountElement.length ? accountElement : null;
+};
+
 var get_account_actions = () => {
-    const extensions = JSON.parse(current_account_element.attr('sieve_extensions'));
+    if (!current_account_element || !current_account_element.length) {
+        current_account_element = find_account_element(current_account);
+    }
+
+    const extensionsAttr = current_account_element
+        ? current_account_element.attr('sieve_extensions')
+        : null;
+    const extensions = extensionsAttr ? JSON.parse(extensionsAttr) : [];
     let possible_actions = hm_sieve_possible_actions();
 
     possible_actions = possible_actions.filter((value) => {
@@ -273,39 +291,6 @@ var get_account_actions = () => {
     })
 
     return possible_actions;
-}
-
-class Hm_Filter_Modal extends Hm_Modal {
-    constructor(current_account) {
-        super({
-            size: "xl",
-            modalId: "myEditFilterModal",
-        });
-        const save_filter = Hm_Filters.save_filter;
-        const modalContent = document.querySelector("#edit_filter_modal");
-        if (modalContent) {
-            this.setContent(modalContent.innerHTML);
-            modalContent.remove();
-        } else {
-            this.setContent("<p>Could not load filter editor</p>");
-        }
-
-        this.addFooterBtn("Save", "btn-primary ms-auto", async () => {
-            let result = save_filter(current_account);
-            if (result) {
-                Hm_Notices.show("Filter saved", "success");
-                this.hide();
-            }
-        });
-
-        this.addFooterBtn("Convert to code", "btn-warning", async () => {
-            let result = save_filter(current_account, true);
-            if (result) {
-                Hm_Notices.show("Filter saved", "success");
-                this.hide();
-            }
-        });
-    }
 }
 
 function createSaveFilter({
@@ -487,6 +472,7 @@ const Hm_Filters = (function (hm) {
                 {'name': 'conditions_json', 'value': JSON.stringify(conditions_parsed)},
                 {'name': 'actions_json', 'value': JSON.stringify(actions_parsed)},
                 {'name': 'filter_test_type', 'value': $('.modal_sieve_filter_test').val()},
+                {'name': 'filter_source', 'value': getPageNameParam()},
                 {'name': 'gen_script', 'value': gen_script},
             ],
             function(res) {
@@ -638,7 +624,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
         $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
     });
 
-    $(document).on('click', '.add_filter', function() {
+    $(document).off('click', '.add_filter').on('click', '.add_filter', function() {
         edit_filter_modal.setTitle('Add Filter');
         $('.modal_sieve_filter_priority').val('');
         $('.modal_sieve_filter_test').val('ALLOF');
@@ -654,7 +640,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
         $(".filter_actions_modal_table").empty();
     });
 
-    $(document).on('click', '.add_script', function() {
+    $(document).off('click', '.add_script').on('click', '.add_script', function() {
         edit_script_modal.setTitle('Add Script');
         $('.modal_sieve_script_textarea').val('');
         $('.modal_sieve_script_name').val('');
@@ -669,7 +655,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Delete action Button
      */
-    $(document).on('click', '.delete_else_action_modal_button', function (e) {
+    $(document).off('click', '.delete_else_action_modal_button').on('click', '.delete_else_action_modal_button', function (e) {
         e.preventDefault();
         $(this).parent().parent().remove();
     });
@@ -677,7 +663,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Delete action Button
      */
-    $(document).on('click', '.delete_action_modal_button', function (e) {
+    $(document).off('click', '.delete_action_modal_button').on('click', '.delete_action_modal_button', function (e) {
         e.preventDefault();
         $(this).parent().parent().remove();
     });
@@ -685,7 +671,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Delete Condition Button
      */
-    $(document).on('click', '.delete_condition_modal_button', function (e) {
+    $(document).off('click', '.delete_condition_modal_button').on('click', '.delete_condition_modal_button', function (e) {
         e.preventDefault();
         $(this).parent().parent().remove();
     });
@@ -738,7 +724,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Action change
      */
-    $(document).on('change', '.sieve_actions_select', function () {
+    $(document).off('change', '.sieve_actions_select').on('change', '.sieve_actions_select', function () {
         let tr_elem = $(this).parent().parent();
         console.log(tr_elem.attr('default_value'));
         let elem = $(this).parent().next().next();
@@ -809,7 +795,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Condition type change
      */
-    $(document).on('change', '.add_condition_sieve_filters', function () {
+    $(document).off('change', '.add_condition_sieve_filters').on('change', '.add_condition_sieve_filters', function () {
         let condition_name = $(this).val();
         let elem = $(this).parent().next().next().find('.condition_options');
         let elem_extra = $(this).parent().next().find('.condition_extra_value');
@@ -855,7 +841,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Delete filter event
      */
-    $(document).on('click', '.delete_filter', function (e) {
+    $(document).off('click', '.delete_filter').on('click', '.delete_filter', function (e) {
         e.preventDefault();
         if (!confirm('Do you want to delete filter?')) {
             return;
@@ -876,7 +862,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Toggle Filter
      */
-    $('.toggle_filter').on('change', function () {
+    $('.toggle_filter').off('change').on('change', function () {
         const checkbox = $(this);
         Hm_Ajax.request(
             [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_toggle_script_state'},
@@ -894,7 +880,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Delete script event
      */
-    $(document).on('click', '.delete_script', function (e) {
+    $(document).off('click', '.delete_script').on('click', '.delete_script', function (e) {
         e.preventDefault();
         if (!confirm('Do you want to delete script?')) {
             return;
@@ -915,7 +901,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Edit script event
      */
-    $(document).on('click', '.edit_script', function (e) {
+    $(document).off('click', '.edit_script').on('click', '.edit_script', function (e) {
         e.preventDefault();
         let obj = $(this);
         edit_script_modal.setTitle('Edit Script');
@@ -939,7 +925,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Edit filter event
      */
-    $(document).on('click', '.edit_filter', function (e) {
+    $(document).off('click', '.edit_filter').on('click', '.edit_filter', function (e) {
         e.preventDefault();
         let obj = $(this);
         current_account = $(this).attr('account');
@@ -1276,6 +1262,7 @@ function get_list_block_sieve() {
 function populateFilterFromDraft(filterDraft) {
     $('.sieve_list_conditions_modal').empty();
     $('.filter_actions_modal_table').empty();
+    $('.sieve_match_mode').remove();
 
     (filterDraft.from || []).forEach((fromVal) => {
         add_filter_condition();
@@ -1313,6 +1300,10 @@ function populateFilterFromDraft(filterDraft) {
     if ($('.filter_actions_modal_table tr').length === 0) {
         add_filter_action();
     }
+
+    window.setTimeout(function () {
+        add_filter_match_mode();
+    }, 0);
 }
 
 function collectChips(container) {
@@ -1337,6 +1328,8 @@ function createFilterFromList(launcherModal) {
 
     // Use the stored mailbox from the button click
     const mailboxName = current_mailbox_for_filter;
+    current_account = mailboxName;
+    current_account_element = find_account_element(mailboxName);
 
     const filterDraft = {
         from: froms,
@@ -1521,7 +1514,7 @@ function dryRunFilterFromModal() {
     resultHtml +=
         '<div class="d-flex justify-content-between align-items-center mb-2">' +
         '<h6 class="fw-bold mb-0"><i class="bi bi-lightning me-2"></i>' +
-        hm_trans('Dry Run Results') +
+        hm_trans('Filter Match Preview for Visible Messages') +
         '</h6>' +
         '<button type="button" class="btn btn-sm btn-outline-secondary dry-run-close" aria-label="Close">' +
         '<i class="bi bi-x"></i>' +
@@ -1622,14 +1615,19 @@ $(function () {
     $(document).on("submit", "#create-filter-form", function (e) {
         e.preventDefault();
         current_account = $(this).attr("account");
+        current_account_element = find_account_element(current_account);
 
-        const edit_filter_modal = new Hm_Filter_Modal(current_account);
+        const edit_filter_modal = createEditFilterModal(
+            Hm_Filters.save_filter,
+            function () {
+                return current_account;
+            },
+        );
         edit_filter_modal.setTitle("Add Filter for message like this");
         const add_filter_condition = Hm_Filters.add_filter_condition;
         const add_filter_action = Hm_Filters.add_filter_action;
 
         const $form = $(this);
-        const $btn = $form.find("#create_filter").prop("disabled", true);
         const data = {};
 
         if ($form.find("#use_from").is(":checked"))
@@ -1644,11 +1642,17 @@ $(function () {
         if ($.isEmptyObject(data)) {
             Hm_Notices.show(
                 "Please check at least one condition to create a filter.",
-                "danger"
+                "#create-filter-form"
             );
-            $btn.prop("disabled", false);
             return;
         }
+
+        $('.modal_sieve_filter_name').val('');
+        $('.modal_sieve_filter_priority').val('');
+        $('.modal_sieve_filter_test').val('ALLOF');
+        $('.sieve_list_conditions_modal').empty();
+        $('.filter_actions_modal_table').empty();
+        $('#stop_filtering').prop('checked', false);
 
         edit_filter_modal.open();
 
@@ -1678,6 +1682,8 @@ $(function () {
             $selectOp.val("Contains");
             $inputVal.val(value);
         }
+
+        add_filter_match_mode();
 
         if (data["reply-to"]) {
             add_filter_action("autoreply");
