@@ -9,80 +9,49 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
+ * Parses Google People API v1 JSON responses into a flat contact array.
  * @subpackage gmail_contacts/lib
  */
-class Hm_Gmail_Contact_XML {
-    private $collect = false;
-    private $all_fields = false;
-    private $misc_tag_name = false;
-    private $results = array();
-    private $xml_parser = false;
-    private $current;
-    private $xml = false;
-    private $index = 0;
-    private $xml_support = false;
+class Hm_Gmail_People_API {
+    private $response;
 
-    public function __construct($xml) {
-        $this->xml = $xml;
-        if (!Hm_Functions::function_exists('xml_parser_create')) {
-            Hm_Debug::add('Gmail contacts enabled, but no PHP XML support found', 'warning');
-            return;
-        }
-        $this->xml_support = true;
-        $this->xml_parser = xml_parser_create('UTF-8');
-        xml_set_object($this->xml_parser, $this);
-        xml_set_element_handler($this->xml_parser, 'xml_start_element', 'xml_end_element');
-        xml_set_character_data_handler($this->xml_parser, 'xml_character_data');
+    public function __construct($response) {
+        $this->response = $response;
     }
+
     public function parse() {
-        if ($this->xml_support) {
-            xml_parse($this->xml_parser, $this->xml);
+        $results = array();
+        if (!is_array($this->response)) {
+            Hm_Debug::add('Gmail People API: empty or non-JSON response received', 'warning');
+            return $results;
         }
-        return $this->results;
-    }
-    public function xml_start_element($parser, $tagname, $attrs) {
-        $this->all_fields = false;
-        $this->current = false;
-        if ($tagname == 'ENTRY') {
-            if (!array_key_exists($this->index, $this->results)) {
-                $this->results[$this->index] = array();
+        if (array_key_exists('error', $this->response)) {
+            $err = $this->response['error'];
+            $msg = isset($err['message']) ? $err['message'] : 'unknown error';
+            $code = isset($err['code']) ? $err['code'] : '?';
+            Hm_Debug::add(sprintf('Gmail People API error %s: %s', $code, $msg), 'warning');
+            return $results;
+        }
+        if (!array_key_exists('connections', $this->response)) {
+            Hm_Debug::add('Gmail People API: response has no connections key (empty contacts or missing API scope)', 'info');
+            return $results;
+        }
+        foreach ($this->response['connections'] as $person) {
+            if (!array_key_exists('emailAddresses', $person) || empty($person['emailAddresses'])) {
+                continue;
             }
-        }
-        if ($tagname == 'GD:EMAIL') {
-            $this->results[$this->index]['email_address'] = $attrs['ADDRESS'];
-        }
-        if ($tagname == 'GD:FULLNAME') {
-            $this->collect = true;
-        }
-        if ($tagname == 'GD:PHONENUMBER') {
-            if (array_key_exists('URI', $attrs)) {
-                $this->results[$this->index]['phone_number'] = mb_substr($attrs['URI'], 5);
+            $contact = array(
+                'email_address' => $person['emailAddresses'][0]['value'],
+                'display_name' => '',
+            );
+            if (array_key_exists('names', $person) && !empty($person['names'])) {
+                $contact['display_name'] = $person['names'][0]['displayName'];
             }
-        }
-        else {
-            $this->all_fields = true;
-            $this->misc_tag_name = $tagname;
-        }
-    }
-    public function xml_end_element($parser, $tagname) {
-        if ($tagname == 'ENTRY') {
-            $this->index++;
-        }
-        $this->current = false;
-        $this->collect = false;
-    }
-    public function xml_character_data($parser, $data) {
-        if ($this->collect) {
-            if ($this->current) {
-                $this->results[$this->index]['display_name'] .= $data;
+            if (array_key_exists('phoneNumbers', $person) && !empty($person['phoneNumbers'])) {
+                $contact['phone_number'] = $person['phoneNumbers'][0]['value'];
             }
-            else {
-                $this->results[$this->index]['display_name'] = $data;
-            }
+            $results[] = $contact;
         }
-        elseif ($this->all_fields && trim($data)) {
-            $this->results[$this->index]['all_fields'][$this->misc_tag_name] = $data;
-        }
-        $this->current = true;
+        return $results;
     }
 }
