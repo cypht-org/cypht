@@ -364,7 +364,7 @@ abstract class Hm_Handler_Module {
             $this->session->destroy($this->request);
             Hm_Debug::add('LOGGED OUT: request key check failed', 'warning');
         }
-        Hm_Dispatch::page_redirect('?page=home');
+        Hm_Dispatch::page_redirect($this->build_page_url('home'));
         return 'redirect';
     }
 
@@ -455,6 +455,14 @@ abstract class Hm_Handler_Module {
             Hm_Msgs::flush();
             $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
         }
+    }
+
+    public function build_page_url($page, $params = []) {
+        $url = '?'.$this->config->get('page_param_name').'='.$page;
+        foreach ($params as $key => $value) {
+            $url .= '&'.urlencode($key).'='.urlencode($value);
+        }
+        return $url;
     }
 
     /**
@@ -572,6 +580,14 @@ abstract class Hm_Output_Module {
             $this->dir = $lang_str['interface_direction'];
         }
         return $this->output();
+    }
+
+    public function build_page_url($page, $params = []) {
+        $url = '?'.$this->get('page_param_name', 'page').'='.$page;
+        foreach ($params as $key => $value) {
+            $url .= '&'.$key.'='.$value;
+        }
+        return $url;
     }
 
     /**

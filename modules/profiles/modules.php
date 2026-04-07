@@ -279,7 +279,7 @@ class Hm_Output_profile_edit_form extends Hm_Output_Module {
  */
 class Hm_Output_profile_page_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">';
+        $res = '<li class="menu_profiles"><a class="unread_link" href="'.$this->build_page_url('profiles').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-person-fill menu-icon"></i>';
         }
@@ -376,7 +376,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     '<td class="d-none d-sm-table-cell">'.(mb_strlen($profile['sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.(mb_strlen($profile['rmk']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.($profile['default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
-                    '<td class="text-right"><a href="?page=profiles&amp;profile_id='.$this->html_safe($profile['id']).'" title="'.$this->trans('Edit').'">'.
+                        '<td class="text-right"><a href="'.$this->build_page_url('profiles', array('profile_id' => $this->html_safe($profile['id']))).'" title="'.$this->trans('Edit').'">'.
                     '<i class="bi bi-pencil-fill"></i></a></td>'.
                     '</tr>';
             }
@@ -409,7 +409,7 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
 
     $res .= '<div class="edit_profile row p-3" '.($form_vals['name'] ? '' : 'style="display: none;"').'><div class="col-12 col-lg-8 col-xl-5">';
 
-    $res .= '<form method="post" action="?page=profiles">';
+    $res .= '<form method="post" action="'.$out_mod->build_page_url('profiles').'">';
     if (empty($form_vals['id'])) {
         $res .= '<div class="form-check form-switch mt-3 mb-3">';
         $res .= '<input class="form-check-input" name="profile_quickly_create" type="checkbox" role="switch" id="profile_quickly_create">';
@@ -485,7 +485,7 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     if ($form_vals['name']) {
         $res .= '<input type="submit" class="btn btn-primary profile_update" value="'.$out_mod->trans('Update').'" /> ';
         $res .= '<input type="submit" class="btn btn-danger" name="profile_delete" value="'.$out_mod->trans('Delete').'" /> ';
-        $res .= '<a href="?page=profiles" class="btn btn-secondary">'.$out_mod->trans('Cancel').'</a>';
+        $res .= '<a href="'.$out_mod->build_page_url('profiles').'" class="btn btn-secondary">'.$out_mod->trans('Cancel').'</a>';
     }
     else {
         $res .= '<input type="submit" class="btn btn-primary submit_profile" value="'.$out_mod->trans('Create').'" />';

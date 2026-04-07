@@ -115,7 +115,7 @@ class Hm_Output_tags_tree extends Hm_Output_Module {
             }               
         
             // Generate the tree view HTML
-            $treeViewHtml = generate_tree_view($folderTree, $this->html_safe(Hm_Request_Key::generate()));
+            $treeViewHtml = generate_tree_view($folderTree, $this->html_safe(Hm_Request_Key::generate()), $this);
             $treeContent = count($folderTree) > 0 ? $treeViewHtml : '<p>'. $this->trans('No tags available yet.') .'</p>';
             $out = '<div class="tags_tree mt-3 col-lg-8 col-md-12 col-sm-12">
                     <div class="card m-3 mr-0">
@@ -155,7 +155,7 @@ class Hm_Output_tags_form extends Hm_Output_Module {
         return '<div class="tags_tree mt-3 col-lg-4 col-md-8 col-sm-12">
                     <div class="card m-3">
                         <div class="card-body">
-                            <form class="add_tag me-0" method="POST" action="?page=tags">
+                            <form class="add_tag me-0" method="POST" action="'.$this->build_page_url('tags').'">
                                 <input type="hidden" name="hm_page_key" id="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
 
                                 <div class="subtitle mt-4">'.$form_title.'</div>
@@ -192,7 +192,7 @@ class Hm_Output_tags extends hm_output_module {
         $folders = $this->get('tags', array());
         if (is_array($folders) && !empty($folders)) {
             if(count($this->get('tags', array()))  > 1) {
-                $res .= '<li class="menu_tags"><a class="all_tags" href="?page=tags">';
+                $res .= '<li class="menu_tags"><a class="all_tags" href="'.$this->build_page_url('tags').'">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-tags fs-5 me-2"></i>';
                 }
@@ -213,13 +213,13 @@ class Hm_Output_tags extends hm_output_module {
                 if (!$this->get('hide_folder_icons')) {
                     $res .= $hasChild ? '<i class="bi bi-caret-down"></i>' : '<i class="bi bi-tags fs-5 me-2"></i>';
                 }
-                $res .= '<a data-id="tag_'.$this->html_safe($id).'" href="?page=message_list&list_path=tag&filter='.$this->html_safe($id).'">';
+                $res .= '<a data-id="tag_'.$this->html_safe($id).'" href="'.$this->build_page_url('message_list', array('list_path' => 'tag', 'filter' => $this->html_safe($id))).'">';
                 $res .= $this->html_safe($folder['name']).'</a>';
                 if($hasChild) {
                     $res .= '<ul>';
                     foreach ($folder['children'] as $key => $child) {
                         $res .= '<li class="tag_'.$this->html_safe($child['id']).'">';
-                        $res .= '<a data-id="tag_'.$this->html_safe($child['id']).'" href="?page=message_list&list_path=tag&filter='.$this->html_safe($child['id']).'">';
+                        $res .= '<a data-id="tag_'.$this->html_safe($child['id']).'" href="'.$this->build_page_url('message_list', array('list_path' => 'tag', 'filter' => $this->html_safe($child['id']))).'">';
                         $res .= $this->html_safe($folder['name']).'</a>';
                         $res .= '</li>';
                     }
@@ -228,7 +228,7 @@ class Hm_Output_tags extends hm_output_module {
                 $res .= '</li>';
             }
         }
-        $res .= '<li class="tags_add_new"><a href="?page=tags">';
+        $res .= '<li class="tags_add_new"><a href="'.$this->build_page_url('tags').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-plus-square menu-icon"></i>';
         }
