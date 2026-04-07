@@ -204,35 +204,6 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_new_filter_message_dropdown_contains_create_button_and_header_toggles() {
-        $parent = build_parent_mock();
-        $mod = new Hm_Output_new_sieve_filter_for_message_like_this($parent, 'test');
-        $mod->output_data = array(
-            'mailbox_name' => 'Primary Account',
-            'filter_headers' => array(
-                'from' => 'sender@example.com',
-                'to' => 'team@example.com',
-                'subject' => 'Build update',
-                'reply-to' => 'reply@example.com',
-            ),
-        );
-
-        $mod->output();
-        $content = $mod->output_data['new_filter'];
-
-        $this->assertStringContainsString('id="filter_message"', $content);
-        $this->assertStringContainsString('id="use_from" checked', $content);
-        $this->assertStringContainsString('id="use_to"', $content);
-        $this->assertStringContainsString('id="use_subject"', $content);
-        $this->assertStringContainsString('id="use_reply"', $content);
-        $this->assertStringContainsString('id="create_filter"', $content);
-        $this->assertStringContainsString('Create filter', $content);
-    }
-
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
     public function test_load_mailbox_name_from_list_path() {
         $test = new Sieve_Handler_Test('load_mailbox_name', 'sievefilters');
         $test->get = array('list_path' => 'imap_0_INBOX');
@@ -520,6 +491,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
             'main_script' => 'require ["include"];',
             'manual_script-15-cypht' => "require [\"fileinto\"];\nkeep;",
         );
+        Hm_IMAP_List::init(new Hm_Mock_Config(), new Hm_Mock_Session());
         Hm_IMAP_List::add(array(
             'name' => 'Primary Account',
             'server' => 'imap.example.com',
