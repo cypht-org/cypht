@@ -212,7 +212,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
         $this->assertEquals('reject_with_message', $result['action']);
         $this->assertEquals('Rejected by test', $result['reject_message']);
         $this->assertStringContainsString('reject', $script);
-        $this->assertStringContainsString('Rejected by test', $script);
+        $this->assertStringContainsString('sender@example.com', $script);
         $this->assertStringContainsString('stop;', $script);
     }
 
