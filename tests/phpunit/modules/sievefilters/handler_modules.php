@@ -57,6 +57,7 @@ class Sieve_Handler_Test {
 class Hm_Test_Sieve_Client {
     public static $scripts = array();
     public static $activated = '';
+    public static $renamed = array();
 
     public function listScripts() {
         return array_keys(self::$scripts);
@@ -78,6 +79,14 @@ class Hm_Test_Sieve_Client {
 
     public function activateScript($name) {
         self::$activated = $name;
+        return true;
+    }
+
+    public function renameScript($name, $prefix) {
+        $new_name = $prefix.$name;
+        self::$scripts[$new_name] = self::$scripts[$name] ?? '';
+        unset(self::$scripts[$name]);
+        self::$renamed[] = array($name, $new_name);
         return true;
     }
 
@@ -110,6 +119,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
         require_once APP_PATH.'modules/sievefilters/modules.php';
         Hm_Test_Sieve_Client::$scripts = array();
         Hm_Test_Sieve_Client::$activated = '';
+        Hm_Test_Sieve_Client::$renamed = array();
         Hm_Msgs::flush();
     }
 
@@ -121,6 +131,29 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
             '# '.base64_encode($source),
             '',
             'require ["fileinto"];',
+        ));
+    }
+
+    private function editableFilterScript($test_type = 'allof') {
+        $conditions_json = json_encode(array(array(
+            'condition' => 'from',
+            'type' => 'Contains',
+            'value' => 'sender@example.com',
+        )));
+        $actions_json = json_encode(array(array(
+            'action' => 'keep',
+            'value' => '',
+        )));
+
+        return implode("\n", array(
+            "# CYPHT CONFIG HEADER - DON'T REMOVE",
+            '# '.base64_encode($conditions_json),
+            '# '.base64_encode($actions_json),
+            '# '.base64_encode('message_list'),
+            '',
+            'if '.$test_type.' (header :contains "From" ["sender@example.com"]) {',
+            '    keep;',
+            '}',
         ));
     }
 
@@ -147,6 +180,53 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
         $this->assertStringContainsString('Add Condition', $content);
         $this->assertStringContainsString('filter_modal_add_action_btn', $content);
         $this->assertStringContainsString('Add Action', $content);
+        $this->assertStringContainsString('stop_filtering', $content);
+        $this->assertStringContainsString('Filter Name:', $content);
+        $this->assertStringContainsString('Priority:', $content);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_script_modal_contains_required_fields() {
+        $content = get_script_modal_content();
+
+        $this->assertStringContainsString('edit_script_modal', $content);
+        $this->assertStringContainsString('modal_sieve_script_name', $content);
+        $this->assertStringContainsString('modal_sieve_script_priority', $content);
+        $this->assertStringContainsString('modal_sieve_script_textarea', $content);
+        $this->assertStringContainsString('Filter Name:', $content);
+        $this->assertStringContainsString('Priority:', $content);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_new_filter_message_dropdown_contains_create_button_and_header_toggles() {
+        $parent = build_parent_mock();
+        $mod = new Hm_Output_new_sieve_filter_for_message_like_this($parent, 'test');
+        $mod->output_data = array(
+            'mailbox_name' => 'Primary Account',
+            'filter_headers' => array(
+                'from' => 'sender@example.com',
+                'to' => 'team@example.com',
+                'subject' => 'Build update',
+                'reply-to' => 'reply@example.com',
+            ),
+        );
+
+        $mod->output();
+        $content = $mod->output_data['new_filter'];
+
+        $this->assertStringContainsString('id="filter_message"', $content);
+        $this->assertStringContainsString('id="use_from" checked', $content);
+        $this->assertStringContainsString('id="use_to"', $content);
+        $this->assertStringContainsString('id="use_subject"', $content);
+        $this->assertStringContainsString('id="use_reply"', $content);
+        $this->assertStringContainsString('id="create_filter"', $content);
+        $this->assertStringContainsString('Create filter', $content);
     }
 
     /**
@@ -199,6 +279,139 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_sieve_edit_filter_loads_conditions_actions_and_test_type() {
+        Hm_Test_Sieve_Client::$scripts = array(
+            'important_sender-10-cyphtfilter' => $this->editableFilterScript('allof'),
+        );
+
+        $test = new Sieve_Handler_Test('sieve_edit_filter', 'sievefilters');
+        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->post = array(
+            'imap_account' => 'Primary Account',
+            'sieve_script_name' => 'important_sender-10-cyphtfilter',
+        );
+        $test->user_config = array(
+            'imap_servers' => $this->imapServersConfig(),
+            'enable_sieve_filter_setting' => true,
+        );
+
+        $res = $test->run();
+
+        $this->assertEquals(json_encode('[{"condition":"from","type":"Contains","value":"sender@example.com"}]'), $res->handler_response['conditions']);
+        $this->assertEquals(json_encode('[{"action":"keep","value":""}]'), $res->handler_response['actions']);
+        $this->assertEquals('ALLOF', $res->handler_response['test_type']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_sieve_edit_script_outputs_existing_script() {
+        Hm_Test_Sieve_Client::$scripts = array(
+            'manual_script-15-cypht' => "require [\"fileinto\"];\nkeep;",
+        );
+
+        $test = new Sieve_Handler_Test('sieve_edit_script', 'sievefilters');
+        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->post = array(
+            'imap_account' => 'Primary Account',
+            'sieve_script_name' => 'manual_script-15-cypht',
+        );
+        $test->user_config = array(
+            'imap_servers' => $this->imapServersConfig(),
+            'enable_sieve_filter_setting' => true,
+        );
+
+        $res = $test->run();
+
+        $this->assertEquals("require [\"fileinto\"];\nkeep;", $res->handler_response['script']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_sieve_delete_filter_removes_script_and_rebuilds_main_script() {
+        Hm_Test_Sieve_Client::$scripts = array(
+            'main_script' => 'require ["include"];',
+            'important_sender-10-cyphtfilter' => $this->editableFilterScript('allof'),
+            'manual_script-15-cypht' => "require [\"fileinto\"];\nkeep;",
+        );
+
+        $test = new Sieve_Handler_Test('sieve_delete_filter', 'sievefilters');
+        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->post = array(
+            'imap_account' => 'Primary Account',
+            'sieve_script_name' => 'important_sender-10-cyphtfilter',
+        );
+        $test->user_config = array(
+            'imap_servers' => $this->imapServersConfig(),
+            'enable_sieve_filter_setting' => true,
+        );
+
+        $res = $test->run();
+
+        $this->assertTrue($res->handler_response['script_removed']);
+        $this->assertArrayNotHasKey('important_sender-10-cyphtfilter', Hm_Test_Sieve_Client::$scripts);
+        $this->assertStringContainsString('manual_script-15-cypht', Hm_Test_Sieve_Client::$scripts['main_script']);
+        $this->assertEquals('main_script', Hm_Test_Sieve_Client::$activated);
+        $this->assertEquals(array('Script removed'), Hm_Msgs::get());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_sieve_delete_script_removes_script_and_rebuilds_main_script() {
+        Hm_Test_Sieve_Client::$scripts = array(
+            'main_script' => 'require ["include"];',
+            'important_sender-10-cyphtfilter' => $this->editableFilterScript('allof'),
+            'manual_script-15-cypht' => "require [\"fileinto\"];\nkeep;",
+        );
+
+        $test = new Sieve_Handler_Test('sieve_delete_script', 'sievefilters');
+        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->post = array(
+            'imap_account' => 'Primary Account',
+            'sieve_script_name' => 'manual_script-15-cypht',
+        );
+        $test->user_config = array(
+            'imap_servers' => $this->imapServersConfig(),
+            'enable_sieve_filter_setting' => true,
+        );
+
+        $res = $test->run();
+
+        $this->assertTrue($res->handler_response['script_removed']);
+        $this->assertArrayNotHasKey('manual_script-15-cypht', Hm_Test_Sieve_Client::$scripts);
+        $this->assertStringContainsString('important_sender-10-cyphtfilter', Hm_Test_Sieve_Client::$scripts['main_script']);
+        $this->assertEquals('main_script', Hm_Test_Sieve_Client::$activated);
+        $this->assertEquals(array('Script removed'), Hm_Msgs::get());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_sieve_filters_enabled_message_content_outputs_client_when_configured() {
+        $test = new Sieve_Handler_Test('sieve_filters_enabled_message_content', 'sievefilters');
+        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->post = array('imap_server_id' => 0);
+        $test->user_config = array(
+            'imap_servers' => $this->imapServersConfig(),
+            'enable_sieve_filter_setting' => true,
+        );
+
+        $res = $test->run();
+
+        $this->assertTrue($res->handler_response['sieve_filters_enabled']);
+        $this->assertInstanceOf(Hm_Test_Sieve_Client::class, $res->handler_response['sieve_filters_client']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_sieve_save_filter_adds_success_message() {
         $test = new Sieve_Handler_Test('sieve_save_filter', 'sievefilters');
         $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
@@ -236,6 +449,47 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_sieve_save_filter_gen_script_returns_script_details_without_persisting_script() {
+        $test = new Sieve_Handler_Test('sieve_save_filter', 'sievefilters');
+        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->post = array(
+            'imap_account' => 'Primary Account',
+            'sieve_filter_name' => 'Important Sender',
+            'sieve_filter_priority' => '10',
+            'current_editing_filter_name' => '',
+            'conditions_json' => json_encode(array((object) array(
+                'condition' => 'from',
+                'type' => 'Contains',
+                'value' => 'camilux@example.com',
+            ))),
+            'actions_json' => json_encode(array((object) array(
+                'action' => 'keep',
+                'value' => '',
+                'extra_option_value' => '',
+            ))),
+            'filter_test_type' => 'ALLOF',
+            'filter_source' => 'message_list',
+            'gen_script' => true,
+        );
+        $test->user_config = array(
+            'imap_servers' => $this->imapServersConfig(),
+            'enable_sieve_filter_setting' => true,
+        );
+
+        $res = $test->run();
+
+        $this->assertArrayHasKey('script_details', $res->handler_response);
+        $this->assertEquals('Important Sender', $res->handler_response['script_details']['filter_name']);
+        $this->assertEquals('10', $res->handler_response['script_details']['filter_priority']);
+        $this->assertStringContainsString('keep;', $res->handler_response['script_details']['gen_script']);
+        $this->assertSame(array(), Hm_Test_Sieve_Client::$scripts);
+        $this->assertSame(array(), Hm_Msgs::get());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_sieve_save_script_adds_success_message() {
         $test = new Sieve_Handler_Test('sieve_save_script', 'sievefilters');
         $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
@@ -255,6 +509,44 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
 
         $this->assertEquals(array('Script saved'), Hm_Msgs::get());
         $this->assertArrayHasKey('manual_script-15-cypht', Hm_Test_Sieve_Client::$scripts);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_sieve_toggle_script_state_renames_script_and_rebuilds_main_script() {
+        Hm_Test_Sieve_Client::$scripts = array(
+            'main_script' => 'require ["include"];',
+            'manual_script-15-cypht' => "require [\"fileinto\"];\nkeep;",
+        );
+        Hm_IMAP_List::add(array(
+            'name' => 'Primary Account',
+            'server' => 'imap.example.com',
+            'user' => 'user@example.com',
+            'pass' => 'secret',
+            'sieve_config_host' => 'tls://sieve.example.com:4190',
+            'id' => 0,
+        ));
+
+        $test = new Sieve_Handler_Test('sieve_toggle_script_state', 'sievefilters');
+        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->post = array(
+            'imap_account' => 0,
+            'script_state' => 0,
+            'sieve_script_name' => 'manual_script-15-cypht',
+        );
+        $test->user_config = array(
+            'imap_servers' => $this->imapServersConfig(),
+            'enable_sieve_filter_setting' => true,
+        );
+
+        $res = $test->run();
+
+        $this->assertTrue($res->handler_response['success']);
+        $this->assertArrayHasKey('sdisabled_manual_script-15-cypht', Hm_Test_Sieve_Client::$scripts);
+        $this->assertEquals(array(array('manual_script-15-cypht', 'sdisabled_manual_script-15-cypht')), Hm_Test_Sieve_Client::$renamed);
+        $this->assertEquals(array('Script disabled'), Hm_Msgs::get());
     }
 
     /**
