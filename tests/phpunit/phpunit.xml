@@ -143,6 +143,7 @@
       <file>./modules/saved_searches/class.php</file>
     </testsuite>
     <testsuite name="modules_sievefilters">
+      <file>./modules/sievefilters/functions.php</file>
       <file>./modules/sievefilters/handler_modules.php</file>
     </testsuite>
   </testsuites>
