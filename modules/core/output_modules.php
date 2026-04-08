@@ -22,7 +22,7 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
             '<i class="bi bi-search"></i>' .
             '</a>';
         }
-        $res .= '<input type="hidden" name="'. $this->get("page_param_name") .'" value="search" />'.
+        $res .= '<input type="hidden" name="'. $this->get("page_param_name", 'page') .'" value="search" />'.
             '<input type="search" class="search_terms form-control form-control-sm" aria-describedby="basic-addon1" '.
             'name="search_terms" placeholder="'.$this->trans('Search').'" /></div></form></li>';
         if ($this->format == 'HTML5') {
@@ -95,7 +95,7 @@ class Hm_Output_search_form_content extends Hm_Output_Module {
     protected function output() {
         $terms = $this->get('search_terms', '');
 
-        return '<input type="hidden" name="'. $this->get("page_param_name") .'" value="search" />'.
+        return '<input type="hidden" name="'. $this->get("page_param_name", 'page') .'" value="search" />'.
             ' <label class="screen_reader" for="search_terms">'.$this->trans('Search Terms').'</label>'.
             '<input required placeholder="'.$this->trans('Search Terms').'" id="search_terms" type="search" class="search_terms form-control form-control-sm" name="search_terms" value="'.$this->html_safe($terms).'" />'.
             ' <label class="screen_reader" for="search_fld">'.$this->trans('Search Field').'</label>'.
@@ -2024,7 +2024,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             }
             $config_link = '<a title="'.$this->trans('Configure').'" href="'.$this->build_page_url('settings').'#'.$path.'_setting"><i class="bi bi-gear-wide refresh_list"></i></a>';
             $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a>';
-            $search_field = '<form method="GET"><input type="hidden" name="'. $this->get("page_param_name") .'" value="message_list" /><input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/><input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="form-control imap_keyword" name="keyword" value="'.$this->html_safe($terms).'"/></form>';
+            $search_field = '<form method="GET"><input type="hidden" name="'. $this->get("page_param_name", 'page') .'" value="message_list" /><input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/><input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="form-control imap_keyword" name="keyword" value="'.$this->html_safe($terms).'"/></form>';
 
         }
         else {
