@@ -988,6 +988,7 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
                         }
                     }
                 });
+                add_filter_match_mode();
                 edit_filter_modal.setTitle(current_editing_filter_name);
                 edit_filter_modal.open();
             }
@@ -1822,6 +1823,7 @@ $(function () {
                     }
                 });
 
+                add_filter_match_mode();
                 edit_filter_modal.setTitle(
                     hm_trans('Edit Filter') + ': ' + filterName,
                 );
