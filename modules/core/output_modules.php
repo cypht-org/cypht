@@ -1309,6 +1309,38 @@ class Hm_Output_msg_list_icons_setting extends Hm_Output_Module {
 }
 
 /**
+ * Auto save settings output
+ * @subpackage core/output
+ */
+class Hm_Output_auto_save_settings extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        
+        $auto_save_checked = '';
+        $auto_save_reset = '';
+        if (array_key_exists('auto_save_setting', $settings) && $settings['auto_save_setting']) {
+            $auto_save_checked = ' checked="checked"';
+            $auto_save_reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
+        }
+        
+        $auto_save_interval = "60";
+        if (array_key_exists('auto_save_interval', $settings) && $settings['auto_save_interval']) {
+            $auto_save_interval = $settings['auto_save_interval'];
+        }
+        
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="auto_save_setting">'.
+            $this->trans('Enable automatic settings save').
+            '</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$auto_save_checked.' id="auto_save_setting" name="auto_save_setting" data-default-value="false" value="1" />'.$auto_save_reset.'</div></td></tr>';
+        
+        $res .= '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="auto_save_interval">'.
+            $this->trans('Auto-save interval (seconds)').
+            '</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-control form-control-sm w-auto" type="number" min="10" max="3600" id="auto_save_interval" name="auto_save_interval" value="'.$auto_save_interval.'" data-default-value="60" /></div></td></tr>';
+        
+        return $res;
+    }
+}
+
+/**
  * Ends the settings table
  * @subpackage core/output
  */

@@ -570,32 +570,46 @@ class Hm_Handler_save_auto_save_settings extends Hm_Handler_Module {
      * save new site settings to the session
      */
     public function process() {
-       
-        $current_settings = $this->session->get('user_settings', array());
+        $auto_save_enabled = $this->user_config->get('auto_save_setting_setting', false);
+        $auto_save_interval = $this->user_config->get('auto_save_interval_setting', 60);
 
-        $path = $this->config->get('user_settings_dir', false);
-        $new_settings = $this->get('new_user_settings', array());
-
-        die(var_dump($this->user_config->get('username'), $path));
-
-        $pages = $this->session->get('saved_pages', array());
-        if (!empty($pages)) {
-            // $this->user_config->set('saved_pages', $pages);
+        if (!$auto_save_enabled) {
+            return;
         }
+
+        $current_settings = $this->session->get('user_settings', array());
         
         $saved_count = 0;
-
         if (!empty($current_settings)) {
             foreach ($current_settings as $name => $value) {
                 $this->user_config->set($name, $value);
                 $saved_count++;
             }
-
-            die($saved_count);
+            // $this->session->record_unsaved('Auto-save settings completed');
         }
-        
-        $this->out('auto_save_status', 'success');
-        $this->out('auto_save_timestamp', time());
+    }
+}
+class Hm_Handler_get_auto_save_settings extends Hm_Handler_Module {
+
+    public function process() {
+        $auto_save_enabled = $this->user_config->get('auto_save_setting', false);
+        $auto_save_interval = $this->user_config->get('auto_save_interval', 60);
+        $this->out('auto_save_enabled', true);
+        $this->out('auto_save_interval', $auto_save_interval);
+    }
+}
+
+/**
+ * Process auto save settings
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_auto_save_settings extends Hm_Handler_Module {
+    public function process() {
+        function process_auto_save_setting_callback($val) { return $val; }
+        function process_auto_save_interval_callback($val) { return $val; }
+
+        process_site_setting('auto_save_setting', $this, 'process_auto_save_setting_callback', true, true);
+        process_site_setting('auto_save_interval', $this, 'process_auto_save_interval_callback');
     }
 }
 

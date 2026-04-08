@@ -66,6 +66,7 @@ add_handler('settings', 'process_mailto_handler_setting', true, 'core', 'date', 
 add_handler('settings', 'process_show_list_icons', true, 'core', 'date', 'after');
 add_handler('settings', 'reset_factory', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
+add_handler('settings', 'process_auto_save_settings', true, 'core', 'save_user_settings', 'after');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
 add_handler('settings', 'privacy_settings', true, 'core', 'date', 'after');
 
@@ -107,6 +108,7 @@ add_output('settings', 'all_source_max_setting', true, 'core', 'all_since_settin
 add_output('settings', 'start_all_email_settings', true, 'core', 'all_source_max_setting', 'after');
 add_output('settings', 'all_email_since_setting', true, 'core', 'start_all_email_settings', 'after');
 add_output('settings', 'all_email_source_max_setting', true, 'core', 'all_email_since_setting', 'after');
+add_output('settings', 'auto_save_settings', true, 'core', 'setting_active_body_structure', 'after');
 add_output('settings', 'end_settings_form', true, 'core', 'content_section_end', 'before');
 add_output('settings', 'privacy_settings', 'true', 'core', 'start_unread_settings', 'before');
 
@@ -207,6 +209,10 @@ add_output('ajax_combined_message_list', 'combined_message_list', true, 'core');
 setup_base_ajax_page('ajax_save_auto_save_settings', 'core');
 add_handler('ajax_save_auto_save_settings', 'save_auto_save_settings', true, 'core');
 
+setup_base_ajax_page('ajax_get_auto_save_settings', 'core');
+add_handler('ajax_get_auto_save_settings', 'get_auto_save_settings', true, 'core');
+
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -230,6 +236,7 @@ return array(
         'ajax_combined_message_list',
         'logout',
         'ajax_save_auto_save_settings',
+        'ajax_get_auto_save_settings',
     ),
     'allowed_output' => array(
         'date' => array(FILTER_UNSAFE_RAW, false),
@@ -250,6 +257,8 @@ return array(
         'imap_service_name' => array(FILTER_UNSAFE_RAW, false),
         'mailbox' => array(FILTER_UNSAFE_RAW, false),
         'mailbox_name' => array(FILTER_UNSAFE_RAW, false),
+        'auto_save_enabled' => array(FILTER_VALIDATE_BOOLEAN, false),
+        'auto_save_interval' => array(FILTER_VALIDATE_INT, false),
     ),
     'allowed_cookie' => array(
         'CYPHTID' => FILTER_UNSAFE_RAW,
@@ -378,5 +387,7 @@ return array(
         'update' => FILTER_VALIDATE_BOOLEAN,
         'images_blacklist' => FILTER_UNSAFE_RAW,
         'pop' => FILTER_VALIDATE_BOOLEAN,
+        'auto_save_setting' => FILTER_VALIDATE_BOOLEAN,
+        'auto_save_interval' => FILTER_VALIDATE_INT,
     )
 );

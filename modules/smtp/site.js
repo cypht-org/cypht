@@ -509,14 +509,15 @@ $(function() {
         }
 
         let autoSaveSettings = function () {
+            if (!window.autoSaveEnabled) {
+                return;
+            }
 
             if (window.autoSaveInProgress) {
-                console.log('Auto-save already in progress, skipping...');
                 return;
             }
             
             window.autoSaveInProgress = true;
-            
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_save_auto_save_settings'}],
                 function(res) {
@@ -532,16 +533,43 @@ $(function() {
                     console.error('Auto-save request failed:', err);
                 }
             );
+        }
 
+        let startAutoSaveTimer = function() {
+            if (!window.autoSaveEnabled) {
+                console.log('Auto-save is disabled, not starting timer');
+                return;
+            }
+            
+            if (window.autoSaveTimer) {
+                clearInterval(window.autoSaveTimer);
+            }
+            
+            let interval = (window.currentAutoSaveInterval || 60) * 1000; 
+            console.log('Starting auto-save timer with interval:', interval/1000, 'seconds');
+
+            window.autoSaveTimer = setInterval(function() {
+                autoSaveSettings();
+            }, interval);
+        }
+
+        let get_auto_save_settings = function() { 
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_get_auto_save_settings'}],
+                function(res) {
+                    console.log(res)
+                    if (res.auto_save_enabled !== undefined) {
+                        window.currentAutoSaveInterval = res.auto_save_interval;
+                        window.autoSaveEnabled = res.auto_save_enabled;
+                        startAutoSaveTimer();
+                    }
+                },
+            );
             
         }
 
-        sendScheduledMessages();
-        
-        setInterval(function() {
-            sendScheduledMessages();
-            autoSaveSettings();
-        }, 60000);
+        get_auto_save_settings();
+        setInterval(sendScheduledMessages, 60000);
         window.onbeforeunload = (e) => {
             if (scheduled_msg_count > 0 && e.currentTarget.location.hostname !== document.location.hostname) {
                 return sprintf(hm_trans("You have %d scheduled messages that won\'t be executed if you quit"), scheduled_msg_count);

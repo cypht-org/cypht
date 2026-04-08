@@ -537,6 +537,8 @@ return array(
     'Show message part icons when reading a message' => false,
     'Show simple message part structure when reading a message' => false,
     'Unsaved changes' => false,
+    'Enable automatic settings save' => false,
+    'Auto-save interval (seconds)' => false,
     'homephone' => false,
     'pager' => false,
     'Brazilian Portuguese' => false,
