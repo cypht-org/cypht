@@ -1209,6 +1209,9 @@ class Hm_Output_sievefilters_modal_content_start extends Hm_Output_Module
  */
 class Hm_Output_new_sieve_filter_for_message_like_this extends Hm_Output_Module {
     public function output() {
+        if (!$this->get('sieve_filters_enabled')) {
+            return '';
+        }
         $mailbox_name = $this->get('mailbox_name') ?? '';
         $headers = $this->get('filter_headers', []);
         
@@ -1742,6 +1745,9 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
 {
     protected function output()
     {
+        if (!$this->get('sieve_filters_enabled')) {
+            return '';
+        }
         $custom_actions = $this->get('custom_actions', []);
         $mailbox_name = $this->get('mailbox_name', '');
 
