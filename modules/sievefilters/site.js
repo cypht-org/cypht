@@ -619,45 +619,14 @@ const add_filter_action = Hm_Filters.add_filter_action;
 /**************************************************************************************
 *                                      MODAL EVENTS
 **************************************************************************************/
-const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
-    $(document).off('click', '.sievefilters_accounts_title').on('click', '.sievefilters_accounts_title', function() {
-        $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
-    });
 
-    $(document).off('click', '.add_filter');
-    if (edit_filter_modal) {
-        $(document).on('click', '.add_filter', function() {
-            edit_filter_modal.setTitle('Add Filter');
-            $('.modal_sieve_filter_priority').val('');
-            $('.modal_sieve_filter_test').val('ALLOF');
-            $('#stop_filtering').prop('checked', false);
-            current_account = $(this).attr('account');
-            current_account_element = $(this);
-            edit_filter_modal.open();
-
-            // Reset the form fields when opening the modal
-            $(".modal_sieve_filter_name").val('');
-            $(".modal_sieve_script_priority").val('');
-            $(".sieve_list_conditions_modal").empty();
-            $(".filter_actions_modal_table").empty();
-        });
-    }
-
-    $(document).off('click', '.add_script');
-    if (edit_script_modal) {
-        $(document).on('click', '.add_script', function() {
-            edit_script_modal.setTitle('Add Script');
-            $('.modal_sieve_script_textarea').val('');
-            $('.modal_sieve_script_name').val('');
-            $('.modal_sieve_script_priority').val('');
-            is_editing_script = false;
-            current_editing_script_name = '';
-            current_account = $(this).attr('account');
-            current_account_element = $(this);
-            edit_script_modal.open();
-        });
-    }
-
+/**
+ * Shared modal-internal event handlers.
+ * Registers delegated handlers for interactions inside any sieve filter/script
+ * modal (add/delete conditions, add/delete actions, select changes).
+ * Called globally on document ready so they work on every page.
+ */
+const registerSieveModalEvents = () => {
     /**
      * Delete action Button
      */
@@ -843,6 +812,45 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
             }
         }
     });
+};
+
+/**
+ * Page-specific event handlers for the sieve filters page.
+ * These require modal instances or operate on elements that only exist
+ * on the sieve filters settings page.
+ */
+const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
+    $(document).off('click', '.sievefilters_accounts_title').on('click', '.sievefilters_accounts_title', function() {
+        $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
+    });
+
+    $(document).off('click', '.add_filter').on('click', '.add_filter', function() {
+        edit_filter_modal.setTitle('Add Filter');
+        $('.modal_sieve_filter_priority').val('');
+        $('.modal_sieve_filter_test').val('ALLOF');
+        $('#stop_filtering').prop('checked', false);
+        current_account = $(this).attr('account');
+        current_account_element = $(this);
+        edit_filter_modal.open();
+
+        // Reset the form fields when opening the modal
+        $(".modal_sieve_filter_name").val('');
+        $(".modal_sieve_script_priority").val('');
+        $(".sieve_list_conditions_modal").empty();
+        $(".filter_actions_modal_table").empty();
+    });
+
+    $(document).off('click', '.add_script').on('click', '.add_script', function() {
+        edit_script_modal.setTitle('Add Script');
+        $('.modal_sieve_script_textarea').val('');
+        $('.modal_sieve_script_name').val('');
+        $('.modal_sieve_script_priority').val('');
+        is_editing_script = false;
+        current_editing_script_name = '';
+        current_account = $(this).attr('account');
+        current_account_element = $(this);
+        edit_script_modal.open();
+    });
 
     /**
      * Delete filter event
@@ -907,90 +915,84 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
     /**
      * Edit script event
      */
-    $(document).off('click', '.edit_script');
-    if (edit_script_modal) {
-        $(document).on('click', '.edit_script', function (e) {
-            e.preventDefault();
-            let obj = $(this);
-            edit_script_modal.setTitle('Edit Script');
-            is_editing_script = true;
-            current_editing_script_name = $(this).attr('script_name');
-            current_account = $(this).attr('imap_account');
-            current_account_element = $(this);
-            $('.modal_sieve_script_name').val($(this).attr('script_name_parsed'));
-            $('.modal_sieve_script_priority').val($(this).attr('priority'));
-            Hm_Ajax.request(
-                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_edit_script'},
-                    {'name': 'imap_account', 'value': $(this).attr('imap_account')},
-                    {'name': 'sieve_script_name', 'value': $(this).attr('script_name')}],
-                function(res) {
-                    $('.modal_sieve_script_textarea').html(res.script);
-                    edit_script_modal.open();
-                }
-            );
-        });
-    }
+    $(document).off('click', '.edit_script').on('click', '.edit_script', function (e) {
+        e.preventDefault();
+        let obj = $(this);
+        edit_script_modal.setTitle('Edit Script');
+        is_editing_script = true;
+        current_editing_script_name = $(this).attr('script_name');
+        current_account = $(this).attr('imap_account');
+        current_account_element = $(this);
+        $('.modal_sieve_script_name').val($(this).attr('script_name_parsed'));
+        $('.modal_sieve_script_priority').val($(this).attr('priority'));
+        Hm_Ajax.request(
+            [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_edit_script'},
+                {'name': 'imap_account', 'value': $(this).attr('imap_account')},
+                {'name': 'sieve_script_name', 'value': $(this).attr('script_name')}],
+            function(res) {
+                $('.modal_sieve_script_textarea').html(res.script);
+                edit_script_modal.open();
+            }
+        );
+    });
 
     /**
      * Edit filter event
      */
-    $(document).off('click', '.edit_filter');
-    if (edit_filter_modal) {
-        $(document).on('click', '.edit_filter', function (e) {
-            e.preventDefault();
-            let obj = $(this);
-            current_account = $(this).attr('account');
-            current_account_element = $(this);
-            is_editing_filter = true;
-            current_editing_filter_name = $(this).attr('script_name');
-            current_account = $(this).attr('imap_account');
-            current_account_element = $(this);
-            // $('#stop_filtering').prop('checked', false);
-            $('.modal_sieve_filter_name').val($(this).attr('script_name_parsed'));
-            $('.modal_sieve_filter_priority').val($(this).attr('priority'));
-            $('.sieve_list_conditions_modal').html('');
-            $('.filter_actions_modal_table').html('');
-            Hm_Ajax.request(
-                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_edit_filter'},
-                    {'name': 'imap_account', 'value': $(this).attr('imap_account')},
-                    {'name': 'sieve_script_name', 'value': $(this).attr('script_name')}],
-                function(res) {
-                    conditions = JSON.parse(JSON.parse(res.conditions));
-                    actions = JSON.parse(JSON.parse(res.actions));
-                    test_type = res.test_type;
-                    $(".modal_sieve_filter_test").val(test_type);
-                    conditions.forEach(function (condition) {
-                        add_filter_condition();
-                        $(".add_condition_sieve_filters").last().val(condition.condition);
-                        $(".add_condition_sieve_filters").last().trigger('change');
-                        $(".condition_options").last().val(condition.type);
-                        $("[name^=sieve_selected_extra_option_value]").last().val(condition.extra_option_value);
-                        if ($("[name^=sieve_selected_option_value]").last().is('input')) {
-                            $("[name^=sieve_selected_option_value]").last().val(condition.value);
-                        }
-                    });
+    $(document).off('click', '.edit_filter').on('click', '.edit_filter', function (e) {
+        e.preventDefault();
+        let obj = $(this);
+        current_account = $(this).attr('account');
+        current_account_element = $(this);
+        is_editing_filter = true;
+        current_editing_filter_name = $(this).attr('script_name');
+        current_account = $(this).attr('imap_account');
+        current_account_element = $(this);
+        // $('#stop_filtering').prop('checked', false);
+        $('.modal_sieve_filter_name').val($(this).attr('script_name_parsed'));
+        $('.modal_sieve_filter_priority').val($(this).attr('priority'));
+        $('.sieve_list_conditions_modal').html('');
+        $('.filter_actions_modal_table').html('');
+        Hm_Ajax.request(
+            [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_edit_filter'},
+                {'name': 'imap_account', 'value': $(this).attr('imap_account')},
+                {'name': 'sieve_script_name', 'value': $(this).attr('script_name')}],
+            function(res) {
+                conditions = JSON.parse(JSON.parse(res.conditions));
+                actions = JSON.parse(JSON.parse(res.actions));
+                test_type = res.test_type;
+                $(".modal_sieve_filter_test").val(test_type);
+                conditions.forEach(function (condition) {
+                    add_filter_condition();
+                    $(".add_condition_sieve_filters").last().val(condition.condition);
+                    $(".add_condition_sieve_filters").last().trigger('change');
+                    $(".condition_options").last().val(condition.type);
+                    $("[name^=sieve_selected_extra_option_value]").last().val(condition.extra_option_value);
+                    if ($("[name^=sieve_selected_option_value]").last().is('input')) {
+                        $("[name^=sieve_selected_option_value]").last().val(condition.value);
+                    }
+                });
 
-                    actions.forEach(function (action) {
-                        if (action.action === "stop") {
-                            $('#stop_filtering').prop('checked', true);
-                        } else {
-                            add_filter_action(action.value);
-                            $(".sieve_actions_select").last().val(action.action);
-                            $(".sieve_actions_select").last().trigger('change');
-                            $("[name^=sieve_selected_extra_action_value]").last().val(action.extra_option_value);
-                            if ($("[name^=sieve_selected_action_value]").last().is('input')) {
-                                $("[name^=sieve_selected_action_value]").last().val(action.value);
-                            } else if ($("[name^=sieve_selected_action_value]").last().is('textarea')) {
-                                $("[name^=sieve_selected_action_value]").last().text(action.value);
-                            }
+                actions.forEach(function (action) {
+                    if (action.action === "stop") {
+                        $('#stop_filtering').prop('checked', true);
+                    } else {
+                        add_filter_action(action.value);
+                        $(".sieve_actions_select").last().val(action.action);
+                        $(".sieve_actions_select").last().trigger('change');
+                        $("[name^=sieve_selected_extra_action_value]").last().val(action.extra_option_value);
+                        if ($("[name^=sieve_selected_action_value]").last().is('input')) {
+                            $("[name^=sieve_selected_action_value]").last().val(action.value);
+                        } else if ($("[name^=sieve_selected_action_value]").last().is('textarea')) {
+                            $("[name^=sieve_selected_action_value]").last().text(action.value);
                         }
-                    });
-                    edit_filter_modal.setTitle(current_editing_filter_name);
-                    edit_filter_modal.open();
-                }
-            );
-        });
-    }
+                    }
+                });
+                edit_filter_modal.setTitle(current_editing_filter_name);
+                edit_filter_modal.open();
+            }
+        );
+    });
 
     /**
      * Actions Drag and Drop
@@ -1004,8 +1006,6 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
             ghostClass: "sortable-ghost",
         });
     }
-
-    return true;
 };
 
 function blockListPageHandlers() {
@@ -1244,7 +1244,7 @@ function sieveFiltersPageHandler() {
     /**************************************************************************************
      * Initialize sieve button events
      **************************************************************************************/
-    hm_sieve_button_events(edit_filter_modal, edit_script_modal);
+    registerSievePageEvents(edit_filter_modal, edit_script_modal);
 
     const save_script = Hm_Filters.save_script;
     // const save_filter = Hm_Filters.save_filter;
@@ -1616,8 +1616,6 @@ function escapeHtml(text) {
 }
 
 $(function () {
-    hm_sieve_button_events();
-
     $(document).on('change', '#block_action', function(e) {
         if ($(this).val() == 'reject_with_message') {
             $('<div id="reject_message"><label>'+hm_trans('Message')+'</label><textarea id="reject_message_textarea"></textarea></div>').insertAfter($(this));
@@ -1831,6 +1829,8 @@ $(function () {
             },
         );
     });
+
+    registerSieveModalEvents();
 
     $(document).on('click', '.remove-chip', function () {
         $(this).parent().remove();
