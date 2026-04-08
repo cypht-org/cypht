@@ -277,7 +277,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
         if (isset($this->request->get['list_path'])) {
             $this->out('feed_list_parent', $this->request->get['list_path']);
         }
-        elseif (isset($this->request->get['page']) && $this->request->get['page'] == 'search') {
+        elseif (isset($this->request->get[$this->config->get('page_param_name')]) && $this->request->get[$this->config->get('page_param_name')] == 'search') {
             $this->out('feed_list_parent', 'search');
         }
         $this->out('feed_server_ids', $form['feed_server_ids']);

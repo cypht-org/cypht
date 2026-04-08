@@ -37,7 +37,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             }
 
             $custom = '<form id="imap_filter_form" method="GET" class="d-flex align-content-center">';
-            $custom .= '<input type="hidden" name="page" value="message_list" />';
+            $custom .= '<input type="hidden" name="'. $this->get("page_param_name") .'" value="message_list" />';
             $custom .= '<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'" />';
             $custom .= '<input type="hidden" name="list_page" value="'.$this->html_safe($this->get('list_page')).'" />';
             $custom .= '<input type="search" placeholder="'.$this->trans('Search').

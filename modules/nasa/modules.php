@@ -199,7 +199,7 @@ function apod_date_form($date, $output_mod) {
         $res .= '<a href="'.$prev.'">'.$output_mod->trans('Previous').'</a>';
     }
     $res .= '<input name="apod_date" class="apod_date_fld" type="date" value="'.$date.'" min="1995-06-16" max="'.dateInESTTZ().'"/>';
-    $res .= '<input type="hidden" name="page" value="nasa_apod" />';
+    $res .= '<input type="hidden" name="'. $output_mod->get("page_param_name") .'" value="nasa_apod" />';
     $res .= '<input type="submit" value="'.$output_mod->trans('Update').'" />';
     // Next can be empty if the day hasn't ticked over at NASA HQ yet
     if ($next) {
