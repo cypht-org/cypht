@@ -125,6 +125,15 @@ class Hm_Custom_User_Config extends Hm_Config {
 }
 
 /**
+ * =======
+ * 
+ * Just skip this part if sieve filters module is not enabled
+ * 
+ * =======
+ */
+
+include_once APP_PATH . 'modules/sievefilters/hm-sieve.php';
+/**
  * Custom sieve client factory class. To use this, you must set the ENABLE_CUSTOM_SIEVE_FACTORY environment variable to true.
  */
 class Hm_Custom_Sieve_Client_Factory extends Hm_Sieve_Client_Factory {
