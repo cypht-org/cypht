@@ -23,8 +23,11 @@ class Hm_Test_User_Config_Functions extends TestCase {
         $this->assertEquals('Hm_User_Config_File', get_class(load_user_config_object($mock_config)));
         $mock_config->set('user_config_type', 'DB');
         $this->assertEquals('Hm_User_Config_DB', get_class(load_user_config_object($mock_config)));
-        $mock_config->set('user_config_type', 'custom:Hm_Mock_Config');
-        $this->assertEquals('Hm_Mock_Config', get_class(load_user_config_object($mock_config)));
+        $mock_config->set('user_config_type', 'custom');
+        $this->assertEquals('Hm_User_Config_File', get_class(load_user_config_object($mock_config)), 'default to file config if custom config class does not exist');
+
+        require_once 'modules/site/lib.php';
+        $this->assertEquals('Hm_Custom_User_Config', get_class(load_user_config_object($mock_config)), 'use custom config class if it exists');
     }
     /**
      * @preserveGlobalState disabled
