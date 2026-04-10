@@ -6,11 +6,6 @@ use PHPUnit\Framework\TestCase;
  * tests for Hm_Output_HTTP
  */
 class Hm_Test_Output extends TestCase {
-
-    public $http;
-    public function setUp(): void {
-        $this->http = new Hm_Output_HTTP();
-    }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
@@ -18,18 +13,22 @@ class Hm_Test_Output extends TestCase {
     public function test_send_response() {
         ob_start();
         ob_start();
-        $this->http->send_response('test', array('http_headers' => array('test')));
+
+        $http = new Hm_Output_HTTP('test', array('http_headers' => array('test')));
+
+        $http->send_response();
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals('test', $output);
+
         ob_start();
         ob_start();
-        $this->http->send_response('test', array());
+
+        $http = new Hm_Output_HTTP('test', array());
+
+        $http->send_response();
         $output = ob_get_contents();
         ob_end_clean();
         $this->assertEquals('test', $output);
-    }
-    public function tearDown(): void {
-        unset($this->http);
     }
 }
