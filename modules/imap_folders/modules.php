@@ -104,6 +104,7 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
             return;
         }
         $new_folder = $mailbox->prep_folder_name($form['folder']);
+        Hm_Msgs::add('Selected folder: ' . $new_folder, 'warning');
         if (! $new_folder || ! $mailbox->get_folder_status($new_folder)) {
             Hm_Msgs::add('Selected folder not found', 'warning');
             return;

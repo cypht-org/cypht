@@ -8,11 +8,20 @@
 .folder-count-badge { font-weight: normal; font-size: 0.75rem; }
 
 /* Special folder role badges */
-.badge-role-trash { background-color: #dc3545; color: #fff; }
-.badge-role-sent { background-color: #198754; color: #fff; }
-.badge-role-archive { background-color: #0d6efd; color: #fff; }
-.badge-role-draft { background-color: #fd7e14; color: #fff; }
-.badge-role-junk { background-color: #6f42c1; color: #fff; }
+.badge-role {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+.badge-role-trash { background-color: #fce4e6; color: #b02a37; border: 1px solid #f1aeb5; }
+.badge-role-sent { background-color: #d1f5e0; color: #146c43; border: 1px solid #a3cfbb; }
+.badge-role-archive { background-color: #cfe2ff; color: #084298; border: 1px solid #9ec5fe; }
+.badge-role-draft { background-color: #fff3cd; color: #cc7a00; border: 1px solid #ffe69c; }
+.badge-role-junk { background-color: #e8d6f5; color: #59359a; border: 1px solid #c5a3e0; }
 
 /* Folders page - old dialogs (subscription page) */
 .sent_folder_select, .draft_folder_select, .trash_folder_select, .folder_dialog, .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select, .archive_folder_select, .junk_folder_select { display: none; }

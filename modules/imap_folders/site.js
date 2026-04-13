@@ -1,3 +1,5 @@
+
+console.log('imap_folders/site.js loaded');
 'use strict';
 
 var folder_page_folder_list = function(container, title, link_class, target, id_dest, subscription = false) {
@@ -145,6 +147,7 @@ var folder_subscribe = function(name, state) {
 /* ===== New Account-based Folders Page ===== */
 
 var load_account_folders = function(server_id, block) {
+    console.log('load_account_folders called for', server_id, block);
     var spinner = block.find('.folder_loading_spinner');
     var table = block.find('.folder_table');
     var tbody = block.find('.folder_table_body');
@@ -203,13 +206,14 @@ var get_special_badge_class = function(type) {
 };
 
 var render_folder_table = function(folders, tbody, server_id) {
+    console.log('Folders for account', server_id, folders);
     tbody.empty();
     folders.forEach(function(folder) {
         if (folder.noselect) return;
 
         var specialBadge = '';
         if (folder.special) {
-            specialBadge = '<span class="badge ' + get_special_badge_class(folder.special) + '"><i class="bi ' + get_special_icon(folder.special) + ' me-1"></i>' + hm_trans(get_special_label(folder.special)) + '</span>';
+            specialBadge = '<span class="badge-role ' + get_special_badge_class(folder.special) + '"><i class="bi ' + get_special_icon(folder.special) + ' me-1"></i>' + hm_trans(get_special_label(folder.special)) + '</span>';
         }
 
         var indent = 0;
@@ -223,7 +227,7 @@ var render_folder_table = function(folders, tbody, server_id) {
         var displayName = folder.basename;
         var indentPx = indent * 20;
 
-        var row = '<tr data-folder-hex="' + folder.hex_name + '" data-folder-name="' + esc_html(folder.basename) + '" data-server-id="' + server_id + '">';
+        var row = '<tr data-folder-hex="' + folder.name + '" data-folder-name="' + esc_html(folder.basename) + '" data-server-id="' + server_id + '">';
         row += '<td style="padding-left:' + (indentPx + 8) + 'px"><i class="bi bi-folder2 me-1"></i>' + esc_html(displayName) + '</td>';
         row += '<td>' + specialBadge + '</td>';
         row += '<td class="text-end">';
@@ -295,7 +299,7 @@ var bind_folder_table_actions = function(tbody, server_id) {
         var folderHex = tr.data('folder-hex');
         var block = tr.closest('.account_folder_block');
         // Find what special type this folder currently has
-        var currentBadge = tr.find('.badge.bg-info');
+        var currentBadge = tr.find('.badge-role');
         if (currentBadge.length === 0) return;
         // Determine the type from the set_special_btn that is active
         var activeBtn = tr.find('.set_special_btn.active');
