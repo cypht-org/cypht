@@ -227,7 +227,7 @@ var render_folder_table = function(folders, tbody, server_id) {
         var displayName = folder.basename;
         var indentPx = indent * 20;
 
-        var row = '<tr data-folder-hex="' + folder.name + '" data-folder-name="' + esc_html(folder.basename) + '" data-server-id="' + server_id + '">';
+        var row = '<tr data-folder-hex="' + folder.hex_name + '" data-folder-name="' + esc_html(folder.basename) + '" data-server-id="' + server_id + '">';
         row += '<td style="padding-left:' + (indentPx + 8) + 'px"><i class="bi bi-folder2 me-1"></i>' + esc_html(displayName) + '</td>';
         row += '<td>' + specialBadge + '</td>';
         row += '<td class="text-end">';
@@ -288,7 +288,8 @@ var bind_folder_table_actions = function(tbody, server_id) {
         var folderHex = tr.data('folder-hex');
         var type = $(this).data('type');
         var block = tr.closest('.account_folder_block');
-        assign_special_folder(server_id, folderHex, type, function() {
+        var folderName = 'imap_' + server_id + '_' + folderHex;
+        assign_special_folder(server_id, folderName, type, function() {
             load_account_folders(server_id, block);
         });
     });
