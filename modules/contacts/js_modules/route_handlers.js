@@ -71,6 +71,27 @@ function applyContactsPageHandlers(routeParams) {
     initContactTabs();
     initPagination();
     
+    const activeTab = routeParams?.active_tab;
+    if (activeTab) {
+        setTimeout(function() {
+            $('.category-tab').removeClass('active');
+            $('.category-tab[data-target="' + activeTab + '"]').addClass('active');
+            $('.tab-content-section').removeClass('active');
+            $('#' + activeTab).addClass('active');
+            
+            if (typeof updateEditLinksWithActiveTab === 'function') {
+                updateEditLinksWithActiveTab(activeTab);
+            }
+        }, 50);
+    } else {
+        setTimeout(function() {
+            var defaultActiveTab = $('.category-tab.active').data('target');
+            if (defaultActiveTab && typeof updateEditLinksWithActiveTab === 'function') {
+                updateEditLinksWithActiveTab(defaultActiveTab);
+            }
+        }, 50);
+    }
+    
     // Initialize local contact modal handlers if available
     if (typeof initLocalContactModal === 'function') {
         initLocalContactModal();
