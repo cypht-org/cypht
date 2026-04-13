@@ -153,19 +153,41 @@ var load_account_folders = function(server_id, block) {
     var tbody = block.find('.folder_table_body');
     var badge = block.find('.folder-count-badge');
 
-    spinner.show();
     tbody.empty();
     table.hide();
+    var loadingRow = $('<tr class="loading-folders-row"><td colspan="3" class="text-center py-4">'
+        + '<div class="spinner-border text-info me-2" role="status"></div>'
+        + '<span>' + hm_trans('Loading folders...') + '</span>'
+        + '</td></tr>');
+    tbody.append(loadingRow);
+    table.show();
+    spinner.show();
 
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_list_all'},
         {'name': 'imap_server_id', 'value': server_id}],
         function(res) {
             spinner.hide();
+            tbody.find('.loading-folders-row').remove();
             if (res.imap_folder_list_all) {
                 var folders = JSON.parse(res.imap_folder_list_all);
                 badge.text(folders.length + ' folders').show();
-                render_folder_table(folders, tbody, server_id);
+                if (folders.length === 0) {
+                    var noneRow = $('<tr class="no-folders-row"><td colspan="3" class="text-center py-4 text-muted">'
+                        + '<i class="bi bi-folder-x me-2"></i>'
+                        + hm_trans('No folders found.')
+                        + '</td></tr>');
+                    tbody.append(noneRow);
+                } else {
+                    render_folder_table(folders, tbody, server_id);
+                }
+                table.show();
+            } else {
+                var errorRow = $('<tr class="no-folders-row"><td colspan="3" class="text-center py-4 text-muted">'
+                    + '<i class="bi bi-folder-x me-2"></i>'
+                    + hm_trans('No folders found.')
+                    + '</td></tr>');
+                tbody.append(errorRow);
                 table.show();
             }
         }
@@ -205,9 +227,53 @@ var get_special_badge_class = function(type) {
     return classes[type] || 'bg-secondary';
 };
 
+var specialFolderHelperMessages = {
+    'trash': hm_trans('If set, all deleted messages will automatically go to this folder.'),
+    'junk': hm_trans('If set, all messages marked as spam will be moved here.'),
+    'sent': hm_trans('If set, all sent messages will be saved in this folder.'),
+    'archive': hm_trans('If set, archived messages will be stored here.'),
+    'draft': hm_trans('If set, message drafts will be saved here.')
+};
+
+function render_special_folder_helpers() {
+    var html = '<div class="special-folder-helper-box" style="background:#f7f7f7;border:1px solid #e0e0e0;border-radius:6px;padding:1em 1.5em 1em 1.5em;margin-bottom:1em;position:relative;font-size:0.95em">';
+    html += '<button type="button" class="btn-close special-folder-helper-close" aria-label="' + hm_trans('Close') + '" style="position:absolute;top:10px;right:10px;opacity:0.5"></button>';
+    html += '<strong>' + hm_trans('How to set special folders:') + '</strong><ul class="mb-1">';
+    html += '<li>' + hm_trans('Use the <i class=\"bi bi-tag\"></i> <b>Set as...</b> button next to a folder to assign a special role (Trash, Sent, Junk, etc).') + '</li>';
+    html += '<li>' + hm_trans('Each special folder changes how messages are handled automatically:') + '</li>';
+    html += '<ul style="margin-bottom:0">';
+    html += '<li><b>' + hm_trans('Trash') + '</b>: ' + specialFolderHelperMessages['trash'] + '</li>';
+    html += '<li><b>' + hm_trans('Junk') + '</b>: ' + specialFolderHelperMessages['junk'] + '</li>';
+    html += '<li><b>' + hm_trans('Sent') + '</b>: ' + specialFolderHelperMessages['sent'] + '</li>';
+    html += '<li><b>' + hm_trans('Archive') + '</b>: ' + specialFolderHelperMessages['archive'] + '</li>';
+    html += '<li><b>' + hm_trans('Draft') + '</b>: ' + specialFolderHelperMessages['draft'] + '</li>';
+    html += '</ul>';
+    html += '</ul>';
+    html += hm_trans('You can clear a special role using the <b>Clear role</b> option in the same menu.');
+    html += '<div class="form-check mt-3" style="user-select:none">';
+    html += '<input class="form-check-input" type="checkbox" value="1" id="dontShowSpecialHelperAgain">';
+    html += '<label class="form-check-label" for="dontShowSpecialHelperAgain" style="font-weight:normal">' + hm_trans("Don't show this message again") + '</label>';
+    html += '</div>';
+    html += '</div>';
+    return html;
+}
+
 var render_folder_table = function(folders, tbody, server_id) {
     console.log('Folders for account', server_id, folders);
     tbody.empty();
+    var table = tbody.closest('.folder_table');
+    if (table.length && tbody.find('.special-folder-helper').length === 0 && !window.localStorage.getItem('specialFolderHelperDismissed')) {
+        var helperRow = $('<tr class="special-folder-helper"><td colspan="3">' + render_special_folder_helpers() + '</td></tr>');
+        tbody.before(helperRow);
+        setTimeout(function() {
+            $('.special-folder-helper-close').on('click', function() {
+                if ($('#dontShowSpecialHelperAgain').is(':checked')) {
+                    window.localStorage.setItem('specialFolderHelperDismissed', '1');
+                }
+                helperRow.remove();
+            });
+        }, 0);
+    }
     folders.forEach(function(folder) {
         if (folder.noselect) return;
 
@@ -438,7 +504,6 @@ function bindFoldersEventHandlers() {
         }
     });
 
-    // Create folder button
     $('.create_folder_btn').on('click', function() {
         var server_id = $(this).data('server-id');
         var block = $(this).closest('.account_folder_block');
