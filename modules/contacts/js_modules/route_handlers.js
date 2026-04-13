@@ -37,7 +37,7 @@ function applyContactsPageHandlers(routeParams) {
     });
 
     $('.delete_contact:not([data-ldap-dn])').on("click", function() {
-        delete_contact($(this).data('id'), $(this).data('source'), $(this).data('type'));
+        delete_contact($(this).data('id'), $(this).data('source'), $(this).data('type'), $(this));
         return false;
     });
     $('.show_contact').on("click", function() {
