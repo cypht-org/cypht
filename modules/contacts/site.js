@@ -291,6 +291,18 @@ var initContactTabs = function() {
         $('.tab-content-section').removeClass('active');
         
         $('#' + targetId).addClass('active');
+        
+        updateEditLinksWithActiveTab(targetId);
+    });
+};
+
+var updateEditLinksWithActiveTab = function(activeTab) {
+    $('.action-btn-edit').each(function() {
+        var href = $(this).attr('href');
+        if (href && href.indexOf('open_modal=') !== -1) {
+            href = href.replace(/&active_tab=[^&]*/, '');
+            $(this).attr('href', href + '&active_tab=' + activeTab);
+        }
     });
 };
 

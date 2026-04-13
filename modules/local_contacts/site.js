@@ -73,7 +73,13 @@ var initLocalContactModal = function() {
                         if (modal) {
                             modal.hide();
                         }
-                        window.location.href = '?page=contacts';
+                        
+                        var activeTab = $('.category-tab.active').data('target');
+                        var redirectUrl = '?page=contacts';
+                        if (activeTab) {
+                            redirectUrl += '&active_tab=' + activeTab;
+                        }
+                        window.location.href = redirectUrl;
                     }
                 },
                 [],
