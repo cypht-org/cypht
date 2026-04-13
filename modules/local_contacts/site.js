@@ -54,9 +54,20 @@ var initLocalContactModal = function() {
                 ajaxData,
                 function(res) {
                     console.log(res);
-                    var successKey = isEdit ? 'contact_updated' : 'contact_added';
+                    
+                    var isSuccess = false;
+                    if (res.router_user_msgs) {
+                        for (var key in res.router_user_msgs) {
+                            if (res.router_user_msgs[key].type === 'success') {
+                                isSuccess = true;
+                                break;
+                            }
+                        }
+                    }
+                    
                     $('#submit-local-contact-btn').prop('disabled', false).text(isEdit ? 'Update Contact' : 'Add Contact');
-                    if (res[successKey] === 1) {
+                    
+                    if (isSuccess) {
                         const modalElement = document.getElementById('localContactModal');
                         const modal = bootstrap.Modal.getInstance(modalElement);
                         if (modal) {
