@@ -2,10 +2,18 @@
 
 var existingRecipients = [];
 
-var delete_contact = function(id, source, type) {
+var delete_contact = function(id, source, type, $button) {
     if (!hm_delete_prompt()) {
         return false;
     }
+    
+    var originalContent = $button.html();
+    var originalTitle = $button.attr('title');
+    
+    $button.prop('disabled', true);
+    $button.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+    $button.attr('title', 'Deleting...');
+    
     var request_data = [
         {'name': 'hm_ajax_hook', 'value': 'ajax_delete_contact'},
         {'name': 'contact_id', 'value': id},
@@ -17,8 +25,20 @@ var delete_contact = function(id, source, type) {
         request_data,
         function(res) {
             if (res.contact_deleted && res.contact_deleted === 1) {
-                $('.contact_row_'+id).remove();
+                window.location.reload();
+            } else {
+                $button.prop('disabled', false);
+                $button.html(originalContent);
+                $button.attr('title', originalTitle);
+                Hm_Notices.show('Failed to delete contact', 'danger');
             }
+        },
+        [],
+        false,
+        function() {
+            $button.prop('disabled', false);
+            $button.html(originalContent);
+            $button.attr('title', originalTitle);
         }
     );
 };
