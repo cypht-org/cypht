@@ -262,7 +262,52 @@ var render_folder_table = function(folders, tbody, server_id) {
     console.log('Folders for account', server_id, folders);
     tbody.empty();
     var table = tbody.closest('.folder_table');
-    if (table.length && tbody.find('.special-folder-helper').length === 0 && !window.localStorage.getItem('specialFolderHelperDismissed')) {
+
+    var specialTypes = ['trash', 'sent', 'archive', 'draft', 'junk'];
+    var found = {};
+    folders.forEach(function(folder) {
+        if (folder.special && specialTypes.includes(folder.special)) {
+            found[folder.special] = folder.basename;
+        }
+    });
+    var missing = specialTypes.filter(function(type) { return !found[type]; });
+
+    tbody.closest('.folder_table').parent().find('.special-folder-status').remove();
+    var statusKey = 'specialFolderStatusDismissed_' + server_id;
+    if ((missing.length > 0 || Object.keys(found).length > 0) && !window.localStorage.getItem(statusKey)) {
+        var msg = '<div class="alert alert-warning special-folder-status-box">';
+        msg += '<button type="button" class="btn-close special-folder-status-close" aria-label="' + hm_trans('Close') + '"></button>';
+        if (missing.length > 0) {
+            msg += '<strong>' + hm_trans('Some special folders are not set for this account:') + '</strong>';
+            msg += '<ul style="margin-bottom:0.5em">';
+            missing.forEach(function(type) {
+                msg += '<li>' + hm_trans(get_special_label(type)) + '</li>';
+            });
+            msg += '</ul>';
+        } else {
+            msg += '<strong>' + hm_trans('All special folders are set for this account.') + '</strong>';
+        }
+        if (Object.keys(found).length > 0) {
+            msg += '<div style="margin-top:0.5em">' + hm_trans('Already set:') + ' ';
+            var setList = Object.keys(found).map(function(type) {
+                return '<span class="badge bg-success me-1">' + hm_trans(get_special_label(type)) + ': ' + esc_html(found[type]) + '</span>';
+            });
+            msg += setList.join(' ');
+            msg += '</div>';
+        }
+        msg += '</div>';
+        var statusRow = $('<tr class="special-folder-status"><td colspan="3">' + msg + '</td></tr>');
+        tbody.before(statusRow);
+        setTimeout(function() {
+            $('.special-folder-status-close').on('click', function() {
+                window.localStorage.setItem(statusKey, '1');
+                statusRow.remove();
+            });
+        }, 0);
+    }
+
+    tbody.closest('.folder_table').parent().find('.special-folder-helper').remove();
+    if (table.length && !window.localStorage.getItem('specialFolderHelperDismissed')) {
         var helperRow = $('<tr class="special-folder-helper"><td colspan="3">' + render_special_folder_helpers() + '</td></tr>');
         tbody.before(helperRow);
         setTimeout(function() {
@@ -274,6 +319,7 @@ var render_folder_table = function(folders, tbody, server_id) {
             });
         }, 0);
     }
+
     folders.forEach(function(folder) {
         if (folder.noselect) return;
 
@@ -372,7 +418,8 @@ var bind_folder_table_actions = function(tbody, server_id) {
         var activeBtn = tr.find('.set_special_btn.active');
         if (activeBtn.length === 0) return;
         var type = activeBtn.data('type');
-        clear_special_folder(type, server_id, function() {
+        var fullFolderName = 'imap_' + server_id + '_' + folderHex;
+        clear_special_folder(type, fullFolderName, function() {
             load_account_folders(server_id, block);
         });
     });
