@@ -1,5 +1,14 @@
 'use strict';
+
+var isSubmitting = false;
+
 var initLocalContactModal = function() {
+    // Remove existing event handlers to avoid duplicates
+    $('#manual-entry-btn').off('click');
+    $('#csv-import-btn').off('click');
+    $('#submit-local-contact-btn').off('click');
+    $('#localContactModal').off('hidden.bs.modal');
+    
     $('#manual-entry-btn').on('click', function() {
         $(this).addClass('active');
         $('#csv-import-btn').removeClass('active');
@@ -19,6 +28,11 @@ var initLocalContactModal = function() {
     $('#submit-local-contact-btn').on('click', function(e) {
         e.preventDefault();
         
+        // Prevent multiple submissions
+        if (isSubmitting) {
+            return;
+        }
+        
         var contactId = $('input[name="contact_id"]').val();
         var isEdit = contactId && contactId.length > 0;
         
@@ -34,6 +48,7 @@ var initLocalContactModal = function() {
                 return;
             }
             
+            isSubmitting = true;
             var buttonText = isEdit ? 'Updating...' : 'Adding...';
             $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> ' + buttonText);
             
@@ -66,6 +81,7 @@ var initLocalContactModal = function() {
                     }
                     
                     $('#submit-local-contact-btn').prop('disabled', false).text(isEdit ? 'Update Contact' : 'Add Contact');
+                    isSubmitting = false;
                     
                     if (isSuccess) {
                         const modalElement = document.getElementById('localContactModal');
@@ -86,6 +102,7 @@ var initLocalContactModal = function() {
                 false,
                 function() {
                     $('#submit-local-contact-btn').prop('disabled', false).text(isEdit ? 'Update Contact' : 'Add Contact');
+                    isSubmitting = false;
                 }
             );
         } else {
@@ -104,6 +121,7 @@ var initLocalContactModal = function() {
     });
 
     $('#localContactModal').on('hidden.bs.modal', function() {
+        isSubmitting = false;
         $('#manual-contact-form')[0].reset();
         $('#manual-entry-btn').addClass('active');
         $('#csv-import-btn').removeClass('active');
@@ -125,17 +143,6 @@ var initLocalContactModal = function() {
 
 $(document).ready(function() {
     initLocalContactModal();
-});
-
-$('#localContactModal').on('hidden.bs.modal', function () {
-    $('#manual-contact-form')[0].reset();
-    if ($('#csv-import-form').length) {
-        $('#csv-import-form')[0].reset();
-    }
-    $('.method-btn').removeClass('active');
-    $('#manual-entry-btn').addClass('active');
-    $('.contact-manual-form').show();
-    $('.csv-import-section').hide();
 });
 
 $(document).on('change', '#contact_csv', function(e) {
