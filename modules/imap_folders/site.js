@@ -270,7 +270,8 @@ var bind_folder_table_actions = function(tbody, server_id) {
         var tr = $(this).closest('tr');
         var folderHex = tr.data('folder-hex');
         var folderName = tr.data('folder-name');
-        show_rename_modal(server_id, folderHex, folderName, tr);
+        var fullFolderName = 'imap_' + server_id + '_' + folderHex;
+        show_rename_modal(server_id, fullFolderName, folderName, tr);
         return false;
     });
 
@@ -278,7 +279,8 @@ var bind_folder_table_actions = function(tbody, server_id) {
         var tr = $(this).closest('tr');
         var folderHex = tr.data('folder-hex');
         var folderName = tr.data('folder-name');
-        show_delete_modal(server_id, folderHex, folderName, tr);
+        var fullFolderName = 'imap_' + server_id + '_' + folderHex;
+        show_delete_modal(server_id, fullFolderName, folderName, tr);
         return false;
     });
 
@@ -299,10 +301,8 @@ var bind_folder_table_actions = function(tbody, server_id) {
         var tr = $(this).closest('tr');
         var folderHex = tr.data('folder-hex');
         var block = tr.closest('.account_folder_block');
-        // Find what special type this folder currently has
         var currentBadge = tr.find('.badge-role');
         if (currentBadge.length === 0) return;
-        // Determine the type from the set_special_btn that is active
         var activeBtn = tr.find('.set_special_btn.active');
         if (activeBtn.length === 0) return;
         var type = activeBtn.data('type');
