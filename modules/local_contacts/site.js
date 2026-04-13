@@ -42,7 +42,7 @@ var initLocalContactModal = function() {
                 {'name': 'contact_name', 'value': name},
                 {'name': 'contact_email', 'value': email},
                 {'name': 'contact_phone', 'value': phone},
-                {'name': 'contact_category', 'value': category},
+                {'name': 'contact_group', 'value': category},
                 {'name': 'contact_source', 'value': 'local:local'}
             ];
             
@@ -110,6 +110,16 @@ var initLocalContactModal = function() {
         $('.contact-manual-form').show();
         $('.csv-import-section').hide();
         $('#submit-local-contact-btn').text('Add Contact');
+        
+        // Clean URL parameters related to modal if present
+        if (window.location.search.indexOf('open_modal=') !== -1) {
+            var currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.delete('open_modal');
+            currentUrl.searchParams.delete('contact_id');
+            currentUrl.searchParams.delete('contact_source');
+            currentUrl.searchParams.delete('contact_type');
+            window.history.replaceState({}, '', currentUrl.toString());
+        }
     });
 };
 
