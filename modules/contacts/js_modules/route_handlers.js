@@ -1,4 +1,4 @@
-function applyContactsPageHandlers() {
+function applyContactsPageHandlers(routeParams) {
     // Validate contact form on submit
     $('.add_contact_form').on('submit', function(e) {
         var emailField = $('#contact_email');
@@ -70,35 +70,26 @@ function applyContactsPageHandlers() {
 
     initContactTabs();
     initPagination();
-
-    $('#manual-entry-btn').on('click', function() {
-        $(this).addClass('active');
-        $('#csv-import-btn').removeClass('active');
-        $('.contact-manual-form').show();
-        $('.csv-import-section').hide();
-        $('#submit-local-contact-btn').text('Add Contact');
-    });
-
-    $('#csv-import-btn').on('click', function() {
-        $(this).addClass('active');
-        $('#manual-entry-btn').removeClass('active');
-        $('.contact-manual-form').hide();
-        $('.csv-import-section').show();
-        $('#submit-local-contact-btn').text('Import Contacts');
-    });
+    
+    // Initialize local contact modal handlers if available
+    if (typeof initLocalContactModal === 'function') {
+        initLocalContactModal();
+    }
 
     // Auto-open modal if open_modal parameter is in URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const modalType = urlParams.get('open_modal');
+    const modalType = routeParams?.open_modal;
     
     if (modalType) {
-        const modalId = modalType === 'ldap' ? 'ldapContactModal' : 'localContactModal';
-        const modalElement = document.getElementById(modalId);
-        
-        if (modalElement) {
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-        }
+        // Use setTimeout to ensure modal is in DOM and handlers are attached
+        setTimeout(function() {
+            const modalId = modalType === 'ldap' ? 'ldapContactModal' : 'localContactModal';
+            const modalElement = document.getElementById(modalId);
+            
+            if (modalElement && !modalElement.classList.contains('show')) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            }
+        }, 150);
     }
 }
 
