@@ -24,6 +24,10 @@
     right: 10px;
     opacity: 0.5;
 }
+
+.create_folder_btn {
+    margin-left: auto;
+}
 /* Folders page - account list */
 .account_folder_block .card-header { cursor: pointer; transition: background-color 0.2s; }
 .account_folder_block .card-header:hover { background-color: rgba(0,0,0,.05); }

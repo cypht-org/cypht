@@ -194,46 +194,69 @@ var load_account_folders = function(server_id, block) {
     );
 };
 
-var get_special_icon = function(type) {
-    var icons = {
-        'trash': 'bi-trash3',
-        'sent': 'bi-send-check-fill',
-        'archive': 'bi-archive',
-        'draft': 'bi-pencil-square',
-        'junk': 'bi-envelope-x-fill'
-    };
-    return icons[type] || '';
-};
 
-var get_special_label = function(type) {
-    var labels = {
-        'trash': 'Trash',
-        'sent': 'Sent',
-        'archive': 'Archive',
-        'draft': 'Draft',
-        'junk': 'Junk'
-    };
-    return labels[type] || '';
-};
+// Unified special folder definitions
+var specialFolders = [
+    {
+        type: 'trash',
+        icon: 'bi-trash3',
+        label: hm_trans('Trash'),
+        badgeClass: 'badge-role-trash',
+        helper: hm_trans('If set, all deleted messages will automatically go to this folder.')
+    },
+    {
+        type: 'sent',
+        icon: 'bi-send-check-fill',
+        label: hm_trans('Sent'),
+        badgeClass: 'badge-role-sent',
+        helper: hm_trans('If set, all sent messages will be saved in this folder.')
+    },
+    {
+        type: 'archive',
+        icon: 'bi-archive',
+        label: hm_trans('Archive'),
+        badgeClass: 'badge-role-archive',
+        helper: hm_trans('If set, archived messages will be stored here.')
+    },
+    {
+        type: 'draft',
+        icon: 'bi-pencil-square',
+        label: hm_trans('Draft'),
+        badgeClass: 'badge-role-draft',
+        helper: hm_trans('If set, message drafts will be saved here.')
+    },
+    {
+        type: 'junk',
+        icon: 'bi-envelope-x-fill',
+        label: hm_trans('Junk'),
+        badgeClass: 'badge-role-junk',
+        helper: hm_trans('If set, all messages marked as spam will be moved here.')
+    }
+];
 
-var get_special_badge_class = function(type) {
-    var classes = {
-        'trash': 'badge-role-trash',
-        'sent': 'badge-role-sent',
-        'archive': 'badge-role-archive',
-        'draft': 'badge-role-draft',
-        'junk': 'badge-role-junk'
-    };
-    return classes[type] || 'bg-secondary';
-};
+function get_special_folder(type) {
+    return specialFolders.find(function(f) { return f.type === type; });
+}
 
-var specialFolderHelperMessages = {
-    'trash': hm_trans('If set, all deleted messages will automatically go to this folder.'),
-    'junk': hm_trans('If set, all messages marked as spam will be moved here.'),
-    'sent': hm_trans('If set, all sent messages will be saved in this folder.'),
-    'archive': hm_trans('If set, archived messages will be stored here.'),
-    'draft': hm_trans('If set, message drafts will be saved here.')
-};
+function get_special_icon(type) {
+    var f = get_special_folder(type);
+    return f ? f.icon : '';
+}
+
+function get_special_label(type) {
+    var f = get_special_folder(type);
+    return f ? f.label : '';
+}
+
+function get_special_badge_class(type) {
+    var f = get_special_folder(type);
+    return f ? f.badgeClass : 'bg-secondary';
+}
+
+function get_special_helper(type) {
+    var f = get_special_folder(type);
+    return f ? f.helper : '';
+}
 
 function render_special_folder_helpers() {
     var html = '<div class="special-folder-helper-box" style="background:#f7f7f7;border:1px solid #e0e0e0;border-radius:6px;padding:1em 1.5em 1em 1.5em;margin-bottom:1em;position:relative;font-size:0.95em">';
@@ -242,11 +265,9 @@ function render_special_folder_helpers() {
     html += '<li>' + hm_trans('Use the <i class=\"bi bi-tag\"></i> <b>Set as...</b> button next to a folder to assign a special role (Trash, Sent, Junk, etc).') + '</li>';
     html += '<li>' + hm_trans('Each special folder changes how messages are handled automatically:') + '</li>';
     html += '<ul style="margin-bottom:0">';
-    html += '<li><b>' + hm_trans('Trash') + '</b>: ' + specialFolderHelperMessages['trash'] + '</li>';
-    html += '<li><b>' + hm_trans('Junk') + '</b>: ' + specialFolderHelperMessages['junk'] + '</li>';
-    html += '<li><b>' + hm_trans('Sent') + '</b>: ' + specialFolderHelperMessages['sent'] + '</li>';
-    html += '<li><b>' + hm_trans('Archive') + '</b>: ' + specialFolderHelperMessages['archive'] + '</li>';
-    html += '<li><b>' + hm_trans('Draft') + '</b>: ' + specialFolderHelperMessages['draft'] + '</li>';
+    specialFolders.forEach(function(f) {
+        html += '<li><b>' + f.label + '</b>: ' + f.helper + '</li>';
+    });
     html += '</ul>';
     html += '</ul>';
     html += hm_trans('You can clear a special role using the <b>Clear role</b> option in the same menu.');
@@ -263,7 +284,7 @@ var render_folder_table = function(folders, tbody, server_id) {
     tbody.empty();
     var table = tbody.closest('.folder_table');
 
-    var specialTypes = ['trash', 'sent', 'archive', 'draft', 'junk'];
+    var specialTypes = specialFolders.map(function(f) { return f.type; });
     var found = {};
     folders.forEach(function(folder) {
         if (folder.special && specialTypes.includes(folder.special)) {
@@ -346,21 +367,15 @@ var render_folder_table = function(folders, tbody, server_id) {
         row += '<div class="btn-group btn-group-sm" role="group">';
         row += '<button class="btn btn-outline-primary btn-sm folder_rename_btn" title="' + hm_trans('Rename') + '"><i class="bi bi-pencil"></i></button>';
         row += '<button class="btn btn-outline-danger btn-sm folder_delete_btn" title="' + hm_trans('Delete') + '"><i class="bi bi-trash"></i></button>';
+        row += '<button class="btn btn-outline-success btn-sm folder_create_child_btn" title="' + hm_trans('Create subfolder') + '"><i class="bi bi-folder-plus"></i></button>';
 
-        var roleButtons = [
-            {type: 'trash', icon: 'bi-trash3', label: 'Trash'},
-            {type: 'archive', icon: 'bi-archive', label: 'Archive'},
-            {type: 'draft', icon: 'bi-pencil-square', label: 'Draft'},
-            {type: 'junk', icon: 'bi-envelope-x-fill', label: 'Junk'},
-            {type: 'sent', icon: 'bi-send-check-fill', label: 'Sent'}
-        ];
 
         row += '<div class="btn-group btn-group-sm dropdown" role="group">';
         row += '<button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" title="' + hm_trans('Set as...') + '"><i class="bi bi-tag"></i></button>';
         row += '<ul class="dropdown-menu dropdown-menu-end">';
-        roleButtons.forEach(function(rb) {
+        specialFolders.forEach(function(rb) {
             var active = folder.special === rb.type ? ' active' : '';
-            row += '<li><a class="dropdown-item set_special_btn' + active + '" href="#" data-type="' + rb.type + '"><i class="bi ' + rb.icon + ' me-2"></i>' + hm_trans(rb.label);
+            row += '<li><a class="dropdown-item set_special_btn' + active + '" href="#" data-type="' + rb.type + '"><i class="bi ' + rb.icon + ' me-2"></i>' + rb.label;
             if (folder.special === rb.type) {
                 row += ' <i class="bi bi-check-lg ms-2"></i>';
             }
@@ -378,6 +393,15 @@ var render_folder_table = function(folders, tbody, server_id) {
 };
 
 var bind_folder_table_actions = function(tbody, server_id) {
+        tbody.find('.folder_create_child_btn').off('click').on('click', function() {
+            var tr = $(this).closest('tr');
+            var folderHex = tr.data('folder-hex');
+            var folderName = tr.data('folder-name');
+            var block = tr.closest('.account_folder_block');
+            // Pass parent folder hex to modal
+            show_create_folder_modal(server_id, block, folderHex, tr);
+            return false;
+        });
     tbody.find('.folder_rename_btn').off('click').on('click', function() {
         var tr = $(this).closest('tr');
         var folderHex = tr.data('folder-hex');
@@ -494,14 +518,18 @@ var show_delete_modal = function(server_id, folderHex, folderName, tr) {
     modal.open();
 };
 
-var show_create_folder_modal = function(server_id, block) {
+var show_create_folder_modal = function(server_id, block, parentHex, parentTr) {
     var modal = new Hm_Modal({
         modalId: 'createFolderModal',
         title: hm_trans('Create a New Folder'),
         btnSize: 'sm'
     });
 
-    var content = '<div class="form-floating mb-3">';
+    var content = '';
+    if (parentHex) {
+        content += '<div class="mb-2"><small>' + hm_trans('Parent folder:') + ' <span class="badge bg-secondary">' + esc_html(parentTr ? parentTr.data('folder-name') : '') + '</span></small></div>';
+    }
+    content += '<div class="form-floating mb-3">';
     content += '<input type="text" class="form-control" id="modal_create_value" placeholder="' + hm_trans('New Folder Name') + '">';
     content += '<label for="modal_create_value">' + hm_trans('New Folder Name') + '</label>';
     content += '</div>';
@@ -513,10 +541,14 @@ var show_create_folder_modal = function(server_id, block) {
             Hm_Notices.show($('#folder_name_error').val(), 'danger');
             return;
         }
+        var fullFolderName = folder;
+        if (parentHex) {
+            fullFolderName = parentTr ? parentTr.data('folder-name') + '/' + folder : folder;
+        }
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_create'},
             {'name': 'imap_server_id', 'value': server_id},
-            {'name': 'folder', 'value': folder}],
+            {'name': 'folder', 'value': fullFolderName}],
             function(res) {
                 if (res.imap_folders_success) {
                     modal.hide();
