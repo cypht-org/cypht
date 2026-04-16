@@ -226,6 +226,9 @@ function check_dependencies($settings) {
         '2fa' => [
             // hash_hmac is part of the hash extension which cannot be disabled
             // in PHP 8.1+ (locked to core since PHP 7.4). No runtime check needed.
+            // GD is required by bacon/bacon-qr-code to render the QR code SVG.
+            ['type' => 'extension', 'name' => 'gd',
+             'label' => 'GD extension (required by bacon/bacon-qr-code to render 2FA QR codes)'],
         ],
     ];
 
