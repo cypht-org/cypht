@@ -25,7 +25,7 @@ add_output('message_list', 'sievefilters_modal_content_start', true, 'sievefilte
 add_output('message_list', 'message_list_custom_actions', true, 'sievefilters', 'imap_custom_controls', 'after');
 add_output('sieve_filters', 'sievefilters_title_start', true, 'sievefilters', 'content_section_start', 'after');
 add_output('ajax_hm_folders', 'sievefilters_settings_link', true, 'sievefilters', 'settings_menu_end', 'before');
-add_output('message', 'sievefilters_settings_start', true, 'sievefilters', 'content_section_start', 'after');
+add_output('message', 'sievefilters_modal_content_start', true, 'sievefilters', 'content_section_start', 'after');
 add_output('message', 'sievefilters_settings_link', true, 'sievefilters', 'settings_menu_end', 'before');
 setup_base_ajax_page('ajax_account_sieve_filters', 'core');
 add_handler('ajax_account_sieve_filters', 'settings_load_imap', true, 'sievefilters', 'load_user_data', 'after');
