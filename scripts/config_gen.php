@@ -57,6 +57,9 @@ function build_config() {
         check_dependencies($settings);
 
         read_mstnef_viewer_config($settings);
+        
+        /* auto-generate APP_2FA_SECRET in .env if 2fa module is enabled and secret is missing */
+        generate_2fa_secret($settings);
 
         /* determine compression commands */
         list($js_compress, $css_compress) = compress_methods($settings);
@@ -107,6 +110,52 @@ function compress($string, $command, $file=false) {
         return $string;
     }
     return $result;
+}
+
+/**
+ * Generate and persist APP_2FA_SECRET in .env when the 2fa module is enabled
+ * and the secret is not already set. Skips silently when a valid secret exists.
+ *
+ * @param array $settings merged site settings array
+ * @return void
+ */
+function generate_2fa_secret($settings) {
+    $modules = get_modules($settings);
+    if (!in_array('2fa', $modules, true)) {
+        return;
+    }
+
+    $secret = trim($settings['2fa_secret'] ?? '');
+    if (strlen($secret) >= 10) {
+        return; // Already configured — nothing to do
+    }
+
+    $env_path = APP_PATH . '.env';
+    if (!is_readable($env_path) || !is_writable($env_path)) {
+        printf("WARNING: 2FA module enabled but APP_2FA_SECRET is empty and .env is not writable.\n");
+        printf("         Set APP_2FA_SECRET to a random string of at least 10 characters.\n");
+        return;
+    }
+
+    // 48 raw bytes → ~64 base64 chars; after stripping non-alphanumeric we always have ≥32
+    $new_secret = substr(preg_replace('/[^A-Za-z0-9]/', '', base64_encode(random_bytes(48))), 0, 32);
+
+    $env = file_get_contents($env_path);
+    // Match APP_2FA_SECRET with an empty value: unquoted, double-quoted, or single-quoted
+    $updated = preg_replace(
+        '/^APP_2FA_SECRET\s*=\s*(""|\'\'|)\s*$/m',
+        'APP_2FA_SECRET="' . $new_secret . '"',
+        $env
+    );
+
+    if ($updated === null || $updated === $env) {
+        printf("WARNING: 2FA module enabled but could not auto-set APP_2FA_SECRET in .env.\n");
+        printf("         Please set it manually (minimum 10 characters).\n");
+        return;
+    }
+
+    file_put_contents($env_path, $updated);
+    printf("Generated APP_2FA_SECRET and saved to .env\n");
 }
 
 /**
