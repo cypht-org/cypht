@@ -988,7 +988,7 @@ class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
  */
 class Hm_Output_sent_folder_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_sent"><a class="unread_link" href="'.$this->build_page_url('message_list', array('list_path' => 'sent')).'">';
+        $res = '<li class="menu_sent"><a class="unread_link" href="'.$this->build_page_url('message_list', array('list_path' => 'sent'), true).'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-send-check-fill menu-icon"></i>';
         }

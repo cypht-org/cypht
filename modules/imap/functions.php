@@ -145,7 +145,7 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
             } else {
                 $attrs = 'id="main-link" data-id="imap_'.$id.'_'.$output_mod->html_safe($folder_name).
                 '" href="'.
-                $output_mod->build_page_url('message_list', array('list_path' => urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)))).'"';
+                $output_mod->build_page_url('message_list', array('list_path' => urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name))), true).'"';
             }
             if (mb_strlen($folder['basename'])>15) {
                 $results .= '<a ' . $attrs .
@@ -1558,12 +1558,12 @@ if (!hm_exists('forward_dropdown')) {
         $txt .= '<li><a href="'.
             $output->build_page_url('compose', array(
                 'forward_as_attachment' => 1
-            )).$reply_args.
+            ), true).$reply_args.
             '" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none" ><span>'.$output->trans('Forward as message attachment').'</a></li>';
         $txt .= '<li><a href="'.
             $output->build_page_url('compose', array(
                 'forward' => 1,
-            )).$reply_args.
+            ), true).$reply_args.
             '" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none"><span>'.$output->trans('Edit as new message').'</a></li>';
         $txt .= '</ul></div>';
         return $txt;

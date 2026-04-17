@@ -224,9 +224,9 @@ class Hm_Output_contacts_content_start extends Hm_Output_Module {
     protected function output() {
         $contact_source_list = $this->get('contact_sources', array());
         $actions = '<div class="src_title fs-5 mb-2">'.$this->trans('Export Contacts as CSV').'</div>';
-        $actions .= '<div class="list_src"><a href="'. $this->build_page_url('export_contact', array('contact_source' => 'all')) .'" target="_blank" data-external="true">'.$this->trans('All Contacts').'</a></div>';
+        $actions .= '<div class="list_src"><a href="'. $this->build_page_url('export_contact', array('contact_source' => 'all'), true) .'" target="_blank" data-external="true">'.$this->trans('All Contacts').'</a></div>';
         foreach ($contact_source_list as $value) {
-            $actions .= '<div class="list_src"><a href="'. $this->build_page_url('export_contact', array('contact_source' => $value)) .'" target="_blank" data-external="true">'.$this->html_safe($this->html_safe($value).' Contacts').'</a></div>';
+            $actions .= '<div class="list_src"><a href="'. $this->build_page_url('export_contact', array('contact_source' => $value), true) .'" target="_blank" data-external="true">'.$this->html_safe($this->html_safe($value).' Contacts').'</a></div>';
         }
 
         return '<div class="contacts_content p-0"><div class="content_title d-flex gap-2 justify-content-between px-3 align-items-center"><div class="d-flex gap-2 align-items-center">'.$this->trans('Contacts'). '</div><div class="list_controls source_link d-flex gap-2 align-items-center"><a href="#" title="' . $this->trans('Export Contacts') . '" class="refresh_list">' .
@@ -410,7 +410,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                             'contact_source' => $this->html_safe($c->value('source')),
                             'contact_type' => $this->html_safe($c->value('type')),
                             'contact_page' => $current_page,
-                        ));
+                        ), true);
                         
                         if (class_exists('Hm_LDAP_Contact')) {
                             $edit_url = Hm_LDAP_Contact::addDNToUrl($c, $edit_url);
@@ -423,7 +423,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                         'contact_id' => $this->html_safe($c->value('id')),
                         'contact_source' => $this->html_safe($c->value('source')),
                         'contact_type' => $this->html_safe($c->value('type')),
-                    ));
+                    ), true);
                     
                     if (class_exists('Hm_LDAP_Contact')) {
                         $send_to_url = Hm_LDAP_Contact::addDNToUrl($c, $send_to_url);

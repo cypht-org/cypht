@@ -400,11 +400,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if (!array_key_exists('flags', $lc_headers) || !mb_stristr($lc_headers['flags'], 'draft')) {
                 $txt .= '<a class="reply_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="'.$this->build_page_url('compose', array(
                     'reply' => 1,
-                )).$reply_args.'">'.$this->trans('Reply').'</a>';
+                ), true).$reply_args.'">'.$this->trans('Reply').'</a>';
                 if ($size > 1) {
                     $txt .= '<a class="reply_all_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="'.$this->build_page_url('compose', array(
                         'reply_all' => 1,
-                    )).$reply_args.'">'.$this->trans('Reply-all').'</a>';
+                    ), true).$reply_args.'">'.$this->trans('Reply-all').'</a>';
                 } else {
                     $txt .= '<a class="reply_all_link hlink disabled_link text-decoration-none">'.$this->trans('Reply-all').'</a>';
                 }

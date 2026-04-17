@@ -582,10 +582,10 @@ abstract class Hm_Output_Module {
         return $this->output();
     }
 
-    public function build_page_url($page, $params = []) {
+    public function build_page_url($page, $params = [], $htm_context = false) {
         $url = '?'.$this->get('page_param_name', 'page').'='.$page;
         foreach ($params as $key => $value) {
-            $url .= '&'.$key.'='.$value;
+            $url .= ($htm_context ? '&amp;': '&').$key.'='.$value;
         }
         return $url;
     }

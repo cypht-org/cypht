@@ -184,14 +184,14 @@ function apod_date_form($date, $output_mod) {
             $nextday = strtotime("1995-06-20");
         else
             $nextday = strtotime('+1 days', strtotime($date));
-        $next = $output_mod->build_page_url('nasa_apod', array('apod_date' => date('Y-m-d', $nextday)));
+        $next = $output_mod->build_page_url('nasa_apod', array('apod_date' => date('Y-m-d', $nextday)), true);
     }
     if (strtotime($date) > strtotime("1995-06-16")) {
         if (date("Y-m-d", strtotime($date)) == "1995-06-20")
             $prevday = strtotime("1995-06-16");
         else
             $prevday = strtotime('-1 days', strtotime($date));
-        $prev = $output_mod->build_page_url('nasa_apod', array('apod_date' => date('Y-m-d', $prevday)));
+        $prev = $output_mod->build_page_url('nasa_apod', array('apod_date' => date('Y-m-d', $prevday)), true);
     }
     $res = '<form class="apod_date" method="get">';
     // Previous can be empty if the first picture of June 16 1995 has been reached

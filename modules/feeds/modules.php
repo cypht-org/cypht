@@ -855,7 +855,7 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
         $folders = $this->get('feed_folders', array());
         if (is_array($folders) && !empty($folders)) {
             if(count($this->get('feeds', array()))  > 1) {
-                $res .= '<li class="menu_feeds"><a class="unread_link" href="'. $this->build_page_url('message_list', array('list_path' => 'feeds')).'">';
+                $res .= '<li class="menu_feeds"><a class="unread_link" href="'. $this->build_page_url('message_list', array('list_path' => 'feeds'), true).'">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-rss-fill menu-icon"></i>';
                 }

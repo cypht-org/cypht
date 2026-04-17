@@ -1395,40 +1395,40 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         }
         $total_accounts = count($this->get('imap_servers', array())) + count($this->get('feeds', array()));
         if ($total_accounts > 1) {
-            $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'combined_inbox']) .'">';
+            $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'combined_inbox'], true) .'">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-box2-fill menu-icon"></i>';
             }
             $res .= '<span class="nav-label">'.$this->trans('Everything').'</span</a><span class="combined_inbox_count"></span></li>';
         }
-        $res .= '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="'. $this->build_page_url('message_list', ['list_path' => 'unread']) .'">';
+        $res .= '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="'. $this->build_page_url('message_list', ['list_path' => 'unread'], true) .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-envelope-fill menu-icon"></i>';
         }
         $res .= '<span class="nav-label">'.$this->trans('Unread').'</span></a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li>';
-        $res .= '<li class="menu_flagged"><a class="unread_link" href="'.$this->build_page_url('message_list', ['list_path' => 'flagged']).'">';
+        $res .= '<li class="menu_flagged"><a class="unread_link" href="'.$this->build_page_url('message_list', ['list_path' => 'flagged'], true).'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-flag-fill menu-icon"></i>';
         }
         $res .= '<span class="nav-label">'.$this->trans('Flagged').'</span></a> <span class="flagged_count"></span></li>';
-        $res .= '<li class="menu_junk"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'junk']) .'">';
+        $res .= '<li class="menu_junk"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'junk'], true) .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-envelope-x-fill menu-icon"></i>';
         }
         $res .= '<span class="nav-label">'.$this->trans('Junk').'</span></a></li>';
-        $res .= '<li class="menu_trash"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'trash']) .'">';
+        $res .= '<li class="menu_trash"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'trash'], true) .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-trash3-fill menu-icon"></i>';
         }
         $res .= '<span class="nav-label">'.$this->trans('Trash').'</span></a></li>';
-        $res .= '<li class="menu_drafts"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'drafts']) .'">';
+        $res .= '<li class="menu_drafts"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'drafts'], true) .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-pencil-square menu-icon"></i>';
         }
         $res .= '<span class="nav-label">'.$this->trans('Drafts').'</span></a></li>';
         $settings = $this->get('user_settings', array());
         if (array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting']) {
-            $res .= '<li class="menu_snoozed"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'snoozed']) .'">';
+            $res .= '<li class="menu_snoozed"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'snoozed'], true) .'">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-clock-fill menu-icon"></i>';
             }
@@ -1481,7 +1481,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
 
             $res .= '<div class="'.$class.'"><ul class="folders">';
             if ($name == 'Email' && count($this->get('imap_servers', array()))  > 1) {
-                $res .= '<li class="menu_email"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'email']) .'">';
+                $res .= '<li class="menu_email"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'email'], true) .'">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-globe-americas menu-icon"></i>';
                 }
@@ -1850,14 +1850,14 @@ class Hm_Output_message_start extends Hm_Output_Module {
             else {
                 $page = 'message_list';
             }
-            $title = '<a href="'. $this->build_page_url($page, $title_params) .'">'.$list_name.'</a>';
+            $title = '<a href="'. $this->build_page_url($page, $title_params, true) .'">'.$list_name.'</a>';
             if (count($this->get('mailbox_list_title', array())) > 0) {
                 $mb_title = array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()));
                 if (($key = array_search($list_name, $mb_title)) !== false) {
                     unset($mb_title[$key]);
                 }
                 $title .= '<i class="bi bi-caret-right-fill path_delim"></i>'.
-                    '<a href="'. $this->build_page_url('message_list', array('list_path' => $this->html_safe($this->get('list_path')))) .'">'.
+                    '<a href="'. $this->build_page_url('message_list', array('list_path' => $this->html_safe($this->get('list_path'))), true) .'">'.
                     implode('<i class="bi bi-caret-right-fill path_delim"></i>',
                     array_map( function($v) { return $this->trans($v); }, $mb_title)).'</a>';
             }
@@ -1873,7 +1873,7 @@ class Hm_Output_message_start extends Hm_Output_Module {
             if ($this->get('list_sort', '')) {
                 $url_params['sort'] = $this->html_safe($this->get('list_sort'));
             }
-            $url = $this->build_page_url('message_list', $url_params);
+            $url = $this->build_page_url('message_list', $url_params, true);
             $title = '<a href="'.$url.'">'.
                 implode('<i class="bi bi-caret-right-fill path_delim"></i>',
                 array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()))).'</a>';

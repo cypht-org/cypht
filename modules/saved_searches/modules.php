@@ -457,7 +457,7 @@ class Hm_Output_search_folders extends Hm_Output_Module {
                     'search_fld' =>  $this->html_safe(urlencode($args[2])),
                     'search_since' => $this->html_safe(urlencode($args[1])),
                     'search_name' => $this->html_safe(urlencode($name)),
-                ));
+                ), true);
                 $res .= '<li class="menu_search_'.$this->html_safe($name).'"><a class="unread_link" href="'.$url.'">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-search account_icon"></i> ';
@@ -466,7 +466,7 @@ class Hm_Output_search_folders extends Hm_Output_Module {
             }
 
             foreach ($search_types['advanced'] as $name => $search_data) {
-                $url = $this->build_page_url('advanced_search', array('search_name' => $this->html_safe(urlencode($name))));
+                $url = $this->build_page_url('advanced_search', array('search_name' => $this->html_safe(urlencode($name))), true);
                 $res .= '<li class="menu_search_advanced_'.$this->html_safe($name).'"><a class="unread_link advanced_search_link" href="'.$url.'" data-search-name="'.$this->html_safe($name).'">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-gear-wide-connected account_icon" title="'.$this->trans('Advanced Search').'"></i> ';
