@@ -20,7 +20,7 @@ add_handler('ajax_imap_debug', 'sieve_connect', true, 'imap', 'imap_connect', 'a
 // sieve filter
 add_handler('message_list', 'load_mailbox_name', true, 'sievefilters', 'load_user_data', 'after');
 add_handler('message_list', 'load_custom_actions', true, 'sievefilters', 'load_mailbox_name', 'after');
-add_output('sieve_filters', 'sievefilters_settings_start', true, 'sievefilters', 'version_upgrade_checker', 'after');
+add_output('sieve_filters', 'sievefilters_modal_content_start', true, 'sievefilters', 'version_upgrade_checker', 'after');
 add_output('message_list', 'sievefilters_modal_content_start', true, 'sievefilters', 'message_list_end', 'after');
 add_output('message_list', 'message_list_custom_actions', true, 'sievefilters', 'imap_custom_controls', 'after');
 add_output('sieve_filters', 'sievefilters_title_start', true, 'sievefilters', 'content_section_start', 'after');
