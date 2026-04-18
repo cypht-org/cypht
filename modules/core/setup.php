@@ -109,6 +109,7 @@ add_output('settings', 'start_all_email_settings', true, 'core', 'all_source_max
 add_output('settings', 'all_email_since_setting', true, 'core', 'start_all_email_settings', 'after');
 add_output('settings', 'all_email_source_max_setting', true, 'core', 'all_email_since_setting', 'after');
 add_output('settings', 'auto_save_settings', true, 'core', 'setting_active_body_structure', 'after');
+add_output('settings', 'auto_save_modals', true, 'core', 'auto_save_settings', 'after');
 add_output('settings', 'end_settings_form', true, 'core', 'content_section_end', 'before');
 add_output('settings', 'privacy_settings', 'true', 'core', 'start_unread_settings', 'before');
 
@@ -212,6 +213,14 @@ add_handler('ajax_save_auto_save_settings', 'save_auto_save_settings', true, 'co
 setup_base_ajax_page('ajax_get_auto_save_settings', 'core');
 add_handler('ajax_get_auto_save_settings', 'get_auto_save_settings', true, 'core');
 
+/* validate auto save password */
+setup_base_ajax_page('ajax_validate_auto_save_password', 'core');
+add_handler('ajax_validate_auto_save_password', 'validate_auto_save_password', true, 'core');
+
+/* disable auto save */
+setup_base_ajax_page('ajax_disable_auto_save', 'core');
+add_handler('ajax_disable_auto_save', 'disable_auto_save', true, 'core');
+
 
 /* allowed input */
 return array(
@@ -237,6 +246,8 @@ return array(
         'logout',
         'ajax_save_auto_save_settings',
         'ajax_get_auto_save_settings',
+        'ajax_validate_auto_save_password',
+        'ajax_disable_auto_save',
     ),
     'allowed_output' => array(
         'date' => array(FILTER_UNSAFE_RAW, false),
@@ -257,6 +268,7 @@ return array(
         'imap_service_name' => array(FILTER_UNSAFE_RAW, false),
         'mailbox' => array(FILTER_UNSAFE_RAW, false),
         'mailbox_name' => array(FILTER_UNSAFE_RAW, false),
+        'is_saved_auto_save_key' => array(FILTER_VALIDATE_BOOLEAN, false),
         'auto_save_enabled' => array(FILTER_VALIDATE_BOOLEAN, false),
         'auto_save_interval' => array(FILTER_VALIDATE_INT, false),
     ),
@@ -388,6 +400,9 @@ return array(
         'images_blacklist' => FILTER_UNSAFE_RAW,
         'pop' => FILTER_VALIDATE_BOOLEAN,
         'auto_save_setting' => FILTER_VALIDATE_BOOLEAN,
+        'auto_save_key' => FILTER_UNSAFE_RAW,
+        'auto_save_password' => FILTER_UNSAFE_RAW,
+        'auto_save_enable' => FILTER_VALIDATE_BOOLEAN,
         'auto_save_interval' => FILTER_VALIDATE_INT,
     )
 );

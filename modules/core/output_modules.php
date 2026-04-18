@@ -1316,27 +1316,69 @@ class Hm_Output_auto_save_settings extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());
         
-        $auto_save_checked = '';
-        $auto_save_reset = '';
+        // auto_save_setting parameter (checkbox)
+        $auto_save_enabled = false;
         if (array_key_exists('auto_save_setting', $settings) && $settings['auto_save_setting']) {
-            $auto_save_checked = ' checked="checked"';
-            $auto_save_reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
+            $auto_save_enabled = true;
         }
         
-        $auto_save_interval = "60";
+        // auto_save_interval parameter (number)
+        $auto_save_interval = "60"; // Default value: 60 seconds
         if (array_key_exists('auto_save_interval', $settings) && $settings['auto_save_interval']) {
             $auto_save_interval = $settings['auto_save_interval'];
         }
         
-        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="auto_save_setting">'.
-            $this->trans('Enable automatic settings save').
-            '</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$auto_save_checked.' id="auto_save_setting" name="auto_save_setting" data-default-value="false" value="1" />'.$auto_save_reset.'</div></td></tr>';
+        // Check if auto-save is already enabled with a key
+        $has_auto_save_key = array_key_exists('auto_save_key_setting', $settings) && !empty($settings['auto_save_key_setting']);
         
-        $res .= '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="auto_save_interval">'.
-            $this->trans('Auto-save interval (seconds)').
-            '</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-control form-control-sm w-auto" type="number" min="10" max="3600" id="auto_save_interval" name="auto_save_interval" value="'.$auto_save_interval.'" data-default-value="60" /></div></td></tr>';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label>' .
+            $this->trans('Enable automatic settings save') .
+            '</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center">';
+        
+        if ($has_auto_save_key) {
+            // If already enabled, show status and disable button
+            $res .= '<span class="badge bg-success me-2">' . $this->trans('Enabled') . '</span>' .
+                   '<button type="button" class="btn btn-sm btn-danger" onclick="showDisableAutoSaveModal()">' .
+                   '<i class="bi bi-shield-lock"></i> ' . $this->trans('Disable Auto-Save') . '</button>';
+        } else {
+            // If not enabled, show status and configure button
+            $res .= '<span class="badge bg-secondary me-2">' . $this->trans('Disabled') . '</span>' .
+                   '<button type="button" class="btn btn-sm btn-primary" onclick="showAutoSaveConfigModal()">' .
+                   '<i class="bi bi-shield-check"></i> ' . $this->trans('Configure Auto-Save') . '</button>';
+        }
+        
+        $res .= '</div></td></tr>';
+        
+        $res .= '<tr class="general_setting"><td class="d-block d-md-table-cell"><label>' .
+            $this->trans('Auto-save interval (seconds)') .
+            '</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center">';
+        
+        if ($has_auto_save_key) {
+            // If enabled, show value and edit button
+            $res .= '<span class="me-2">' . $auto_save_interval . '</span>' .
+                   '<button type="button" class="btn btn-sm btn-outline-secondary" onclick="showAutoSaveConfigModal()">' .
+                   '<i class="bi bi-pencil"></i> ' . $this->trans('Edit') . '</button>';
+        } else {
+            // If not enabled, show default value in gray
+            $res .= '<span class="text-muted">' . $auto_save_interval . '</span>';
+        }
+        
+        $res .= '</div></td></tr>';
         
         return $res;
+    }
+}
+
+/**
+ * Auto-save modals output
+ * @subpackage core/output
+ */
+class Hm_Output_auto_save_modals extends Hm_Output_Module {
+    protected function output() {
+        // Inclure le fichier des modaux
+        ob_start();
+        include 'auto_save_modals.php';
+        return ob_get_clean();
     }
 }
 

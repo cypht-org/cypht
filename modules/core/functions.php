@@ -515,6 +515,17 @@ function save_user_settings($handler, $form, $logout) {
 
 }}
 
+if (!hm_exists('is_valid_password')) {
+function is_valid_password($handler, $password) {
+    $user = $handler->session->get('username', false);
+
+    if ($handler->session->auth($user, $password)) {
+        return true;
+    } else {
+        return false;
+    }
+}}
+
 /**
  * Setup commonly used modules for an ajax request
  * @subpackage core/functions
