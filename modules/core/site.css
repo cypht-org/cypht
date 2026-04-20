@@ -83,8 +83,10 @@ a:hover {
 li.selected_menu {
   background-color: var(--bs-primary-bg-subtle);
 }
-li.selected_menu a {
-  color: var(--bs-link-color) !important;
+li.selected_menu:not(.menu_search) a,
+li.selected_menu:not(.menu_search) a:hover,
+li.selected_menu:not(.menu_search) a i.bi {
+    color: var(--bs-primary-text-emphasis) !important;
 }
 
 form {
@@ -500,8 +502,7 @@ button {
   margin-top: 0px;
   border-bottom: solid 1px var(--bs-secondary-bg);
   border-top: solid 1px var(--bs-secondary-bg);
-  padding-bottom: 15px;
-  padding-top: 15px;
+  padding: calc(var(--bs-gutter-x) * .65);
   letter-spacing: -1px;
   gap: 1rem;
   font-size: 1.25rem;
@@ -839,10 +840,10 @@ div.unseen,
   background-color: #ccc;
   font-size: 90%;
   margin-left: 10px;
-  padding: 2px 6px;
-  padding-bottom: 3px;
+  padding: 3px 6px;
+  padding-bottom: 2px;
   border-radius: 4px 4px 4px 4px;
-  vertical-align: 2px;
+  vertical-align: 1px;
   font-weight: bold;
   color: #fff;
 }
@@ -1013,7 +1014,7 @@ div.unseen,
   padding-bottom: 5px;
 }
 .mobile .content_cell {
-  padding-top: 55px;
+  padding-top: 52px;
   display: block;
   width: 100%;
 }
@@ -1046,9 +1047,6 @@ div.unseen,
   position: fixed;
   z-index: 101;
 }
-.mobile .message_table {
-  padding-left: 5px !important;
-}
 .mobile .list_settings_link {
   width: 24px;
   height: 24px;
@@ -1060,7 +1058,6 @@ div.unseen,
   word-break: break-all;
   word-wrap: break-word;
   font-size: 100%;
-  padding-top: 10px !important;
 }
 .mobile .msg_controls {
   z-index: 1000;
@@ -1682,6 +1679,8 @@ pre.msg_source {
 #dropdownMenuForward + ul .forward_link span,
 #contact_info + #contact_popup span { white-space: nowrap; }
 #extra-header-buttons { display: inline-block; margin-top: 0; }
+.sievefilters_settings > .p-3 { padding: 0 !important; }
+#sieve_accounts > .p-2 { padding: 0.5rem 1rem; }
 
 /* some theming changes */
 .allow_image_link .btn-light, .definitive_actions .btn-light,
@@ -1698,7 +1697,9 @@ pre.msg_source {
   color: var(--bs-body-bg) !important;
   background: var(--bs-link-color);
 }
-.total_unread_count, .unread_count { color: #fff; background-color: RGBA(var(--bs-info-rgb), var(--bs-bg-opacity, 1)); }
+.content_title .list_sources.w-100 { width: auto !important; }
+.content_title .list_sources .src_title { font-weight: bold; }
+.total_unread_count, .total_unread_count.badge, .unread_count { color: var(--bs-body-bg) !important; background-color: var(--bs-link-hover-color) !important; }
 .folders a, .unread_link, .logout_link { color: rgba(var(--bs-body-color-rgb), 0.85); }
 .msg_text .js-header_subject { color: var(--bs-body-color) !important; font-size: 1.4rem !important; }
 .plink, .nlink { color: var(--bs-link-color); }
@@ -1719,17 +1720,22 @@ pre.msg_source {
 .mobile .on_mobile { display: block !important; }
 .mobile .move_to_location { right: 0; }
 .mobile .move_to_location .folders { margin-top: 0.5rem; margin-left: 0.5rem !important; }
-.mobile .search_content .p-3 { flex: 1 1 auto; overflow: auto; }
+.mobile .search_content > .p-3 { flex: 1 1 auto; overflow: auto; padding-top: 10px !important; }
 .mobile .search_form { padding-left: 0; }
 .mobile .folders { margin-top: 1rem; margin-left: 1rem !important; }
+.mobile .folders_page.row { margin-left: 0; margin-right: 0; }
 .mobile .server_section { overflow: hidden; }
 .mobile .add_server .txt_fld { width: 100%; }
 .mobile .user_settings table td { padding: 5px 10px; }
 .mobile .reset_factory_button { margin-right: 1rem; }
 .mobile .message_list .list_controls.on_mobile form { display: inline-block; }
+.mobile .message_list > .p-3 { padding-top: 10px !important; }
 .mobile .mailbox_list_title.hide { display: block; }
 .mobile .toggle_recipients { top: 8px !important; }
 .mobile .msg_text_inner { font-size: 120%; padding: 0px !important; }
+.mobile .save_perm_form { margin-bottom: 1.5rem; }
+.mobile .save_perm_form .save_settings { margin-bottom: 0.5rem; }
+.mobile .content_title .list_sources { top: 40px; border: 1px solid var(--bs-border-color); }
 
 
 /* Mobile responsive overrides for Bootstrap classes */
@@ -1766,7 +1772,7 @@ pre.msg_source {
   .mobile .content_title > .flex-wrap {
     flex-wrap: nowrap !important; margin-bottom: 0px !important;
   }
-  .mobile .content_title .list_meta { margin-bottom: 0px !important; }
+  .mobile .content_title .list_meta { margin-top: 3px; margin-bottom: 0px !important; }
   .mobile .msg_text .small_header .col-md-2 { width: 16.667%; }
   .mobile .msg_text .small_header > div + div { width: 83.333%; }
   .mobile #list_controls_menu.show { left: auto; right: -15px; }
@@ -1781,6 +1787,7 @@ pre.msg_source {
   .mobile .msg_text .small_header .col-md-2 { width: 20%; }
   .mobile .msg_text .small_header > div + div { width: 80%; }
   .mobile .msg_text .small_header > div.d-none + div { width: 100%; }
+  .mobile .msg_controls .move_to_location { right: -90px; }
   .notices .definitive_actions {
     margin-left: 0 !important;
   }
