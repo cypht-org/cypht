@@ -451,6 +451,11 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
         'imagepjpeg',
         'imagegif',
     );
+
+    if ($output_mod->get('enable_mstnef_viewer')) {
+        $allowed[] = 'applicationms-tnef';
+    }
+
     $icons = array(
         'text' => 'doc',
         'image' => 'camera',
@@ -1697,5 +1702,89 @@ if (!hm_exists('is_imap_trash_folder')) {
             return $specials['trash'] === $folder;
         }
         return false;
+    }
+}
+
+if (!hm_exists('parse_mstnef')) {
+    function parse_mstnef($config) {
+        [
+            'tnefBinary' => $tnefBinary,
+            'attachmentDir' => $attachmentDir,
+            'msgUid' => $msgId,
+            'msgPart' => $msgPart,
+            'imapServerId' => $imapServerId,
+            'folder' => $folder,
+            'returnFile' => $returnFile
+        ] = $config;
+
+        if (! is_writable($attachmentDir) && ! mkdir($attachmentDir)) {
+            return '<div class="alert alert-danger" rol="alert">Unable to parse TNEF message. Please ensure that "attachment_dir" is configured in your environmment and is writable!</div>';
+        }
+
+        $unpackDir = $attachmentDir . DIRECTORY_SEPARATOR . 'message_' . $msgId . '_' . rand(1000, 9999);
+
+        if (! file_exists($unpackDir)) {
+            mkdir($unpackDir);
+        }
+        
+        $filename = $unpackDir . DIRECTORY_SEPARATOR . 'message' . '.dat';
+        file_put_contents($filename, $tnefBinary);
+
+        $tnefParserOutput = shell_exec("tnef -f $filename -C $unpackDir --save-body");
+        if ($tnefParserOutput) {
+            Hm_Debug::add("Failed to parse TNEF message. Details: " . $tnefParserOutput);
+            return '<div class="alert alert-danger" rol="alert">Unable to parse TNEF message. Please check the log output for more details.</div>';
+        }
+
+        unlink($filename);
+
+        if ($returnFile) {
+            // remove the files not requested
+            foreach (glob($unpackDir . DIRECTORY_SEPARATOR . '*') as $file) {
+                if (is_file($file)) {
+                    $fileInfo = pathinfo($file);
+                    if ($fileInfo['basename'] !== $returnFile) {
+                        unlink($file);
+                    }
+                }
+            }
+            
+            $filePath = $unpackDir . DIRECTORY_SEPARATOR . $returnFile;
+            if (file_exists($filePath)) {
+                return $filePath;
+            }
+        }
+
+        $bodyOutput = null;
+        $attachmentsOutput = '';
+        foreach (glob($unpackDir . DIRECTORY_SEPARATOR . '*') as $file) {
+            if (is_file($file)) {
+                $fileInfo = pathinfo($file);
+                $mimeType = mime_content_type($file);
+
+                if (strtolower($fileInfo['extension']) === 'rtf') {
+                    $bodyOutput = shell_exec("unrtf --html $file");
+                    if (! $bodyOutput) {
+                        Hm_Debug::add("Failed to parse RTF body from TNEF message. Details: " . $bodyOutput);
+                        $bodyOutput = '<div class="alert alert-danger" rol="alert">Unable to parse RTF body from TNEF message. Please check the log output for more details.</div>';
+                    }
+                } elseif (strpos($mimeType, 'image/') === 0) {
+                    // display images
+                    $base64Data = base64_encode(file_get_contents($file));
+                    $attachmentsOutput .= '<div><img src="data:' . $mimeType . ';base64,' . $base64Data . '" alt="' . htmlspecialchars($fileInfo['basename']) . '" class="img-fluid"></div>';
+                } else {
+                    // other attachments
+                    $fileUrl = "?page=message&imap_msg_uid=$msgId&imap_server_id=$imapServerId&imap_folder=$folder&imap_msg_part=$msgPart&download_attachment=" . urlencode($fileInfo['basename']);
+                    $attachmentsOutput .= '<div class="download_link">
+                    <a href="#" data-src="' . $fileUrl . '" class="btn btn-sm btn-link">
+                        ' . htmlspecialchars($fileInfo['basename']) . '
+                    </a>
+                    </div>';
+                }
+                unlink($file);
+            }
+        }
+
+        return $bodyOutput . $attachmentsOutput;
     }
 }

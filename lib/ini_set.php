@@ -79,6 +79,7 @@ foreach (array('user_settings_dir', 'attachment_dir') as $dir) {
         $base .= PATH_SEPARATOR.$config->get($dir, false);
     }
 }
+
 if (!$disabled) {
     ini_set('open_basedir', $base);
 }

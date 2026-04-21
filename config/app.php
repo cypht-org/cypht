@@ -1375,4 +1375,6 @@ return [
     'js_exclude_deps' => env('JS_EXCLUDE_DEPS', ''),
 
     'page_param_name' => env('PAGE_PARAM_NAME', 'page'),
+  
+    'enable_mstnef_viewer' => env('ENABLE_MSTNEF_VIEWER', false),
 ];
