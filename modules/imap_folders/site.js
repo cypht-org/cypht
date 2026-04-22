@@ -541,14 +541,16 @@ var show_create_folder_modal = function(server_id, block, parentHex, parentTr) {
             Hm_Notices.show($('#folder_name_error').val(), 'danger');
             return;
         }
-        var fullFolderName = folder;
+        var params = [
+            {'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_create'},
+            {'name': 'imap_server_id', 'value': server_id},
+            {'name': 'folder', 'value': folder}
+        ];
         if (parentHex) {
-            fullFolderName = parentTr ? parentTr.data('folder-name') + '/' + folder : folder;
+            params.push({'name': 'parent', 'value': 'imap_' + server_id + '_' + parentHex});
         }
         Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_create'},
-            {'name': 'imap_server_id', 'value': server_id},
-            {'name': 'folder', 'value': fullFolderName}],
+            params,
             function(res) {
                 if (res.imap_folders_success) {
                     modal.hide();
