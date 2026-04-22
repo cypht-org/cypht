@@ -365,10 +365,9 @@ var render_folder_table = function(folders, tbody, server_id) {
         row += '<td>' + specialBadge + '</td>';
         row += '<td class="text-end">';
         row += '<div class="btn-group btn-group-sm" role="group">';
-        row += '<button class="btn btn-outline-primary btn-sm folder_rename_btn" title="' + hm_trans('Rename') + '"><i class="bi bi-pencil"></i></button>';
-        row += '<button class="btn btn-outline-danger btn-sm folder_delete_btn" title="' + hm_trans('Delete') + '"><i class="bi bi-trash"></i></button>';
-        row += '<button class="btn btn-outline-success btn-sm folder_create_child_btn" title="' + hm_trans('Create subfolder') + '"><i class="bi bi-folder-plus"></i></button>';
-
+        row += '<button class="btn btn-outline-secondary btn-sm folder_rename_btn" title="' + hm_trans('Rename') + '"><i class="bi bi-pencil"></i></button>';
+        row += '<button class="btn btn-outline-secondary btn-sm folder_delete_btn" title="' + hm_trans('Delete') + '"><i class="bi bi-trash"></i></button>';
+        row += '<button class="btn btn-outline-secondary btn-sm folder_create_child_btn" title="' + hm_trans('Create subfolder') + '"><i class="bi bi-folder-plus"></i></button>';
 
         row += '<div class="btn-group btn-group-sm dropdown" role="group">';
         row += '<button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" title="' + hm_trans('Set as...') + '"><i class="bi bi-tag"></i></button>';
@@ -456,21 +455,24 @@ var show_rename_modal = function(server_id, folderHex, folderName, tr) {
         btnSize: 'sm'
     });
 
-    var content = '<div class="mb-3">';
-    content += '<label class="form-label">' + hm_trans('Current name') + ': <strong>' + esc_html(folderName) + '</strong></label>';
-    content += '</div>';
-    content += '<div class="form-floating mb-3">';
-    content += '<input type="text" class="form-control" id="modal_rename_value" placeholder="' + hm_trans('New Folder Name') + '">';
+    var content = '<div class="form-floating mb-3">';
+    content += '<input type="text" class="form-control" id="modal_rename_value" placeholder="' + hm_trans('New Folder Name') + '" value="' + esc_html(folderName) + '">';
     content += '<label for="modal_rename_value">' + hm_trans('New Folder Name') + '</label>';
     content += '</div>';
 
     modal.setContent(content);
+    modal.modal.on('shown.bs.modal', function() {
+        var input = document.getElementById('modal_rename_value');
+        if (input) { input.focus(); input.select(); }
+    });
     modal.addFooterBtn(hm_trans('Rename'), 'btn-primary', function() {
         var newName = $('#modal_rename_value').val().trim();
         if (!newName.length) {
             Hm_Notices.show($('#rename_folder_error').val(), 'danger');
             return;
         }
+        var btn = $(this);
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + hm_trans('Rename'));
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_rename'},
             {'name': 'imap_server_id', 'value': server_id},
@@ -482,6 +484,8 @@ var show_rename_modal = function(server_id, folderHex, folderName, tr) {
                     var block = tr.closest('.account_folder_block');
                     load_account_folders(server_id, block);
                     Hm_Folders.reload_folders(true);
+                } else {
+                    btn.prop('disabled', false).html(hm_trans('Rename'));
                 }
             }
         );
@@ -501,6 +505,8 @@ var show_delete_modal = function(server_id, folderHex, folderName, tr) {
 
     modal.setContent(content);
     modal.addFooterBtn(hm_trans('Delete'), 'btn-danger', function() {
+        var btn = $(this);
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + hm_trans('Delete'));
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_delete'},
             {'name': 'imap_server_id', 'value': server_id},
@@ -511,6 +517,8 @@ var show_delete_modal = function(server_id, folderHex, folderName, tr) {
                     var block = tr.closest('.account_folder_block');
                     load_account_folders(server_id, block);
                     Hm_Folders.reload_folders(true);
+                } else {
+                    btn.prop('disabled', false).html(hm_trans('Delete'));
                 }
             }
         );
@@ -541,6 +549,8 @@ var show_create_folder_modal = function(server_id, block, parentHex, parentTr) {
             Hm_Notices.show($('#folder_name_error').val(), 'danger');
             return;
         }
+        var btn = $(this);
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + hm_trans('Create'));
         var params = [
             {'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_create'},
             {'name': 'imap_server_id', 'value': server_id},
@@ -556,6 +566,8 @@ var show_create_folder_modal = function(server_id, block, parentHex, parentTr) {
                     modal.hide();
                     load_account_folders(server_id, block);
                     Hm_Folders.reload_folders(true);
+                } else {
+                    btn.prop('disabled', false).html(hm_trans('Create'));
                 }
             }
         );
