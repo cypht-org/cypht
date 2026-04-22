@@ -230,7 +230,7 @@ var specialFolders = [
         icon: 'bi-envelope-x-fill',
         label: hm_trans('Junk'),
         badgeClass: 'badge-role-junk',
-        helper: hm_trans('If set, all messages marked as spam will be moved here.')
+        helper: hm_trans('If set, all junk and spam messages will be moved here.')
     }
 ];
 
@@ -423,12 +423,11 @@ var bind_folder_table_actions = function(tbody, server_id) {
         e.preventDefault();
         var tr = $(this).closest('tr');
         var folderHex = tr.data('folder-hex');
+        var folderName = tr.data('folder-name');
         var type = $(this).data('type');
         var block = tr.closest('.account_folder_block');
-        var folderName = 'imap_' + server_id + '_' + folderHex;
-        assign_special_folder(server_id, folderName, type, function() {
-            load_account_folders(server_id, block);
-        });
+        var fullFolderName = 'imap_' + server_id + '_' + folderHex;
+        show_assign_special_modal(server_id, fullFolderName, folderName, type, block);
     });
 
     tbody.find('.clear_special_btn').off('click').on('click', function(e) {
@@ -446,6 +445,38 @@ var bind_folder_table_actions = function(tbody, server_id) {
             load_account_folders(server_id, block);
         });
     });
+};
+
+var show_assign_special_modal = function(server_id, folderHex, folderName, type, block) {
+    var sf = get_special_folder(type);
+    var modal = new Hm_Modal({
+        modalId: 'assignSpecialFolderModal',
+        title: hm_trans('Set Special Folder Role'),
+        btnSize: 'sm'
+    });
+
+    var roleLabel = sf ? sf.label : type;
+    var roleIcon = sf ? sf.icon : '';
+    var content = '<div class="d-flex align-items-start gap-3 mb-3">';
+    content += '<i class="bi ' + roleIcon + ' fs-2 text-secondary mt-1"></i>';
+    content += '<div>';
+    content += '<div class="fw-semibold fs-6">' + esc_html(folderName) + '</div>';
+    content += '<div class="text-muted small">' + hm_trans('will be set as the') + ' <strong>' + esc_html(roleLabel) + '</strong> ' + hm_trans('folder') + '</div>';
+    content += '</div></div>';
+    if (sf) {
+        content += '<div class="alert alert-secondary py-2 px-3 mb-0 small">' + sf.helper + '</div>';
+    }
+
+    modal.setContent(content);
+    modal.addFooterBtn(hm_trans('Confirm'), 'btn-primary', function() {
+        var btn = $(this);
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + hm_trans('Saving...'));
+        assign_special_folder(server_id, folderHex, type, function() {
+            modal.hide();
+            load_account_folders(server_id, block);
+        });
+    });
+    modal.open();
 };
 
 var show_rename_modal = function(server_id, folderHex, folderName, tr) {
