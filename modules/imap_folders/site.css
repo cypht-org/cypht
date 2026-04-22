@@ -53,6 +53,12 @@
 .badge-role-draft { background-color: #fff3cd; color: #cc7a00; border: 1px solid #ffe69c; }
 .badge-role-junk { background-color: #e8d6f5; color: #59359a; border: 1px solid #c5a3e0; }
 
+.folder_table .dropdown-item.active,
+.folder_table .dropdown-item:active {
+    background-color: var(--bs-primary);
+    color: #fff;
+}
+
 /* Folders page - old dialogs (subscription page) */
 .sent_folder_select, .draft_folder_select, .trash_folder_select, .folder_dialog, .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select, .archive_folder_select, .junk_folder_select { display: none; }
 .draft_folder_select, .sent_folder_select, .trash_folder_select, .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select, .archive_folder_select { width: fit-content; position: absolute; background-color: #fff; padding: 15px; border: solid 1px #ede8e6; font-weight: normal; padding-left: 10px; min-width: 55px; padding-top: 10px; margin-left: 0px !important; margin-top: 0px; }

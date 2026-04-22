@@ -173,9 +173,10 @@ var load_account_folders = function(server_id, block) {
                 var folders = JSON.parse(res.imap_folder_list_all);
                 badge.text(folders.length + ' folders').show();
                 if (folders.length === 0) {
-                    var noneRow = $('<tr class="no-folders-row"><td colspan="3" class="text-center py-4 text-muted">'
-                        + '<i class="bi bi-folder-x me-2"></i>'
-                        + hm_trans('No folders found.')
+                    var noneRow = $('<tr class="no-folders-row"><td colspan="3" class="text-center py-5 text-muted">'
+                        + '<i class="bi bi-folder2-open fs-2 d-block mb-2"></i>'
+                        + '<div class="fw-semibold">' + hm_trans('No folders found') + '</div>'
+                        + '<div class="small">' + hm_trans('This account has no folders yet. Use the Create button to add one.') + '</div>'
                         + '</td></tr>');
                     tbody.append(noneRow);
                 } else {
@@ -183,12 +184,18 @@ var load_account_folders = function(server_id, block) {
                 }
                 table.show();
             } else {
-                var errorRow = $('<tr class="no-folders-row"><td colspan="3" class="text-center py-4 text-muted">'
-                    + '<i class="bi bi-folder-x me-2"></i>'
-                    + hm_trans('No folders found.')
+                var errorRow = $('<tr class="no-folders-row"><td colspan="3" class="text-center py-5">'
+                    + '<i class="bi bi-exclamation-triangle fs-2 d-block mb-2 text-warning"></i>'
+                    + '<div class="fw-semibold">' + hm_trans('Could not load folders') + '</div>'
+                    + '<div class="small text-muted">' + hm_trans('There was a problem connecting to this account. Please check your connection and try again.') + '</div>'
+                    + '<button class="btn btn-sm btn-outline-secondary mt-3 retry-load-folders">'
+                    + '<i class="bi bi-arrow-clockwise me-1"></i>' + hm_trans('Retry') + '</button>'
                     + '</td></tr>');
                 tbody.append(errorRow);
                 table.show();
+                errorRow.find('.retry-load-folders').on('click', function() {
+                    load_account_folders(server_id, block);
+                });
             }
         }
     );
@@ -317,8 +324,8 @@ var render_folder_table = function(folders, tbody, server_id) {
             msg += '</div>';
         }
         msg += '</div>';
-        var statusRow = $('<tr class="special-folder-status"><td colspan="3">' + msg + '</td></tr>');
-        tbody.before(statusRow);
+        var statusRow = $('<div class="special-folder-status">' + msg + '</div>');
+        tbody.closest('.folder_table').before(statusRow);
         setTimeout(function() {
             $('.special-folder-status-close').on('click', function() {
                 window.localStorage.setItem(statusKey, '1');
@@ -329,8 +336,8 @@ var render_folder_table = function(folders, tbody, server_id) {
 
     tbody.closest('.folder_table').parent().find('.special-folder-helper').remove();
     if (table.length && !window.localStorage.getItem('specialFolderHelperDismissed')) {
-        var helperRow = $('<tr class="special-folder-helper"><td colspan="3">' + render_special_folder_helpers() + '</td></tr>');
-        tbody.before(helperRow);
+        var helperRow = $('<div class="special-folder-helper">' + render_special_folder_helpers() + '</div>');
+        tbody.closest('.folder_table').before(helperRow);
         setTimeout(function() {
             $('.special-folder-helper-close').on('click', function() {
                 if ($('#dontShowSpecialHelperAgain').is(':checked')) {
