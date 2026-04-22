@@ -324,7 +324,7 @@ class Hm_Mailbox {
         }
     }
 
-    public function get_structured_message($folder, $msg_id, $part, $text_only) {
+    public function get_structured_message($folder, $msg_id, $part, $text_only, $support_mstnef = false) {
         if (! $this->select_folder($folder)) {
             return;
         }
@@ -343,7 +343,12 @@ class Hm_Mailbox {
             }
             else {
                 if (! $text_only) {
-                    list($part, $msg_text) = $this->connection->get_first_message_part($msg_id, 'text', 'html', $msg_struct);
+                    if ($support_mstnef) {
+                        list($part, $msg_text) = $this->connection->get_first_message_part($msg_id, 'application', 'ms-tnef', $msg_struct);
+                    }
+                    if (! $part) {
+                        list($part, $msg_text) = $this->connection->get_first_message_part($msg_id, 'text', 'html', $msg_struct);
+                    }
                     if (!$part) {
                         list($part, $msg_text) = $this->connection->get_first_message_part($msg_id, 'text', false, $msg_struct);
                     }

@@ -99,6 +99,7 @@ add_handler('message', 'imap_show_message', true, 'imap', 'message_list_type', '
 add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'imap_remove_attachment', true, 'imap', 'message_list_type', 'after');
 add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
+add_handler('message', 'imap_download_attachment', true, 'imap', 'message_list_type', 'after');
 
 /* message source page */
 setup_base_page('message_source', 'core', false);
@@ -365,6 +366,7 @@ return array(
         'imap_msg_uid' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_folder' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'sort' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'download_attachment' => FILTER_DEFAULT,
     ),
 
     'allowed_post' => array(

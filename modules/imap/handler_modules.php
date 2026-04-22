@@ -518,6 +518,54 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
 }
 
 /**
+ * Stream a file from the attachment directory to the browser (usually attachments found in MSTNEF messages)
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_download_attachment extends Hm_Handler_Module {
+    /**
+     * Download a file from the attachment directory
+     */
+    public function process() {
+        if (array_key_exists('download_attachment', $this->request->get) && $file = $this->request->get['download_attachment']) {
+            $server_id = $this->request->get['imap_server_id'];
+            $uid = $this->request->get['imap_msg_uid'];
+            $folder = $this->request->get['imap_folder'];
+            $msg_part = $this->request->get['imap_msg_part'];
+
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
+
+            if (! $mailbox || ! $mailbox->authed()) {
+                Hm_Msgs::add('An Error occurred trying to download the attachment', 'danger');
+                return;
+            }
+
+            list(,, $msg_text) = $mailbox->get_structured_message(hex2bin($folder), $uid, $msg_part, $this->user_config->get('text_only_setting', false), true);
+
+            $filepath = parse_mstnef([
+                'tnefBinary' => $msg_text,
+                'attachmentDir' => $this->config->get('attachment_dir'),
+                'msgUid' => $uid,
+                'msgPart' => $msg_part,
+                'imapServerId' => $server_id,
+                'folder' => $folder,
+                'returnFile' => $file
+            ]);
+
+            if (file_exists($filepath)) {
+                header('Content-Disposition: attachment; filename="' . basename($filepath) . '"');
+                header('Content-Type: application/octet-stream');
+                header('Content-Transfer-Encoding: binary');
+
+                unlink($filepath);
+
+                Hm_Functions::cease();
+            }
+            Hm_Msgs::add('An Error occurred trying to download the attachment', 'danger');
+        }
+    }
+}
+
+/**
  * Process the list_path input argument
  * @subpackage imap/handler
  */
@@ -2011,7 +2059,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 else {
                     $mailbox->set_read_only($prefetch);
                 }
-                list($msg_struct, $msg_struct_current, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($form['folder']), $form['imap_msg_uid'], $part, $this->user_config->get('text_only_setting', false));
+                list($msg_struct, $msg_struct_current, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($form['folder']), $form['imap_msg_uid'], $part, $this->user_config->get('text_only_setting', false), $this->config->get('enable_mstnef_viewer'));
                 $save_reply_text = false;
                 if ($part == 0 || (isset($msg_struct_current['type']) && mb_strtolower($msg_struct_current['type'] == 'text'))) {
                     $save_reply_text = true;
@@ -2028,7 +2076,24 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 $this->out('use_message_part_icons', $this->user_config->get('msg_part_icons_setting', false));
                 $this->out('simple_msg_part_view', $this->user_config->get('simple_msg_parts_setting', DEFAULT_SIMPLE_MSG_PARTS));
                 $this->out('allow_delete_attachment', $this->user_config->get('allow_delete_attachment_setting', false));
+                $this->out('enable_mstnef_viewer', $this->config->get('enable_mstnef_viewer', false));
+                
                 if ($msg_struct_current) {
+                    if ($msg_struct_current['type'] == 'application' && $msg_struct_current['subtype'] == 'ms-tnef') {
+                        $msg_text = parse_mstnef([
+                            'tnefBinary' => $msg_text,
+                            'attachmentDir' => $this->config->get('attachment_dir'),
+                            'msgUid' => $form['imap_msg_uid'],
+                            'msgPart' => $part,
+                            'imapServerId' => $form['imap_server_id'],
+                            'folder' => $form['folder'],
+                            'returnFile' => false
+                        ]);
+
+                        $msg_struct_current['type'] = 'text';
+                        $msg_struct_current['subtype'] = 'html';
+                    }
+
                     $this->out('msg_struct_current', $msg_struct_current);
                 }
                 $this->out('msg_text', $msg_text);

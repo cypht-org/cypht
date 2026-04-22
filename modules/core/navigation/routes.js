@@ -87,6 +87,9 @@ const routes = [
         handler: 'applyTagsPageHandlers'
     },
     {
+        page: 'save'
+    },
+    {
         page: 'logout',
         handler: 'applyLogoutPageHandlers',
         useLayout: false
@@ -96,8 +99,8 @@ const routes = [
 /* 
 Now let's validate and use handlers that are given.
 */
-const ROUTES = routes.filter(route => typeof(window[route.handler]) === 'function').map(route => ({
+const ROUTES = routes.filter(route => !route.handler || typeof(window[route.handler]) === 'function').map(route => ({
     ...route,
-    handler: window[route.handler],
+    handler: route.handler ? window[route.handler] : () => {},
     commonHandler: route.useLayout === false ? window.applyCommonUnwrappedPageHandlers : window.applyCommonWrappedPageHandlers
 }));

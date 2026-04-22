@@ -355,6 +355,16 @@ Hm_Modal.prototype = {
     init: function() {
         this.destroy();
 
+        // Remove any orphaned modal element with the same ID
+        var orphan = document.getElementById(this.opts.modalId);
+        if (orphan) {
+            var orphanBsModal = bootstrap.Modal.getInstance(orphan);
+            if (orphanBsModal) {
+                orphanBsModal.dispose();
+            }
+            orphan.remove();
+        }
+
         const modal = `
             <div id="${this.opts.modalId}" class="modal fade modal-${this.opts.size}" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog">
