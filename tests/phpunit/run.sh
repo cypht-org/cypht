@@ -27,8 +27,9 @@ if [ "$DB" = "sqlite" ]; then
 
     FILE=/tmp/test.db
 
-    export DB_CONNECTION_TYPE=socket
-    export DB_SOCKET=${FILE}
+    # DB_NAME is the file path for SQLite (used directly in the DSN: sqlite:<path>)
+    export DB_NAME=${FILE}
+    export DB_CONNECTION_TYPE=host
 
     cat ${SCRIPT_DIR}/data/schema_sqlite.sql | sqlite3 ${FILE}
     cat ${SCRIPT_DIR}/data/seed_sqlite.sql | sqlite3 ${FILE}
