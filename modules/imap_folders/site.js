@@ -1,5 +1,3 @@
-
-console.log('imap_folders/site.js loaded');
 'use strict';
 
 var folder_page_folder_list = function(container, title, link_class, target, id_dest, subscription = false) {
@@ -388,7 +386,7 @@ var render_folder_table = function(folders, tbody, server_id) {
             row += '</a></li>';
         });
         row += '<li><hr class="dropdown-divider"></li>';
-        row += '<li><a class="dropdown-item clear_special_btn" href="#"><i class="bi bi-x-circle me-2"></i>' + hm_trans('Clear role') + '</a></li>';
+        row += '<li><a class="dropdown-item clear_special_btn" href="#" data-type="' + (folder.special || '') + '"><i class="bi bi-x-circle me-2"></i>' + hm_trans('Clear role') + '</a></li>';
         row += '</ul></div>';
 
         row += '</div></td></tr>';
@@ -441,17 +439,42 @@ var bind_folder_table_actions = function(tbody, server_id) {
         e.preventDefault();
         var tr = $(this).closest('tr');
         var folderHex = tr.data('folder-hex');
+        var folderName = tr.data('folder-name');
+        var type = $(this).data('type');
         var block = tr.closest('.account_folder_block');
-        var currentBadge = tr.find('.badge-role');
-        if (currentBadge.length === 0) return;
-        var activeBtn = tr.find('.set_special_btn.active');
-        if (activeBtn.length === 0) return;
-        var type = activeBtn.data('type');
+        if (!type) return;
         var fullFolderName = 'imap_' + server_id + '_' + folderHex;
-        clear_special_folder(type, fullFolderName, function() {
+        show_clear_special_modal(server_id, fullFolderName, folderName, type, block);
+    });
+};
+
+var show_clear_special_modal = function(server_id, folderHex, folderName, type, block) {
+    var sf = get_special_folder(type);
+    var modal = new Hm_Modal({
+        modalId: 'clearSpecialFolderModal',
+        title: hm_trans('Clear Folder Role'),
+        btnSize: 'sm'
+    });
+
+    var roleLabel = sf ? sf.label : type;
+    var roleIcon = sf ? sf.icon : 'bi-x-circle';
+    var content = '<div class="d-flex align-items-start gap-3 mb-3">';
+    content += '<i class="bi ' + roleIcon + ' fs-2 text-secondary mt-1"></i>';
+    content += '<div>';
+    content += '<div class="fw-semibold fs-6">' + esc_html(folderName) + '</div>';
+    content += '<div class="text-muted small">' + hm_trans('will no longer be set as the') + ' <strong>' + esc_html(roleLabel) + '</strong> ' + hm_trans('folder') + '</div>';
+    content += '</div></div>';
+
+    modal.setContent(content);
+    modal.addFooterBtn(hm_trans('Clear role'), 'btn-warning', function() {
+        var btn = $(this);
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + hm_trans('Saving...'));
+        clear_special_folder(type, server_id, function() {
+            modal.hide();
             load_account_folders(server_id, block);
         });
     });
+    modal.open();
 };
 
 var show_assign_special_modal = function(server_id, folderHex, folderName, type, block) {
