@@ -66,7 +66,7 @@ class Hm_DB {
      */
     static public function build_dsn() {
         if (self::$config['db_driver'] == 'sqlite') {
-            return sprintf('%s:%s', self::$config['db_driver'], self::$config['db_socket']);
+            return sprintf('%s:%s', self::$config['db_driver'], self::$config['db_name']);
         }
         if (self::$config['db_conn_type'] == 'socket') {
             return sprintf('%s:unix_socket=%s;dbname=%s', self::$config['db_driver'], self::$config['db_socket'], self::$config['db_name']);
