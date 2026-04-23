@@ -352,7 +352,10 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
                 $this->out('sent_imap_id', $imap_id);
 
                 if ($this->user_config->get('review_sent_email_setting', false)) {
-                    $this->out('redirect_url', '?page=message&uid='.$uid.'&list_path=imap_'.$imap_id.'_'.bin2hex($sent_folder));
+                    $this->out('redirect_url', $this->build_page_url('message', array(
+                        'uid' => $uid,
+                        'list_path' => 'imap_'.$imap_id.'_'.bin2hex($sent_folder),
+                    )));
                 }
             }
         }
@@ -675,7 +678,9 @@ class Hm_Handler_imap_remove_attachment extends Hm_Handler_Module {
                 if ($mailbox && $mailbox->authed()) {
                     if ($mailbox->remove_attachment($folder, $uid, $this->request->get['imap_msg_part'])) {
                         Hm_Msgs::add('Attachment deleted');
-                        $this->out('redirect_url', '?page=message_list&list_path=' . $this->request->get['list_path']);
+                        $this->out('redirect_url', $this->build_page_url('message_list', array(
+                            'list_path' => $this->request->get['list_path'],
+                        )));
                         return;
                     }
                 }
@@ -1312,7 +1317,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
 
         $folderNotFoundError = false;
         if (!$special_folder && $action_type != 'read' && $action_type != 'unread' && $action_type != 'flag' && $action_type != 'unflag' && $action_type != 'restore') {
-            Hm_Msgs::add(sprintf('No %s folder configured for %s. Please go to <a href="?page=folders&imap_server_id=%s">Folders settings</a> and configure one', $action_type, $server_details['name'], $server_details['id']), empty($moved) ? 'danger' : 'warning');
+            Hm_Msgs::add(sprintf('No %s folder configured for %s. Please go to <a href="%s">Folders settings</a> and configure one', $action_type, $server_details['name'], $this->build_page_url('folders', array('imap_server_id' => $server_details['id']))), empty($moved) ? 'danger' : 'warning');
             $folderNotFoundError = true;
         }
 
@@ -1557,7 +1562,7 @@ class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
                     'port' => false,
                     'tls' => false));
                 if (isPageConfigured('save')) {
-                    Hm_Msgs::add("Added server!. To preserve these settings after logout, please go to <a class='alert-link' href='?page=save'>Save Settings</a>.");
+                    Hm_Msgs::add("Added server!. To preserve these settings after logout, please go to <a class='alert-link' href='".$this->build_page_url('save')."'>Save Settings</a>.");
                     $this->session->record_unsaved('JMAP server added');
                 } else {
                     Hm_Msgs::add('Added server!');
@@ -1720,7 +1725,7 @@ class Hm_Handler_save_ews_server extends Hm_Handler_Module {
                 $this->user_config->set('special_imap_folders', $specials);
             }
             if (isPageConfigured('save')) {
-                Hm_Msgs::add("EWS server saved. To preserve these settings after logout, please go to <a class='alert-link' href='?page=save'>Save Settings</a>.");
+                Hm_Msgs::add("EWS server saved. To preserve these settings after logout, please go to <a class='alert-link' href='".$this->build_page_url('save')."'>Save Settings</a>.");
                 $this->session->record_unsaved('EWS server added');
             } else {
                 Hm_Msgs::add('EWS server saved.');

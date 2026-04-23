@@ -145,7 +145,7 @@ class Hm_Output_pgp_settings_public_keys extends Hm_Output_Module {
         $res = '<div class="public_title settings_subtitle p-3 border-bottom cursor-pointer"><i class="bi bi-filetype-key me-3"></i> '.$this->trans('Public Keys');
         $res .= '<span class="key_count">'.sprintf($this->trans('%s imported'), count($this->get('pgp_public_keys', array()))).'</span></div>';
         $res .= '<div class="public_keys pgp_block col-lg-7 col-xl-4">';
-        $res .= '<form enctype="multipart/form-data" method="post" action="?page=pgp#public_keys" class="pgp_subblock col-lg-6"><div class="mb-2"><label class="form-label">'.$this->trans('Import a public key from a file').'</label><input required id="public_key" name="public_key" type="file" class="form-control"></div>';
+        $res .= '<form enctype="multipart/form-data" method="post" action="'.$this->build_page_url('pgp').'#public_keys" class="pgp_subblock col-lg-6"><div class="mb-2"><label class="form-label">'.$this->trans('Import a public key from a file').'</label><input required id="public_key" name="public_key" type="file" class="form-control"></div>';
         $res .= '<div class="mb-2"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         $res .= '<label class="form-label" for="public_email">For</label>';
         $res .= '<input required id="public_email" name="public_key_email" placeholder="'.$this->trans('E-mail Address');
@@ -156,7 +156,7 @@ class Hm_Output_pgp_settings_public_keys extends Hm_Output_Module {
         $res .= '</thead><tbody>';
         foreach ($this->get('pgp_public_keys', array()) as $index => $vals) {
             $res .= '<tr><td>'.$this->html_safe($vals['fingerprint']).'</td><td>'.$this->html_safe($vals['email']).'</td>';
-            $res .= '</td><td><form method="post" action="?page=pgp#public_keys">';
+            $res .= '</td><td><form method="post" action="'.$this->build_page_url('pgp').'#public_keys">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" value="'.$this->html_safe($index).'" name="delete_public_key_id" />'.
                 '<button type="submit" class="delete_pgp_key btn btn-light" title="'.$this->trans('Delete').'">';
@@ -209,7 +209,7 @@ class Hm_Output_pgp_msg_controls extends Hm_Output_Module {
  */
 class Hm_Output_pgp_settings_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_pgp"><a class="unread_link" href="?page=pgp">';
+        $res = '<li class="menu_pgp"><a class="unread_link" href="'.$this->build_page_url('pgp').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-lock-fill account_icon menu-icon"></i> ';
         }

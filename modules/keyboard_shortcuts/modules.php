@@ -62,7 +62,7 @@ class Hm_Handler_process_edit_shortcut extends Hm_Handler_Module {
             $this->session->record_unsaved('Shortcut updated');
             Hm_Msgs::add('Shortcut updated');
             $this->save_hm_msgs();
-            Hm_Dispatch::page_redirect('?page=shortcuts');
+            Hm_Dispatch::page_redirect($this->build_page_url('shortcuts'));
         }
     }
 }
@@ -136,7 +136,7 @@ class Hm_Output_shortcut_edit_form extends Hm_Output_Module {
         $codes = keycodes();
         $meta = array('none', 'shift', 'control', 'alt', 'meta');
         $res = '<div class="settings_subtitle p-3">'.$this->trans('Edit Shortcut').'</div>';
-        $res .= '<div class="edit_shortcut_form px-5"><form method="POST" action="?page=shortcuts&edit_id='.$this->html_safe($details['id']).'">';
+        $res .= '<div class="edit_shortcut_form px-5"><form method="POST" action="'.$this->build_page_url('shortcuts', array('edit_id' => $this->html_safe($details['id']))).'">';
         $res .= '<input type="hidden" name="shortcut_id" value="'.$this->html_safe($details['id']).'" />';
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         $res .= '<table>';
@@ -211,7 +211,7 @@ class Hm_Output_keyboard_shortcut_data extends Hm_Output_Module {
 class Hm_Output_shortcuts_page_link extends Hm_Output_Module {
     protected function output() {
         if ($this->get('shortcuts_enabled')) {
-            $res = '<li class="menu_shortcuts"><a class="unread_link" href="?page=shortcuts">';
+            $res = '<li class="menu_shortcuts"><a class="unread_link" href="'.$this->build_page_url('shortcuts').'">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-code-slash menu-icon"></i>';
             }
@@ -239,9 +239,9 @@ function format_shortcut_section($data, $type, $output_mod) {
             }
             $char = array_search($vals['char'], $codes);
             $res .= sprintf('<tr><th class="keys">%s %s</th><th>%s</th>'.
-                '<td><a href="?page=shortcuts&edit_id=%s"><i class="kbd_config cursor-pointer bi bi-gear-wide-connected fs-5"></i><a></td></tr>',
+                '<td><a href="%s"><i class="kbd_config cursor-pointer bi bi-gear-wide-connected fs-5"></i><a></td></tr>',
                 $output_mod->html_safe($c_keys), $output_mod->html_safe($char),
-                $output_mod->trans($vals['label']), $index);
+                $output_mod->trans($vals['label']), $output_mod->build_page_url('shortcuts', array('edit_id' => $index)));
         }
     }
     return $res;

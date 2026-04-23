@@ -331,7 +331,7 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
  */
 class Hm_Output_highlight_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_highlights"><a class="unread_link" href="?page=highlights">';
+        $res = '<li class="menu_highlights"><a class="unread_link" href="'.$this->build_page_url('highlights').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-highlighter me-2"></i>';
         }

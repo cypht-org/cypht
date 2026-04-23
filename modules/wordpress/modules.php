@@ -213,7 +213,7 @@ class Hm_Handler_process_wordpress_authorization extends Hm_Handler_Module {
                 Hm_Msgs::add('An Error Occurred', 'danger');
             }
             $this->save_hm_msgs();
-            Hm_Dispatch::page_redirect('?page=servers');
+            Hm_Dispatch::page_redirect($this->build_page_url('servers'));
         }
     }
 }
@@ -257,7 +257,7 @@ class Hm_Output_wordpress_folders extends Hm_Output_Module {
     protected function output() {
         $details = $this->get('wp_connect_details', array());
         if (!empty($details)) {
-            $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=message_list&list_path=wp_notifications">';
+            $res = '<li class="menu_wp_notifications"><a class="unread_link" href="'.$this->build_page_url('message_list', array('list_path' => 'wp_notifications')).'">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-caret-down-fill account_icon"></i> ';
             }
@@ -304,7 +304,10 @@ class Hm_Output_filter_wp_notification_data extends Hm_Output_Module {
             $row_class = 'wordpress notifications';
             if (array_key_exists('id', $vals)) {
                 $id = 'wordpress_0_'.$vals['id'];
-                $url = '?page=message&list_path=wp_notifications&uid='.$this->html_safe($id);;
+                $url = $this->build_page_url('message', array(
+                    'list_path' => 'wp_notifications',
+                    'uid' => $this->html_safe($id),
+                ));
                 if ($this->get('list_parent', '')) {
                     $url .= '&list_parent='.$this->html_safe($this->get('list_parent', ''));
                 }

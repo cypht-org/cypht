@@ -1003,7 +1003,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('<div class="content_title"></div><div class="msg_text">'), $res->output_response);
         $test->handler_response = array('list_parent' => 'sent');
         $res = $test->run();
-        $this->assertEquals(array('<div class="content_title"><a href="?page=message_list&amp;list_path=sent">Sent</a></div><div class="msg_text">'), $res->output_response);
+         $this->assertEquals(array('<div class="content_title"><a href="?page=message_list&amp;list_path=sent">Sent</a></div><div class="msg_text">'), $res->output_response);
         $test->handler_response = array('list_parent' => 'combined_inbox');
         $res = $test->run();
         $this->assertEquals(array('<div class="content_title"><a href="?page=message_list&amp;list_path=combined_inbox">Everything</a></div><div class="msg_text">'), $res->output_response);
@@ -1024,7 +1024,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('<input type="hidden" class="msg_uid" value="5" /><div class="content_title"><a href="?page=search&amp;list_path=search&amp;list_page=1&amp;sort=bar">Search</a><i class="bi bi-caret-right-fill path_delim"></i><a href="?page=message_list&amp;list_path=">search<i class="bi bi-caret-right-fill path_delim"></i>bar</a></div><div class="msg_text">'), $res->output_response);
         $test->handler_response = array('list_page' => 1, 'list_filter' => 'foo', 'list_sort' => 'bar', 'uid' => 5, 'mailbox_list_title' => array('foo', 'bar'));
         $res = $test->run();
-        $this->assertEquals(array('<input type="hidden" class="msg_uid" value="5" /><div class="content_title"><a href="?page=message_list&amp;list_path=&list_page=1&filter=foo&sort=bar">foo<i class="bi bi-caret-right-fill path_delim"></i>bar</a></div><div class="msg_text">'), $res->output_response);
+        $this->assertEquals(array('<input type="hidden" class="msg_uid" value="5" /><div class="content_title"><a href="?page=message_list&amp;list_path=&amp;list_page=1&amp;filter=foo&amp;sort=bar">foo<i class="bi bi-caret-right-fill path_delim"></i>bar</a></div><div class="msg_text">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

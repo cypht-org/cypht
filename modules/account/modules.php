@@ -133,7 +133,7 @@ class Hm_Output_create_account_link extends Hm_Output_Module {
             $res = '';
         }
         else {
-            $res = '<li class="menu_create_account"><a class="unread_link" href="?page=accounts">';
+            $res = '<li class="menu_create_account"><a class="unread_link" href="' . $this->build_page_url('accounts') . '">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-europe-africa account_icon"></i> ';
             }
@@ -152,7 +152,7 @@ class Hm_Output_create_account_link extends Hm_Output_Module {
 class Hm_Output_create_form extends Hm_Output_Module {
     protected function output() {
         if (!$this->get('internal_users') || !$this->get('is_admin', false)) {
-            Hm_Dispatch::page_redirect('?page=home');
+            Hm_Dispatch::page_redirect($this->build_page_url('home'));
         }
         return '<div class="content_title">'.$this->trans('Accounts').'</div>'.
             '<div class="settings_subtitle">'.$this->trans('Create Account').'</div>'.
@@ -183,7 +183,7 @@ class Hm_Output_user_list extends Hm_Output_Module {
             if ($count == 0) {
                 $res .= '<tr>';
             }
-            $res .= '<td><form class="delete_user_form" action="?page=accounts" method="POST">'.
+            $res .= '<td><form class="delete_user_form" action="'.$this->build_page_url('accounts').'" method="POST">'.
                 '<input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
                 '<input name="delete_username" type="hidden" value="'.
                 $this->html_safe($user['username']).'" /><input class="user_delete" type="submit" '.
@@ -210,7 +210,7 @@ class Hm_Output_user_list extends Hm_Output_Module {
 class Hm_Output_change_password_link extends Hm_Output_Module {
     protected function output() {
         if ($this->get('internal_users')) {
-            $res = '<li class="menu_change_password"><a class="unread_link" href="?page=change_password">';
+            $res = '<li class="menu_change_password"><a class="unread_link" href="'.$this->build_page_url('change_password').'">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-key-fill menu-icon"></i>';
             }

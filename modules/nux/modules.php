@@ -141,7 +141,7 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                         $this->session->record_unsaved('SMTP server added');
                     }
                     if (isPageConfigured('save')) {
-                        Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='?page=save'>Save Settings</a>.");
+                        Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='".$this->build_page_url('save')."'>Save Settings</a>.");
                     } else {
                         Hm_Msgs::add("E-mail account successfully added.");
                     }
@@ -162,7 +162,7 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                 Hm_Msgs::add('An Error Occurred', 'danger');
             }
             $this->save_hm_msgs();
-            Hm_Dispatch::page_redirect('?page=servers');
+            Hm_Dispatch::page_redirect($this->build_page_url('servers'));
         }
     }
 }
@@ -218,7 +218,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     $this->session->record_unsaved('IMAP server added');
                     $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
                     if (isPageConfigured('save')) {
-                        Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='?page=save'>Save Settings</a>.");
+                        Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='".$this->build_page_url('save')."'>Save Settings</a>.");
                     } else {
                         Hm_Msgs::add("E-mail account successfully added.");
                     }
@@ -489,7 +489,7 @@ class Hm_Output_quick_add_multiple_dialog extends Hm_Output_Module {
 
         return '<div class="quick_add_multiple_section">' .
             '<div class="row"><div class="col col-lg-6"><div class="form-floating mb-3">' .
-            '<form class="quick_add_multiple_server_form" action="?page=servers" method="POST" enctype="multipart/form-data">' .
+            '<form class="quick_add_multiple_server_form" action="'.$this->build_page_url('servers').'" method="POST" enctype="multipart/form-data">' .
             '<p class="mt-2">' . $notice . '</p>' .
             '<div class="server_form"><br />' .
             '<div class="row">' .
@@ -581,7 +581,7 @@ class Hm_Output_start_welcome_dialog extends Hm_Output_Module {
         }
         $res = '<div class="nux_welcome mt-3 col-lg-6 col-md-5 col-sm-12"><div class="card"><div class="card-body"><div class="card-title"><h4>'.$this->trans('Welcome to Cypht').'</h4></div>';
         $res .= '<div class="mb-3"><p>'.$this->trans('Add a popular E-mail source quickly and easily').'</p>';
-        $res .= '<a class="mt-3 btn btn-outline-secondary text-decoration-none" href="?page=servers#quick_add_section"><i class="bi bi-person-plus me-3"></i>'.$this->trans('Add an E-mail Account').'</a>';
+        $res .= '<a class="mt-3 btn btn-outline-secondary text-decoration-none" href="'.$this->build_page_url('servers').'#quick_add_section"><i class="bi bi-person-plus me-3"></i>'.$this->trans('Add an E-mail Account').'</a>';
         $res .= '</div>';
         return $res;
     }
@@ -613,11 +613,11 @@ class Hm_Output_end_welcome_dialog extends Hm_Output_Module {
             if ($proto == 'profiles') {
                 if ($server_data[$proto] === 0) {
                     $res .= sprintf($this->trans('You don\'t have any profile(s)'));
-                    $res .= sprintf(' <a href="?page=profiles">%s</a>', $proto, $this->trans('Add'));
+                    $res .= sprintf(' <a href="%s">%s</a>', $this->build_page_url('profiles'), $proto, $this->trans('Add'));
                 }
                 if ($server_data[$proto] > 0) {
                     $res .= sprintf($this->trans('You have %s profile(s)'), $server_data[$proto]);
-                    $res .= sprintf(' <a href="?page=profiles">%s</a>', $this->trans('Manage'));
+                    $res .= sprintf(' <a href="%s">%s</a>', $this->build_page_url('profiles'), $this->trans('Manage'));
                 }
                 $res .= '</li>';
                 continue;
@@ -629,7 +629,7 @@ class Hm_Output_end_welcome_dialog extends Hm_Output_Module {
             }
             elseif ($server_data[$proto] === 0) {
                 $res .= sprintf($this->trans('You don\'t have any %s sources'), mb_strtoupper($proto_dsp));
-                $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $section, $this->trans('Add'));
+                $res .= sprintf(' <a href="%s#%s_section">%s</a>', $this->build_page_url('servers'), $section, $this->trans('Add'));
             }
             else {
                 if ($server_data[$proto] > 1) {
@@ -638,7 +638,7 @@ class Hm_Output_end_welcome_dialog extends Hm_Output_Module {
                 else {
                     $res .= sprintf($this->trans('You have %d %s source'), $server_data[$proto], mb_strtoupper($proto_dsp));
                 }
-                $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $section, $this->trans('Manage'));
+                $res .= sprintf(' <a href="%s#%s_section">%s</a>', $this->build_page_url('servers'), $section, $this->trans('Manage'));
             }
             $res .= '</li>';
         }
@@ -650,7 +650,7 @@ class Hm_Output_end_welcome_dialog extends Hm_Output_Module {
         else {
             $res .= sprintf($this->trans('Your timezone is set to %s'), $this->html_safe($tz));
         }
-        $res .= ' <a href="?page=settings#general_setting">'.$this->trans('Update').'</a></div></div></div></div>';
+        $res .= ' <a href="'.$this->build_page_url('settings').'#general_setting">'.$this->trans('Update').'</a></div></div></div></div>';
         return $res;
     }
 }
@@ -662,7 +662,7 @@ class Hm_Output_nux_message_list_notice extends Hm_Output_Module {
     protected function output() {
         $msg = '<div class="nux_empty_combined_view">';
         $msg .= $this->trans('You don\'t have any data sources assigned to this page.');
-        $msg .= '<br /><a href="?page=servers">'.$this->trans('Add some').'</a>';
+        $msg .= '<br /><a href="'.$this->build_page_url('servers').'">'.$this->trans('Add some').'</a>';
         $msg .= '</div>';
         return $msg;
     }
