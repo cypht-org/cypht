@@ -59,7 +59,7 @@ $(document).on('click', '.cypht-layout a', function(event) {
         href.startsWith('https://') || 
         href.startsWith('//')
     ) && !href.includes(window.location.hostname);
-    
+
     if (href !== "#" && target !== '_blank' && !isExternal && !isExternalDomain) {
         event.preventDefault();
         const currentUrl = new URL(window.location.href);
