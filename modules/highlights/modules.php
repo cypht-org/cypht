@@ -28,8 +28,6 @@ class Hm_Handler_highlight_page_data extends Hm_Handler_Module {
         $feeds = false;
         $github = false;
 
-        $modules = $this->config->get_modules();
-
         if ($this->module_is_supported('imap')) {
             $imap = Hm_IMAP_List::dump(false);
         }
