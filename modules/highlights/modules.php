@@ -190,11 +190,13 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
         }
         else {
             $res .= '<div class="px-3"><table class="hl_rules table table-striped">'.
+                '<thead><tr>'.
                 '<th>'.$this->trans('Type').'</th>'.
                 '<th>'.$this->trans('Target').'</th>'.
                 '<th>'.$this->trans('Color').'</th>'.
                 '<th>'.$this->trans('Sources').'</th>'.
-                '<th>'.$this->trans('Flags').'</th><th>'.$this->trans('Force').'</th><th></th></tr>';
+                '<th>'.$this->trans('Flags').'</th><th>'.$this->trans('Force').'</th><th></th>'.
+                '</tr></thead>';
             foreach ($rules as $index => $rule) {
                 if ($rule['types']) {
                     $types = implode(' ', $rule['types']);
