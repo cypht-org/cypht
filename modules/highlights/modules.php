@@ -28,8 +28,6 @@ class Hm_Handler_highlight_page_data extends Hm_Handler_Module {
         $feeds = false;
         $github = false;
 
-        $modules = $this->config->get_modules();
-
         if ($this->module_is_supported('imap')) {
             $imap = Hm_IMAP_List::dump(false);
         }
@@ -137,18 +135,20 @@ class Hm_Output_highlight_css extends Hm_Output_Module {
                 }
             }
             foreach ($ids as $id) {
-                $css[] = sprintf('.message_table %s td {%s: %s !important;}',
+                $important = $rule['important'] ? ' !important' : '';
+                $css[] = sprintf('.message_table %s td {%s: %s%s;}',
                     $id,
-                    ($rule['target'] == 'text' ? 'color': 'background-color'),
-                    $rule['color'], ($rule['important'] ? '!important' : '')
+                    ($rule['target'] == 'text' ? 'color' : 'background-color'),
+                    $rule['color'],
+                    $important
                 );
                 if ($rule['target'] == 'text') {
-                    $css[] = sprintf('.message_table %s td a {color: %s !important;}',
-                        $id, $rule['color'], ($rule['important'] ? '!important' : ''));
+                    $css[] = sprintf('.message_table %s td a {color: %s%s;}',
+                        $id, $rule['color'], $important);
                 }
                 else {
-                    $css[] = sprintf('.message_table %s td div {background-color: %s !important;}',
-                        $id, $rule['color'], ($rule['important'] ? '!important' : ''));
+                    $css[] = sprintf('.message_table %s td div {background-color: %s%s;}',
+                        $id, $rule['color'], $important);
                 }
             }
         }
@@ -164,7 +164,10 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
     protected function output() {
         $rules = $this->get('highlight_rules', array());
         $sources = $this->get('highlight_sources', array());
-        $source_types = array('E-mail' => 'imap');
+        $source_types = array();
+        if ($sources['imap'] !== false) {
+            $source_types['E-mail'] = 'imap';
+        }
         if ($sources['feeds'] !== false) {
             $source_types['RSS'] = 'feeds';
         }
@@ -176,7 +179,7 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
             'Seen' => 'seen',
             'Flagged' => 'flagged',
             'Deleted' => 'deleted',
-            'Anwered' => 'answered'
+            'Answered' => 'answered'
         );
         $targets = array(
             'Text' => 'text',
@@ -189,11 +192,13 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
         }
         else {
             $res .= '<div class="px-3"><table class="hl_rules table table-striped">'.
+                '<thead><tr>'.
                 '<th>'.$this->trans('Type').'</th>'.
                 '<th>'.$this->trans('Target').'</th>'.
                 '<th>'.$this->trans('Color').'</th>'.
                 '<th>'.$this->trans('Sources').'</th>'.
-                '<th>'.$this->trans('Flags').'</th><th>'.$this->trans('Force').'</th><th></th></tr>';
+                '<th>'.$this->trans('Flags').'</th><th>'.$this->trans('Force').'</th><th></th>'.
+                '</tr></thead>';
             foreach ($rules as $index => $rule) {
                 if ($rule['types']) {
                     $types = implode(' ', $rule['types']);

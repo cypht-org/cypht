@@ -90,6 +90,10 @@ const routes = [
         page: 'save'
     },
     {
+        page: 'highlights',
+        handler: 'applyHighlightsPageHandlers'
+    },
+    {
         page: 'logout',
         handler: 'applyLogoutPageHandlers',
         useLayout: false
