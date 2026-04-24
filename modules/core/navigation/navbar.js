@@ -102,9 +102,7 @@ function updateNavbarDynamicContent() {
 }
 
 function toggleExpandableNavbarItems(collapsed) {
-    console.log('Toggling navbar items, collapsed:', collapsed);
     $(".cypht-layout nav .folder_list .src_name").each(function() {
-        console.log('Processing src_name element:', $(this).text().trim());
         const initial = $(`<div class="src_name_initial temp" role="button">${$(this).text().trim().charAt(0)}</div>`)
         if (collapsed) {
             $(this).after(initial);
