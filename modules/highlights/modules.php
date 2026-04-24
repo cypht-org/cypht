@@ -162,7 +162,10 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
     protected function output() {
         $rules = $this->get('highlight_rules', array());
         $sources = $this->get('highlight_sources', array());
-        $source_types = array('E-mail' => 'imap');
+        $source_types = array();
+        if ($sources['imap'] !== false) {
+            $source_types['E-mail'] = 'imap';
+        }
         if ($sources['feeds'] !== false) {
             $source_types['RSS'] = 'feeds';
         }
