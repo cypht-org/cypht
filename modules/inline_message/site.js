@@ -123,6 +123,8 @@ var update_imap_links = function(uid, details) {
 
 var capture_subject_click = function() {
     $(document).off('click', ".subject a");
+    // Mark subject links so the global SPA navigation handler skips them.
+    $('.subject a').addClass('no-navigation');
     $(document).on("click", ".subject a", function(e) {
         var msg_details = get_inline_msg_details(this);
         var uid = msg_details[0];
@@ -166,6 +168,9 @@ var capture_subject_click = function() {
 
 function inlineMessageMessageListAndSearchPageHandler(routeParams) {
     if (window.inline_msg && inline_msg()) {
+        // Mark subject links immediately (synchronously) so no clicks are
+        // intercepted by SPA navigation before capture_subject_click fires.
+        $('.subject a').addClass('no-navigation');
         setTimeout(capture_subject_click, 100);
         $('tr').removeClass('hl');
         Hm_Ajax.add_callback_hook('*', capture_subject_click);

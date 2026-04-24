@@ -53,7 +53,14 @@ $(document).on('click', '.cypht-layout a', function(event) {
         href.startsWith('https://') || 
         href.startsWith('//')
     ) && !href.includes(window.location.hostname);
-    
+
+    // Links marked with 'no-navigation' opt out of SPA navigation and are handled
+    // by their own module (e.g. inline_message). This is a reusable convention.
+    if ($(this).hasClass('no-navigation')) {
+        event.preventDefault();
+        return;
+    }
+
     if (href !== "#" && target !== '_blank' && !isExternal && !isExternalDomain) {
         event.preventDefault();
         const currentUrl = new URL(window.location.href);
