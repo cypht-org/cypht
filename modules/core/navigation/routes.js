@@ -90,7 +90,8 @@ const routes = [
         page: 'save'
     },
     {
-        page: 'highlights'
+        page: 'highlights',
+        handler: 'applyHighlightsPageHandlers'
     },
     {
         page: 'logout',
