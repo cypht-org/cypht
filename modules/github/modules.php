@@ -197,7 +197,7 @@ class Hm_Handler_process_github_authorization extends Hm_Handler_Module {
                 Hm_Msgs::add('An Error Occurred', 'danger');
             }
             $this->save_hm_msgs();
-            Hm_Dispatch::page_redirect('?page=servers');
+            Hm_Dispatch::page_redirect($this->build_page_url('servers'));
         }
     }
 
@@ -428,13 +428,13 @@ class Hm_Output_github_folders extends Hm_Output_Module {
     protected function output() {
         $details = $this->get('github_connect_details', array());
         if (!empty($details)) {
-            $res = '<li class="menu_github_all"><a class="unread_link" href="?page=message_list&list_path=github_all">';
+            $res = '<li class="menu_github_all"><a class="unread_link" href="'.$this->build_page_url('message_list', array('list_path' => 'github_all')).'">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-code-slash account_icon"></i> ';
             }
             $res .= $this->trans('All').'</a></li>';
             foreach ($this->get('github_repos', array()) as $repo) {
-                $res .= '<li class="menu_github_'.$this->html_safe($repo).'"><a class="unread_link" href="?page=message_list&list_path=github_'.$this->html_safe($repo).'">';
+                $res .= '<li class="menu_github_'.$this->html_safe($repo).'"><a class="unread_link" href="'.$this->build_page_url('message_list', array('list_path' => 'github_'.$this->html_safe($repo))).'">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-code-slash account_icon"></i> ';
                 }
@@ -485,7 +485,10 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
             $row_class = 'github';
             $id = 'github_'.$repo_id.'_'.$event['id'];
             $subject = build_github_subject($event, $this);
-            $url = '?page=message&uid='.$this->html_safe($id).'&list_path=github_'.$this->html_safe($repo);
+            $url = $this->build_page_url('message', array(
+                'uid' => $$this->html_safe($id),
+                'list_path' => 'github_'.$this->html_safe($repo),
+            ));
             if ($list_parent) {
                 $url .= '&list_parent='.$this->html_safe($list_parent);
             }

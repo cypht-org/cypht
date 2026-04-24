@@ -108,6 +108,7 @@ class Hm_Test_Auth extends TestCase {
         $this->assertFalse($auth->change_pass('nobody', 'nopass'));
 
         $this->config->set('db_pass', 'asdf');
+        $this->config->set('db_name', '/root/cantgetthere.db');
         $this->config->set('db_socket', '/root/cantgetthere.db');
         $this->config->set('db_connection_type', 'socket');
         $auth = new Hm_Auth_DB($this->config);

@@ -79,7 +79,7 @@ class Hm_Output_hello_world_home_page extends Hm_Output_Module {
          * the supplied string. It also sanitizes output. If you don't want to translate you
          * and just sanitize, use $this->html_safe().
          */
-        $output = '<div class="hw"><a href="?page=hello_world">'.$this->trans('hello world').'</a></div>';
+        $output = '<div class="hw"><a href="'.$this->build_page_url('hello_world').'">'.$this->trans('hello world').'</a></div>';
         return $output;
     }
 }

@@ -144,8 +144,8 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
                 }
             } else {
                 $attrs = 'id="main-link" data-id="imap_'.$id.'_'.$output_mod->html_safe($folder_name).
-                '" href="?page=message_list&amp;list_path='.
-                urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)).'"';
+                '" href="'.
+                $output_mod->build_page_url('message_list', array('list_path' => urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name))), true).'"';
             }
             if (mb_strlen($folder['basename'])>15) {
                 $results .= '<a ' . $attrs .
@@ -306,19 +306,24 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         if ($msg['folder'] && strtolower(hex2bin($msg['folder'])) != 'inbox') {
             $source .= '-'.preg_replace("/^INBOX.{1}/", '', hex2bin($msg['folder']));
         }
-        $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
+        $url_params = array(
+            'uid' => $msg['uid'],
+            'list_path' => sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']),
+            'list_parent' => $parent_value,
+        );
         if ($list_page) {
-            $url .= '&list_page='.$output_module->html_safe($list_page);
+            $url_params['list_page'] = $output_module->html_safe($list_page);
         }
         if ($list_sort) {
-            $url .= '&sort='.$output_module->html_safe($list_sort);
+            $url_params['sort'] = $output_module->html_safe($list_sort);
         }
         if ($list_filter) {
-            $url .= '&filter='.$output_module->html_safe($list_filter);
+            $url_params['filter'] = $output_module->html_safe($list_filter);
         }
         if ($list_keyword) {
-            $url .= '&keyword='.$output_module->html_safe($list_keyword);
+            $url_params['keyword'] = $output_module->html_safe($list_keyword);
         }
+        $url = $output_module->build_page_url('message', $url_params);
         if (!$show_icons) {
             $icon = false;
         }
@@ -1283,9 +1288,10 @@ function format_list_headers($mod) {
             $sources = array();
             $section = '<div><p class="mb-1">'.$mod->html_safe($name).':</p>';
             foreach ($vals['email'] as $v) {
-                $sources[] = '<a href="?page=compose&compose_to='.urlencode($mod->html_safe($v)).
-                    '&compose_from='.$mod->get('msg_headers')['Delivered-To'].
-                    '" class="text-decoration-none">'.$mod->trans('email').'</a>';
+                $sources[] = '<a href="'.$mod->build_page_url('compose', array(
+                    'compose_to' => urlencode($mod->html_safe($v)),
+                    'compose_from' => $mod->get('msg_headers')['Delivered-To'],
+                )).'" class="text-decoration-none">'.$mod->trans('email').'</a>';
             }
             foreach ($vals['links'] as $v) {
                 $sources[] = '<a href="'.$mod->html_safe($v).'" class="text-decoration-none">'.$mod->trans('link').'</a>';
@@ -1554,8 +1560,16 @@ if (!hm_exists('forward_dropdown')) {
         $txt = '<div class="dropdown d-inline-block">
                     <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" id="dropdownMenuForward" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Forward').'</button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuForward">';
-        $txt .= '<li><a href="?page=compose&amp;forward_as_attachment=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none" ><span>'.$output->trans('Forward as message attachment').'</a></li>';
-        $txt .= '<li><a href="?page=compose&amp;forward=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none"><span>'.$output->trans('Edit as new message').'</a></li>';
+        $txt .= '<li><a href="'.
+            $output->build_page_url('compose', array(
+                'forward_as_attachment' => 1
+            ), true).$reply_args.
+            '" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none" ><span>'.$output->trans('Forward as message attachment').'</a></li>';
+        $txt .= '<li><a href="'.
+            $output->build_page_url('compose', array(
+                'forward' => 1,
+            ), true).$reply_args.
+            '" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none"><span>'.$output->trans('Edit as new message').'</a></li>';
         $txt .= '</ul></div>';
         return $txt;
     }

@@ -702,6 +702,7 @@ class Hm_Handler_default_page_data extends Hm_Handler_Module {
         $this->out('encrypt_local_storage', $this->config->get('encrypt_local_storage', false));
         $this->out('default_timezone', $this->user_config->get('default_setting_timezone', 'UTC'));
         $this->out('enabled_modules', $this->config->get_modules());
+        $this->out('page_param_name', $this->config->get('page_param_name'));
         if (!crypt_state($this->config)) {
             $this->out('single_server_mode', true);
         }
@@ -1198,7 +1199,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 }
                 $this->out('just_saved_credentials', true);
                 if (isPageConfigured('save')) {
-                    Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='?page=save'>Save Settings</a>.");
+                    Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='".$this->build_page_url('save')."'>Save Settings</a>.");
                 } else {
                     Hm_Msgs::add("Server saved.");
                 }

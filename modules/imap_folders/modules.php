@@ -63,7 +63,7 @@ class Hm_Handler_add_folder_manage_link extends Hm_Handler_Module {
             $folder = $this->request->post['folder'];
         }
         if (($server || $server === 0) && !$folder) {
-            $this->out('imap_folder_manage_link', sprintf('?page=folders&imap_server_id=%s', $server));
+            $this->out('imap_folder_manage_link', $this->build_page_url('folders', array('imap_server_id' => $server)));
         }
     }
 }
@@ -279,7 +279,7 @@ class Hm_Handler_folders_server_id extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('imap_server_id', $this->request->get)) {
             $this->out('folder_server', $this->request->get['imap_server_id']);
-            $this->out('page', $this->request->get['page']);
+            $this->out('page', $this->request->get[$this->config->get('page_param_name')]);
             $this->out('trigger_default_submit', false);
         }
     }
@@ -415,7 +415,7 @@ class Hm_Output_folders_server_select extends Hm_Output_Module {
         $server_id = $this->get('folder_server', '');
         $data_auto_submit = !empty($this->get('trigger_default_submit')) ? ' data-auto-submit="1"' : 'data-auto-submit="0"';
         $res = '<div class="folders_page mt-4 row mb-4"><div class="col-xl-6 col-sm-12"><form id="form_folder_imap" method="get"'.$data_auto_submit.'>';
-        $res .= '<input type="hidden" name="page" value="'.$this->get('page', 'folders').'" />';
+        $res .= '<input type="hidden" name="'. $this->get("page_param_name") .'" value="'.$this->get('page', 'folders').'" />';
         $res .= '<div class="form-floating"><select class="form-select" id="imap_server_folder" name="imap_server_id">';
         $res .= '<option ';
         if (empty($server_id)) {
@@ -770,9 +770,8 @@ class Hm_Output_folders_folder_subscription_button extends Hm_Output_Module {
     protected function output() {
         if ($this->get('only_subscribed_folders_setting', 0)) {
             $server = $this->get('folder_server');
-            $results = '<div class="folder_subscription_btn"><a href="?page=folders_subscription';
-            $results .= !is_null($server)? '&imap_server_id='.$server: '';
-            $results .= '" title="'.$this->trans('Folders subscription').'"><i class="bi bi-gear-fill account_icon float-end"></i> ';
+            $url = $this->build_page_url('folders_subscription', !is_null($server) ? array('imap_server_id' => $server) : array());
+            $results = '<div class="folder_subscription_btn"><a href="'.$url.'" title="'.$this->trans('Folders subscription').'"><i class="bi bi-gear-fill account_icon float-end"></i> ';
             $results .= '</a></div>';
             return $results;
         }
@@ -879,7 +878,7 @@ class Hm_Output_folders_content_start extends Hm_Output_Module {
 class Hm_Output_folders_page_link extends Hm_Output_Module {
     protected function output() {
         if ($this->get('imap_support')) {
-            $res = '<li class="menu_folders"><a class="unread_link" href="?page=folders">';
+            $res = '<li class="menu_folders"><a class="unread_link" href="'.$this->build_page_url('folders').'">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-folder-fill menu-icon"></i>';
             }
