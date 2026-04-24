@@ -1548,7 +1548,7 @@ var Hm_Utils = {
         var prefix = window.location.pathname.length;
         for (i in sessionStorage) {
             i = i.substr(prefix);
-            if (i.match(/\..+(_setting|_section)/)) {
+            if (i.match(/\..+(_setting|_section)/) || i == 'navbar_collapsed') {
                 result[i] = Hm_Utils.get_from_local_storage(i);
             }
         }
