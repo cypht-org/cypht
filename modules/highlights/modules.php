@@ -176,7 +176,7 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
             'Seen' => 'seen',
             'Flagged' => 'flagged',
             'Deleted' => 'deleted',
-            'Anwered' => 'answered'
+            'Answered' => 'answered'
         );
         $targets = array(
             'Text' => 'text',
