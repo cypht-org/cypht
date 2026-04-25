@@ -182,6 +182,9 @@ class Hm_Handler_process_folder_create extends Hm_Handler_Module {
                 if ($form['folder'] && $mailbox->create_folder($form['folder'], $parent)) {
                     Hm_Msgs::add('Folder created');
                     $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_');
+                    if ($parent !== false) {
+                        $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_'.bin2hex($parent));
+                    }
                     $this->out('imap_folders_success', true);
                 }
                 else {
