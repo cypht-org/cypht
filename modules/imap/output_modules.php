@@ -367,25 +367,34 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
 
             $lc_headers = lc_headers($headers);
+            // Collect all recipients from To and Cc
+            $all_recipients = array();
             if (array_key_exists('to', $lc_headers)) {
-                $addr_list = process_address_fld($lc_headers['to']);
-                $size = count($addr_list);
+                $all_recipients = array_merge($all_recipients, process_address_fld($lc_headers['to']));
             }
             if (array_key_exists('cc', $lc_headers)) {
-                $addr_list = process_address_fld($lc_headers['cc']);
-                $size += count($addr_list);
+                $all_recipients = array_merge($all_recipients, process_address_fld($lc_headers['cc']));
             }
+            // Get current user email
+            $imap_server_id = null;
+            $server_user = null;
             if (array_key_exists('from', $lc_headers)) {
                 $imap_server_id = explode('_', $this->get('msg_list_path'))[1];
                 $server = Hm_IMAP_List::get($imap_server_id, false);
                 if ($server) {
-                    $addr_list = process_address_fld($lc_headers['from']);
-                    $addr_list = array_filter($addr_list, function ($addr) use($server) {
-                        return $addr['email'] != $server['user'];
-                    });
-                    $size += count($addr_list);
+                    $server_user = $server['user'];
                 }
             }
+            // Remove current user from recipients
+            $other_recipients = array();
+            foreach ($all_recipients as $addr) {
+                if (!$server_user || mb_strtolower($addr['email']) != mb_strtolower($server_user)) {
+                    $other_recipients[] = $addr['email'];
+                }
+            }
+            // Unique recipients
+            $other_recipients = array_unique($other_recipients);
+            $size = count($other_recipients);
 
             // Action links section
             $txt .= '<div class="event_calendar_section"></div>';
@@ -401,7 +410,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 $txt .= '<a class="reply_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="'.$this->build_page_url('compose', array(
                     'reply' => 1,
                 ), true).$reply_args.'">'.$this->trans('Reply').'</a>';
-                if ($size > 1) {
+                if ($size > 0) {
                     $txt .= '<a class="reply_all_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="'.$this->build_page_url('compose', array(
                         'reply_all' => 1,
                     ), true).$reply_args.'">'.$this->trans('Reply-all').'</a>';
