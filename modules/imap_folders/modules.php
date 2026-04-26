@@ -118,7 +118,12 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
         Hm_Msgs::add('Special folder assigned');
 
         $this->session->record_unsaved('Special folder assigned');
-        $this->out('imap_special_name', $new_folder);
+        if ($mailbox->is_imap()) {
+            $this->out('imap_special_name', $new_folder);
+        } else {
+            $status = $mailbox->get_folder_status($new_folder);
+            $this->out('imap_special_name', $status['name'] ?? $new_folder);
+        }
     }
 }
 
