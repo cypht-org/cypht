@@ -370,6 +370,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
 
         $tabIndex = 1;
         $contactGroups = [];
+        // exit(var_dump($contacts));
         if ($contacts) {
             foreach ($contacts->paginate_grouped('group', $current_page, $per_page) as $key => $contact) {
                 if (!array_key_exists($key, $contactGroups)) {
@@ -407,11 +408,19 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
             ['Personal Addresses', $personalAddressesContacts, 'personal-addresses', 'bi-person-badge-fill']
         ];
 
+        $defaultActiveId = 'collected-recipients';
+        foreach ($predefinedTabs as $tabData) {
+            if (array_sum(array_map('count', $tabData[1])) > 0) {
+                $defaultActiveId = $tabData[2];
+                break;
+            }
+        }
+
         $tabIndex = 1;
         foreach ($predefinedTabs as $tabData) {
             list($groupName, $groupContacts, $targetId, $iconClass) = $tabData;
-            
-            $activeClass = (strtolower($groupName) === 'collected recipients') ? ' active' : '';
+
+            $activeClass = ($targetId === $defaultActiveId) ? ' active' : '';
             
             $contactCount = array_sum(array_map('count', $groupContacts));
             
@@ -462,9 +471,9 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
         $res .= '<div class="col-12 px-0">';
 
         $contactGroupsToDisplay = [
-            'list-collected' => ['Collected Recipients', $collectedRecipientsContacts, 'collected-recipients', true],
-            'list-trusted-senders' => ['Trusted Senders', $trustedSendersContacts, 'trusted-senders', false],
-            'list-personal' => ['Personal Addresses', $personalAddressesContacts, 'personal-addresses', false]
+            'list-collected' => ['Collected Recipients', $collectedRecipientsContacts, 'collected-recipients', $defaultActiveId === 'collected-recipients'],
+            'list-trusted-senders' => ['Trusted Senders', $trustedSendersContacts, 'trusted-senders', $defaultActiveId === 'trusted-senders'],
+            'list-personal' => ['Personal Addresses', $personalAddressesContacts, 'personal-addresses', $defaultActiveId === 'personal-addresses']
         ];
 
         foreach ($contactGroupsToDisplay as $containerClass => $groupData) {
