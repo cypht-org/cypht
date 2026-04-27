@@ -1,5 +1,4 @@
 <?php
-
 return [
     /*
     |
@@ -651,7 +650,7 @@ return [
     | Handles page layout, login/logout, and the default settings pages. This set
     | is required.
     */
-    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags')),
+    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags,brute_force')),
     // 'modules' => [
     //     /*
     //     |  ----
@@ -972,6 +971,16 @@ return [
     //     |
     //     */
     //     // 'hello_world',
+
+    //     /*
+    //     | -------------------------
+    //     | Brute Force Protection
+    //     | -------------------------
+    //     |
+    //     | Tracks failed login attempts per IP and per username. Locks out the
+    //     | source IP and targeted account after too many failures.
+    //     */
+    //     'brute_force',
     // ],
 
     /*
@@ -980,6 +989,22 @@ return [
     | ----------
     */
     // 'api_login_key' => env('API_LOGIN_KEY'),
+
+    /*
+    | -----------------------------------------------------------------------------
+    | Brute Force Login Protection
+    | -----------------------------------------------------------------------------
+    |
+    | These settings control the brute_force module set. The module tracks failed
+    | login attempts by IP address and username. After brute_force_max_attempts
+    | consecutive failures the source IP and/or the targeted account are locked
+    | out for brute_force_lockout_duration seconds.
+    |
+    | brute_force_max_attempts     – failures before lockout (default: 5)
+    | brute_force_lockout_duration – lockout length in seconds (default: 900 = 15 min)
+    */
+    'brute_force_max_attempts'     => env('BRUTE_FORCE_MAX_ATTEMPTS', 5),
+    'brute_force_lockout_duration' => env('BRUTE_FORCE_LOCKOUT_DURATION', 900),
 
     /*
     | -----------------------------------------------------------------------------
@@ -1375,6 +1400,6 @@ return [
     'js_exclude_deps' => env('JS_EXCLUDE_DEPS', ''),
 
     'page_param_name' => env('PAGE_PARAM_NAME', 'page'),
-  
+
     'enable_mstnef_viewer' => env('ENABLE_MSTNEF_VIEWER', false),
 ];
