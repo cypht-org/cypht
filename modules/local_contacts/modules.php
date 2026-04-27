@@ -379,15 +379,3 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
         return $res;
     }
 }
-
-/**
- * @subpackage import_local_contacts/output
- * This class is now deprecated as CSV import is integrated into Hm_Output_contacts_form
- */
-class Hm_Output_import_contacts_form extends Hm_Output_Module {
-    protected function output() {
-        // This output module is no longer needed as CSV import is now part of the main contact modal
-        // Keeping it for backward compatibility but it outputs nothing
-        return '';
-    }
-}
