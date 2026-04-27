@@ -581,6 +581,9 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                         
                         if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
                             $delete_attrs = 'data-id="'.$this->html_safe($c->value('id')).'" data-type="'.$this->html_safe($c->value('type')).'" data-source="'.$this->html_safe($c->value('source')).'"';
+                            if ($c->value('type') === 'ldap' && class_exists('Hm_LDAP_Contact')) {
+                                $delete_attrs .= Hm_LDAP_Contact::generateDeleteAttributes($c, array($this, 'html_safe'));
+                            }
                             $res .= '<a '.$delete_attrs.' class="action-btn action-btn-delete delete_contact" title="Supprimer">';
                             $res .= '<i class="bi bi-trash-fill"></i>';
                             $res .= '</a>';

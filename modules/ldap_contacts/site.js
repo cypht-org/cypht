@@ -18,7 +18,7 @@ var delete_ldap_contact = function(id, source, type, ldap_dn) {
         request_data,
         function(res) {
             if (res.contact_deleted && res.contact_deleted === 1) {
-                $('.contact_row_'+id).remove();
+                window.location.reload();
             }
         }
     );
