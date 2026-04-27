@@ -229,6 +229,41 @@ class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
 /**
  * @subpackage ldap_contacts/handler
  */
+class Hm_Handler_process_update_ldap_server_ajax extends Hm_Handler_Module {
+    public function process() {
+        if ($this->get('ldap_action') != 'update') {
+            return;
+        }
+        $entry = $this->get('ldap_entry_data', array());
+        if (!is_array($entry) || count($entry) == 0) {
+            return;
+        }
+        $dn = isset($this->request->post['ldap_dn']) && !empty($this->request->post['ldap_dn'])
+            ? $this->request->post['ldap_dn']
+            : $this->get('entry_dn');
+        if (empty($dn)) {
+            Hm_Msgs::add('Missing contact DN for update', 'danger');
+            return;
+        }
+        $config = $this->get('ldap_config');
+        $ldap = new Hm_LDAP_Contacts($config);
+        if ($ldap->connect()) {
+            if ($ldap->modify($entry, $dn)) {
+                Hm_Msgs::add('Contact Updated');
+                $this->out('contact_updated', 1);
+            }
+            else {
+                Hm_Msgs::add('Unable to update contact', 'danger');
+            }
+        } else {
+            Hm_Msgs::add('Unable to connect to LDAP server', 'danger');
+        }
+    }
+}
+
+/**
+ * @subpackage ldap_contacts/handler
+ */
 class Hm_Handler_process_update_ldap_server extends Hm_Handler_Module {
     public function process() {
         if ($this->get('ldap_action') != 'update') {
@@ -275,6 +310,7 @@ class Hm_Handler_process_add_to_ldap_server extends Hm_Handler_Module {
         if ($ldap->connect()) {
             if ($ldap->add($entry, $dn)) {
                 Hm_Msgs::add('Contact Added');
+                $this->out('contact_added', 1);
             }
             else {
                 Hm_Msgs::add('Could not add contact, eror: '.$ldap->error(), 'danger');
@@ -860,6 +896,7 @@ class Hm_Output_ldap_form_dn_display extends Hm_Output_Module {
         $res = '<div class="col-md-12 mb-3">';
         $res .= '<label for="ldap_dn_display" class="form-label">' . $this->trans('Distinguished Name') . ' (' . $this->trans('Read Only') . ')</label>';
         $res .= '<input type="text" id="ldap_dn_display" class="form-control" value="' . $this->html_safe($dn) . '" readonly />';
+        $res .= '<input type="hidden" name="ldap_dn" value="' . $this->html_safe($dn) . '" />';
         $res .= '</div>';
         return $res;
     }
@@ -1234,6 +1271,7 @@ function fetch_ldap_contacts($config, $user_config, $contact_store, $session=fal
                 $vals['name'] = $name;
             }
             $ldap = new Hm_LDAP_Contacts($vals);
+
             if ($ldap->connect()) {
                 $contacts = $ldap->fetch();
                 if (count($contacts) > 0) {
