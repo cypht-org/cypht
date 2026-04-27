@@ -110,21 +110,8 @@ $(function() {
         });
     }
 
-    var clearLdapFormErrors = function() {
-        $('#ldap-contact-form .is-invalid').removeClass('is-invalid');
-        $('#ldap-contact-form .invalid-feedback').remove();
-    };
-
-    var showLdapFieldError = function(fieldId, message) {
-        var $field = $('#' + fieldId);
-        $field.addClass('is-invalid');
-        if ($field.next('.invalid-feedback').length === 0) {
-            $field.after('<div class="invalid-feedback">' + message + '</div>');
-        }
-    };
-
     var validateLdapForm = function() {
-        clearLdapFormErrors();
+        hm_clear_form_errors('#ldap-contact-form');
         var valid = true;
 
         var firstName = ($('#ldap_first_name').val() || '').trim();
@@ -141,46 +128,46 @@ $(function() {
         var urlPattern   = /^https?:\/\/.+\..+/;
 
         if (!firstName) {
-            showLdapFieldError('ldap_first_name', 'First name is required.');
+            hm_show_field_error('ldap_first_name', 'First name is required.');
             valid = false;
         } else if (!namePattern.test(firstName)) {
-            showLdapFieldError('ldap_first_name', 'First name must be 2–50 characters and contain only letters, spaces, hyphens, or apostrophes.');
+            hm_show_field_error('ldap_first_name', 'First name must be 2–50 characters and contain only letters, spaces, hyphens, or apostrophes.');
             valid = false;
         }
 
         if (!lastName) {
-            showLdapFieldError('ldap_last_name', 'Last name is required.');
+            hm_show_field_error('ldap_last_name', 'Last name is required.');
             valid = false;
         } else if (!namePattern.test(lastName)) {
-            showLdapFieldError('ldap_last_name', 'Last name must be 2–50 characters and contain only letters, spaces, hyphens, or apostrophes.');
+            hm_show_field_error('ldap_last_name', 'Last name must be 2–50 characters and contain only letters, spaces, hyphens, or apostrophes.');
             valid = false;
         }
 
         if (!email) {
-            showLdapFieldError('ldap_mail', 'Email address is required.');
+            hm_show_field_error('ldap_mail', 'Email address is required.');
             valid = false;
         } else if (!emailPattern.test(email)) {
-            showLdapFieldError('ldap_mail', 'Please enter a valid email address (e.g. user@example.com).');
+            hm_show_field_error('ldap_mail', 'Please enter a valid email address (e.g. user@example.com).');
             valid = false;
         }
 
         if (phone && !phonePattern.test(phone)) {
-            showLdapFieldError('ldap_phone', 'Please enter a valid phone number (e.g. +1 555 123 4567).');
+            hm_show_field_error('ldap_phone', 'Please enter a valid phone number (e.g. +1 555 123 4567).');
             valid = false;
         }
 
         if (mobile && !phonePattern.test(mobile)) {
-            showLdapFieldError('ldap_mobile', 'Please enter a valid mobile number (e.g. +1 555 123 4567).');
+            hm_show_field_error('ldap_mobile', 'Please enter a valid mobile number (e.g. +1 555 123 4567).');
             valid = false;
         }
 
         if (fax && !phonePattern.test(fax)) {
-            showLdapFieldError('ldap_fax', 'Please enter a valid fax number (e.g. +1 555 123 4567).');
+            hm_show_field_error('ldap_fax', 'Please enter a valid fax number (e.g. +1 555 123 4567).');
             valid = false;
         }
 
         if (website && !urlPattern.test(website)) {
-            showLdapFieldError('ldap_uri', 'Please enter a valid URL starting with http:// or https://.');
+            hm_show_field_error('ldap_uri', 'Please enter a valid URL starting with http:// or https://.');
             valid = false;
         }
 
@@ -257,7 +244,7 @@ $(function() {
         });
 
         $('#ldapContactModal').on('hidden.bs.modal', function() {
-            clearLdapFormErrors();
+            hm_clear_form_errors('#ldap-contact-form');
             isLdapSubmitting = false;
             var form = document.getElementById('ldap-contact-form');
             if (form) {
