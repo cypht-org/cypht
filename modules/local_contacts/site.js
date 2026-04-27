@@ -2,6 +2,42 @@
 
 var isSubmitting = false;
 
+var validateLocalForm = function() {
+    hm_clear_form_errors('#manual-contact-form');
+    var valid = true;
+
+    var name  = ($('#contact_name').val() || '').trim();
+    var email = ($('#contact_email').val() || '').trim();
+    var phone = ($('#contact_phone').val() || '').trim();
+
+    var namePattern  = /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,100}$/;
+    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    var phonePattern = /^\+?[\d\s\-().]{7,20}$/;
+
+    if (!name) {
+        hm_show_field_error('contact_name', 'Name is required.');
+        valid = false;
+    } else if (!namePattern.test(name)) {
+        hm_show_field_error('contact_name', 'Name must be 2–100 characters and contain only letters, spaces, hyphens, or apostrophes.');
+        valid = false;
+    }
+
+    if (!email) {
+        hm_show_field_error('contact_email', 'Email address is required.');
+        valid = false;
+    } else if (!emailPattern.test(email)) {
+        hm_show_field_error('contact_email', 'Please enter a valid email address (e.g. user@example.com).');
+        valid = false;
+    }
+
+    if (phone && !phonePattern.test(phone)) {
+        hm_show_field_error('contact_phone', 'Please enter a valid phone number (e.g. +1 555 123 4567).');
+        valid = false;
+    }
+
+    return valid;
+};
+
 var initLocalContactModal = function() {
     // Remove existing event handlers to avoid duplicates
     $('#manual-entry-btn').off('click');
@@ -37,17 +73,15 @@ var initLocalContactModal = function() {
         var isEdit = contactId && contactId.length > 0;
         
         if ($('#manual-entry-btn').hasClass('active') || isEdit) {
-            var name = $('#contact_name').val();
-            var email = $('#contact_email').val();
-            var phone = $('#contact_phone').val();
-            var category = $('#contact_group').val();
-            
-            if (!name || !email) {
-                //TODO: Use better error display
-                alert('Please fill in the required fields (Name and Email)');
+            if (!validateLocalForm()) {
                 return;
             }
-            
+
+            var name = ($('#contact_name').val() || '').trim();
+            var email = ($('#contact_email').val() || '').trim();
+            var phone = ($('#contact_phone').val() || '').trim();
+            var category = $('#contact_group').val();
+
             isSubmitting = true;
             var buttonText = isEdit ? 'Updating...' : 'Adding...';
             $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> ' + buttonText);
@@ -120,7 +154,13 @@ var initLocalContactModal = function() {
         }
     });
 
+    $('#manual-contact-form').on('input change', '.is-invalid', function() {
+        $(this).removeClass('is-invalid');
+        $(this).next('.invalid-feedback').remove();
+    });
+
     $('#localContactModal').on('hidden.bs.modal', function() {
+        hm_clear_form_errors('#manual-contact-form');
         isSubmitting = false;
         $('#manual-contact-form')[0].reset();
         $('#manual-entry-btn').addClass('active');
