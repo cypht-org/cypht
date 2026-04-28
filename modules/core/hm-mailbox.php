@@ -643,6 +643,13 @@ class Hm_Mailbox {
         return false;
     }
 
+    public function is_inplace_archive_enabled() {
+        if ($this->type === self::TYPE_EWS && $this->connection) {
+            return $this->connection->is_inplace_archive_enabled();
+        }
+        return null;
+    }
+
     public function get_config() {
         return $this->config;
     }
