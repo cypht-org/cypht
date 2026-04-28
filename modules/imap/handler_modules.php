@@ -1045,7 +1045,11 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
         if ($mailbox && ! $mailbox->is_imap()) {
-            // EWS supports archiving to user archive folders
+            if (!$mailbox->is_inplace_archive_enabled()) {
+                Hm_Msgs::add('In-Place Archive is not enabled for this Exchange account. Please contact your administrator.', 'danger');
+                $this->save_hm_msgs();
+                return;
+            }
             $status = $mailbox->message_action($form_folder, 'ARCHIVE', array($form['imap_msg_uid']))['status'];
         } else {
             if (!$archive_folder) {
@@ -2072,6 +2076,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 $msg_headers = $mailbox->get_message_headers(hex2bin($form['folder']), $form['imap_msg_uid']);
 
                 $this->out('is_archive_folder', $mailbox->is_archive_folder($form['imap_server_id'], $this->user_config, $form['folder']));
+                $this->out('ews_inplace_archive_enabled', $mailbox->is_inplace_archive_enabled());
                 $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_state()));
                 $this->out('msg_struct', $msg_struct);
                 $this->out('list_headers', get_list_headers($msg_headers));
