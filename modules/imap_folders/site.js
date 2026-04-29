@@ -10,23 +10,19 @@ var folder_page_folder_list = function(container, title, link_class, target, id_
     folder_location.prepend(folders);
     folder_location.show();
 
-    // 1. Get the <a> element
     const link = document.querySelector('.'+link_class);
-    // 2. Save the <i> element
     const original_icon = link.querySelector('i');
     const original_icon_clone = original_icon.cloneNode(true);
-    // 3. Create the spinner
     const spinner = document.createElement('div');
     spinner.className = 'spinner-border text-info spinner-border-sm';
     spinner.setAttribute('role', 'status');
     spinner.setAttribute('id', 'imap-spinner');
     spinner.innerHTML = '<span class="sr-only"></span>';
-    // 4. Replace the icon with the spinner
     if (original_icon.parentNode === link) {
         link.replaceChild(spinner, original_icon);
     }
- 
-    var child_link_target =  folder_location.find('a.'+link_class).data('target')
+
+    var child_link_target = folder_location.find('a.'+link_class).data('target');
     $('.' + link_class, folder_location).on("click", function () { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest, subscription); });
     $('a', folder_location).not('.'+link_class).not('.close').off('click');
     $('a', folder_location).not('.'+link_class).not('.close').on("click", function() { set_folders_page_value($(this).data('id'), container, target, id_dest); return false; });
@@ -41,7 +37,7 @@ var folder_page_folder_list = function(container, title, link_class, target, id_
     return false;
 };
 
-var expand_folders_page_list = function(path, container, link_class, target, id_dest, lsub, original_icon = null, parent_icon_link = null) {
+var expand_folders_page_list = function(path, container, link_class, target, id_dest, lsub, original_icon, parent_icon_link) {
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.'+container));
     if ($('li', list).length === 0) {
@@ -68,13 +64,10 @@ var expand_folders_page_list = function(path, container, link_class, target, id_
                             $('.folder_subscription').on("change", function() { folder_subscribe(this.id, $('#'+this.id).is(':checked')); return false; });
                         }
                     }
-                    if(original_icon != null) {
-                        // 5. Restore the icon by removing the spinner element
+                    if(original_icon != null && parent_icon_link != null) {
                         const spinner_element = document.getElementById('imap-spinner');
                         if (spinner_element && spinner_element.parentNode === parent_icon_link) {
-                            if(parent_icon_link != null) {
-                                parent_icon_link.replaceChild(original_icon, spinner_element);
-                            }
+                            parent_icon_link.replaceChild(original_icon, spinner_element);
                         }
                     }
                 }
@@ -105,163 +98,12 @@ var set_folders_page_value = function(id, container, target, id_dest) {
         } else {
             $('#children_number').val(0);
         }
-        
     }
     list.hide();
-
 };
 
-var folder_page_delete = function() {
-    var children_number = parseInt($('#children_number').val());
-    var val = $('#delete_source').val();
-    var id = $('#imap_server_folder').val();
-    if (!id.length) {
-        Hm_Notices.show($('#server_error').val(), 'danger');
-        return;
-    }
-    if (!val.length) {
-        Hm_Notices.show($('#delete_folder_error').val(), 'danger');
-        return;
-    }
-
-    let message = "";
-    if (children_number) {
-        message = `<p>${hm_trans('This folder contains '+ children_number +' sub-folders.')}</p>`;
-    }
-
-    const modal = new Hm_Modal({
-        modalId: 'emptySubjectBodyModal',
-        title: hm_trans("Deletion confirmation"),
-        btnSize: 'sm'
-    });
-
-    modal.addFooterBtn(hm_trans('Delete anyway'), 'btn-warning', handleDeleteFolder);
-    modal.setContent(message + $('#delete_folder_confirm').val());
-    modal.open();
-    function handleDeleteFolder() {
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_delete'},
-            {'name': 'imap_server_id', value: id},
-            {'name': 'folder', 'value': val}],
-            function(res) {
-                if (res.imap_folders_success) {
-                    $('#delete_source').val('');
-                    $('.selected_delete').html('');
-                    Hm_Folders.reload_folders(true);
-                }
-            }
-        );
-        modal.hide();
-    };
-};
-
-var folder_page_rename = function() {
-    var val = $('#rename_value').val();
-    var par = $('#rename_parent_source').val().trim();
-    var folder = $('#rename_source').val().trim();
-    var notices = [];
-    var id = $('#imap_server_folder').val();
-    if (!id.length) {
-        Hm_Notices.show($('#server_error').val(), 'danger');
-        return;
-    }
-    if (!val.length) {
-        notices.push($('#rename_folder_error').val());
-    }
-    if (!folder.length) {
-        notices.push($('#folder_name_error').val());
-    }
-    if (notices.length) {
-        notices.forEach((msg) => {
-            Hm_Notices.show(msg, 'danger');
-        });
-        return;
-    }
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_rename'},
-        {'name': 'imap_server_id', value: id},
-        {'name': 'folder', 'value': folder},
-        {'name': 'parent', 'value': par},
-        {'name': 'new_folder', 'value': val}],
-        function(res) {
-            if (res.imap_folders_success) {
-                $('#rename_value').val('');
-                $('#rename_source').val('');
-                $('#rename_parent_source').val('');
-                $('.selected_rename').html('');
-                $('.selected_rename_parent').html('');
-                Hm_Folders.reload_folders(true);
-            }
-        }
-    );
-};
-
-
-var folder_page_assign_trash = function() {
-    var id = $('#imap_server_folder').val();
-    var folder = $('#trash_source').val();
-    if (id && folder) {
-        assign_special_folder(id, folder, 'trash', function(res) {
-            $('#trash_val').text(res.imap_special_name);
-            $('.selected_trash').text('');
-        });
-    }
-};
-
-var folder_page_assign_sent = function() {
-    var id = $('#imap_server_folder').val();
-    var folder = $('#sent_source').val();
-    if (id && folder) {
-        assign_special_folder(id, folder, 'sent', function(res) {
-            $('#sent_val').text(res.imap_special_name);
-            $('.selected_sent').text('');
-        });
-    }
-};
-
-var folder_page_assign_archive = function() {
-    var id = $('#imap_server_folder').val();
-    var folder = $('#archive_source').val();
-    if (id && folder) {
-        assign_special_folder(id, folder, 'archive', function(res) {
-            $('#archive_val').text(res.imap_special_name);
-            $('.selected_archive').text('');
-        });
-    }
-};
-
-var folder_page_assign_draft = function() {
-    var id = $('#imap_server_folder').val();
-    var folder = $('#draft_source').val();
-    if (id && folder) {
-        assign_special_folder(id, folder, 'draft', function(res) {
-            $('#draft_val').text(res.imap_special_name);
-            $('.selected_draft').text('');
-        });
-    }
-};
-
-var folder_page_assign_junk = function() {
-    var id = $('#imap_server_folder').val();
-    var folder = $('#junk_source').val();
-    if (id && folder) {
-        assign_special_folder(id, folder, 'junk', function(res) {
-            $('#junk_val').text(res.imap_special_name);
-            $('.selected_junk').text('');
-        });
-    }
-};
-
-var clear_special_folder = function(type) {
-    var id = $('#imap_server_folder').val();
-    if (id) {
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_clear_special_folder'},
-            {'name': 'imap_server_id', 'value': id},
-            {'name': 'special_folder_type', 'value': type}],
-            function(res) { $('#'+type+'_val').text($('#not_set_string').val()); }
-        );
-    }
+var esc_html = function(str) {
+    return $('<div>').text(str).html();
 };
 
 var assign_special_folder = function(id, folder, type, callback) {
@@ -270,6 +112,15 @@ var assign_special_folder = function(id, folder, type, callback) {
         {'name': 'imap_server_id', 'value': id},
         {'name': 'special_folder_type', 'value': type},
         {'name': 'folder', 'value': folder}],
+        callback
+    );
+};
+
+var clear_special_folder = function(type, server_id, callback) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_clear_special_folder'},
+        {'name': 'imap_server_id', 'value': server_id},
+        {'name': 'special_folder_type', 'value': type}],
         callback
     );
 };
@@ -291,57 +142,526 @@ var folder_subscribe = function(name, state) {
     );
 };
 
-var folder_page_create = function() {
-    var par = $('#create_parent').val();
-    var folder = $('#create_value').val().trim();
-    var id = $('#imap_server_folder').val();
-    if (!id.length) {
-        Hm_Notices.show($('#server_error').val());
-        return;
-    }
-    if (!folder.length) {
-        Hm_Notices.show($('#folder_name_error').val());
-        return;
-    }
+/* ===== New Account-based Folders Page ===== */
+
+var load_account_folders = function(server_id, block) {
+    console.log('load_account_folders called for', server_id, block);
+    var spinner = block.find('.folder_loading_spinner');
+    var table = block.find('.folder_table');
+    var tbody = block.find('.folder_table_body');
+    var badge = block.find('.folder-count-badge');
+
+    tbody.empty();
+    table.hide();
+    var loadingRow = $('<tr class="loading-folders-row"><td colspan="3" class="text-center py-4">'
+        + '<div class="spinner-border text-info me-2" role="status"></div>'
+        + '<span>' + hm_trans('Loading folders...') + '</span>'
+        + '</td></tr>');
+    tbody.append(loadingRow);
+    table.show();
+    spinner.show();
+
     Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_create'},
-        {'name': 'imap_server_id', value: id},
-        {'name': 'folder', 'value': folder},
-        {'name': 'parent', 'value': par}],
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_list_all'},
+        {'name': 'imap_server_id', 'value': server_id}],
         function(res) {
-            if (res.imap_folders_success) {
-                $('#create_value').val('');
-                $('#create_parent').val('');
-                $('.selected_parent').html('');
-                Hm_Folders.reload_folders(true);
+            spinner.hide();
+            tbody.find('.loading-folders-row').remove();
+            if (res.imap_folder_list_all) {
+                var folders = JSON.parse(res.imap_folder_list_all);
+                badge.text(folders.length + ' folders').show();
+                if (folders.length === 0) {
+                    var noneRow = $('<tr class="no-folders-row"><td colspan="3" class="text-center py-5 text-muted">'
+                        + '<i class="bi bi-folder2-open fs-2 d-block mb-2"></i>'
+                        + '<div class="fw-semibold">' + hm_trans('No folders found') + '</div>'
+                        + '<div class="small">' + hm_trans('This account has no folders yet. Use the Create button to add one.') + '</div>'
+                        + '</td></tr>');
+                    tbody.append(noneRow);
+                } else {
+                    render_folder_table(folders, tbody, server_id);
+                }
+                table.show();
+            } else {
+                var errorRow = $('<tr class="no-folders-row"><td colspan="3" class="text-center py-5">'
+                    + '<i class="bi bi-exclamation-triangle fs-2 d-block mb-2 text-warning"></i>'
+                    + '<div class="fw-semibold">' + hm_trans('Could not load folders') + '</div>'
+                    + '<div class="small text-muted">' + hm_trans('There was a problem connecting to this account. Please check your connection and try again.') + '</div>'
+                    + '<button class="btn btn-sm btn-outline-secondary mt-3 retry-load-folders">'
+                    + '<i class="bi bi-arrow-clockwise me-1"></i>' + hm_trans('Retry') + '</button>'
+                    + '</td></tr>');
+                tbody.append(errorRow);
+                table.show();
+                errorRow.find('.retry-load-folders').on('click', function() {
+                    load_account_folders(server_id, block);
+                });
             }
         }
     );
+};
 
+
+// Unified special folder definitions
+var specialFolders = [
+    {
+        type: 'trash',
+        icon: 'bi-trash3',
+        label: hm_trans('Trash'),
+        badgeClass: 'badge-role-trash',
+        helper: hm_trans('If set, all deleted messages will automatically go to this folder.')
+    },
+    {
+        type: 'sent',
+        icon: 'bi-send-check-fill',
+        label: hm_trans('Sent'),
+        badgeClass: 'badge-role-sent',
+        helper: hm_trans('If set, all sent messages will be saved in this folder.')
+    },
+    {
+        type: 'archive',
+        icon: 'bi-archive',
+        label: hm_trans('Archive'),
+        badgeClass: 'badge-role-archive',
+        helper: hm_trans('If set, archived messages will be stored here.')
+    },
+    {
+        type: 'draft',
+        icon: 'bi-pencil-square',
+        label: hm_trans('Draft'),
+        badgeClass: 'badge-role-draft',
+        helper: hm_trans('If set, message drafts will be saved here.')
+    },
+    {
+        type: 'junk',
+        icon: 'bi-envelope-x-fill',
+        label: hm_trans('Junk'),
+        badgeClass: 'badge-role-junk',
+        helper: hm_trans('If set, all junk and spam messages will be moved here.')
+    }
+];
+
+function get_special_folder(type) {
+    return specialFolders.find(function(f) { return f.type === type; });
+}
+
+function get_special_icon(type) {
+    var f = get_special_folder(type);
+    return f ? f.icon : '';
+}
+
+function get_special_label(type) {
+    var f = get_special_folder(type);
+    return f ? f.label : '';
+}
+
+function get_special_badge_class(type) {
+    var f = get_special_folder(type);
+    return f ? f.badgeClass : 'bg-secondary';
+}
+
+function get_special_helper(type) {
+    var f = get_special_folder(type);
+    return f ? f.helper : '';
+}
+
+function render_special_folder_helpers() {
+    var html = '<div class="special-folder-helper-box" style="background:#f7f7f7;border:1px solid #e0e0e0;border-radius:6px;padding:1em 1.5em 1em 1.5em;margin-bottom:1em;position:relative;font-size:0.95em">';
+    html += '<button type="button" class="btn-close special-folder-helper-close" aria-label="' + hm_trans('Close') + '" style="position:absolute;top:10px;right:10px;opacity:0.5"></button>';
+    html += '<strong>' + hm_trans('How to set special folders:') + '</strong><ul class="mb-1">';
+    html += '<li>' + hm_trans('Use the <i class=\"bi bi-tag\"></i> <b>Set as...</b> button next to a folder to assign a special role (Trash, Sent, Junk, etc).') + '</li>';
+    html += '<li>' + hm_trans('Each special folder changes how messages are handled automatically:') + '</li>';
+    html += '<ul style="margin-bottom:0">';
+    specialFolders.forEach(function(f) {
+        html += '<li><b>' + f.label + '</b>: ' + f.helper + '</li>';
+    });
+    html += '</ul>';
+    html += '</ul>';
+    html += hm_trans('You can clear a special role using the <b>Clear role</b> option in the same menu.');
+    html += '<div class="form-check mt-3" style="user-select:none">';
+    html += '<input class="form-check-input" type="checkbox" value="1" id="dontShowSpecialHelperAgain">';
+    html += '<label class="form-check-label" for="dontShowSpecialHelperAgain" style="font-weight:normal">' + hm_trans("Don't show this message again") + '</label>';
+    html += '</div>';
+    html += '</div>';
+    return html;
+}
+
+var render_folder_table = function(folders, tbody, server_id) {
+    console.log('Folders for account', server_id, folders);
+    tbody.empty();
+    var table = tbody.closest('.folder_table');
+
+    var specialTypes = specialFolders.map(function(f) { return f.type; });
+    var found = {};
+    folders.forEach(function(folder) {
+        if (folder.special && specialTypes.includes(folder.special)) {
+            found[folder.special] = folder.basename;
+        }
+    });
+    var missing = specialTypes.filter(function(type) { return !found[type]; });
+
+    tbody.closest('.folder_table').parent().find('.special-folder-status').remove();
+    var statusKey = 'specialFolderStatusDismissed_' + server_id;
+    if ((missing.length > 0 || Object.keys(found).length > 0) && !window.localStorage.getItem(statusKey)) {
+        var msg = '<div class="alert alert-warning special-folder-status-box">';
+        msg += '<button type="button" class="btn-close special-folder-status-close" aria-label="' + hm_trans('Close') + '"></button>';
+        if (missing.length > 0) {
+            msg += '<strong>' + hm_trans('Some special folders are not set for this account:') + '</strong>';
+            msg += '<ul style="margin-bottom:0.5em">';
+            missing.forEach(function(type) {
+                msg += '<li>' + hm_trans(get_special_label(type)) + '</li>';
+            });
+            msg += '</ul>';
+        } else {
+            msg += '<strong>' + hm_trans('All special folders are set for this account.') + '</strong>';
+        }
+        if (Object.keys(found).length > 0) {
+            msg += '<div style="margin-top:0.5em">' + hm_trans('Already set:') + ' ';
+            var setList = Object.keys(found).map(function(type) {
+                return '<span class="badge bg-success me-1">' + hm_trans(get_special_label(type)) + ': ' + esc_html(found[type]) + '</span>';
+            });
+            msg += setList.join(' ');
+            msg += '</div>';
+        }
+        msg += '</div>';
+        var statusRow = $('<div class="special-folder-status">' + msg + '</div>');
+        tbody.closest('.folder_table').before(statusRow);
+        setTimeout(function() {
+            $('.special-folder-status-close').on('click', function() {
+                window.localStorage.setItem(statusKey, '1');
+                statusRow.remove();
+            });
+        }, 0);
+    }
+
+    tbody.closest('.folder_table').parent().find('.special-folder-helper').remove();
+    if (table.length && !window.localStorage.getItem('specialFolderHelperDismissed')) {
+        var helperRow = $('<div class="special-folder-helper">' + render_special_folder_helpers() + '</div>');
+        tbody.closest('.folder_table').before(helperRow);
+        setTimeout(function() {
+            $('.special-folder-helper-close').on('click', function() {
+                if ($('#dontShowSpecialHelperAgain').is(':checked')) {
+                    window.localStorage.setItem('specialFolderHelperDismissed', '1');
+                }
+                helperRow.remove();
+            });
+        }, 0);
+    }
+
+    folders.forEach(function(folder) {
+        if (folder.noselect) return;
+
+        var specialBadge = '';
+        if (folder.special) {
+            specialBadge = '<span class="badge-role ' + get_special_badge_class(folder.special) + '"><i class="bi ' + get_special_icon(folder.special) + ' me-1"></i>' + hm_trans(get_special_label(folder.special)) + '</span>';
+        }
+
+        var indent = 0;
+        var name = folder.name || '';
+        var parts = name.split('/');
+        if (parts.length <= 1) {
+            parts = name.split('.');
+        }
+        indent = parts.length - 1;
+
+        var displayName = folder.basename;
+        var indentPx = indent * 20;
+
+        var row = '<tr data-folder-hex="' + folder.hex_name + '" data-folder-name="' + esc_html(folder.basename) + '" data-server-id="' + server_id + '">';
+        row += '<td style="padding-left:' + (indentPx + 8) + 'px"><i class="bi bi-folder2 me-1"></i>' + esc_html(displayName) + '</td>';
+        row += '<td>' + specialBadge + '</td>';
+        row += '<td class="text-end">';
+        row += '<div class="btn-group btn-group-sm" role="group">';
+        row += '<button class="btn btn-outline-secondary btn-sm folder_rename_btn" title="' + hm_trans('Rename') + '"><i class="bi bi-pencil"></i></button>';
+        row += '<button class="btn btn-outline-secondary btn-sm folder_delete_btn" title="' + hm_trans('Delete') + '"><i class="bi bi-trash"></i></button>';
+        row += '<button class="btn btn-outline-secondary btn-sm folder_create_child_btn" title="' + hm_trans('Create subfolder') + '"><i class="bi bi-folder-plus"></i></button>';
+
+        row += '<div class="btn-group btn-group-sm dropdown" role="group">';
+        row += '<button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" title="' + hm_trans('Set as...') + '"><i class="bi bi-tag"></i></button>';
+        row += '<ul class="dropdown-menu dropdown-menu-end">';
+        specialFolders.forEach(function(rb) {
+            var active = folder.special === rb.type ? ' active' : '';
+            row += '<li><a class="dropdown-item set_special_btn' + active + '" href="#" data-type="' + rb.type + '"><i class="bi ' + rb.icon + ' me-2"></i>' + rb.label;
+            if (folder.special === rb.type) {
+                row += ' <i class="bi bi-check-lg ms-2"></i>';
+            }
+            row += '</a></li>';
+        });
+        row += '<li><hr class="dropdown-divider"></li>';
+        row += '<li><a class="dropdown-item clear_special_btn" href="#" data-type="' + (folder.special || '') + '"><i class="bi bi-x-circle me-2"></i>' + hm_trans('Clear role') + '</a></li>';
+        row += '</ul></div>';
+
+        row += '</div></td></tr>';
+        tbody.append(row);
+    });
+
+    bind_folder_table_actions(tbody, server_id);
+};
+
+var bind_folder_table_actions = function(tbody, server_id) {
+        tbody.find('.folder_create_child_btn').off('click').on('click', function() {
+            var tr = $(this).closest('tr');
+            var folderHex = tr.data('folder-hex');
+            var folderName = tr.data('folder-name');
+            var block = tr.closest('.account_folder_block');
+            // Pass parent folder hex to modal
+            show_create_folder_modal(server_id, block, folderHex, tr);
+            return false;
+        });
+    tbody.find('.folder_rename_btn').off('click').on('click', function() {
+        var tr = $(this).closest('tr');
+        var folderHex = tr.data('folder-hex');
+        var folderName = tr.data('folder-name');
+        var fullFolderName = 'imap_' + server_id + '_' + folderHex;
+        show_rename_modal(server_id, fullFolderName, folderName, tr);
+        return false;
+    });
+
+    tbody.find('.folder_delete_btn').off('click').on('click', function() {
+        var tr = $(this).closest('tr');
+        var folderHex = tr.data('folder-hex');
+        var folderName = tr.data('folder-name');
+        var fullFolderName = 'imap_' + server_id + '_' + folderHex;
+        show_delete_modal(server_id, fullFolderName, folderName, tr);
+        return false;
+    });
+
+    tbody.find('.set_special_btn').off('click').on('click', function(e) {
+        e.preventDefault();
+        var tr = $(this).closest('tr');
+        var folderHex = tr.data('folder-hex');
+        var folderName = tr.data('folder-name');
+        var type = $(this).data('type');
+        var block = tr.closest('.account_folder_block');
+        var fullFolderName = 'imap_' + server_id + '_' + folderHex;
+        show_assign_special_modal(server_id, fullFolderName, folderName, type, block);
+    });
+
+    tbody.find('.clear_special_btn').off('click').on('click', function(e) {
+        e.preventDefault();
+        var tr = $(this).closest('tr');
+        var folderHex = tr.data('folder-hex');
+        var folderName = tr.data('folder-name');
+        var type = $(this).data('type');
+        var block = tr.closest('.account_folder_block');
+        if (!type) return;
+        var fullFolderName = 'imap_' + server_id + '_' + folderHex;
+        show_clear_special_modal(server_id, fullFolderName, folderName, type, block);
+    });
+};
+
+var show_clear_special_modal = function(server_id, folderHex, folderName, type, block) {
+    var sf = get_special_folder(type);
+    var modal = new Hm_Modal({
+        modalId: 'clearSpecialFolderModal',
+        title: hm_trans('Clear Folder Role'),
+        btnSize: 'sm'
+    });
+
+    var roleLabel = sf ? sf.label : type;
+    var roleIcon = sf ? sf.icon : 'bi-x-circle';
+    var content = '<div class="d-flex align-items-start gap-3 mb-3">';
+    content += '<i class="bi ' + roleIcon + ' fs-2 text-secondary mt-1"></i>';
+    content += '<div>';
+    content += '<div class="fw-semibold fs-6">' + esc_html(folderName) + '</div>';
+    content += '<div class="text-muted small">' + hm_trans('will no longer be set as the') + ' <strong>' + esc_html(roleLabel) + '</strong> ' + hm_trans('folder') + '</div>';
+    content += '</div></div>';
+
+    modal.setContent(content);
+    modal.addFooterBtn(hm_trans('Clear role'), 'btn-warning', function() {
+        var btn = $(this);
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + hm_trans('Saving...'));
+        clear_special_folder(type, server_id, function() {
+            modal.hide();
+            load_account_folders(server_id, block);
+        });
+    });
+    modal.open();
+};
+
+var show_assign_special_modal = function(server_id, folderHex, folderName, type, block) {
+    var sf = get_special_folder(type);
+    var modal = new Hm_Modal({
+        modalId: 'assignSpecialFolderModal',
+        title: hm_trans('Set Special Folder Role'),
+        btnSize: 'sm'
+    });
+
+    var roleLabel = sf ? sf.label : type;
+    var roleIcon = sf ? sf.icon : '';
+    var content = '<div class="d-flex align-items-start gap-3 mb-3">';
+    content += '<i class="bi ' + roleIcon + ' fs-2 text-secondary mt-1"></i>';
+    content += '<div>';
+    content += '<div class="fw-semibold fs-6">' + esc_html(folderName) + '</div>';
+    content += '<div class="text-muted small">' + hm_trans('will be set as the') + ' <strong>' + esc_html(roleLabel) + '</strong> ' + hm_trans('folder') + '</div>';
+    content += '</div></div>';
+    if (sf) {
+        content += '<div class="alert alert-secondary py-2 px-3 mb-0 small">' + sf.helper + '</div>';
+    }
+
+    modal.setContent(content);
+    modal.addFooterBtn(hm_trans('Confirm'), 'btn-primary', function() {
+        var btn = $(this);
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + hm_trans('Saving...'));
+        assign_special_folder(server_id, folderHex, type, function() {
+            modal.hide();
+            load_account_folders(server_id, block);
+        });
+    });
+    modal.open();
+};
+
+var show_rename_modal = function(server_id, folderHex, folderName, tr) {
+    var modal = new Hm_Modal({
+        modalId: 'renameFolderModal',
+        title: hm_trans('Rename Folder'),
+        btnSize: 'sm'
+    });
+
+    var content = '<div class="form-floating mb-3">';
+    content += '<input type="text" class="form-control" id="modal_rename_value" placeholder="' + hm_trans('New Folder Name') + '" value="' + esc_html(folderName) + '">';
+    content += '<label for="modal_rename_value">' + hm_trans('New Folder Name') + '</label>';
+    content += '</div>';
+
+    modal.setContent(content);
+    modal.modal.on('shown.bs.modal', function() {
+        var input = document.getElementById('modal_rename_value');
+        if (input) { input.focus(); input.select(); }
+    });
+    modal.addFooterBtn(hm_trans('Rename'), 'btn-primary', function() {
+        var newName = $('#modal_rename_value').val().trim();
+        if (!newName.length) {
+            Hm_Notices.show($('#rename_folder_error').val(), 'danger');
+            return;
+        }
+        var btn = $(this);
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + hm_trans('Rename'));
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_rename'},
+            {'name': 'imap_server_id', 'value': server_id},
+            {'name': 'folder', 'value': folderHex},
+            {'name': 'new_folder', 'value': newName}],
+            function(res) {
+                if (res.imap_folders_success) {
+                    modal.hide();
+                    var block = tr.closest('.account_folder_block');
+                    load_account_folders(server_id, block);
+                    Hm_Folders.reload_folders(true);
+                } else {
+                    btn.prop('disabled', false).html(hm_trans('Rename'));
+                }
+            }
+        );
+    });
+    modal.open();
+};
+
+var show_delete_modal = function(server_id, folderHex, folderName, tr) {
+    var modal = new Hm_Modal({
+        modalId: 'deleteFolderModal',
+        title: hm_trans('Delete Folder'),
+        btnSize: 'sm'
+    });
+
+    var content = '<p>' + hm_trans('Are you sure you want to delete this folder, and all the messages in it?') + '</p>';
+    content += '<p><strong>' + esc_html(folderName) + '</strong></p>';
+
+    modal.setContent(content);
+    modal.addFooterBtn(hm_trans('Delete'), 'btn-danger', function() {
+        var btn = $(this);
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + hm_trans('Delete'));
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_delete'},
+            {'name': 'imap_server_id', 'value': server_id},
+            {'name': 'folder', 'value': folderHex}],
+            function(res) {
+                if (res.imap_folders_success) {
+                    modal.hide();
+                    var block = tr.closest('.account_folder_block');
+                    load_account_folders(server_id, block);
+                    Hm_Folders.reload_folders(true);
+                } else {
+                    btn.prop('disabled', false).html(hm_trans('Delete'));
+                }
+            }
+        );
+    });
+    modal.open();
+};
+
+var show_create_folder_modal = function(server_id, block, parentHex, parentTr) {
+    var modal = new Hm_Modal({
+        modalId: 'createFolderModal',
+        title: hm_trans('Create a New Folder'),
+        btnSize: 'sm'
+    });
+
+    var content = '';
+    if (parentHex) {
+        content += '<div class="mb-2"><small>' + hm_trans('Parent folder:') + ' <span class="badge bg-secondary">' + esc_html(parentTr ? parentTr.data('folder-name') : '') + '</span></small></div>';
+    }
+    content += '<div class="form-floating mb-3">';
+    content += '<input type="text" class="form-control" id="modal_create_value" placeholder="' + hm_trans('New Folder Name') + '">';
+    content += '<label for="modal_create_value">' + hm_trans('New Folder Name') + '</label>';
+    content += '</div>';
+
+    modal.setContent(content);
+    modal.addFooterBtn(hm_trans('Create'), 'btn-primary', function() {
+        var folder = $('#modal_create_value').val().trim();
+        if (!folder.length) {
+            Hm_Notices.show($('#folder_name_error').val(), 'danger');
+            return;
+        }
+        var btn = $(this);
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + hm_trans('Create'));
+        var params = [
+            {'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_create'},
+            {'name': 'imap_server_id', 'value': server_id},
+            {'name': 'folder', 'value': folder}
+        ];
+        if (parentHex) {
+            params.push({'name': 'parent', 'value': 'imap_' + server_id + '_' + parentHex});
+        }
+        Hm_Ajax.request(
+            params,
+            function(res) {
+                if (res.imap_folders_success) {
+                    modal.hide();
+                    load_account_folders(server_id, block);
+                    Hm_Folders.reload_folders(true);
+                } else {
+                    btn.prop('disabled', false).html(hm_trans('Create'));
+                }
+            }
+        );
+    });
+    modal.open();
 };
 
 function bindFoldersEventHandlers() {
-    $('.select_parent_folder').on("click", function() { return folder_page_folder_list('parent_folder_select', 'parent_title', 'imap_parent_folder_link', 'selected_parent', 'create_parent'); });
-    $('.select_rename_folder').on("click", function() { return folder_page_folder_list('rename_folder_select', 'rename_title', 'imap_rename_folder_link', 'selected_rename', 'rename_source'); });
-    $('.select_delete_folder').on("click", function() { return folder_page_folder_list('delete_folder_select', 'delete_title', 'imap_delete_folder_link', 'selected_delete', 'delete_source'); });
-    $('.select_trash_folder').on("click", function() { return folder_page_folder_list('trash_folder_select', 'trash_title', 'imap_trash_folder_link', 'selected_trash', 'trash_source'); });
-    $('.select_sent_folder').on("click", function() { return folder_page_folder_list('sent_folder_select', 'sent_title', 'imap_sent_folder_link', 'selected_sent', 'sent_source'); });
-    $('.select_archive_folder').on("click", function() { return folder_page_folder_list('archive_folder_select', 'archive_title', 'imap_archive_folder_link', 'selected_archive', 'archive_source'); });
-    $('.select_draft_folder').on("click", function() { return folder_page_folder_list('draft_folder_select', 'draft_title', 'imap_draft_folder_link', 'selected_draft', 'draft_source'); });
-    $('.select_junk_folder').on("click", function() { return folder_page_folder_list('junk_folder_select', 'junk_title', 'imap_junk_folder_link', 'selected_junk', 'junk_source'); });
-    $('.select_rename_parent_folder').on("click", function() { return folder_page_folder_list('rename_parent_folder_select', 'rename_parent_title', 'imap_rename_parent_folder_link', 'selected_rename_parent', 'rename_parent_source'); });
-    $('#create_folder').on("click", function() { folder_page_create(); return false; });
-    $('#delete_folder').on("click", function() { folder_page_delete(); return false; });
-    $('#rename_folder').on("click", function() { folder_page_rename(); return false; });
+    // Account expand/collapse
+    $('.account_folder_header').on('click', function() {
+        var block = $(this).closest('.account_folder_block');
+        var body = block.find('.account_folder_body');
+        var icon = block.find('.account_expand_icon');
+        var server_id = block.data('server-id');
+        var visible = body.css('display') !== 'none';
 
-    $('#set_trash_folder').on("click", function() { folder_page_assign_trash(); return false; });
-    $('#set_sent_folder').on("click", function() { folder_page_assign_sent(); return false; });
-    $('#set_archive_folder').on("click", function() { folder_page_assign_archive(); return false; });
-    $('#set_draft_folder').on("click", function() { folder_page_assign_draft(); return false; });
-    $('#set_junk_folder').on("click", function() { folder_page_assign_junk(); return false; });
+        if (visible) {
+            body.css('display', 'none');
+            icon.removeClass('bi-chevron-down').addClass('bi-chevron-right');
+        } else {
+            body.css('display', '');
+            icon.removeClass('bi-chevron-right').addClass('bi-chevron-down');
+            // Load folders if table is empty
+            if (block.find('.folder_table_body tr').length === 0) {
+                load_account_folders(server_id, block);
+            }
+        }
+    });
 
-    $('#clear_trash_folder').on("click", function() { clear_special_folder('trash'); return false; });
-    $('#clear_sent_folder').on("click", function() { clear_special_folder('sent'); return false; });
-    $('#clear_archive_folder').on("click", function() { clear_special_folder('archive'); return false; });
-    $('#clear_draft_folder').on("click", function() { clear_special_folder("draft"); return false; });
+    $('.create_folder_btn').on('click', function() {
+        var server_id = $(this).data('server-id');
+        var block = $(this).closest('.account_folder_block');
+        show_create_folder_modal(server_id, block);
+        return false;
+    });
 }
