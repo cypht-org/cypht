@@ -250,12 +250,12 @@ trait Hm_Server_List {
     }
 
     /**
-     * Fetch a server by the username and servername
+     * Fetch a server by the username and/or servername
      * @param string $username the user associated with the server
      * @param string $servername the host associated with the server
      * @return array|false
      */
-    public static function fetch($username, $servername) {
+    public static function fetch($username, $servername = '') {
         foreach (self::$server_list as $id => $server) {
             if (self::match($server, $username, $servername)) {
                 if (array_key_exists('pass', $server)) {
@@ -274,9 +274,12 @@ trait Hm_Server_List {
      * @param string $name server name
      * @return boolean
      */
-    private static function match($server, $user, $name) {
+    private static function match($server, $user, $name ='') {
         if (array_key_exists('user', $server) && array_key_exists('server', $server)) {
-            if ($user == $server['user'] && $name == $server['server']) {
+            if ($user == $server['user']) {
+                if ($name) {
+                    return $name == $server['server'];
+                }
                 return true;
             }
         }

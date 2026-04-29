@@ -70,22 +70,28 @@ function send_scheduled_message($handler, $imapMailbox, $folder, $msg_id, $send_
     $msg_headers = $imapMailbox->get_message_headers($folder, $msg_id);    
     $mailbox_details = $imapMailbox->get_config();  
     try {
-        if (empty($msg_headers['X-Schedule']) || empty($msg_headers['X-Profile-ID'])) {
+        if (empty($msg_headers['X-Schedule'])) {
             return false;
         }
 
         if (new DateTime($msg_headers['X-Schedule']) <= new DateTime() || $send_now) {
-            $profile = Hm_Profiles::get($msg_headers['X-Profile-ID']);
+            $profile = isset($msg_headers['X-Profile-ID']) ? Hm_Profiles::get($msg_headers['X-Profile-ID']): false;
             if (!$profile) {
                 $profiles = Hm_Profiles::search('server', $mailbox_details['server']);
 
-                if (!$profiles) {
-                    Hm_Debug::add(sprintf('ERRCannot find profiles corresponding with MAILBOX server: %s', $mailbox_details['server']));
+                if (! empty($profiles)) {
+                    $smtpId = $profile = $profiles[0]['smtp_id'];
+                } else {
+                    if ($smtpServer = Hm_SMTP_List::fetch($mailbox_details['user'])) {
+                        $smtpId = $smtpServer['id'];
+                    }
+                }
+                if (!isset($smtpId)) {
+                    Hm_Debug::add(sprintf('ERRCannot find SMTP profile for mailbox server: %s', $mailbox_details['id']));
                     return false;
                 }
-                $profile = $profiles[0];
             }
-            $smtpMailbox = Hm_SMTP_List::connect($profile['smtp_id'], false);
+            $smtpMailbox = Hm_SMTP_List::connect($smtpId, false);
             if (! $smtpMailbox || ! $smtpMailbox->authed()) {
                 Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
                 return;
