@@ -7,4 +7,6 @@ add_output('ajax_hm_folders', 'scheduled_folder_link', true, 'scheduled_sends', 
 
 add_handler('message_list', 'load_scheduled_sends_sources', true, 'scheduled_sends', 'load_imap_servers_for_message_list', 'after');
 
+add_output('message_list', 'reschedule_msg_control', true, 'imap', 'imap_custom_controls', 'after');
+
 return [];

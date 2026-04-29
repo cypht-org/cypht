@@ -16,3 +16,17 @@ class Hm_Output_scheduled_folder_link extends Hm_Output_Module {
         $this->concat('formatted_folder_list', $res);
     }
 }
+
+/**
+ * Add reschedule dialog to the message list controls
+ * @subpackage imap/output
+ */
+class Hm_Output_reschedule_msg_control extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('list_path') != 'scheduled') {
+            return;
+        }
+
+        $this->concat('msg_controls_extra', schedule_dropdown($this, true, true));
+    }
+}
