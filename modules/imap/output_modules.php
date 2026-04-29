@@ -367,13 +367,18 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
 
             $lc_headers = lc_headers($headers);
-            // Collect all recipients from To and Cc
+            // Collect all recipients from To, Cc, and From (sender)
             $all_recipients = array();
             if (array_key_exists('to', $lc_headers)) {
                 $all_recipients = array_merge($all_recipients, process_address_fld($lc_headers['to']));
             }
             if (array_key_exists('cc', $lc_headers)) {
                 $all_recipients = array_merge($all_recipients, process_address_fld($lc_headers['cc']));
+            }
+            // Add sender (from) as a possible recipient
+            if (array_key_exists('from', $lc_headers)) {
+                $from_addrs = process_address_fld($lc_headers['from']);
+                $all_recipients = array_merge($all_recipients, $from_addrs);
             }
             // Get current user email
             $imap_server_id = null;
