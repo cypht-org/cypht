@@ -422,7 +422,7 @@ function icon_callback($vals, $style, $output_mod) {
 if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
     $txt = '';
-    $controls = ['read', 'unread', 'flag', 'unflag', 'delete', 'archive', 'junk'];
+    $controls = ['read', 'unread', 'flag', 'unflag', 'delete', 'archive', 'junk', 'restore'];
     $controls = array_filter($controls, function($val) use ($output_mod) {
         if (in_array($val, [$output_mod->get('list_path', ''), strtolower($output_mod->get('core_msg_control_folder', ''))])) {
             return false;
@@ -430,6 +430,12 @@ function message_controls($output_mod) {
         if ($val == 'flag' && $output_mod->get('list_path', '') == 'flagged') {
             return false;
         }
+        $is_trash_folder = $output_mod->get('is_trash_folder', false);
+
+        if ($val == 'restore' && !$is_trash_folder) {
+            return false;
+        }
+
         return true;
     });
 
@@ -454,6 +460,11 @@ function message_controls($output_mod) {
     if(!empty($output_mod->get('tags'))) {
         $res .= tags_dropdown($output_mod, []);
     }
+
+    if ($output_mod->get('msg_controls_custom_actions')) {
+        $res .= $output_mod->get('msg_controls_custom_actions');
+    }
+
     $res .= '</div>';
     return $res;
 }}
@@ -542,7 +553,7 @@ function update_search_label_field($search_term, $output_mod) {
     $res = '<div class="update_search_label_field">';
     $res .= '<div class="update_saved_search_title">'.$output_mod->html_safe('Update saved search label') .'</div>';
     $res .= '<div>
-    <input type="hidden" name="page" value="search">
+    <input type="hidden" name="'. $output_mod->get('page_param_name') .'" value="search">
     <input type="hidden" name="search_terms" value="'. $search_term .'">
     <label class="screen_reader" for="search_terms_label">Current Search Label</label>
     <input required="" disabled id="old_search_terms_label" type="search" value="' . $search_term . '" class="old_search_terms_label form-control form-control-sm" name="old_search_terms_label">

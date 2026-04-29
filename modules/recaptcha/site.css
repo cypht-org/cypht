@@ -1,2 +1,9 @@
-.g-recaptcha { margin-left: -12px; }
-.mobile .g-recaptcha { clear: left; margin-left: 20px; }
+.g-recaptcha {
+    margin: 15px auto 20px auto;
+    display: flex;
+    justify-content: center;
+}
+.mobile .g-recaptcha {
+    clear: left;
+    margin: 15px auto 20px auto;
+}

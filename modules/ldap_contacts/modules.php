@@ -33,6 +33,11 @@ class Hm_Handler_process_add_ldap_contact_from_message extends Hm_Handler_Module
                 $contacts = $this->get('contact_store');
                 if ($ldap->connect()) {
                     foreach ($addresses as $vals) {
+                        // Validate email address before adding to LDAP
+                        if (empty($vals['email']) || !is_email_address($vals['email'], false)) {
+                            Hm_Msgs::add('Invalid email address: ' . htmlspecialchars($vals['email']) . '. Please use a valid email address with a proper domain (e.g., user@example.com)', 'danger');
+                            continue;
+                        }
                         $atts = array('mail' => $vals['email'], 'objectclass' => $config['objectclass']);
                         if (array_key_exists('name', $vals) && trim($vals['name'])) {
                             $dn = sprintf('cn=%s,%s', $vals['name'], $config['base_dn']);
@@ -193,7 +198,21 @@ class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
             // Skip uid attribute when uidattr is 'cn' to avoid empty uid values
             if ($name === 'ldap_uid' && $uidattr === 'cn') {
                 continue;
-            }      
+            }
+            // Validate email address if it's the mail field
+            if ($name === 'ldap_mail') {
+                $email = '';
+                if (array_key_exists($name, $form)) {
+                    $email = $form[$name];
+                }
+                elseif (array_key_exists($name, $this->request->post) && trim($this->request->post[$name])) {
+                    $email = $this->request->post[$name];
+                }
+                if ($email && !is_email_address($email, false)) {
+                    Hm_Msgs::add('Invalid email address. Please use a valid email address with a proper domain (e.g., user@example.com)', 'danger');
+                    return;
+                }
+            }
             if (array_key_exists($name, $form)) {
                 $result[$val] = $form[$name];
             }
@@ -226,7 +245,7 @@ class Hm_Handler_process_update_ldap_server extends Hm_Handler_Module {
             if ($ldap->modify($entry, $dn)) {
                 Hm_Msgs::add('Contact Updated');
                 $this->save_hm_msgs();
-                Hm_Dispatch::page_redirect('?page=contacts');
+                Hm_Dispatch::page_redirect($this->build_page_url('contacts'));
             }
             else {
                 Hm_Msgs::add('Unable to update contact', 'danger');
@@ -377,7 +396,9 @@ class Hm_Handler_load_edit_ldap_contact extends Hm_Handler_Module {
             if (!array_key_exists('contact_id', $this->request->get)) $missing[] = 'contact_id';
             if (array_key_exists('contact_source', $this->request->get) && !array_key_exists($this->request->get['contact_source'], $ldap_config)) $missing[] = 'ldap_config_for_source';
             
-            error_log("LDAP Edit: Handler skipped due to missing: " . implode(', ', $missing));
+            if (DEBUG_MODE) {
+                Hm_Debug::add("LDAP Edit: Handler skipped due to missing: " . implode(', ', $missing));
+            }
         }
     }
 }
@@ -639,7 +660,7 @@ class Hm_Output_ldap_contact_form_start extends Hm_Output_Module {
         }
         return '<div class="add_contact_responsive"><form class="add_contact_form" method="POST">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<button class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
+            '<button type="button" class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
             '<div class="'.$form_class.'"><input type="hidden" name="contact_source" value="ldap" />'.$source_html;
     }
 }
@@ -752,7 +773,7 @@ class Hm_Output_ldap_form_mail extends Hm_Output_Module {
         }
         $val = get_ldap_value('email_address', $this);
         return '<div class="form-floating mb-2">'.
-            '<input required placeholder="'.$this->trans('E-mail Address').'" id="ldap_mail" type="email" name="ldap_mail" '.
+            '<input required placeholder="'.$this->trans('E-mail Address').'" id="ldap_mail" type="text" name="ldap_mail" '.
             'value="'.$this->html_safe($val).'" class="form-control" />'.
             '<label for="ldap_mail">'.$this->trans('E-mail Address').' *</label></div>';
     }

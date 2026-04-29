@@ -12,7 +12,7 @@
  */
 class Hm_MIME_Msg {
     private $bcc = '';
-    private $headers = array('X-Mailer' => 'Cypht', 'MIME-Version' => '1.0');
+    private $headers = array('X-Mailer' => '', 'User-Agent' => '', 'MIME-Version' => '');
     private $boundary = '';
     private $attachments = array();
     private $body = '';
@@ -22,6 +22,13 @@ class Hm_MIME_Msg {
 
     /* build mime message data */
     function __construct($to, $subject, $body, $from, $html=false, $cc='', $bcc='', $in_reply_to_id='', $from_name='', $reply_to='', $delivery_receipt='', $schedule='', $profile_id = '') {
+        if (defined('CYPHT_VERSION')) {
+            $version = CYPHT_VERSION;
+        }
+        $this->headers['X-Mailer'] = 'Cypht ' . $version;
+        $this->headers['User-Agent'] = 'Cypht ' . $version;
+        $this->headers['MIME-Version'] = '1.0';
+
         if ($cc) {
             $this->headers['Cc'] = $cc;
         }

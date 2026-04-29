@@ -23,6 +23,8 @@ function format_msg_html($str, $images=false) {
     $config->set('Cache.DefinitionImpl', null);
     $config->set('HTML.TargetBlank', true);
     $config->set('HTML.TargetNoopener', true);
+    $config->set('HTML.ForbiddenElements', ['html', 'head']);
+    $config->set('CSS.AllowTricky', true);
 
     if (!$images) {
         $config->set('URI.DisableExternalResources', true);
@@ -31,7 +33,7 @@ function format_msg_html($str, $images=false) {
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
 
     if ($def = $config->maybeGetRawHTMLDefinition()) {
-        $html_tags = ['img', 'script', 'iframe', 'audio', 'embed', 'source', 'track', 'video'];
+        $html_tags = ['img', 'script', 'iframe', 'audio', 'embed', 'source', 'track', 'video', 'a'];
         foreach ($html_tags as $tag) {
             $def->addAttribute($tag, 'data-src', 'Text');
         }
@@ -462,7 +464,16 @@ class HTMLToText {
 
     function __construct($html) {
         $doc = new DOMDocument();
-        $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+        libxml_use_internal_errors(true);
+
+        // Check if already valid UTF-8, if not convert it
+        if (!mb_check_encoding($html, 'UTF-8')) {
+            // Try to detect and convert the encoding
+            $html = mb_convert_encoding($html, 'UTF-8', mb_detect_encoding($html, mb_list_encodings(), true));
+        }
+        $doc->loadHTML('<?xml encoding="UTF-8">' . $html);
+        libxml_clear_errors();
+
         if (trim($html) && $doc->hasChildNodes()) {
             $this->parse_nodes($doc->childNodes);
         }

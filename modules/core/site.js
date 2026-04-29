@@ -263,6 +263,11 @@ var Hm_Ajax_Request = function() { return {
                     Hm_Folders.update_unread_counts();
                 }
             }
+            
+            if (res.reload_folders_list) {
+                Hm_Folders.update_folder_list(true);
+            }
+
             if (this.callback) {
                 this.callback(res);
             }
@@ -349,6 +354,16 @@ function Hm_Modal(options) {
 Hm_Modal.prototype = {
     init: function() {
         this.destroy();
+
+        // Remove any orphaned modal element with the same ID
+        var orphan = document.getElementById(this.opts.modalId);
+        if (orphan) {
+            var orphanBsModal = bootstrap.Modal.getInstance(orphan);
+            if (orphanBsModal) {
+                orphanBsModal.dispose();
+            }
+            orphan.remove();
+        }
 
         const modal = `
             <div id="${this.opts.modalId}" class="modal fade modal-${this.opts.size}" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
@@ -930,9 +945,6 @@ function Message_List() {
     };
 
     this.message_action = function(action_type) {
-        if (action_type == 'delete' && !hm_delete_prompt()) {
-            return false;
-        }
         var msg_list = $('.message_table');
         var selected = [];
         var current_list = self.filter_list();
@@ -941,6 +953,23 @@ function Message_List() {
                 selected.push($(this).val());
             }
         });
+
+        if (action_type == 'delete') {
+            // Extract server_id and folder from first selected message for trash check
+            // Message ID format: imap_serverid_uid_folder
+            var server_id = null;
+            var folder = null;
+            if (selected.length > 0) {
+                var matches = selected[0].match(/^imap_([^_]+)_\d+_(.+)$/);
+                if (matches && matches[1]) {
+                    server_id = matches[1];
+                    folder = matches[2];
+                }
+            }
+            if (!hm_delete_prompt(server_id, folder)) {
+                return false;
+            }
+        }
         if (selected.length > 0) {
             var updated = false;
             Hm_Ajax.request(
@@ -1204,7 +1233,9 @@ var Hm_Folders = {
     observer : false,
 
     save_folder_list: function() {
-        Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+        const toSave = $('.folder_list').clone();
+        toSave.find('.temp').remove();
+        Hm_Utils.save_to_local_storage('formatted_folder_list', toSave.html());
     },
 
     load_unread_counts: function() {
@@ -1313,7 +1344,7 @@ var Hm_Folders = {
         $('.folder_list').hide();
         $('.folder_toggle').show();
         if (!forget) {
-            Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+            Hm_Folders.save_folder_list();
             Hm_Utils.save_to_local_storage('hide_folder_list', '1');
             $('main').css('display', 'block');
         }
@@ -1361,6 +1392,7 @@ var Hm_Folders = {
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         Hm_Folders.hl_selected_menu();
         Hm_Folders.folder_list_events();
+        toggleExpandableNavbarItems(Hm_Utils.get_from_local_storage('navbar_collapsed'));
         if (Hm_Folders.expand_after_update) {
             Hm_Utils.toggle_section(Hm_Folders.expand_after_update);
         }
@@ -1370,16 +1402,20 @@ var Hm_Folders = {
     },
 
     update_folder_list: function(reset_cache = false) {
+        Hm_Folders.request_folder_list_update(Hm_Folders.update_folder_list_display, reset_cache);
+        return false;
+    },
+
+    request_folder_list_update: function(callback, reset_cache = false) {
         Hm_Ajax.request(
             [
                 {'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'},
                 {'name': 'reset_cache', 'value': reset_cache}
             ],
-            Hm_Folders.update_folder_list_display,
+            callback,
             [],
             true
         );
-        return false;
     },
 
     folder_list_events: function() {
@@ -1406,7 +1442,6 @@ var Hm_Folders = {
             return false;
         });
         $('.hide_folders').on("click", function() { return Hm_Folders.hide_folder_list(); });
-        $('.logout_link').on("click", function(e) { return Hm_Utils.confirm_logout(); });
         if (hm_search_terms()) {
             $('.search_terms').val(hm_search_terms());
         }
@@ -1452,6 +1487,7 @@ var Hm_Folders = {
         var folder_list = Hm_Utils.get_from_local_storage('formatted_folder_list');
         if (folder_list) {
             $('.folder_list').html(folder_list);
+            toggleExpandableNavbarItems(Hm_Utils.get_from_local_storage('navbar_collapsed'))
             if (Hm_Utils.get_from_local_storage('hide_folder_list') == '1') {
                 $('.folder_list').hide();
                 $('.folder_toggle').show();
@@ -1465,6 +1501,14 @@ var Hm_Folders = {
             return true;
         }
         return false;
+    },
+
+    unload_folder_list: function() {
+        $('.folder_list').html('');
+    },
+
+    folder_list_loaded: function() {
+        return $('.folder_list').html() != '';
     },
 
     toggle_folders_event: function() {
@@ -1504,7 +1548,7 @@ var Hm_Utils = {
         var prefix = window.location.pathname.length;
         for (i in sessionStorage) {
             i = i.substr(prefix);
-            if (i.match(/\..+(_setting|_section)/)) {
+            if (i.match(/\..+(_setting|_section)/) || i == 'navbar_collapsed') {
                 result[i] = Hm_Utils.get_from_local_storage(i);
             }
         }
@@ -1526,7 +1570,7 @@ var Hm_Utils = {
     },
 
     confirm_logout: function() {
-        if (! $('#unsaved_changes').length || $('#unsaved_changes').val() == 0) {
+        if ((! $('#unsaved_changes').length || $('#unsaved_changes').val() == 0) && !$('.save_reminder').length) {
             document.getElementById('logout_without_saving').click();
         }
         else {
@@ -1604,7 +1648,8 @@ var Hm_Utils = {
                 $(class_name).css('display', 'none');
             }
             $(`[data-bs-target="${class_name}"]`).trigger('click');
-            Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+
+            Hm_Folders.save_folder_list();
         }
         return false;
     },
@@ -1744,7 +1789,148 @@ var Hm_Utils = {
     },
 
     is_valid_email: function (val) {
-        return /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(val)
+        var email = val.trim();
+        if (!email || email.length > 320) { // RFC 5321: max 320 chars
+            return false;
+        }
+
+        var atIndex = email.lastIndexOf('@');
+        if (atIndex === -1 || atIndex === 0 || atIndex === email.length - 1) {
+            return false;
+        }
+
+        var localPart = email.substring(0, atIndex);
+        var domain = email.substring(atIndex + 1);
+
+        // Validate local part (before @)
+        if (localPart.length === 0 || localPart.length > 64) { // RFC 5321: max 64 chars
+            return false;
+        }
+
+        // Check if local part is quoted
+        if (localPart.startsWith('"') && localPart.endsWith('"')) {
+            // Quoted string - almost anything goes inside quotes (except unescaped quotes and backslashes)
+            var quoted = localPart.slice(1, -1);
+            // Check for unescaped quotes or backslashes
+            if (/(?<!\\)["]/.test(quoted.replace(/\\\\/g, ''))) {
+                return false;
+            }
+        } else {
+            // Unquoted local part - standard rules
+            // Allowed chars: A-Z a-z 0-9 . ! # $ % & ' * + - / = ? ^ _ ` { | } ~
+            // Cannot start or end with dot, no consecutive dots
+            if (/^\.|\.$/i.test(localPart) || /\.\./.test(localPart)) {
+                return false;
+            }
+            if (!/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+$/.test(localPart)) {
+                return false;
+            }
+        }
+
+        // Validate domain (after @)
+        if (domain.length === 0 || domain.length > 255) { // RFC 5321: max 255 chars
+            return false;
+        }
+
+        // Check for domain literal (IP address in brackets)
+        if (domain.startsWith('[') && domain.endsWith(']')) {
+            var literal = domain.slice(1, -1);
+            // IPv4: [192.168.1.1]
+            if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(literal)) {
+                // Validate IPv4 ranges (0-255)
+                var parts = literal.split('.');
+                for (var i = 0; i < parts.length; i++) {
+                    if (parseInt(parts[i], 10) > 255) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            // IPv6: [IPv6:2001:db8::1]
+            if (/^IPv6:/i.test(literal)) {
+                var ipv6 = literal.substring(5);
+
+                // IPv6 validation
+                // Can contain hex digits (0-9, a-f, A-F) and colons
+                // May contain :: to represent consecutive zero groups
+                // Should have 2-8 colon-separated groups (with :: compression)
+
+                if (!ipv6 || !/^[a-fA-F0-9:]+$/.test(ipv6)) {
+                    return false;
+                }
+
+                // Check for valid :: usage (at most one occurrence)
+                var doubleColonCount = (ipv6.match(/::/g) || []).length;
+                if (doubleColonCount > 1) {
+                    return false;
+                }
+
+                // Remove :: for part counting
+                var parts;
+                if (doubleColonCount === 1) {
+                    // With :: compression, we can have fewer than 8 groups
+                    var segments = ipv6.split('::');
+                    var leftParts = segments[0] ? segments[0].split(':') : [];
+                    var rightParts = segments[1] ? segments[1].split(':') : [];
+                    var totalParts = leftParts.length + rightParts.length;
+
+                    // With ::, total parts should be less than 8
+                    if (totalParts >= 8) {
+                        return false;
+                    }
+
+                    parts = leftParts.concat(rightParts);
+                } else {
+                    // No :: compression, must have exactly 8 groups
+                    parts = ipv6.split(':');
+                    if (parts.length !== 8) {
+                        return false;
+                    }
+                }
+
+                // Validate each part (1-4 hex digits)
+                for (var k = 0; k < parts.length; k++) {
+                    if (parts[k] === '') continue; // Empty parts allowed in split artifacts
+                    if (parts[k].length > 4 || !/^[a-fA-F0-9]+$/.test(parts[k])) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+        // Standard domain validation
+        // Allow internationalized domains (Unicode) and standard ASCII
+        // Each label separated by dots, no leading/trailing hyphens in labels
+        var labels = domain.split('.');
+        if (labels.length < 2) { // At least domain.tld
+            return false;
+        }
+
+        for (var j = 0; j < labels.length; j++) {
+            var label = labels[j];
+            if (label.length === 0 || label.length > 63) { // RFC 1035: max 63 chars per label
+                return false;
+            }
+            // Labels cannot start or end with hyphen
+            if (label.startsWith('-') || label.endsWith('-')) {
+                return false;
+            }
+            // Allow alphanumeric, hyphen, and Unicode for IDN
+            if (!/^[a-zA-Z0-9-\u0080-\uFFFF]+$/.test(label)) {
+                return false;
+            }
+        }
+
+        // TLD should have at least 2 chars (most common) or be valid single-char TLD
+        var tld = labels[labels.length - 1];
+        if (tld.length < 1) {
+            return false;
+        }
+
+        return true;
     },
 };
 
@@ -1874,6 +2060,35 @@ var decrease_servers = function(section) {
     }
 };
 
+/**
+ * Initialize a KindEditor instance for a signature textarea in HTML compose mode.
+ * @param {string} selector - CSS selector for the textarea element
+ * @param {string} storeAs  - window property name to store and guard the editor instance
+ */
+var hm_init_sig_editor = function(selector, storeAs) {
+    if (typeof KindEditor === 'undefined') {
+        return;
+    }
+    // No stale-global guard: K.create() guards internally against double-init on
+    // the same live element, and a guard here would skip init on fresh SPA-injected
+    // textareas that share the selector with a now-stale global.
+    KindEditor.ready(function(K) {
+        if ($(selector).length) {
+            var editor = K.create(selector, {
+                items: ['bold', 'italic', 'underline', 'strikethrough', 'forecolor',
+                        'hilitecolor', 'fontname', 'fontsize', '|',
+                        'link', 'unlink', '|', 'undo', 'redo'],
+                basePath: 'third_party/kindeditor/',
+                resizeType: 1,
+                minHeight: 100,
+            });
+            if (storeAs) {
+                window[storeAs] = editor;
+            }
+        }
+    });
+};
+
 var hm_spinner = function(type = 'border', size = '') {
     return `<div class="d-flex justify-content-center spinner">
         <div class="spinner-${type} text-dark${size ? ` spinner-${type}-${size}` : ''}" role="status">
@@ -1988,9 +2203,6 @@ $(function() {
     })
     $('.reset_factory_button').on('click', function() { return hm_delete_prompt(); });
 
-    /* check for folder reload */
-    var reloaded = Hm_Folders.reload_folders();
-
     /* setup a few page wide event handlers */
     Hm_Utils.cancel_logout_event();
     Hm_Folders.toggle_folders_event();
@@ -2000,11 +2212,6 @@ $(function() {
 
     /* show any pending notices */
     Hm_Notices.showPendingMessages();
-
-    /* load folder list */
-    if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
-        Hm_Folders.update_folder_list();
-    }
 
     hl_save_link();
     if (hm_mailto()) {
@@ -2114,7 +2321,7 @@ function submitSmtpImapServer() {
         { name: 'srv_setup_stepper_imap_sieve_mode_tls', value: $('#srv_setup_stepper_imap_sieve_mode_tls').prop('checked') },
         { name: 'srv_setup_stepper_create_profile', value: $('#srv_setup_stepper_create_profile').prop('checked') },
         { name: 'srv_setup_stepper_profile_is_default', value: $('#srv_setup_stepper_profile_is_default').prop('checked') },
-        { name: 'srv_setup_stepper_profile_signature', value: $('#srv_setup_stepper_profile_signature').val() },
+        { name: 'srv_setup_stepper_profile_signature', value: (function() { if (window.stepperSigEditor) { window.stepperSigEditor.sync(); } return $('#srv_setup_stepper_profile_signature').val(); })() },
         { name: 'srv_setup_stepper_profile_reply_to', value: $('#srv_setup_stepper_profile_reply_to').val() },
         { name: 'srv_setup_stepper_imap_sieve_host', value: $('#srv_setup_stepper_imap_sieve_host').val() },
         { name: 'srv_setup_stepper_only_jmap', value: $('input[name="srv_setup_stepper_only_jmap"]:checked').val() },
@@ -2153,6 +2360,7 @@ function resetQuickSetupForm() {
 
     //Initialize the form
     $("#srv_setup_stepper_profile_reply_to").val('');
+    if (window.stepperSigEditor) { window.stepperSigEditor.html(''); }
     $("#srv_setup_stepper_profile_signature").val('');
     $("#srv_setup_stepper_profile_name").val('');
     $("#srv_setup_stepper_email").val('');
@@ -2480,6 +2688,9 @@ function setupActionSnooze(callback) {
     $(document).on('click', '.nexter_date_helper_snooze', function (e) {
         e.preventDefault();
         $('.nexter_input_snooze').val($(this).attr('data-value')).trigger('change');
+
+        const dropdown = bootstrap.Dropdown.getOrCreateInstance($('#dropdownMenuSnooze')[0]);
+        dropdown.toggle();
     });
     $(document).on('input', '.nexter_input_date_snooze', function (e) {
         var now = new Date();

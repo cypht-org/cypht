@@ -3,8 +3,6 @@
 if (mb_strtolower(php_sapi_name()) !== 'cli') {
     die("Must be run from the command line\n");
 }
-/* debug mode has to be set to something or include files will die() */
-define('DEBUG_MODE', false);
 
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
@@ -12,7 +10,14 @@ define('VENDOR_PATH', APP_PATH.'vendor/');
 define('WEB_ROOT', '');
 
 /* get the framework */
+require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
+
+$environment = Hm_Environment::getInstance();
+$environment->load();
+
+/* Define DEBUG_MODE from environment variable */
+define('DEBUG_MODE', (bool) env('ENABLE_DEBUG', false));
 
 function read_config($source) {
     if ($source == 'Defaults') {

@@ -1,10 +1,9 @@
 function applyImapMessageListPageHandlers(routeParams) {
     const setupPageResult = setup_imap_folder_page(routeParams.list_path, routeParams.list_page);
 
-    imap_setup_snooze();
     imap_setup_tags();
 
-    processNextActionDate();
+    setupScreening();
 
     if (window.inlineMessageMessageListAndSearchPageHandler) inlineMessageMessageListAndSearchPageHandler(routeParams);
     if (window.wpMessageListPageHandler) wpMessageListPageHandler(routeParams);
@@ -20,7 +19,6 @@ function applyImapMessageListPageHandlers(routeParams) {
 function applyImapMessageContentPageHandlers(routeParams) {
     imap_setup_message_view_page(routeParams.uid, null, routeParams.list_path, routeParams.list_parent, () => {
         imap_setup_tags();
-        imap_setup_snooze();
         window.dispatchEvent(new CustomEvent('message-loaded'));
     });
 

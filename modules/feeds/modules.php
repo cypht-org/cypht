@@ -9,6 +9,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 require APP_PATH.'modules/feeds/hm-feed.php';
+require APP_PATH.'modules/feeds/handler_modules.php';
 
 /**
  * @subpackage feeds/handler
@@ -276,7 +277,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
         if (isset($this->request->get['list_path'])) {
             $this->out('feed_list_parent', $this->request->get['list_path']);
         }
-        elseif (isset($this->request->get['page']) && $this->request->get['page'] == 'search') {
+        elseif (isset($this->request->get[$this->config->get('page_param_name')]) && $this->request->get[$this->config->get('page_param_name')] == 'search') {
             $this->out('feed_list_parent', 'search');
         }
         $this->out('feed_server_ids', $form['feed_server_ids']);
@@ -511,6 +512,74 @@ class Hm_Handler_load_feed_folders extends Hm_Handler_Module {
 /**
  * @subpackage feeds/output
  */
+/**
+ * @subpackage feeds/output
+ */
+class Hm_Output_filter_opml_import_result extends Hm_Output_Module {
+    protected function output() {
+        $result = $this->get('opml_import_result');
+        if ($result) {
+            // Output raw data for AJAX response
+            $this->out('opml_import_result', $result);
+
+            if ($result['success']) {
+                $html = '<div class="alert alert-success">';
+                $html .= '<strong>'.$this->trans('Import Successful!').'</strong><br>';
+                $html .= $this->trans('Total feeds processed').': ' . ($result['total'] ?: 0) . '<br>';
+                $html .= $this->trans('Successfully imported').': ' . ($result['imported'] ?: 0) . '<br>';
+                $html .= $this->trans('Skipped').': ' . ($result['skipped'] ?: 0) . '<br>';
+                $html .= $this->trans('Failed').': ' . ($result['failed'] ?: 0) . '</div>';
+
+                if (!empty($result['failed_details'])) {
+                    $html .= '<div class="alert alert-warning mt-2"><strong>'.$this->trans('Failed details').':</strong><ul>';
+                    foreach ($result['failed_details'] as $detail) {
+                        $label = $detail['name'] ?? $detail['url'] ?? 'Unknown feed';
+                        $reason = $detail['error'] ?? 'Unknown error';
+                        $html .= '<li>' . $this->html_safe($label) . ': ' . $this->html_safe($reason) . '</li>';
+                    }
+                    $html .= '</ul></div>';
+                }
+
+                $this->out('opml_import_result_html', $html);
+            } else {
+                $html = '<div class="alert alert-danger">' .
+                    '<strong>'.$this->trans('Import Failed').':</strong> ' . $this->html_safe($result['error'] ?? $result['message'] ?? 'Unknown error') .
+                    '</div>';
+                $this->out('opml_import_result_html', $html);
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage feeds/output
+ */
+class Hm_Output_import_opml_dialog extends Hm_Output_Module {
+    protected function output() {
+        if ($this->format == 'HTML5') {
+            return '<div class="opml_import_section mb-3">
+                        <button type="button" class="btn btn-primary px-3" id="import_opml_btn">
+                            <i class="bi bi-upload"></i> '.$this->trans('Import OPML').'
+                        </button>
+
+                        <div id="opml_import_dialog" class="mt-3" style="display:none;">
+                            <form id="opml_import_form" enctype="multipart/form-data">
+                                <input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
+                                <div class="mb-3">
+                                    <input type="file" name="opml_file" accept=".opml,.xml" class="form-control" />
+                                </div>
+                                <input type="submit" class="btn btn-primary" value="'.$this->trans('Import').'" />
+                            </form>
+                            <div id="opml_import_result" class="mt-3"></div>
+                        </div>
+                    </div>';
+        }
+    }
+}
+
+/**
+ * @subpackage feeds/output
+ */
 class Hm_Output_add_feed_dialog extends Hm_Output_Module {
     protected function output() {
         if ($this->format == 'HTML5') {
@@ -675,7 +744,10 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 if ($date) {
                     $date = translate_time_str($date, $mod);
                 }
-                $url = '?page=message&uid='.urlencode(md5($item['guid'])).'&list_path=feeds_'.$item['server_id'];
+                $url = $mod->build_page_url('message', array(
+                    'uid' => urlencode(md5($item['guid'])),
+                    'list_path' => 'feeds_'.$item['server_id'],
+                ));
                 if ($mod->in('feed_list_parent', array('combined_inbox', 'unread', 'feeds', 'search'))) {
                     $url .= '&list_parent='.$mod->html_safe($mod->get('feed_list_parent', ''));
                 }
@@ -783,7 +855,7 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
         $folders = $this->get('feed_folders', array());
         if (is_array($folders) && !empty($folders)) {
             if(count($this->get('feeds', array()))  > 1) {
-                $res .= '<li class="menu_feeds"><a class="unread_link" href="?page=message_list&amp;list_path=feeds">';
+                $res .= '<li class="menu_feeds"><a class="unread_link" href="'. $this->build_page_url('message_list', array('list_path' => 'feeds'), true).'">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-rss-fill menu-icon"></i>';
                 }
@@ -792,14 +864,14 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
             }
             foreach ($this->get('feed_folders') as $id => $folder) {
                 $res .= '<li class="feeds_'.$this->html_safe($id).'">'.
-                    '<a data-id="feeds_'.$this->html_safe($id).'" href="?page=message_list&list_path=feeds_'.$this->html_safe($id).'">';
+                    '<a data-id="feeds_'.$this->html_safe($id).'" href="'.$this->build_page_url('message_list', array('list_path' => 'feeds_'.$this->html_safe($id))).'">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-rss menu-icon"></i>';
                 }
                 $res .= $this->html_safe($folder).'</a></li>';
             }
         }
-        $res .= '<li class="feeds_add_new"><a href="?page=servers#feeds_section">';
+        $res .= '<li class="feeds_add_new"><a href="'.$this->build_page_url('servers').'#feeds_section">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-plus-square menu-icon"></i>';
         }
@@ -915,14 +987,14 @@ function feed_source_callback($vals, $style, $output_mod) {
         $img = '';
     }
     if ($style == 'email') {
-        return sprintf('<td class="%s" title="%s"><a href="?page=message_list&list_path=feeds_%s">%s%s</td>',
-            $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[3]),
-            $img, $output_mod->html_safe($vals[1]));
+        return sprintf('<td class="%s" title="%s"><a href="%s">%s%s</td>',
+            $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]),
+            $output_mod->build_page_url('message_list', array('list_path' => 'feeds_'.$output_mod->html_safe($vals[3]))), $img, $output_mod->html_safe($vals[1]));
     }
     elseif ($style == 'news') {
-        return sprintf('<div class="%s" title="%s"><a href="?page=message_list&list_path=feeds_%s">%s%s</div>',
-            $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $output_mod->html_safe($vals[3]),
-            $img, $output_mod->html_safe($vals[1]));
+        return sprintf('<div class="%s" title="%s"><a href="%s">%s%s</div>',
+            $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]),
+            $output_mod->build_page_url('message_list', array('list_path' => 'feeds_'.$output_mod->html_safe($vals[3]))), $img, $output_mod->html_safe($vals[1]));
     }
 }}
 

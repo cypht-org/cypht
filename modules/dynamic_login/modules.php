@@ -120,7 +120,7 @@ class Hm_Output_dynamic_login extends Hm_Output_login {
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<div class="confirm_logout"><div class="confirm_text">'.
                 $this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' &nbsp;'.
-                '<a href="?page=save">'.$this->trans('More info').'</a></div>'.
+                '<a href="'.$this->build_page_url('save').'">'.$this->trans('More info').'</a></div>'.
                 '<label class="screen_reader" for="logout_password">'.$this->trans('Password').'</label>'.
                 '<input id="logout_password" name="password" class="save_settings_password warn_on_paste" type="password" placeholder="'.$this->trans('Password').'" />'.
                 '<input class="save_settings" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />'.

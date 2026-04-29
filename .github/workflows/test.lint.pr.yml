@@ -36,7 +36,7 @@ jobs:
             frontend
             backend
             frontend/backend
-            module/[a-z-]+
+            module/[a-z0-9_-]+
             unit
             e2e
             other

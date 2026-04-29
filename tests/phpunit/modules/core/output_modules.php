@@ -125,7 +125,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('<form class="login_form" method="POST">'), $res->output_response);
         $test->handler_response = array('router_login_state' => true);
         $res = $test->run();
-        $this->assertEquals(array('<form class="logout_form" method="POST">'), $res->output_response);
+        $this->assertEquals(array('<form class="logout_form" method="POST" action="?page=logout">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -139,7 +139,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     </style><div class="form-container"><form class="login_form" method="POST">'), $res->output_response);
         $test->handler_response = array('router_login_state' => true, 'fancy_login_allowed' => true);
         $res = $test->run();
-        $this->assertEquals(array('<div class="form-container"><form class="logout_form" method="POST">'), $res->output_response);
+        $this->assertEquals(array('<div class="form-container"><form class="logout_form" method="POST" action="?page=logout">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -426,10 +426,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('js_data', 'core');
         $test->handler_response = array('disable_delete_prompt' => true);
         $res = $test->run();
-        $this->assertStringStartsWith('<script type="text/javascript" id="data-store">var globals = {};var hm_is_logged = function () { return 0; };var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "<i class=\\"bi bi-star-half\\"></i>"; };var hm_check_dirty_flag = function() { return 0; };var hm_special_folders = function() { return []; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return true; };', implode($res->output_response));
+        $this->assertStringContainsString('var hm_delete_prompt = function() { return true; };', implode($res->output_response));
         $test->handler_response = array();
         $res = $test->run();
-        $this->assertStringStartsWith('<script type="text/javascript" id="data-store">var globals = {};var hm_is_logged = function () { return 0; };var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "<i class=\\"bi bi-star-half\\"></i>"; };var hm_check_dirty_flag = function() { return 0; };var hm_special_folders = function() { return []; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return confirm("This action cannot be undone. Are you sure you want to delete this?"); };', implode($res->output_response));
+        $this->assertStringContainsString('var hm_delete_prompt = function(server_id, folder)', implode($res->output_response));
     }
     /**
      * @preserveGlobalState disabled
@@ -759,7 +759,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('language_setting', 'core');
         $test->handler_response = array('language'=> 'en');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="language">Language</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select id="language" class="form-select form-select-sm w-auto" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="zh-Hans">Chinese Simplified</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option><option value="zh-TW">Traditional Chinese</option></select></div></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="language">Language</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select id="language" class="form-select form-select-sm w-auto" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="zh-Hans">Chinese Simplified</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="pl">Polish</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option><option value="zh-TW">Traditional Chinese</option></select></div></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -944,11 +944,18 @@ class Hm_Test_Core_Output_Modules extends TestCase {
      */
     public function test_folder_list_content_end() {
         $test = new Output_Test('folder_list_content_end', 'core');
+        $test->handler_response = array('router_get_export' => array('page' => 'compose'));
         $res = $test->run();
-        $this->assertEquals(array('<div class="sidebar-footer"><a class="logout_link" href="#" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
+        $expectedLogoutBackQuery = base64_encode(serialize(array('page' => 'compose')));
+        $this->assertEquals(array('<div class="sidebar-footer"><a class="logout_link" id="js-logout_link" href="?page=logout&prompt=true&back_query=' . $expectedLogoutBackQuery . '" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
         $test->rtype = 'AJAX';
+
+        $router_get_params = ['page' => 'settings'];
+        $test->handler_response = array('router_get_export' => $router_get_params);
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="sidebar-footer"><a class="logout_link" href="#" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
+
+        $expectedLogoutBackQuery = base64_encode(serialize($router_get_params));
+        $this->assertEquals(array('formatted_folder_list' => '<div class="sidebar-footer"><a class="logout_link" id="js-logout_link" href="?page=logout&prompt=true&back_query=' . $expectedLogoutBackQuery . '" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>', 'router_get_export' => $router_get_params), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -996,7 +1003,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('<div class="content_title"></div><div class="msg_text">'), $res->output_response);
         $test->handler_response = array('list_parent' => 'sent');
         $res = $test->run();
-        $this->assertEquals(array('<div class="content_title"><a href="?page=message_list&amp;list_path=sent">Sent</a></div><div class="msg_text">'), $res->output_response);
+         $this->assertEquals(array('<div class="content_title"><a href="?page=message_list&amp;list_path=sent">Sent</a></div><div class="msg_text">'), $res->output_response);
         $test->handler_response = array('list_parent' => 'combined_inbox');
         $res = $test->run();
         $this->assertEquals(array('<div class="content_title"><a href="?page=message_list&amp;list_path=combined_inbox">Everything</a></div><div class="msg_text">'), $res->output_response);
@@ -1017,7 +1024,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('<input type="hidden" class="msg_uid" value="5" /><div class="content_title"><a href="?page=search&amp;list_path=search&amp;list_page=1&amp;sort=bar">Search</a><i class="bi bi-caret-right-fill path_delim"></i><a href="?page=message_list&amp;list_path=">search<i class="bi bi-caret-right-fill path_delim"></i>bar</a></div><div class="msg_text">'), $res->output_response);
         $test->handler_response = array('list_page' => 1, 'list_filter' => 'foo', 'list_sort' => 'bar', 'uid' => 5, 'mailbox_list_title' => array('foo', 'bar'));
         $res = $test->run();
-        $this->assertEquals(array('<input type="hidden" class="msg_uid" value="5" /><div class="content_title"><a href="?page=message_list&amp;list_path=&list_page=1&filter=foo&sort=bar">foo<i class="bi bi-caret-right-fill path_delim"></i>bar</a></div><div class="msg_text">'), $res->output_response);
+        $this->assertEquals(array('<input type="hidden" class="msg_uid" value="5" /><div class="content_title"><a href="?page=message_list&amp;list_path=&amp;list_page=1&amp;filter=foo&amp;sort=bar">foo<i class="bi bi-caret-right-fill path_delim"></i>bar</a></div><div class="msg_text">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

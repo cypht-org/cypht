@@ -17,7 +17,7 @@ class Hm_MTA_STS {
      * Cache for MTA-STS policy lookups
      * @var array
      */
-    private $policy_cache = array();
+    private static $policy_cache = array();
 
     /**
      * DNS cache TTL in seconds
@@ -67,8 +67,8 @@ class Hm_MTA_STS {
         }
 
         // Check cache first
-        if (isset($this->policy_cache[$this->domain])) {
-            $cached = $this->policy_cache[$this->domain];
+        if (isset(self::$policy_cache[$this->domain])) {
+            $cached = self::$policy_cache[$this->domain];
             if (time() - $cached['timestamp'] < $this->cache_ttl) {
                 return $cached['result'];
             }
@@ -119,7 +119,7 @@ class Hm_MTA_STS {
      *
      * @return string|false The DNS record or false if not found
      */
-    private function get_mta_sts_dns_record() {
+    protected function get_mta_sts_dns_record() {
         $record_name = "_mta-sts.{$this->domain}";
 
         // Try to get DNS TXT records
@@ -145,7 +145,7 @@ class Hm_MTA_STS {
      * @param string $dns_record The DNS TXT record
      * @return string|false The policy ID or false if not found
      */
-    private function parse_policy_id($dns_record) {
+    public function parse_policy_id($dns_record) {
         // Expected format: "v=STSv1; id=20190429T010101;"
         if (preg_match('/id=([^;]+);?/i', $dns_record, $matches)) {
             return trim($matches[1]);
@@ -158,10 +158,9 @@ class Hm_MTA_STS {
      *
      * @return array|false Parsed policy or false on failure
      */
-    private function fetch_policy() {
+    protected function fetch_policy() {
         $policy_url = "https://mta-sts.{$this->domain}/.well-known/mta-sts.txt";
 
-        // Use Hm_Functions curl wrappers if available, otherwise fall back to file_get_contents
         $ch = Hm_Functions::c_init();
         if ($ch) {
             $policy_content = $this->fetch_with_curl($ch, $policy_url);
@@ -183,16 +182,19 @@ class Hm_MTA_STS {
      * @param string $url The URL to fetch
      * @return string|false The content or false on failure
      */
-    private function fetch_with_curl($ch, $url) {
+    protected function fetch_with_curl($ch, $url) {
         Hm_Functions::c_setopt($ch, CURLOPT_URL, $url);
         Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        Hm_Functions::c_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        Hm_Functions::c_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
         Hm_Functions::c_setopt($ch, CURLOPT_TIMEOUT, 10);
         Hm_Functions::c_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         Hm_Functions::c_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 
         $content = Hm_Functions::c_exec($ch);
         $http_code = Hm_Functions::c_status($ch);
+        if (is_resource($ch) || (class_exists('CurlHandle') && $ch instanceof CurlHandle)) {
+            curl_close($ch);
+        }
 
         if ($http_code === 200 && $content !== false) {
             return $content;
@@ -207,11 +209,11 @@ class Hm_MTA_STS {
      * @param string $url The URL to fetch
      * @return string|false The content or false on failure
      */
-    private function fetch_with_fopen($url) {
+    protected function fetch_with_fopen($url) {
         $context = stream_context_create(array(
             'http' => array(
                 'timeout' => 10,
-                'follow_location' => 1
+                'follow_location' => 0
             ),
             'ssl' => array(
                 'verify_peer' => true,
@@ -230,7 +232,7 @@ class Hm_MTA_STS {
      * @param string $content The policy file content
      * @return array|false Parsed policy or false on failure
      */
-    private function parse_policy($content) {
+    public function parse_policy($content) {
         $policy = array(
             'version' => null,
             'mode' => null,
@@ -244,7 +246,7 @@ class Hm_MTA_STS {
             $line = trim($line);
 
             // Skip empty lines and comments
-            if (empty($line) || $line[0] === '#') {
+            if ($line === '' || $line[0] === '#') {
                 continue;
             }
 
@@ -274,7 +276,13 @@ class Hm_MTA_STS {
         }
 
         // Validate required fields
-        if ($policy['version'] !== 'STSv1' || empty($policy['mode']) || empty($policy['mx'])) {
+        if ($policy['version'] !== 'STSv1' || empty($policy['mode']) || $policy['max_age'] === null) {
+            return false;
+        }
+        if (!in_array($policy['mode'], array('enforce', 'testing', 'none'), true)) {
+            return false;
+        }
+        if ($policy['mode'] !== 'none' && empty($policy['mx'])) {
             return false;
         }
 
@@ -287,7 +295,7 @@ class Hm_MTA_STS {
      * @param array $result The result to cache
      */
     private function cache_result($result) {
-        $this->policy_cache[$this->domain] = array(
+        self::$policy_cache[$this->domain] = array(
             'timestamp' => time(),
             'result' => $result
         );
@@ -360,7 +368,7 @@ class Hm_MTA_STS {
      * @param string $email The email address
      * @return string|false The domain or false if invalid
      */
-    public static function extract_domain($email) {
+    public function extract_domain($email) {
         $email = trim($email);
 
         // Remove display name if present (e.g., "John Doe <john@example.com>")
@@ -383,19 +391,19 @@ class Hm_MTA_STS {
      * @param array $mta_sts_result Result from check_domain()
      * @return string Status message
      */
-    public static function get_status_message($mta_sts_result) {
+    public function get_status_message($mta_sts_result) {
         if ($mta_sts_result['enabled']) {
             $mode = isset($mta_sts_result['policy']['mode']) ? $mta_sts_result['policy']['mode'] : 'unknown';
 
             switch ($mode) {
                 case 'enforce':
-                    return 'MTA-STS enabled (enforce mode) - TLS required';
+                    return 'MTA-STS policy published (enforce mode)';
                 case 'testing':
-                    return 'MTA-STS enabled (testing mode) - TLS preferred';
+                    return 'MTA-STS policy published (testing mode)';
                 case 'none':
                     return 'MTA-STS disabled';
                 default:
-                    return 'MTA-STS enabled (unknown mode)';
+                    return 'MTA-STS policy published (unknown mode)';
             }
         }
 
@@ -408,7 +416,7 @@ class Hm_MTA_STS {
      * @param array $mta_sts_result Result from check_domain()
      * @return string CSS class name
      */
-    public static function get_status_class($mta_sts_result) {
+    public function get_status_class($mta_sts_result) {
         if (!$mta_sts_result['enabled']) {
             return 'mta-sts-disabled';
         }
@@ -429,6 +437,6 @@ class Hm_MTA_STS {
      * Clear the policy cache
      */
     public function clear_cache() {
-        $this->policy_cache = array();
+        self::$policy_cache = array();
     }
 }

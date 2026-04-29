@@ -74,6 +74,11 @@ var save_compose_state = function(no_files, notice, schedule, callback) {
     if (notice) {
         no_icon = false;
     }
+
+    // Sync editor content to textarea before saving
+    if (window.kindEditor) {
+        kindEditor.sync();
+    }
     var uploaded_files = $("input[name='uploaded_files[]']").map(function(){return $(this).val();}).get();
     var body = $('.compose_body').val();
     var subject = $('.compose_subject').val();
@@ -140,6 +145,109 @@ var toggle_recip_flds = function() {
     return false;
 }
 
+var mta_sts_status_timer = false;
+var mta_sts_last_recipient_state = false;
+var mta_sts_status_request_id = 0;
+
+var mta_sts_status_check_enabled = function() {
+    return $('.mta-sts-status-container[data-mta-sts-enabled="1"]').length > 0;
+};
+
+var place_mta_sts_status_container = function() {
+    var container = $('.mta-sts-status-container[data-mta-sts-enabled="1"]').first();
+    if (container.length && $('.recipient_fields').length) {
+        container.insertAfter($('.recipient_fields'));
+    }
+};
+
+var compose_recipient_value = function(selector) {
+    var values = [];
+    var input = $(selector);
+    input.prev('.bubbles').children('.bubble').each(function() {
+        var value = $(this).attr('data-value');
+        if (value) {
+            values.push(value);
+        }
+    });
+    if (input.val()) {
+        values.push(input.val());
+    }
+    return values.join(', ');
+};
+
+var compose_recipient_state = function() {
+    return {
+        to: compose_recipient_value('.compose_to'),
+        cc: compose_recipient_value('.compose_cc'),
+        bcc: compose_recipient_value('.compose_bcc')
+    };
+};
+
+var hide_mta_sts_status_container = function() {
+    var container = $('.mta-sts-status-container[data-mta-sts-enabled="1"]').first();
+    container.html('').addClass('d-none');
+    place_mta_sts_status_container();
+};
+
+var update_mta_sts_status_container = function(html) {
+    var container = $('.mta-sts-status-container[data-mta-sts-enabled="1"]').first();
+    if (!container.length) {
+        return;
+    }
+    if (!html) {
+        hide_mta_sts_status_container();
+        return;
+    }
+    container.replaceWith(html);
+    place_mta_sts_status_container();
+};
+
+var refresh_mta_sts_status = function() {
+    if (!mta_sts_status_check_enabled()) {
+        return;
+    }
+    var recipients = compose_recipient_state();
+    var recipient_state = recipients.to + '|' + recipients.cc + '|' + recipients.bcc;
+    if (recipient_state == mta_sts_last_recipient_state) {
+        return;
+    }
+    mta_sts_last_recipient_state = recipient_state;
+    mta_sts_status_request_id++;
+    if (!recipients.to && !recipients.cc && !recipients.bcc) {
+        hide_mta_sts_status_container();
+        return;
+    }
+    var request_id = mta_sts_status_request_id;
+    Hm_Ajax.request([
+        {'name': 'hm_ajax_hook', 'value': 'ajax_mta_sts_status'},
+        {'name': 'compose_to', 'value': recipients.to},
+        {'name': 'compose_cc', 'value': recipients.cc},
+        {'name': 'compose_bcc', 'value': recipients.bcc}
+    ], function(res) {
+        if (request_id != mta_sts_status_request_id) {
+            return;
+        }
+        update_mta_sts_status_container((res && res.mta_sts_status_display) ? res.mta_sts_status_display : '');
+    }, [], true);
+};
+
+var schedule_mta_sts_status_check = function() {
+    if (!mta_sts_status_check_enabled()) {
+        return;
+    }
+    clearTimeout(mta_sts_status_timer);
+    mta_sts_status_timer = setTimeout(refresh_mta_sts_status, 500);
+};
+
+var init_mta_sts_status_check = function() {
+    if (!mta_sts_status_check_enabled()) {
+        return;
+    }
+    place_mta_sts_status_container();
+    $('.compose_to, .compose_cc, .compose_bcc').on('input change', schedule_mta_sts_status_check);
+    schedule_mta_sts_status_check();
+};
+
 function smtpServersPageHandler() {
     $('.test_smtp_connect').on('click', smtp_test_action);
     $('.delete_smtp_connection').on('click', smtp_delete_action);
@@ -158,6 +266,7 @@ var reset_smtp_form = function(save = true) {
     $('.ke-content', $('iframe').contents()).html('');
     $('.uploaded_files').html('');
     $('#compose_delivery_receipt').prop('checked', false);
+    schedule_mta_sts_status_check();
     if (save) {
         save_compose_state(true);
     }
@@ -249,6 +358,7 @@ var move_recipient_to_section = function(e) {
     target.find('.bubbles').append($('#'+id));
     var input = target.find('input');
     input.focus();
+    schedule_mta_sts_status_check();
 };
 
 var allow_drop = function(e) {
@@ -275,6 +385,7 @@ var bubbles_to_text = function(input) {
         $(input).val(value);
     }
     $(input).css('width', '95%');
+    schedule_mta_sts_status_check();
 };
 
 var text_to_bubbles = function(input) {
@@ -298,6 +409,7 @@ var text_to_bubbles = function(input) {
             }
         }
         $(input).val(invalid_recipients);
+        schedule_mta_sts_status_check();
     }
 };
 
@@ -336,8 +448,107 @@ var copy_text_to_clipboard = function(e) {
 }
 
 var is_valid_recipient = function(recipient) {
-    var valid_regex = /^[\p{L}|\d' ]*(<)?[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*(>)?$/u;
-    return recipient.match(valid_regex);
+    // This function extracts an email address from RFC 5322 formatted recipient strings
+    // and validates it using Hm_Utils.is_valid_email()
+    if (!recipient) {
+        return false;
+    }
+    var val = recipient.trim();
+
+    if (!val) {
+        return false;
+    }
+
+    // Step 1: Remove comments in parentheses (RFC 5322 allows comments)
+    // Examples: "Name (comment) <email>", "email@domain.com (comment)"
+    // Handle nested parentheses properly
+    var depth = 0;
+    var cleaned = '';
+    for (var i = 0; i < val.length; i++) {
+        if (val[i] === '(') {
+            depth++;
+        } else if (val[i] === ')') {
+            depth--;
+        } else if (depth === 0) {
+            cleaned += val[i];
+        }
+    }
+    // Collapse multiple whitespaces and trim
+    val = cleaned.replace(/\s+/g, ' ').trim();
+
+    if (!val) {
+        return false;
+    }
+
+    // Step 2: Handle RFC 5322 group syntax: "display-name : mailbox-list ;"
+    // After splitting by comma/semicolon, we might get "Group Name: email@domain.com"
+    // BUT: Ignore colons inside square brackets (IPv6 addresses like user@[IPv6:2001:db8::1])
+    if (val.includes(':') && !val.includes('<')) {
+        var colonIndex = val.indexOf(':');
+        var bracketIndex = val.indexOf('[');
+
+        // Only treat as group syntax if colon appears before any brackets
+        // or if there are no brackets at all
+        if (bracketIndex === -1 || colonIndex < bracketIndex) {
+            var afterColon = val.substring(colonIndex + 1).trim();
+            if (afterColon) {
+                val = afterColon;
+            } else {
+                // Empty group like "Undisclosed recipients:;" - no email to extract
+                return false;
+            }
+        }
+    }
+
+    // Step 3: Extract email from angle brackets or plain text
+    var email = '';
+    var angleBracketMatch = val.match(/<([^>]+)>/);
+
+    if (angleBracketMatch) {
+        // Format: "Display Name <email@example.com>"
+        email = angleBracketMatch[1].trim();
+    } else {
+        // No angle brackets - extract email from plain text
+        // Remove quoted display name if present: "Display Name" email@example.com
+        val = val.replace(/^"[^"]*"\s+/, '');
+
+        // Find the word containing @ (typically the last word)
+        var parts = val.split(/\s+/);
+        for (var i = parts.length - 1; i >= 0; i--) {
+            if (parts[i].includes('@')) {
+                email = parts[i];
+                break;
+            }
+        }
+    }
+
+    if (!email) {
+        return false;
+    }
+
+    // Step 4: Clean up extracted email (remove trailing punctuation from splitting)
+    // Preserve quoted local-part (e.g., "user name"@example.com)
+    if (email.includes('@')) {
+        var atPos = email.indexOf('@');
+        var localPart = email.substring(0, atPos);
+        var domainPart = email.substring(atPos);
+
+        // Clean domain part (remove trailing commas, semicolons, etc.)
+        domainPart = domainPart.replace(/[,;]+$/g, '').trim();
+
+        // Clean local part only if quotes aren't wrapping it completely
+        if (!(localPart.startsWith('"') && localPart.endsWith('"'))) {
+            localPart = localPart.replace(/^["',;]+|["',;]+$/g, '').trim();
+        }
+
+        email = localPart + domainPart;
+    } else {
+        email = email.replace(/^["',;]+|["',;]+$/g, '').trim();
+    }
+
+    // Step 5: Validate the extracted email using the core validation function
+    // All RFC 5322 validation rules are handled by is_valid_email
+    return Hm_Utils.is_valid_email(email);
 };
 
 var process_compose_form = function(){

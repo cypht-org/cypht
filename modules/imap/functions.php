@@ -144,8 +144,8 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
                 }
             } else {
                 $attrs = 'id="main-link" data-id="imap_'.$id.'_'.$output_mod->html_safe($folder_name).
-                '" href="?page=message_list&amp;list_path='.
-                urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)).'"';
+                '" href="'.
+                $output_mod->build_page_url('message_list', array('list_path' => urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name))), true).'"';
             }
             if (mb_strlen($folder['basename'])>15) {
                 $results .= '<a ' . $attrs .
@@ -306,19 +306,24 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         if ($msg['folder'] && strtolower(hex2bin($msg['folder'])) != 'inbox') {
             $source .= '-'.preg_replace("/^INBOX.{1}/", '', hex2bin($msg['folder']));
         }
-        $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
+        $url_params = array(
+            'uid' => $msg['uid'],
+            'list_path' => sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']),
+            'list_parent' => $parent_value,
+        );
         if ($list_page) {
-            $url .= '&list_page='.$output_module->html_safe($list_page);
+            $url_params['list_page'] = $output_module->html_safe($list_page);
         }
         if ($list_sort) {
-            $url .= '&sort='.$output_module->html_safe($list_sort);
+            $url_params['sort'] = $output_module->html_safe($list_sort);
         }
         if ($list_filter) {
-            $url .= '&filter='.$output_module->html_safe($list_filter);
+            $url_params['filter'] = $output_module->html_safe($list_filter);
         }
         if ($list_keyword) {
-            $url .= '&keyword='.$output_module->html_safe($list_keyword);
+            $url_params['keyword'] = $output_module->html_safe($list_keyword);
         }
+        $url = $output_module->build_page_url('message', $url_params);
         if (!$show_icons) {
             $icon = false;
         }
@@ -446,6 +451,11 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
         'imagepjpeg',
         'imagegif',
     );
+
+    if ($output_mod->get('enable_mstnef_viewer')) {
+        $allowed[] = 'applicationms-tnef';
+    }
+
     $icons = array(
         'text' => 'doc',
         'image' => 'camera',
@@ -1278,9 +1288,10 @@ function format_list_headers($mod) {
             $sources = array();
             $section = '<div><p class="mb-1">'.$mod->html_safe($name).':</p>';
             foreach ($vals['email'] as $v) {
-                $sources[] = '<a href="?page=compose&compose_to='.urlencode($mod->html_safe($v)).
-                    '&compose_from='.$mod->get('msg_headers')['Delivered-To'].
-                    '" class="text-decoration-none">'.$mod->trans('email').'</a>';
+                $sources[] = '<a href="'.$mod->build_page_url('compose', array(
+                    'compose_to' => urlencode($mod->html_safe($v)),
+                    'compose_from' => $mod->get('msg_headers')['Delivered-To'],
+                )).'" class="text-decoration-none">'.$mod->trans('email').'</a>';
             }
             foreach ($vals['links'] as $v) {
                 $sources[] = '<a href="'.$mod->html_safe($v).'" class="text-decoration-none">'.$mod->trans('link').'</a>';
@@ -1500,7 +1511,7 @@ function snooze_dropdown($output, $unsnooze = false) {
     $values = nexter_formats();
 
     $txt = '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-bs-auto-close="outside">'.$output->trans('Snooze').'</a>
+                <a class="hlink text-decoration-none btn btn-sm btn-light dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-bs-auto-close="outside">'.$output->trans('Snooze').'</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
     foreach ($values as $format) {
         $labels = get_scheduled_date($format, true);
@@ -1525,7 +1536,7 @@ function tags_dropdown($context) {
 
     $folders = $context->get('tags', array());
     $txt = '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" href="#" aria-expanded="true">'.$context->trans('Tags').'</a>
+                <a class="hlink text-decoration-none btn btn-sm btn-light dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" href="#" aria-expanded="true">'.$context->trans('Tags').'</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuTag">';
 
     foreach ($folders as $folder) {
@@ -1549,8 +1560,16 @@ if (!hm_exists('forward_dropdown')) {
         $txt = '<div class="dropdown d-inline-block">
                     <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" id="dropdownMenuForward" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Forward').'</button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuForward">';
-        $txt .= '<li><a href="?page=compose&amp;forward_as_attachment=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none" ><span>'.$output->trans('Forward as message attachment').'</a></li>';
-        $txt .= '<li><a href="?page=compose&amp;forward=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none"><span>'.$output->trans('Edit as new message').'</a></li>';
+        $txt .= '<li><a href="'.
+            $output->build_page_url('compose', array(
+                'forward_as_attachment' => 1
+            ), true).$reply_args.
+            '" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none" ><span>'.$output->trans('Forward as message attachment').'</a></li>';
+        $txt .= '<li><a href="'.
+            $output->build_page_url('compose', array(
+                'forward' => 1,
+            ), true).$reply_args.
+            '" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none"><span>'.$output->trans('Edit as new message').'</a></li>';
         $txt .= '</ul></div>';
         return $txt;
     }
@@ -1675,3 +1694,97 @@ function is_imap_archive_folder($server_id, $user_config, $current_folder) {
     
     return false;
 }}
+
+if (!hm_exists('is_imap_trash_folder')) {
+    function is_imap_trash_folder($handler, $server_id, $folder) {
+        $specials = get_special_folders($handler, $server_id);
+        if (array_key_exists('trash', $specials) && $specials['trash']) {
+            return $specials['trash'] === $folder;
+        }
+        return false;
+    }
+}
+
+if (!hm_exists('parse_mstnef')) {
+    function parse_mstnef($config) {
+        [
+            'tnefBinary' => $tnefBinary,
+            'attachmentDir' => $attachmentDir,
+            'msgUid' => $msgId,
+            'msgPart' => $msgPart,
+            'imapServerId' => $imapServerId,
+            'folder' => $folder,
+            'returnFile' => $returnFile
+        ] = $config;
+
+        if (! is_writable($attachmentDir) && ! mkdir($attachmentDir)) {
+            return '<div class="alert alert-danger" rol="alert">Unable to parse TNEF message. Please ensure that "attachment_dir" is configured in your environmment and is writable!</div>';
+        }
+
+        $unpackDir = $attachmentDir . DIRECTORY_SEPARATOR . 'message_' . $msgId . '_' . rand(1000, 9999);
+
+        if (! file_exists($unpackDir)) {
+            mkdir($unpackDir);
+        }
+        
+        $filename = $unpackDir . DIRECTORY_SEPARATOR . 'message' . '.dat';
+        file_put_contents($filename, $tnefBinary);
+
+        $tnefParserOutput = shell_exec("tnef -f $filename -C $unpackDir --save-body");
+        if ($tnefParserOutput) {
+            Hm_Debug::add("Failed to parse TNEF message. Details: " . $tnefParserOutput);
+            return '<div class="alert alert-danger" rol="alert">Unable to parse TNEF message. Please check the log output for more details.</div>';
+        }
+
+        unlink($filename);
+
+        if ($returnFile) {
+            // remove the files not requested
+            foreach (glob($unpackDir . DIRECTORY_SEPARATOR . '*') as $file) {
+                if (is_file($file)) {
+                    $fileInfo = pathinfo($file);
+                    if ($fileInfo['basename'] !== $returnFile) {
+                        unlink($file);
+                    }
+                }
+            }
+            
+            $filePath = $unpackDir . DIRECTORY_SEPARATOR . $returnFile;
+            if (file_exists($filePath)) {
+                return $filePath;
+            }
+        }
+
+        $bodyOutput = null;
+        $attachmentsOutput = '';
+        foreach (glob($unpackDir . DIRECTORY_SEPARATOR . '*') as $file) {
+            if (is_file($file)) {
+                $fileInfo = pathinfo($file);
+                $mimeType = mime_content_type($file);
+
+                if (strtolower($fileInfo['extension']) === 'rtf') {
+                    $bodyOutput = shell_exec("unrtf --html $file");
+                    if (! $bodyOutput) {
+                        Hm_Debug::add("Failed to parse RTF body from TNEF message. Details: " . $bodyOutput);
+                        $bodyOutput = '<div class="alert alert-danger" rol="alert">Unable to parse RTF body from TNEF message. Please check the log output for more details.</div>';
+                    }
+                } elseif (strpos($mimeType, 'image/') === 0) {
+                    // display images
+                    $base64Data = base64_encode(file_get_contents($file));
+                    $attachmentsOutput .= '<div><img src="data:' . $mimeType . ';base64,' . $base64Data . '" alt="' . htmlspecialchars($fileInfo['basename']) . '" class="img-fluid"></div>';
+                } else {
+                    // other attachments
+                    $fileUrl = "?page=message&imap_msg_uid=$msgId&imap_server_id=$imapServerId&imap_folder=$folder&imap_msg_part=$msgPart&download_attachment=" . urlencode($fileInfo['basename']);
+                    $attachmentsOutput .= '<div class="download_link">
+                    <a href="#" data-src="' . $fileUrl . '" class="btn btn-sm btn-link">
+                        ' . htmlspecialchars($fileInfo['basename']) . '
+                    </a>
+                    </div>';
+                }
+                unlink($file);
+            }
+        }
+
+        return $bodyOutput . $attachmentsOutput;
+    }
+}

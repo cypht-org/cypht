@@ -1,0 +1,42 @@
+.mta-sts-status-container {
+    background-color: #f8f9fa;
+}
+
+.mta-sts-status-title {
+    font-weight: 600;
+    color: #495057;
+}
+
+.mta-sts-recipient {
+    padding: 0.5rem;
+    background-color: #fff;
+    border-radius: 0.25rem;
+}
+
+.mta-sts-email {
+    font-size: 0.95rem;
+}
+
+.mta-sts-domain {
+    font-size: 0.85rem;
+}
+
+.mta-sts-indicator,
+.tls-rpt-indicator {
+    font-size: 0.9rem;
+}
+
+.mta-sts-enforce {
+    border-left: 3px solid #28a745;
+    padding-left: 0.5rem;
+}
+
+.mta-sts-testing {
+    border-left: 3px solid #17a2b8;
+    padding-left: 0.5rem;
+}
+
+.mta-sts-disabled {
+    border-left: 3px solid #ffc107;
+    padding-left: 0.5rem;
+}

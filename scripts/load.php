@@ -19,8 +19,13 @@ if (mb_strtolower(php_sapi_name()) !== 'cli') {
     die("Must be run from the command line\n");
 }
 
-define('DEBUG_MODE', false);
+require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
+$environment = Hm_Environment::getInstance();
+$environment->load();
+
+/* Define DEBUG_MODE from environment variable */
+define('DEBUG_MODE', filter_var(env('ENABLE_DEBUG', false), FILTER_VALIDATE_BOOLEAN));
 require sprintf("%s/modules/core/modules.php", APP_PATH);
 
 foreach (scandir(sprintf('%s/modules/', APP_PATH)) as $mod) {

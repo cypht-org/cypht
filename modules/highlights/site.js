@@ -1,6 +1,6 @@
 'use strict';
 
-$(function() {
+function applyHighlightsPageHandlers() {
     $('.rule_del').on('click', function() {
         return hm_delete_prompt();
     });
@@ -11,4 +11,4 @@ $(function() {
         var selected = $(this).val();
         $('.'+selected+'_row').removeClass('d-none');
     });
-});
+}

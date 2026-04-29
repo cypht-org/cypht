@@ -203,6 +203,7 @@ trait Hm_Handler_Module_Exec {
             'router_module_list'  => $this->site_config->get_modules(),
             'router_app_name'     => $this->site_config->get('app_name', 'HM3'),
             'router_js_exclude_deps' => $this->site_config->get('js_exclude_deps'),
+            'router_get_export' => $request->get,
         ));
     }
 }
@@ -234,7 +235,7 @@ class Hm_Module_Exec {
      * @return void
      */
     public function process_module_setup() {
-        if (DEBUG_MODE or $this->site_config->get('debug_log')) {
+        if (DEBUG_MODE) {
             $this->setup_debug_modules();
         }
         else {

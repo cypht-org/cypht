@@ -141,6 +141,7 @@ class Hm_Test_Saved_Searches_Functions extends TestCase {
         $mock_output = new class {
             public function trans($str) { return $str; }
             public function html_safe($str) { return htmlspecialchars($str, ENT_QUOTES); }
+            public function get($name, $default=false) { return $default; }
         };
 
         $result = update_search_label_field('Test Search', $mock_output);

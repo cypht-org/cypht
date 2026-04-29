@@ -99,6 +99,7 @@ add_handler('message', 'imap_show_message', true, 'imap', 'message_list_type', '
 add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'imap_remove_attachment', true, 'imap', 'message_list_type', 'after');
 add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
+add_handler('message', 'imap_download_attachment', true, 'imap', 'message_list_type', 'after');
 
 /* message source page */
 setup_base_page('message_source', 'core', false);
@@ -159,6 +160,7 @@ add_handler('ajax_imap_message_content', 'save_imap_servers',  true);
 add_handler('ajax_imap_message_content', 'close_session_early',  true, 'core');
 add_output('ajax_imap_message_content', 'filter_message_headers', true);
 add_output('ajax_imap_message_content', 'filter_message_body', true);
+add_output('ajax_imap_message_content', 'filter_message_headers_end', true);
 add_output('ajax_imap_message_content', 'filter_message_struct', true);
 
 /* ajax combined/all/flagged/unread/sent message list pages */
@@ -220,6 +222,15 @@ add_handler('ajax_imap_archive_message', 'load_imap_servers_from_config',  true)
 add_handler('ajax_imap_archive_message', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_archive_message', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_archive_message', 'imap_archive_message',  true);
+
+/* restore message callback */
+setup_base_ajax_page('ajax_imap_restore_message', 'core');
+add_handler('ajax_imap_restore_message', 'message_list_type', true, 'core');
+add_handler('ajax_imap_restore_message', 'imap_message_list_type', true);
+add_handler('ajax_imap_restore_message', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_restore_message', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_restore_message', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_restore_message', 'imap_restore_message',  true);
 
 
 /* ajax message action callback */
@@ -314,6 +325,7 @@ return array(
         'ajax_imap_junk',
         'message_source',
         'ajax_share_folders',
+        'ajax_imap_restore_message',
     ),
 
     'allowed_output' => array(
@@ -329,6 +341,9 @@ return array(
         'imap_expanded_folder_formatted' => array(FILTER_UNSAFE_RAW, false),
         'imap_server_ids' => array(FILTER_UNSAFE_RAW, false),
         'imap_server_id' => array(FILTER_UNSAFE_RAW, false),
+        'mailbox_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'filter_headers' => array(FILTER_UNSAFE_RAW, false),
+        'msg_headers_end' => array(FILTER_UNSAFE_RAW, false),
         'combined_inbox_server_ids' => array(FILTER_UNSAFE_RAW, false),
         'imap_delete_error' => array(FILTER_VALIDATE_BOOLEAN, false),
         'move_count' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
@@ -339,6 +354,7 @@ return array(
         'do_not_flag_as_read_on_open' => array(FILTER_VALIDATE_BOOLEAN, false),
         'ajax_imap_folders_permissions' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'move_responses' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+        'reload_folders_list' => array(FILTER_VALIDATE_BOOLEAN, false),
     ),
 
     'allowed_get' => array(
@@ -350,6 +366,7 @@ return array(
         'imap_msg_uid' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_folder' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'sort' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'download_attachment' => FILTER_DEFAULT,
     ),
 
     'allowed_post' => array(

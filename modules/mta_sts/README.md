@@ -1,13 +1,15 @@
 # MTA-STS Module
 
-This module provides MTA-STS (Mail Transfer Agent Strict Transport Security) and TLS-RPT (TLS Reporting) support in Cypht.
+This module displays recipient-domain MTA-STS (Mail Transfer Agent Strict Transport Security) and TLS-RPT (TLS Reporting) policy information in Cypht.
+
+MTA-STS delivery enforcement belongs to the sending MTA that connects to recipient MX hosts. Cypht normally submits mail to a configured SMTP relay, so this module reports the recipient domain policy status; it does not replace MTA-level enforcement in Postfix, Exim, OpenSMTPD, or another outbound MTA.
 
 ## Features
 
-- **Real-time MTA-STS checking**: Automatically checks if recipient domains support MTA-STS when composing emails
-- **Visual status indicators**: Displays clear security status badges for each recipient
+- **Opt-in MTA-STS checking**: Checks whether recipient domains publish MTA-STS policy records when composing emails
+- **Visual status indicators**: Displays clear policy status badges for each recipient
 - **TLS-RPT detection**: Shows if domains have TLS reporting configured
-- **Policy information**: Displays whether a domain enforces or prefers TLS encryption
+- **Policy information**: Displays whether a recipient domain publishes `enforce`, `testing`, or `none`
 
 ## What is MTA-STS?
 
@@ -31,15 +33,15 @@ When you compose an email in Cypht, the module:
 2. Checks each recipient's domain for MTA-STS DNS records
 3. Fetches and parses the MTA-STS policy (if available)
 4. Checks for TLS-RPT configuration
-5. Displays the security status with visual indicators
+5. Displays the policy status with visual indicators
 
 ## Status Indicators
 
 ### MTA-STS Status
 
-- **Enforce Mode (Green)**: TLS encryption is required. Email will only be delivered over encrypted connections.
-- **Testing Mode (Blue)**: TLS encryption is preferred but not required. Delivery will proceed even without TLS.
-- **Not Configured (Yellow)**: Domain does not have MTA-STS configured. TLS security is not enforced.
+- **Enforce Mode (Green)**: The recipient domain publishes an MTA-STS enforce policy.
+- **Testing Mode (Blue)**: The recipient domain publishes an MTA-STS testing policy.
+- **Not Configured (Yellow)**: No MTA-STS policy was found for the recipient domain.
 
 ### TLS-RPT Status
 
@@ -51,28 +53,18 @@ The module is included with Cypht. To enable it:
 
 1. Ensure the main MTA-STS library is present: `lib/mta_sts.php`
 2. The module is automatically loaded if present in `modules/mta_sts/`
-3. No additional configuration is required
-
-## For Administrators
-
-To set up MTA-STS for your own email domain, use the included setup script:
-
-```bash
-./scripts/setup_mta_sts.sh -d yourdomain.com -m "mail.yourdomain.com" -e security@yourdomain.com
-```
-
-
+3. Enable "Show recipient MTA-STS policy status when composing" in Settings
 
 ## Dependencies
 
-- PHP with cURL or allow_url_fopen enabled
+- PHP with cURL or `allow_url_fopen` enabled
 - DNS functions available (dns_get_record)
 - Internet access to check external domains
 
 ## Performance
 
 - Results are cached for 1 hour to minimize DNS lookups and HTTP requests
-- Only active when composing emails
+- Only active when composing emails and the user setting is enabled
 - Checks are performed server-side
 
 ## Privacy
@@ -102,18 +94,18 @@ To set up MTA-STS for your own email domain, use the included setup script:
 
 - `modules.php`: Handler and output classes
 - `setup.php`: Module registration and hooks
+- `site.css`: Module styles
 
 ### Classes
 
 - `Hm_Handler_check_mta_sts_status`: Checks MTA-STS and TLS-RPT status for recipients
-- `Hm_Output_mta_sts_status_indicator`: Displays security status in compose form
-- `Hm_Output_mta_sts_styles`: Adds CSS styling for status indicators
+- `Hm_Output_mta_sts_status_indicator`: Displays policy status in compose form
 
 ### Library
 
 The module uses `Hm_MTA_STS` class from `lib/mta_sts.php`:
 
-- `check_domain()`: Check if domain has MTA-STS enabled
+- `check_domain()`: Check whether a domain publishes a valid MTA-STS policy
 - `check_tls_rpt()`: Check if domain has TLS-RPT enabled
 - `extract_domain()`: Extract domain from email address
 - `get_status_message()`: Get human-readable status message

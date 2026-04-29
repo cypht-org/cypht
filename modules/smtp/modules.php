@@ -398,7 +398,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if ($reply_type) {
             $this->out('reply_type', $reply_type);
         }
-        if (is_dir($this->config->get('attachment_dir'))) {
+        if (@is_dir($this->config->get('attachment_dir'))) {
             $this->out('attachment_dir_access', true);
         } else {
             $this->out('attachment_dir_access', false);
@@ -988,7 +988,7 @@ class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
  */
 class Hm_Output_sent_folder_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_sent"><a class="unread_link" href="?page=message_list&amp;list_path=sent">';
+        $res = '<li class="menu_sent"><a class="unread_link" href="'.$this->build_page_url('message_list', array('list_path' => 'sent'), true).'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-send-check-fill menu-icon"></i>';
         }
@@ -1014,7 +1014,7 @@ class Hm_Output_compose_form_start extends Hm_Output_Module {
         $res = '<div class="container">';
         $res .= '<div class="row justify-content-md-center">';
         $res .= '<div class="col col-lg-10 col-xl-8">';
-        $res .= '<form class="compose_form p-4" method="post" action="?page=compose" data-reminder="' . $this->get('enable_attachment_reminder', 0) . '">';
+        $res .= '<form class="compose_form p-4" method="post" action="'.$this->build_page_url('compose').'" data-reminder="' . $this->get('enable_attachment_reminder', 0) . '">';
         return $res;
     }
 }
@@ -1053,8 +1053,7 @@ class Hm_Output_compose_form_draft_list extends Hm_Output_Module {
         $res .= '<div class="draft_list">';
         foreach ($drafts as $id => $draft) {
             $subject = trim($draft['draft_subject']) ? trim($draft['draft_subject']) : 'Draft '.($id+1);
-            $res .= '<div class="draft_'.$this->html_safe($id).'"><a class="draft_link" href="?page=compose&draft_id='.
-                $this->html_safe($id).'">'.$this->html_safe($subject).'</a> '.
+            $res .= '<div class="draft_'.$this->html_safe($id).'"><a class="draft_link" href="'.$this->build_page_url('compose', array('draft_id' => $this->html_safe($id))).'">'.$this->html_safe($subject).'</a> '.
                 '<i class="bi bi-x-circle-fill delete_draft" data-id="'.$this->html_safe($id).'"></i></div>';
         }
         $res .= '</div>';
@@ -1529,7 +1528,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
  */
 class Hm_Output_compose_page_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_compose"><a class="unread_link" href="?page=compose">';
+        $res = '<li class="menu_compose"><a class="unread_link" href="'.$this->build_page_url('compose').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-file-earmark-text menu-icon"></i>';
         }
@@ -2362,6 +2361,16 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     $smtp_port = $config->get('default_smtp_port', 465);
     $smtp_tls = $config->get('default_smtp_tls', true);
     Hm_SMTP_List::init($user_config, $session);
+
+    // Check if a default server already exists
+    $default_server_id = false;
+    foreach (Hm_SMTP_List::getAll() as $id => $server) {
+        if (array_key_exists('default', $server) && $server['default']) {
+            $default_server_id = $id;
+            break;
+        }
+    }
+
     $attributes = array(
         'name' => $config->get('default_smtp_name', 'Default'),
         'default' => true,
@@ -2375,8 +2384,15 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     if ($config->get('default_smtp_no_auth', false)) {
         $attributes['no_auth'] = true;
     }
-    Hm_SMTP_List::add($attributes);
-    Hm_Debug::add('Default SMTP server added', 'info');
+
+    if (!$default_server_id) {
+        Hm_SMTP_List::add($attributes);
+        Hm_Debug::add('Default SMTP server added', 'info');
+    } else {
+        // Update existing default server instead of adding a duplicate
+        Hm_SMTP_List::edit($default_server_id, $attributes);
+        Hm_Debug::add('Default SMTP server updated', 'info');
+    }
 }}
 
 /**

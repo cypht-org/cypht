@@ -4,12 +4,9 @@
  * CLI script to build the site configuration
  */
 
-if (mb_strtolower(php_sapi_name()) !== 'cli') {
+if (strtolower(php_sapi_name()) !== 'cli') {
     die("Must be run from the command line\n");
 }
-
-/* debug mode has to be set to something or include files will die() */
-define('DEBUG_MODE', false);
 
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
@@ -24,46 +21,12 @@ require APP_PATH.'lib/framework.php';
 $environment = Hm_Environment::getInstance();
 $environment->load();
 
-/* check for proper php support */
-check_php();
+/* Define DEBUG_MODE from environment variable */
+define('DEBUG_MODE', filter_var(env('ENABLE_DEBUG', false), FILTER_VALIDATE_BOOLEAN));
 
 /* create site */
 build_config();
 
-
-/**
- * Check PHP for correct support
- *
- * @return void
- * */
-function check_php() {
-    $minVersion = 8.1;
-    $version = phpversion();
-    if (mb_substr($version, 0, 3) < $minVersion) {
-        die("Cypht requires PHP version $minVersion or greater");
-    }
-    if (!function_exists('mb_strpos')) {
-        die('Cypht requires PHP MB support');
-    }
-    if (!function_exists('curl_exec')) {
-        die('Cypht requires PHP cURL support');
-    }
-    if (!function_exists('openssl_random_pseudo_bytes')) {
-        die('Cypht requires PHP OpenSSL support');
-    }
-    if (!class_exists('PDO')) {
-        echo "\nWARNING: No PHP PDO support found, database featueres will not work\n\n";
-    }
-    if (!class_exists('Redis')) {
-        echo "\nWARNING: No PHP Redis support found, Redis caching or sessions will not work\n\n";
-    }
-    if (!class_exists('Memcached')) {
-        echo "\nWARNING: No PHP Memcached support found, Memcached caching or sessions will not work\n\n";
-    }
-    if (!class_exists('gnupg')) {
-        echo "\nWARNING: No PHP gnupg support found, The PGP module set will not work if enabled\n\n";
-    }
-}
 
 /**
  * build sub-resource integrity hash
@@ -78,13 +41,10 @@ function build_integrity_hash($data) {
  * @return void
  */
 function build_config() {
-    if (!Hm_Dispatch::is_php_setup()) {
-        printf("\nPHP is not correctly configured\n");
-        printf("\nMbstring:   %s\n", function_exists('mb_strpos') ? 'yes' : 'no');
-        printf("Curl:       %s\n", function_exists('curl_exec') ? 'yes' : 'no');
-        printf("Openssl:    %s\n", function_exists('openssl_random_pseudo_bytes') ? 'yes' : 'no');
-        printf("PDO:        %s\n\n", class_exists('PDO') ? 'yes' : 'no');
-        exit;
+    /* check PHP version before loading settings (mb_* functions used throughout) */
+    $minVersion = 8.1;
+    if ((float) substr(phpversion(), 0, 3) < $minVersion) {
+        die("Cypht requires PHP version $minVersion or greater\n");
     }
 
     /* get the site settings */
@@ -92,6 +52,15 @@ function build_config() {
 
     if (is_array($settings) && !empty($settings)) {
         $settings['version'] = VERSION;
+
+        /* check all PHP dependencies (fatal framework deps + module/settings-specific) */
+        check_dependencies($settings);
+
+        read_mstnef_viewer_config($settings);
+        
+        /* auto-generate APP_2FA_SECRET in .env if 2fa module is enabled and secret is missing */
+        generate_2fa_secret($settings);
+
         /* determine compression commands */
         list($js_compress, $css_compress) = compress_methods($settings);
 
@@ -141,6 +110,260 @@ function compress($string, $command, $file=false) {
         return $string;
     }
     return $result;
+}
+
+/**
+ * Generate and persist APP_2FA_SECRET in .env when the 2fa module is enabled
+ * and the secret is not already set. Skips silently when a valid secret exists.
+ *
+ * @param array $settings merged site settings array
+ * @return void
+ */
+function generate_2fa_secret($settings) {
+    $modules = get_modules($settings);
+    if (!in_array('2fa', $modules, true)) {
+        return;
+    }
+
+    $secret = trim($settings['2fa_secret'] ?? '');
+    if (strlen($secret) >= 10) {
+        return; // Already configured — nothing to do
+    }
+
+    $env_path = APP_PATH . '.env';
+    if (!is_readable($env_path) || !is_writable($env_path)) {
+        printf("WARNING: 2FA module enabled but APP_2FA_SECRET is empty and .env is not writable.\n");
+        printf("         Set APP_2FA_SECRET to a random string of at least 10 characters.\n");
+        return;
+    }
+
+    // 48 raw bytes → ~64 base64 chars; after stripping non-alphanumeric we always have ≥32
+    $new_secret = substr(preg_replace('/[^A-Za-z0-9]/', '', base64_encode(random_bytes(48))), 0, 32);
+
+    $env = file_get_contents($env_path);
+    // Match APP_2FA_SECRET with an empty value: unquoted, double-quoted, or single-quoted
+    $updated = preg_replace(
+        '/^APP_2FA_SECRET\s*=\s*(""|\'\'|)\s*$/m',
+        'APP_2FA_SECRET="' . $new_secret . '"',
+        $env
+    );
+
+    if ($updated === null || $updated === $env) {
+        printf("WARNING: 2FA module enabled but could not auto-set APP_2FA_SECRET in .env.\n");
+        printf("         Please set it manually (minimum 10 characters).\n");
+        return;
+    }
+
+    file_put_contents($env_path, $updated);
+    printf("Generated APP_2FA_SECRET and saved to .env\n");
+}
+
+/**
+ * Check all PHP dependencies required to build and run the site.
+ *
+ * Covers three tiers in one pass:
+ *   1. Core framework requirements (fatal — build aborts if missing)
+ *   2. Module-specific requirements (warning — only checked for enabled modules)
+ *   3. Settings-driven requirements (warning — only checked when relevant settings are active)
+ *
+ * Each dependency descriptor: ['type', 'name', 'label', 'fatal', 'required_by']
+ *   type       — 'extension', 'function', or 'class'
+ *   fatal      — true: die after reporting; false: warn and continue
+ *   required_by — list of module names / setting descriptions for context
+ *
+ * @param array $settings merged site settings array
+ * @return void
+ */
+function check_dependencies($settings) {
+    // 1. Core framework deps — always required, fatal if missing
+    $deps = [
+        ['type' => 'extension', 'name' => 'mbstring',
+         'label' => 'Multibyte String (mbstring) extension',
+         'fatal' => true, 'required_by' => ['core']],
+        // curl is ext-curl (wraps libcurl); every call site guards against
+        // c_init() returning false, so absence degrades features rather than
+        // crashing. OAuth2, API integrations, and contacts sync all go silent.
+        ['type' => 'extension', 'name' => 'curl',
+         'label' => 'cURL extension (OAuth2 and all external HTTP API calls will fail silently)',
+         'fatal' => false, 'required_by' => ['core']],
+        ['type' => 'function', 'name' => 'openssl_random_pseudo_bytes',
+         'label' => 'OpenSSL extension',
+         'fatal' => true, 'required_by' => ['core']],
+        // DOM can be disabled at PHP compile time; used unconditionally by the
+        // HTMLToText class in core/message_functions.php (HTML email rendering).
+        ['type' => 'extension', 'name' => 'dom',
+         'label' => 'DOM extension (required for HTML email rendering in the core module)',
+         'fatal' => true, 'required_by' => ['core']],
+    ];
+
+    // 2. Module-specific deps — warnings, only for enabled modules
+    $module_map = [
+        'imap' => [
+            // EWS (Exchange Web Services) support is bundled in the imap module
+            // via hm-ews.php. The garethp/php-ews library uses SoapClient;
+            // without the soap extension any Exchange server connection will fail.
+            ['type' => 'extension', 'name' => 'soap',
+             'label' => 'SOAP extension (required for Exchange Web Services / EWS connectivity in the imap module)'],
+        ],
+        'pgp' => [
+            ['type' => 'class',    'name' => 'gnupg',
+             'label' => 'GnuPG PECL extension (required for PGP encryption and signing)'],
+        ],
+        'ldap_contacts' => [
+            ['type' => 'extension', 'name' => 'ldap',
+             'label' => 'LDAP extension (required for LDAP contact lookups)'],
+        ],
+        'carddav_contacts' => [
+            ['type' => 'extension', 'name' => 'simplexml',
+             'label' => 'SimpleXML extension (required for CardDAV vCard parsing)'],
+        ],
+        'feeds' => [
+            ['type' => 'function', 'name' => 'xml_parser_create',
+             'label' => 'XML extension (required for parsing RSS/Atom feeds)'],
+            ['type' => 'function', 'name' => 'simplexml_load_string',
+             'label' => 'SimpleXML extension (required for OPML import in feeds)'],
+        ],
+        '2fa' => [
+            // hash_hmac is part of the hash extension which cannot be disabled
+            // in PHP 8.1+ (locked to core since PHP 7.4). No runtime check needed.
+            // GD is required by bacon/bacon-qr-code to render the QR code SVG.
+            ['type' => 'extension', 'name' => 'gd',
+             'label' => 'GD extension (required by bacon/bacon-qr-code to render 2FA QR codes)'],
+        ],
+    ];
+
+    foreach (get_modules($settings) as $mod) {
+        $mod = trim($mod);
+        if (!array_key_exists($mod, $module_map)) {
+            continue;
+        }
+        foreach ($module_map[$mod] as $dep) {
+            $deps[] = ['type' => $dep['type'], 'name' => $dep['name'],
+                       'label' => $dep['label'], 'fatal' => false, 'required_by' => [$mod]];
+        }
+    }
+
+    // 3. Settings-driven deps — warnings, only when relevant settings are active
+    $session_type = strtoupper($settings['session_type'] ?? '');
+    $auth_type    = strtoupper($settings['auth_type']    ?? '');
+
+    if ($session_type === 'DB' || $auth_type === 'DB') {
+        $deps[] = ['type' => 'class', 'name' => 'PDO',
+                   'label' => 'PDO extension (required for database authentication/sessions)',
+                   'fatal' => false, 'required_by' => ['setting: AUTH_TYPE/SESSION_TYPE=DB']];
+    }
+    if ($session_type === 'REDIS' || !empty($settings['enable_redis'])) {
+        $deps[] = ['type' => 'class', 'name' => 'Redis',
+                   'label' => 'Redis PHP extension (required for Redis caching/sessions)',
+                   'fatal' => false, 'required_by' => ['setting: ENABLE_REDIS / SESSION_TYPE=REDIS']];
+    }
+    if ($session_type === 'MEM' || !empty($settings['enable_memcached'])) {
+        $deps[] = ['type' => 'class', 'name' => 'Memcached',
+                   'label' => 'Memcached PHP extension (required for Memcached caching/sessions)',
+                   'fatal' => false, 'required_by' => ['setting: ENABLE_MEMCACHED / SESSION_TYPE=MEM']];
+    }
+    if ($auth_type === 'LDAP') {
+        $deps[] = ['type' => 'extension', 'name' => 'ldap',
+                   'label' => 'LDAP extension (required for LDAP authentication)',
+                   'fatal' => false, 'required_by' => ['setting: AUTH_TYPE=LDAP']];
+    }
+
+    // Probe each dep; deduplicate by type:name, merging required_by lists
+    $seen = [];
+    foreach ($deps as $dep) {
+        $absent = match($dep['type']) {
+            'extension' => !extension_loaded($dep['name']),
+            'function'  => !function_exists($dep['name']),
+            'class'     => !class_exists($dep['name'], false),
+            default     => false,
+        };
+        if (!$absent) {
+            continue;
+        }
+        $key = $dep['type'] . ':' . $dep['name'];
+        if (!isset($seen[$key])) {
+            $seen[$key] = ['label' => $dep['label'], 'fatal' => $dep['fatal'],
+                           'required_by' => $dep['required_by']];
+        } else {
+            if ($dep['fatal']) {
+                $seen[$key]['fatal'] = true; // escalate severity if needed
+            }
+            foreach ($dep['required_by'] as $rb) {
+                if (!in_array($rb, $seen[$key]['required_by'], true)) {
+                    $seen[$key]['required_by'][] = $rb;
+                }
+            }
+        }
+    }
+
+    $fatal_missing   = array_filter($seen, fn($d) => $d['fatal']);
+    $warning_missing = array_filter($seen, fn($d) => !$d['fatal']);
+
+    printf("\nchecking dependencies ...\n");
+
+    if (empty($fatal_missing) && empty($warning_missing)) {
+        printf("all dependency checks passed.\n\n");
+        return;
+    }
+
+    printf("\n%s\n", str_repeat('-', 72));
+
+    if (!empty($warning_missing)) {
+        printf("WARNING: %d missing PHP dependency(s) — affected features will not work\n",
+               count($warning_missing));
+        printf("%s\n", str_repeat('-', 72));
+        foreach ($warning_missing as $dep) {
+            printf("  MISSING  : %s\n", $dep['label']);
+            printf("  Needed by: %s\n\n", implode(', ', $dep['required_by']));
+        }
+    }
+
+    if (!empty($fatal_missing)) {
+        printf("FATAL: %d missing required PHP dependency(s) — build cannot continue\n",
+               count($fatal_missing));
+        printf("%s\n", str_repeat('-', 72));
+        foreach ($fatal_missing as $dep) {
+            printf("  MISSING  : %s\n", $dep['label']);
+            printf("  Needed by: %s\n\n", implode(', ', $dep['required_by']));
+        }
+        printf("%s\n", str_repeat('-', 72));
+        die("Aborting: install the missing required extension(s) and re-run.\n");
+    }
+
+    printf("%s\n\n", str_repeat('-', 72));
+}
+
+/**
+ * Check if a required executable dependency is available for use in shell.
+ * 
+ * @param string $dependency Name of the executable to check
+ * @return bool True if the executable is found, false otherwise
+ */
+function check_executable_dependency($dependency) {
+    if (PHP_OS_FAMILY == 'Windows') {
+        exec("where " . escapeshellarg($dependency) . " >null 2>&1", $output, $resultCode);
+    } else {
+        exec("which " . escapeshellarg($dependency) . " 2>/dev/null", $output, $resultCode);
+    }
+
+    return $resultCode === 0;
+}
+
+function read_mstnef_viewer_config($settings) {
+    if ($settings['enable_mstnef_viewer']) {
+        if (! check_executable_dependency('tnef')) {
+            printf("\n%s\n", str_repeat('-', 72));
+            printf("ERROR: 'tnef' executable not found. Please install `tnef` cli tool or disable 'enable_mstnef_viewer' to continue.\n");
+            printf("\n%s\n", str_repeat('-', 72));
+            exit(1);
+        }
+        if (! check_executable_dependency('unrtf')) {
+            printf("\n%s\n", str_repeat('-', 72));
+            printf("ERROR: 'unrtf' executable not found. Please install `unrtf` cli tool or disable 'enable_mstnef_viewer' to continue.\n");
+            printf("\n%s\n", str_repeat('-', 72));
+            exit(1);
+        }
+    }
 }
 
 /**
@@ -339,6 +562,43 @@ function append_bootstrap_icons_files() {
     }
 }
 
+/**
+ * Copies KindEditor runtime assets (themes, plugins, lang) to site/ directory.
+ * KindEditor needs these resources at runtime for the HTML compose functionality.
+ *
+ * @return void
+ */
+function copy_kindeditor_assets() {
+    $source = 'third_party/kindeditor';
+    $dest = 'site/third_party/kindeditor';
+
+    if (!is_readable($source)) {
+        printf("WARNING: KindEditor source directory not found at %s\n", $source);
+        return;
+    }
+
+    // Create the destination directory structure
+    if (!is_dir('site/third_party')) {
+        mkdir('site/third_party', 0755, true);
+    }
+
+    if (!is_dir($dest)) {
+        mkdir($dest, 0755, true);
+    }
+
+    // Copy necessary directories and files (excluding the main JS file which is already bundled)
+    $items_to_copy = array('themes', 'plugins', 'lang');
+
+    foreach ($items_to_copy as $item) {
+        $source_path = $source . '/' . $item;
+        if (is_dir($source_path)) {
+            copy_recursive($source_path);
+        }
+    }
+
+    printf("KindEditor assets copied successfully\n");
+}
+
 function process_bootswatch_files() {
     $src = 'site/modules/themes/assets';
     if (! is_dir($src)) {
@@ -382,6 +642,9 @@ function create_production_site($assets, $settings, $hashes) {
     copy('site.js', 'site/site.js');
     append_bootstrap_icons_files();
 
+    // Copy KindEditor resources (themes, plugins, lang)
+    copy_kindeditor_assets();
+
     // Copy main assets directory
     if (is_readable('assets/')) {
         printf("copying assets directory...\n");
@@ -393,7 +656,6 @@ function create_production_site($assets, $settings, $hashes) {
     $index_file = preg_replace("/ASSETS_PATH', APP_PATH\.'assets\/'/", "ASSETS_PATH', WEB_ROOT.'assets/'", $index_file);
     $index_file = preg_replace("/CACHE_ID', ''/", "CACHE_ID', '".urlencode(Hm_Crypt::unique_id(32))."'", $index_file);
     $index_file = preg_replace("/SITE_ID', ''/", "SITE_ID', '".urlencode(Hm_Crypt::unique_id(64))."'", $index_file);
-    $index_file = preg_replace("/DEBUG_MODE', true/", "DEBUG_MODE', false", $index_file);
     $index_file = preg_replace("/JS_HASH', ''/", "JS_HASH', '".$hashes['js']."'", $index_file);
     $index_file = preg_replace("/CSS_HASH', ''/", "CSS_HASH', '".$hashes['css']."'", $index_file);
     file_put_contents('site/index.php', $index_file);

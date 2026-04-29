@@ -50,7 +50,7 @@ class Hm_Handler_update_search extends Hm_Handler_Module {
                 $this->session->set('user_data', $this->user_config->dump());
                 $this->out('updated_search', true);
                 if (isPageConfigured('save')) {
-                    Hm_Msgs::add("Saved search updated. To preserve your searches after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.", 'info');
+                    Hm_Msgs::add("Saved search updated. To preserve your searches after logout, please go to <a class='alert-link' href='".$this->build_page_url('save')."'>Save Settings</a>.", 'info');
                 }
                 else {
                     Hm_Msgs::add('Saved search updated', 'info');
@@ -117,7 +117,7 @@ class Hm_Handler_save_search extends Hm_Handler_Module {
                 $this->session->set('user_data', $this->user_config->dump());
                 $this->out('saved_search', true);
                 if (isPageConfigured('save')) {
-                    Hm_Msgs::add("Search saved. To preserve your searches after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.", 'success');
+                    Hm_Msgs::add("Saved search updated. To preserve your searches after logout, please go to <a class='alert-link' href='".$this->build_page_url('save')."'>Save Settings</a>.", 'info');
                 }
                 else {
                     Hm_Msgs::add('Search saved', 'success');
@@ -156,7 +156,7 @@ class Hm_Handler_save_advanced_search extends Hm_Handler_Module {
                 $this->session->set('user_data', $this->user_config->dump());
                 $this->out('saved_advanced_search', true);
                 if (isPageConfigured('save')) {
-                    Hm_Msgs::add("Advanced search saved. To preserve your searches after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.", 'success');
+                    Hm_Msgs::add("Advanced search saved. To preserve your searches after logout, please go to <a class='alert-link' href='".$this->build_page_url('save')."'>Save Settings</a>.", 'success');
                 }
                 else {
                     Hm_Msgs::add('Advanced search saved', 'success');
@@ -210,7 +210,7 @@ class Hm_Handler_update_advanced_search extends Hm_Handler_Module {
                 $this->session->set('user_data', $this->user_config->dump());
                 $this->out('updated_advanced_search', true);
                 if (isPageConfigured('save')) {
-                    Hm_Msgs::add("Advanced search updated. To preserve your searches after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.", 'info');
+                    Hm_Msgs::add("Advanced search updated. To preserve your searches after logout, please go to <a class='alert-link' href='".$this->build_page_url('save')."'>Save Settings</a>.", 'info');
                 }
                 else {
                     Hm_Msgs::add('Advanced search updated', 'info');
@@ -452,12 +452,12 @@ class Hm_Output_search_folders extends Hm_Output_Module {
             $search_types = $searches->get_by_type();
 
             foreach ($search_types['simple'] as $name => $args) {
-                $url = sprintf('?page=search&amp;search_terms=%s&amp;search_fld=%s&amp;search_since=%s&amp;search_name=%s',
-                    $this->html_safe(urlencode($args[0])),
-                    $this->html_safe(urlencode($args[2])),
-                    $this->html_safe(urlencode($args[1])),
-                    $this->html_safe(urlencode($name))
-                );
+                $url = $this->build_page_url('search', array(
+                    'search_terms' => $this->html_safe(urlencode($args[0])),
+                    'search_fld' =>  $this->html_safe(urlencode($args[2])),
+                    'search_since' => $this->html_safe(urlencode($args[1])),
+                    'search_name' => $this->html_safe(urlencode($name)),
+                ), true);
                 $res .= '<li class="menu_search_'.$this->html_safe($name).'"><a class="unread_link" href="'.$url.'">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-search account_icon"></i> ';
@@ -466,9 +466,7 @@ class Hm_Output_search_folders extends Hm_Output_Module {
             }
 
             foreach ($search_types['advanced'] as $name => $search_data) {
-                $url = sprintf('?page=advanced_search&amp;search_name=%s',
-                    $this->html_safe(urlencode($name))
-                );
+                $url = $this->build_page_url('advanced_search', array('search_name' => $this->html_safe(urlencode($name))), true);
                 $res .= '<li class="menu_search_advanced_'.$this->html_safe($name).'"><a class="unread_link advanced_search_link" href="'.$url.'" data-search-name="'.$this->html_safe($name).'">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-gear-wide-connected account_icon" title="'.$this->trans('Advanced Search').'"></i> ';

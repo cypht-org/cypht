@@ -2,6 +2,13 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+if (!hm_exists('split_script_lines')) {
+    function split_script_lines($script)
+    {
+        return preg_split('#\r?\n#', $script);
+    }
+}
+
 if (!hm_exists('get_script_modal_content')) {
     function get_script_modal_content()
     {
@@ -34,57 +41,44 @@ if (!hm_exists('get_classic_filter_modal_content')) {
     function get_classic_filter_modal_content()
     {
         return '<div id="edit_filter_modal" class="d-none">
-            <div class="mb-2">
-                <h3 class="mb-1">General</h3>
-                <small>Input a name and order for your filter. In filters, the order of execution is important. You can define an order value (or priority value) for your filter. Filters will run from lowest to highest priority value.</small>
-            </div>
-            <div class="mb-2 mt-4">
+            <div class="sieve-filter-name-group mb-2 mt-4">
                 <label for="sieve-filter-name" class="form-label fw-bold">Filter Name:</label>
                 <input type="text" class="modal_sieve_filter_name form-control" placeholder="Your filter name" id="sieve-filter-name" />
+                <small class="form-text text-muted">Input the name for your filter.</small>
             </div>
-            <div class="mb-2">
+            <div class="sieve-filter-priority-group mb-2">
                 <label for="sieve-filter-priority" class="form-label fw-bold">Priority:</label>
                 <input class="modal_sieve_filter_priority form-control" type="number" placeholder="0" id="sieve-filter-priority" />
-            </div>
-            <div class="mb-2">
-                <label for="sieve-filter-test" class="form-label fw-bold">Test:</label>
-                <select class="modal_sieve_filter_test form-control" name="test_type" placeholder="0" id="sieve-filter-test">
-                    <option value="ANYOF">ANYOF (OR)</option>
-                    <option value="ALLOF" selected>ALLOF (AND)</option>
-                </select>
-            </div>
-            <div class="d-block mb-2 mt-4">
-                <h3 class="mb-1">Conditions & Actions</h3>
-                <small>Filters must have at least one action and one condition</small>
+                <small class="form-text text-muted"> In filters, the order of execution is important. Filters will run from lowest to highest priority value.</small>
             </div>
             <div class="mt-2 rounded card">
                 <div class="p-3">
                     <div class="d-flex">
                         <div class="col-sm-10">
-                            <h5 class="mt-0">Conditions</h5>
-                        </div>
-                        <div class="flex-grow-1 text-end">
-                            <button class="sieve_add_condition_modal_button btn btn-sm border btn-primary">Add Condition</button>
+                            <h4 class="mt-0">Conditions</h4>
                         </div>
                     </div>
-                    <div class="d-block mt-3 table-responsive">
+                    <div class="sieve-filter-conditions-block d-block mt-3 table-responsive">
                         <table class="sieve_list_conditions_modal table">
                         </table>
+                        <div class="flex-grow-1 text-end">
+                            <button class="sieve_add_condition_modal_button btn btn-sm border btn-primary"><i class="bi bi-plus-lg me-1"></i> Add Condition</button>
+                        </div>
                     </div>
                 </div>
                 <hr/>
                 <div class="p-3">
                     <div class="d-flex">
                         <div class="col-sm-10">
-                            <h5 class="mt-0">Actions</h5>
-                        </div>
-                        <div class="flex-grow-1 text-end">
-                            <button class="filter_modal_add_action_btn btn btn-sm border btn-primary">Add Action</button>
+                            <h4 class="mt-0">Actions</h4>
                         </div>
                     </div>
-                    <div class="d-block mt-3 table-responsive">
+                    <div class="sieve-filter-actions-block d-block mt-3 table-responsive">
                         <table class="filter_actions_modal_table table">
                         </table>
+                        <div class="flex-grow-1 text-end">
+                            <button class="filter_modal_add_action_btn btn btn-sm border btn-primary"><i class="bi bi-plus-lg me-1"></i> Add Action</button>
+                        </div>
                     </div>
                 </div>
                 <hr/>
@@ -97,9 +91,13 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                     </div>
                 </div>
             </div>
+            <div class="filter-error-msgs d-block mb-2 mt-4">
+                <small class="form-text text-muted">Filters must have at least one action and one condition.</small>
+            </div>
         </div>';
     }
 }
+
 
 if (!hm_exists('get_mailbox_filters')) {
     function get_mailbox_filters($mailbox, $site_config, $user_config)
@@ -161,7 +159,7 @@ if (!hm_exists('get_mailbox_filters')) {
                     <span class="form-switch">
                         <input script_name_parsed="'.$parsed_name.'" priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'" class="toggle_filter form-check-input" type="checkbox" role="switch" id="Check" name="script_state"'.$checked.'>
                     </span>
-                    <a href="#" script_name_parsed="'.$parsed_name.'"  priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'"  class="edit_'.$base_class.' ps-2">
+                    <a href="#"  script_name_parsed="'.$parsed_name.'"  priority="'.$exp_name[sizeof($exp_name) - 2].'" sieve_extensions=\''.json_encode($mailbox['sieve_extensions']).'\' imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'"  class="edit_'.$base_class.' ps-2">
                         <i class="bi bi-pencil-fill"></i>
                     </a>
                     <a href="#" script_name_parsed="'.$parsed_name.'" priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'" class="delete_'.$base_class.' ps-2">
@@ -179,9 +177,14 @@ if (!hm_exists('generate_main_script')) {
     function generate_main_script($script_list)
     {
         $sorted_list = [];
+        $has_blocked_senders = false;
         foreach ($script_list as $script_name) {
             if ($script_name == 'main_script') {
                 continue;
+            }
+
+            if ($script_name == 'blocked_senders') {
+                $has_blocked_senders = true;
             }
 
             if (mb_strstr($script_name, 'cypht')) {
@@ -193,8 +196,10 @@ if (!hm_exists('generate_main_script')) {
         $include_header = 'require ["include"];'."\n\n";
         $include_body = '';
 
-        // Block List MUST be the first script executed
-        $include_body .= 'include :personal "blocked_senders";'."\n";
+        // Block List MUST be the first script executed when it exists.
+        if ($has_blocked_senders) {
+            $include_body .= 'include :personal "blocked_senders";' ."\n";
+        }
 
         foreach ($sorted_list as $script_name => $include_script) {
             $include_body .= 'include :personal "'.$script_name.'";'."\n";
@@ -258,7 +263,10 @@ if (!hm_exists('format_main_script')) {
             return '"' . $req . '"';
         }, $reqs);
 
-        $script = 'require [' . implode(',', $reqs) . '];' . "\n";
+        $script = '';
+        if (!empty($reqs)) {
+            $script .= 'require [' . implode(',', $reqs) . '];' . "\n";
+        }
         $script .= implode("\n", $lines);
         
         return $script;
@@ -312,7 +320,7 @@ if (!hm_exists('prepare_sieve_script')) {
     {
         $blocked_list = [];
         if ($script != '') {
-            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[$index]);
+            $base64_obj = str_replace("# ", "", split_script_lines($script)[$index]);
             if ($action == "decode") {
                 $blocked_list = json_decode(str_replace("*", "", base64_decode($base64_obj)), true);
             } else {
@@ -497,7 +505,7 @@ if (!hm_exists('get_blocked_senders')){
             $blocked_list_actions = [];
             $blocked_senders = [];
             if ($current_script != '') {
-                $script_split = preg_split('#\r?\n#', $current_script, 0);
+                $script_split = split_script_lines($current_script);
                 if (!isset($script_split[1])) {
                     return '';
                 }
@@ -599,7 +607,7 @@ if (!hm_exists('get_sieve_linked_mailbox')) {
             $folders = [];
             foreach ($scripts as $s) {
                 $script = $client->getScript($s);
-                $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
+                $base64_obj = str_replace("# ", "", split_script_lines($script)[2]);
                 $obj = json_decode(base64_decode($base64_obj))[0];
                 if ($obj && in_array($obj->action, ['copy', 'move'])) {
                     $folders[$s] = $obj->value;
