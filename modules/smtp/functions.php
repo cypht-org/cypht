@@ -109,6 +109,8 @@ function send_scheduled_message($handler, $imapMailbox, $folder, $msg_id, $send_
             $msg_content = $imapMailbox->get_message_content($folder, $msg_id, 0);
             $from = process_address_fld($msg_headers['From']);
 
+            $msg_content = preg_replace("/^X-Schedule:.*(\r?\n[ \t]+.*)*\r?\n?/im", '', $msg_content);
+
             $err_msg = $smtpMailbox->send_message($from[0]['email'], $recipients, $msg_content, $delivery_receipt);
             if (!$err_msg) {
                 $imapMailbox->delete_message($folder, $msg_id, false);
