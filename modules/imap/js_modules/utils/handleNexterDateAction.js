@@ -1,10 +1,4 @@
 function processNextActionDate(e) {
-    let reload_and_redirect = async function () {
-        Hm_Folders.reload_folders(true);
-        let path = getListPathParam();
-        await navigate(`?page=message_list&list_path=${path}`);
-    };
-
     let collectCheckedIds = function () {
         const ids = [];
         if (getPageNameParam() == 'message') {
@@ -34,8 +28,18 @@ function processNextActionDate(e) {
                 { 'name': 'schedule_date', 'value': $(this).val() }
             ],
             function (res) {
-                if (res.scheduled_msg_count > 0) {
-                    reload_and_redirect();
+                if (!res.scheduled_msg_count) return;
+                
+                if (getPageNameParam() == 'message_list') {
+                    Hm_Message_List.reset_checkboxes();
+                    select_imap_folder(getParam('list_path'), getParam('list_page'), true);
+                } else if (getPageNameParam() == 'message') {
+                    Hm_Utils.remove_from_local_storage(getMessageStorageKey(getMessageUidParam()));
+
+                    const store = new Hm_MessagesStore(getParam('list_parent'), getParam('list_page'), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
+                    store.load(false, true, true).then((store) => store.removeRow(getMessageUidParam()));
+
+                    navigate(`?page=message_list&list_path=${getParam('list_parent')}&list_page=${getParam('list_page')}&sort=${getParam('sort')}`);
                 }
             }
         );
