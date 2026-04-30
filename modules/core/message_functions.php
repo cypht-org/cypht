@@ -158,20 +158,42 @@ function reply_to_address($headers, $type) {
         }
     }
     if ($type == 'reply_all') {
+        $all_cc = array();
+        $all_cc_parsed = $parsed;
+        // Collect all Cc and To addresses except the main To (msg_to)
         if (array_key_exists('cc', $headers)) {
-            list($cc_parsed, $msg_cc) = format_reply_address($headers['cc'], $parsed);
-            $parsed += $cc_parsed;
+            list($cc_parsed, $cc_str) = format_reply_address($headers['cc'], $all_cc_parsed);
+            $all_cc_parsed += $cc_parsed;
+            foreach ($cc_parsed as $cc_addr) {
+                $all_cc[mb_strtolower($cc_addr['email'])] = $cc_addr;
+            }
         }
         if (array_key_exists('to', $headers)) {
-            list($parsed, $recips) = format_reply_address($headers['to'], $parsed);
-            if ($recips) {
-                if ($msg_cc) {
-                    $msg_cc .= ', '.$recips;
-                }
-                else {
-                    $msg_cc = $recips;
-                }
+            list($to_parsed, $to_str) = format_reply_address($headers['to'], $all_cc_parsed);
+            foreach ($to_parsed as $to_addr) {
+                $all_cc[mb_strtolower($to_addr['email'])] = $to_addr;
             }
+        }
+        // Remove the main To (msg_to) from Cc
+        $main_to_email = '';
+        if ($msg_to) {
+            // Extract email from msg_to (may include label)
+            if (preg_match('/([\w.%-]+@[\w.-]+)/', $msg_to, $matches)) {
+                $main_to_email = mb_strtolower($matches[1]);
+            }
+        }
+        if ($main_to_email && isset($all_cc[$main_to_email])) {
+            unset($all_cc[$main_to_email]);
+        }
+        // Build msg_cc string
+        if (!empty($all_cc)) {
+            $msg_cc = implode(', ', array_map(function($v) {
+                if (trim($v['label'])) {
+                    return str_replace([',', ';'], '', $v['label']).' '.$v['email'];
+                } else {
+                    return $v['email'];
+                }
+            }, $all_cc));
         }
     }
     return array($msg_to, $msg_cc);
