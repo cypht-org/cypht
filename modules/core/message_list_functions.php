@@ -532,7 +532,8 @@ function list_sources($sources, $output_mod) {
         else {
             $folder = $src['folder_name'];
         }
-        $res .= '<div class="list_src">'.$output_mod->html_safe($src['type']).' '.$output_mod->html_safe($src['name']);
+        $src_name = array_key_exists('name', $src) ? $src['name'] : '';
+        $res .= '<div class="list_src">'.$output_mod->html_safe($src['type']).' '.$output_mod->html_safe($src_name);
         $res .= ' '.$output_mod->html_safe($folder);
         $res .= '</div>';
     }
