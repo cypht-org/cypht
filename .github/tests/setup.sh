@@ -24,6 +24,7 @@ setup_cypht() {
     if [ "$DB" = "sqlite" ]; then
         # .env
         sed -i 's/DB_DRIVER=mysql/DB_DRIVER=sqlite/' .env
+        sed -i 's|DB_NAME=.*|DB_NAME=/tmp/test.db|' .env
         # mocks.php
         sed -i 's/mysql/sqlite/' tests/phpunit/mocks.php
         sed -i "s/'host'/'socket'/" tests/phpunit/mocks.php
@@ -144,6 +145,7 @@ setup_site() {
 	sudo -u www-data cp .github/tests/.env .
 	if [ "$DB" = "sqlite" ]; then
 		sudo -u www-data sed -i 's/DB_DRIVER=mysql/DB_DRIVER=sqlite/' .env
+		sudo -u www-data sed -i 's|DB_NAME=.*|DB_NAME=/tmp/test.db|' .env
 	fi
 	sudo -u www-data sed -i "s|ATTACHMENT_DIR=.*|ATTACHMENT_DIR=/var/www/cypht/hm3/attachments|" .env
 	sudo -u www-data php scripts/config_gen.php
