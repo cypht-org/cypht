@@ -850,7 +850,7 @@ function schedule_dropdown($output, $send_now = false, $list_control = false) {
     $txt = '';
     if ($send_now) {
         $txt .= '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none dropdown-toggle' . ($list_control ? ' core_msg_control border btn btn-sm btn-light': ''). '" id="dropdownMenuNexterDate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Reschedule').'</a>';
+                <a class="hlink text-decoration-none dropdown-toggle' . ($list_control ? ' border btn btn-sm btn-light': ''). '" id="dropdownMenuNexterDate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Reschedule').'</a>';
     }
     $txt .= '<ul class="dropdown-menu nexter_dropdown schedule_dropdown" aria-labelledby="dropdownMenuNexterDate">';
     foreach ($values as $format) {
