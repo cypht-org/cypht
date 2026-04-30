@@ -19,6 +19,7 @@ class Hm_SMTP_List {
 
     public static function init($user_config, $session) {
         self::initRepo('smtp_servers', $user_config, $session, self::$server_list);
+        self::bindServerTypes('smtp');
         self::$user_config = $user_config;
         self::$session = $session;
     }
