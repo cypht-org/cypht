@@ -36,15 +36,10 @@ var validateLdapForm = function() {
     var fax       = ($('#ldap_fax').val() || '').trim();
     var website   = ($('#ldap_uri').val() || '').trim();
 
-    var namePattern  = /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,50}$/;
-    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    var phonePattern = /^\+?[\d\s\-().]{7,20}$/;
-    var urlPattern   = /^https?:\/\/.+\..+/;
-
     if (!firstName) {
         hm_show_field_error('ldap_first_name', 'First name is required.');
         valid = false;
-    } else if (!namePattern.test(firstName)) {
+    } else if (!Hm_Utils.is_valid_name(firstName, 2, 50)) {
         hm_show_field_error('ldap_first_name', 'First name must be 2–50 characters and contain only letters, spaces, hyphens, or apostrophes.');
         valid = false;
     }
@@ -52,7 +47,7 @@ var validateLdapForm = function() {
     if (!lastName) {
         hm_show_field_error('ldap_last_name', 'Last name is required.');
         valid = false;
-    } else if (!namePattern.test(lastName)) {
+    } else if (!Hm_Utils.is_valid_name(lastName, 2, 50)) {
         hm_show_field_error('ldap_last_name', 'Last name must be 2–50 characters and contain only letters, spaces, hyphens, or apostrophes.');
         valid = false;
     }
@@ -60,27 +55,27 @@ var validateLdapForm = function() {
     if (!email) {
         hm_show_field_error('ldap_mail', 'Email address is required.');
         valid = false;
-    } else if (!emailPattern.test(email)) {
+    } else if (!Hm_Utils.is_valid_email(email)) {
         hm_show_field_error('ldap_mail', 'Please enter a valid email address (e.g. user@example.com).');
         valid = false;
     }
 
-    if (phone && !phonePattern.test(phone)) {
+    if (phone && !Hm_Utils.is_valid_phone(phone)) {
         hm_show_field_error('ldap_phone', 'Please enter a valid phone number (e.g. +1 555 123 4567).');
         valid = false;
     }
 
-    if (mobile && !phonePattern.test(mobile)) {
+    if (mobile && !Hm_Utils.is_valid_phone(mobile)) {
         hm_show_field_error('ldap_mobile', 'Please enter a valid mobile number (e.g. +1 555 123 4567).');
         valid = false;
     }
 
-    if (fax && !phonePattern.test(fax)) {
+    if (fax && !Hm_Utils.is_valid_phone(fax)) {
         hm_show_field_error('ldap_fax', 'Please enter a valid fax number (e.g. +1 555 123 4567).');
         valid = false;
     }
 
-    if (website && !urlPattern.test(website)) {
+    if (website && !Hm_Utils.is_valid_url(website)) {
         hm_show_field_error('ldap_uri', 'Please enter a valid URL starting with http:// or https://.');
         valid = false;
     }

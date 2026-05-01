@@ -1932,6 +1932,54 @@ var Hm_Utils = {
 
         return true;
     },
+
+    is_valid_name: function(val, minLength, maxLength) {
+        minLength = minLength || 2;
+        maxLength = maxLength || 100;
+        
+        if (!val) {
+            return false;
+        }
+        
+        var name = val.trim();
+        if (name.length < minLength || name.length > maxLength) {
+            return false;
+        }
+        
+        // Allow letters (including accented), spaces, hyphens, and apostrophes
+        return /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]+$/.test(name);
+    },
+
+    is_valid_phone: function(val) {
+        if (!val) {
+            return false;
+        }
+        
+        var phone = val.trim();
+        if (phone.length < 7 || phone.length > 20) {
+            return false;
+        }
+        
+        // Allow optional +, digits, spaces, hyphens, dots, and parentheses
+        return /^\+?[\d\s\-().]+$/.test(phone);
+    },
+
+    is_valid_url: function(val) {
+        if (!val) {
+            return false;
+        }
+        
+        var url = val.trim();
+        
+        // Must start with http:// or https://
+        if (!/^https?:\/\//i.test(url)) {
+            return false;
+        }
+        
+        // Must have at least one dot after the protocol
+        var withoutProtocol = url.replace(/^https?:\/\//i, '');
+        return withoutProtocol.includes('.') && withoutProtocol.length > 3;
+    },
 };
 
 var Hm_Crypt = {

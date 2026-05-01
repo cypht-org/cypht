@@ -785,52 +785,6 @@ class Hm_Output_ldap_form_uidattr extends Hm_Output_Module {
         $current = $this->get('current_ldap_contact');
         $is_edit = !empty($current);
         $options = array('cn', 'uid');
-        
-        // if ($is_edit) {
-        //     $select = '<div class="form-floating mb-2">'.
-        //         '<input placeholder="'.$this->trans('UID Attribute').'" id="ldap_uidattr_display" type="text" '.
-        //         'value="'.$this->html_safe($this->trans($val)).'" class="form-control" readonly />'.
-        //         '<label for="ldap_uidattr_display">'.$this->trans('UID Attribute').' ('.$this->trans('Read Only').')</label></div>';
-            
-        //     $select .= '<input type="hidden" name="ldap_uidattr" value="'.$this->html_safe($val).'" />';
-            
-        //     $uid_val = get_ldap_value('uid', $this);
-            
-        //     // Username field - also read-only in edit mode
-        //     if ($val === 'uid' && !empty($uid_val)) {
-        //         $select .= '<div class="form-floating mb-2">'.
-        //             '<input placeholder="'.$this->trans('Username').'" id="ldap_uid_display" type="text" '.
-        //             'value="'.$this->html_safe($uid_val).'" class="form-control" readonly />'.
-        //             '<label for="ldap_uid_display">'.$this->trans('Username').' ('.$this->trans('Read Only').')</label></div>';
-                
-        //         $select .= '<input type="hidden" name="ldap_uid" value="'.$this->html_safe($uid_val).'" />';
-        //     }
-        // } else {
-        //     $select = '<div class="form-floating mb-2">';
-            
-        //     $select .= '<select id="ldap_uidattr" name="ldap_uidattr" class="form-select">';
-        //     foreach ($options as $opt) {
-        //         $selected = ($val == $opt) ? ' selected' : '';
-        //         $select .= '<option value="'.$this->html_safe($opt).'"'.$selected.'>'.$this->trans($opt).'</option>';
-        //     }
-        //     $select .= '</select>';
-        //     $select .= '<label for="ldap_uidattr">'.$this->trans('UID Attribute').'</label></div>';
-            
-        //     $uid_val = get_ldap_value('uid', $this);
-            
-        //     $required = ($val === 'uid') ? ' required' : '';
-        //     $hidden_class = ($val !== 'uid') ? ' d-none' : '';
-        //     $select .= '<div class="form-floating mb-2'.$hidden_class.'" id="ldap_uid_field_wrapper">'.
-        //         '<input placeholder="'.$this->trans('Username').'" id="ldap_uid" type="text" name="ldap_uid" '.
-        //         'value="'.$this->html_safe($uid_val).'" class="form-control" autocomplete="username"'.$required.' />'.
-        //         '<label for="ldap_uid">'.$this->trans('Username').'</label></div>';
-        // }
-
-                // if ($val === 'uid' && !empty($uid_val)) {
-        // $res = '<div class="col-md-12 mb-3 d-none" id="ldap_uid_field_wrapper">';
-        // $res .= '<label for="ldap_uid" class="form-label">' . $this->trans('Username') . '</label>';
-        // $res .= '<input placeholder="' . $this->trans('Username') . '" id="ldap_uid" type="text" name="ldap_uid" value="" class="form-control custom-input" autocomplete="username">';
-        // $res .= '</div>';
         if ($is_edit) {
                   $res = '<div class="col-md-6 mb-3">'.
                 '<label for="ldap_uidattr_display" class="form-label">'.$this->trans('UID Attribute').' ('.$this->trans('Read Only').')</label>'.

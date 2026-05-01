@@ -10,14 +10,10 @@ var validateLocalForm = function() {
     var email = ($('#contact_email').val() || '').trim();
     var phone = ($('#contact_phone').val() || '').trim();
 
-    var namePattern  = /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,100}$/;
-    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    var phonePattern = /^\+?[\d\s\-().]{7,20}$/;
-
     if (!name) {
         hm_show_field_error('contact_name', 'Name is required.');
         valid = false;
-    } else if (!namePattern.test(name)) {
+    } else if (!Hm_Utils.is_valid_name(name, 2, 100)) {
         hm_show_field_error('contact_name', 'Name must be 2–100 characters and contain only letters, spaces, hyphens, or apostrophes.');
         valid = false;
     }
@@ -25,12 +21,12 @@ var validateLocalForm = function() {
     if (!email) {
         hm_show_field_error('contact_email', 'Email address is required.');
         valid = false;
-    } else if (!emailPattern.test(email)) {
+    } else if (!Hm_Utils.is_valid_email(email)) {
         hm_show_field_error('contact_email', 'Please enter a valid email address (e.g. user@example.com).');
         valid = false;
     }
 
-    if (phone && !phonePattern.test(phone)) {
+    if (phone && !Hm_Utils.is_valid_phone(phone)) {
         hm_show_field_error('contact_phone', 'Please enter a valid phone number (e.g. +1 555 123 4567).');
         valid = false;
     }
