@@ -253,19 +253,19 @@ var contact_import_pagination = function() {
     var total_pages = $('#totalPages').val();
     showPage(selected_page, total_pages);
 
-    $('.page_link_selector').on('click', function () {
+    $('.page_link_selector').off('click').on('click', function () {
         selected_page = $(this).data('page');
         showPage(selected_page, total_pages);
     });
 
-    $('.prev_page').on('click', function () {
+    $('.prev_page').off('click').on('click', function () {
         if (selected_page > 1) {
             selected_page--;
             showPage(selected_page, total_pages);
         }
     });
 
-    $('.next_page').on('click', function () {
+    $('.next_page').off('click').on('click', function () {
         if (selected_page < total_pages) {
             selected_page++;
             showPage(selected_page, total_pages);
@@ -299,7 +299,7 @@ var check_cc_exist_in_contacts_list = function() {
 };
 
 var initContactTabs = function() {
-    $('.category-tab').on('click', function(e) {
+    $('.category-tab').off('click').on('click', function(e) {
         e.preventDefault();
         
         var targetId = $(this).data('target');
@@ -327,7 +327,7 @@ var updateEditLinksWithActiveTab = function(activeTab) {
 };
 
 var initPagination = function() {
-    $(document).on('click', '.pagination-btn:not([disabled]), .pagination-number', function(e) {
+    $(document).off('click', '.pagination-btn:not([disabled]), .pagination-number').on('click', '.pagination-btn:not([disabled]), .pagination-number', function(e) {
         e.preventDefault();
         var page = $(this).data('page');
         var currentPage = parseInt(getUrlParameter('contact_page')) || 1;
