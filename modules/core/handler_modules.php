@@ -702,6 +702,7 @@ class Hm_Handler_default_page_data extends Hm_Handler_Module {
         $this->out('encrypt_local_storage', $this->config->get('encrypt_local_storage', false));
         $this->out('default_timezone', $this->user_config->get('default_setting_timezone', 'UTC'));
         $this->out('enabled_modules', $this->config->get_modules());
+        $this->out('page_param_name', $this->config->get('page_param_name'));
         if (!crypt_state($this->config)) {
             $this->out('single_server_mode', true);
         }
@@ -778,9 +779,18 @@ class Hm_Handler_logout extends Hm_Handler_Module {
      * Clean up everything on logout
      */
     public function process() {
+        if ($this->request->get['prompt'] ?? false) {
+            $backQuery = isset($this->request->get['back_query']) ? unserialize(base64_decode($this->request->get['back_query'])): [];
+
+            $this->out('cancel_logout_url', '?' . http_build_query($backQuery));
+            
+            return;
+        }
+
         if (array_key_exists('logout', $this->request->post) && !$this->session->loaded) {
             $this->session->destroy($this->request);
             Hm_Msgs::add('Session destroyed on logout', 'info');
+            $this->out('redirect_url', '?home');
         }
         elseif (array_key_exists('save_and_logout', $this->request->post)) {
             list($success, $form) = $this->process_form(array('password'));
@@ -803,6 +813,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
                         $this->user_config->save($user, $pass);
                         $this->session->destroy($this->request);
                         Hm_Msgs::add('Saved user data on logout, Session destroyed on logout', 'info');
+                        $this->out('redirect_url', '?home');
                     } catch (Exception $e) {
                         Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
                     }
@@ -1093,6 +1104,10 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 'srv_setup_stepper_imap_server_id' => $imapServerId,
                 'srv_setup_stepper_smtp_server_id' => $smtpServerId
             ] = $form;
+            $compose_type = $this->user_config->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
+            if ($compose_type == 1) {
+                $profileSignature = purify_html_sig($profileSignature);
+            }
 
             /*
             *  Connect to SMTP server if user wants to send emails
@@ -1184,7 +1199,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 }
                 $this->out('just_saved_credentials', true);
                 if (isPageConfigured('save')) {
-                    Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='?page=save'>Save Settings</a>.");
+                    Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='".$this->build_page_url('save')."'>Save Settings</a>.");
                 } else {
                     Hm_Msgs::add("Server saved.");
                 }

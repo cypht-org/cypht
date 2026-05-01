@@ -160,6 +160,10 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
 
         if (array_key_exists('profile_sig', $this->request->post)) {
             $sig = $this->request->post['profile_sig'];
+            $compose_type = $this->user_config->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
+            if ($compose_type == 1) {
+                $sig = purify_html_sig($sig);
+            }
         }
         if (array_key_exists('profile_rmk', $this->request->post)) {
             $rmk = $this->request->post['profile_rmk'];
@@ -235,6 +239,17 @@ class Hm_Handler_profile_data extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage profile/handler
+ */
+class Hm_Handler_profile_page_smtp_type extends Hm_Handler_Module {
+    public function process() {
+        $settings = $this->user_config;
+        $compose_type = $settings->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
+        $this->out('smtp_compose_type', $compose_type);
+    }
+}
+
 /**id
  * @subpackage profile/output
  */
@@ -264,7 +279,7 @@ class Hm_Output_profile_edit_form extends Hm_Output_Module {
  */
 class Hm_Output_profile_page_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">';
+        $res = '<li class="menu_profiles"><a class="unread_link" href="'.$this->build_page_url('profiles').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-person-fill menu-icon"></i>';
         }
@@ -295,6 +310,7 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
         $sigs = array();
         $profiles = $this->get('profiles', array());
         $smtp_servers = $this->get('smtp_servers', array());
+        $compose_type = $this->get('smtp_compose_type', DEFAULT_SMTP_COMPOSE_TYPE);
 
         foreach ($smtp_servers as $id => $vals) {
             $smtp_profiles = profiles_by_smtp_id($profiles, $vals['id']);
@@ -302,15 +318,24 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
                 foreach ($smtp_profiles as $index => $profile) {
                     if (mb_strlen(trim($profile['sig']))) {
                         $sig = $profile['sig'];
-                        $sig = str_replace(array("\r\n", "\r"), "\n", $sig);
-                        $sig = "\n" . $sig . "\n";
-                        $encoded_sig = json_encode($sig, JSON_UNESCAPED_SLASHES);
+                        if ($compose_type == 1) {
+                            // HTML mode: store signature as-is
+                            $encoded_sig = json_encode($sig, JSON_UNESCAPED_SLASHES);
+                        } else {
+                            // Plain text mode: normalize newlines
+                            $sig = str_replace(array("\r\n", "\r"), "\n", $sig);
+                            $sig = "\n" . $sig . "\n";
+                            $encoded_sig = json_encode($sig, JSON_UNESCAPED_SLASHES);
+                        }
                         $sigs[] = sprintf("\"%s\": %s", $vals['id'].'.'.($index+1), $encoded_sig);
                     }
                 }
             }
         }
         $res .= implode(', ', $sigs).'}</script>';
+        if ($compose_type == 1) {
+            $res .= '<script type="text/javascript">window.sig_is_html = true;</script>';
+        }
         return $res;
     }
 }
@@ -351,7 +376,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     '<td class="d-none d-sm-table-cell">'.(mb_strlen($profile['sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.(mb_strlen($profile['rmk']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.($profile['default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
-                    '<td class="text-right"><a href="?page=profiles&amp;profile_id='.$this->html_safe($profile['id']).'" title="'.$this->trans('Edit').'">'.
+                        '<td class="text-right"><a href="'.$this->build_page_url('profiles', array('profile_id' => $this->html_safe($profile['id'])), true).'" title="'.$this->trans('Edit').'">'.
                     '<i class="bi bi-pencil-fill"></i></a></td>'.
                     '</tr>';
             }
@@ -384,7 +409,7 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
 
     $res .= '<div class="edit_profile row p-3" '.($form_vals['name'] ? '' : 'style="display: none;"').'><div class="col-12 col-lg-8 col-xl-5">';
 
-    $res .= '<form method="post" action="?page=profiles">';
+    $res .= '<form method="post" action="'.$out_mod->build_page_url('profiles').'">';
     if (empty($form_vals['id'])) {
         $res .= '<div class="form-check form-switch mt-3 mb-3">';
         $res .= '<input class="form-check-input" name="profile_quickly_create" type="checkbox" role="switch" id="profile_quickly_create">';
@@ -433,9 +458,17 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res .= '<label>'.$out_mod->trans('SMTP Server').' *</label></div>';
 
     // Signature
-    $res .= '<div class="form-floating mb-3 form-check-create-profile">';
-    $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control" style="min-height : 120px" placeholder="'.$out_mod->trans('Signature').'">'.$out_mod->html_safe($form_vals['sig']).'</textarea>';
-    $res .= '<label>'.$out_mod->trans('Signature').'</label></div>';
+    $compose_type = $out_mod->get('smtp_compose_type', 0);
+    if ($compose_type == 1) {
+        $res .= '<div class="mb-3 form-check-create-profile">';
+        $res .= '<label class="form-label">'.$out_mod->trans('Signature').'</label>';
+        $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control html_sig_editor" style="min-height : 120px">'.$form_vals['sig'].'</textarea>';
+        $res .= '</div>';
+    } else {
+        $res .= '<div class="form-floating mb-3 form-check-create-profile">';
+        $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control" style="min-height : 120px" placeholder="'.$out_mod->trans('Signature').'">'.$out_mod->html_safe($form_vals['sig']).'</textarea>';
+        $res .= '<label>'.$out_mod->trans('Signature').'</label></div>';
+    }
 
     // Remark
     $res .= '<div class="form-floating mb-3 form-check-create-profile">';
@@ -452,7 +485,7 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     if ($form_vals['name']) {
         $res .= '<input type="submit" class="btn btn-primary profile_update" value="'.$out_mod->trans('Update').'" /> ';
         $res .= '<input type="submit" class="btn btn-danger" name="profile_delete" value="'.$out_mod->trans('Delete').'" /> ';
-        $res .= '<a href="?page=profiles" class="btn btn-secondary">'.$out_mod->trans('Cancel').'</a>';
+        $res .= '<a href="'.$out_mod->build_page_url('profiles').'" class="btn btn-secondary">'.$out_mod->trans('Cancel').'</a>';
     }
     else {
         $res .= '<input type="submit" class="btn btn-primary submit_profile" value="'.$out_mod->trans('Create').'" />';

@@ -103,7 +103,7 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
     public function test_content_end_debug() {
         $test = new Output_Test('content_end', 'core');
         $res = $test->run();
-        $expected = '</div><span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span></body></html>';
+        $expected = '</div><span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail. Click to toggle debug panel." class="debug_title" onclick="var panel = document.getElementById(\'cypht-debug-panel\'); if (panel) { panel.style.display = (panel.style.display === \'none\' ? \'block\' : \'none\'); }" style="cursor: pointer;">Debug</span></body></html>';
         $this->assertEquals(array($expected), $res->output_response);
     }
 }

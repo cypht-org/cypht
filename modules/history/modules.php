@@ -16,8 +16,10 @@ class Hm_Handler_history_record_feed_message extends Hm_Handler_Module {
             return;
         }
         $history = $this->session->get('msg_history', array());
-        $url = sprintf('?page=message&uid=%s&list_path=%s', $this->request->post['feed_uid'],
-            $this->request->post['feed_list_path']);
+        $url = $this->build_page_url('message', array(
+            'uid' => $this->request->post['feed_uid'],
+            'list_path' => $this->request->post['feed_list_path'],
+        ));
         if (array_key_exists($url, $history)) {
             return;
         }
@@ -64,8 +66,10 @@ class Hm_Handler_history_record_github_message extends Hm_Handler_Module {
         if (count($data) == 0) {
             return;
         }
-        $url = sprintf('?page=message&uid=%s&list_path=%s', $this->request->post['github_uid'],
-            $this->request->post['list_path']);
+        $url = $this->build_page_url('message', array(
+            'uid' => $this->request->post['github_uid'],
+            'list_path' => $this->request->post['list_path'],
+        ));
         $history = $this->session->get('msg_history', array());
         if (array_key_exists($url, $history)) {
             return;
@@ -102,7 +106,10 @@ class Hm_Handler_history_record_wp_message extends Hm_Handler_Module {
         if (count($data) == 0) {
             return;
         }
-        $url = sprintf('?page=message&list_path=wp_notifications&uid=%s', $this->request->post['wp_uid']);
+        $url = $this->build_page_url('message', array(
+            'list_path' => 'wp_notifications',
+            'uid' => $this->request->post['wp_uid'],
+        ));
         $history = $this->session->get('msg_history', array());
         $id = sprintf('wp_%s', $this->request->post['wp_uid']);
         if (array_key_exists($url, $history)) {
@@ -134,7 +141,10 @@ class Hm_Handler_history_record_imap_message extends Hm_Handler_Module {
         }
         $history = $this->session->get('msg_history', array());
         $list_path = sprintf('imap_%s_%s', $this->request->post['imap_server_id'], $this->request->post['folder']);
-        $url = sprintf('?page=message&uid=%s&list_path=%s', $this->request->post['imap_msg_uid'], $list_path);
+        $url = $this->build_page_url('message', array(
+            'uid' => $this->request->post['imap_msg_uid'],
+            'list_path' => $list_path,
+        ));
         $id = sprintf('imap_%s_%s_%s', $this->request->post['imap_server_id'],
             $this->request->post['imap_msg_uid'], $this->request->post['folder']);
         if (array_key_exists($url, $history)) {
@@ -179,7 +189,7 @@ class Hm_Handler_load_message_history extends Hm_Handler_Module {
  */
 class Hm_Output_history_page_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_history"><a class="unread_link" href="?page=history">';
+        $res = '<li class="menu_history"><a class="unread_link" href="'.$this->build_page_url('history').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-clock-history menu-icon"></i>';
         }

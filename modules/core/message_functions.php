@@ -23,6 +23,8 @@ function format_msg_html($str, $images=false) {
     $config->set('Cache.DefinitionImpl', null);
     $config->set('HTML.TargetBlank', true);
     $config->set('HTML.TargetNoopener', true);
+    $config->set('HTML.ForbiddenElements', ['html', 'head']);
+    $config->set('CSS.AllowTricky', true);
 
     if (!$images) {
         $config->set('URI.DisableExternalResources', true);
@@ -31,7 +33,7 @@ function format_msg_html($str, $images=false) {
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
 
     if ($def = $config->maybeGetRawHTMLDefinition()) {
-        $html_tags = ['img', 'script', 'iframe', 'audio', 'embed', 'source', 'track', 'video'];
+        $html_tags = ['img', 'script', 'iframe', 'audio', 'embed', 'source', 'track', 'video', 'a'];
         foreach ($html_tags as $tag) {
             $def->addAttribute($tag, 'data-src', 'Text');
         }

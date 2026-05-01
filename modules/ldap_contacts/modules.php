@@ -245,7 +245,7 @@ class Hm_Handler_process_update_ldap_server extends Hm_Handler_Module {
             if ($ldap->modify($entry, $dn)) {
                 Hm_Msgs::add('Contact Updated');
                 $this->save_hm_msgs();
-                Hm_Dispatch::page_redirect('?page=contacts');
+                Hm_Dispatch::page_redirect($this->build_page_url('contacts'));
             }
             else {
                 Hm_Msgs::add('Unable to update contact', 'danger');
@@ -396,7 +396,9 @@ class Hm_Handler_load_edit_ldap_contact extends Hm_Handler_Module {
             if (!array_key_exists('contact_id', $this->request->get)) $missing[] = 'contact_id';
             if (array_key_exists('contact_source', $this->request->get) && !array_key_exists($this->request->get['contact_source'], $ldap_config)) $missing[] = 'ldap_config_for_source';
             
-            error_log("LDAP Edit: Handler skipped due to missing: " . implode(', ', $missing));
+            if (DEBUG_MODE) {
+                Hm_Debug::add("LDAP Edit: Handler skipped due to missing: " . implode(', ', $missing));
+            }
         }
     }
 }

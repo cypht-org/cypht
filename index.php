@@ -17,17 +17,11 @@ define('VENDOR_PATH', APP_PATH.'vendor/');
 define('CONFIG_PATH', APP_PATH.'config/');
 define('WEB_ROOT', '');
 define('ASSETS_THEMES_ROOT', '');
-define('DEBUG_MODE', true);
 define('CACHE_ID', '');
 define('SITE_ID', '');
 define('JS_HASH', '');
 define('CSS_HASH', '');
 define('ASSETS_PATH', APP_PATH.'assets/');
-
-/* show all warnings in debug mode */
-if (DEBUG_MODE) {
-    error_reporting(E_ALL);
-}
 
 /* don't let anything output content until we are ready */
 ob_start();
@@ -37,6 +31,23 @@ require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
 $environment = Hm_Environment::getInstance();
 $environment->load();
+
+/* initialize glitchtip to capture errors */
+$glitchtip_dsn = env('GLITCHTIP_DSN', '');
+
+if ($glitchtip_dsn) {
+    \Sentry\init([
+        'dsn' => $glitchtip_dsn,
+        'traces_sample_rate' => env('GLITCHTIP_TRACES_SAMPLE_RATE', 0.01),
+    ]);
+}
+
+define('DEBUG_MODE', filter_var(env('ENABLE_DEBUG', false), FILTER_VALIDATE_BOOLEAN));
+
+/* show all warnings in debug mode */
+if (DEBUG_MODE) {
+    error_reporting(E_ALL);
+}
 
 /* get configuration */
 $config = new Hm_Site_Config_File();
@@ -51,15 +62,14 @@ if (!$config->get('disable_ini_settings')) {
     require APP_PATH.'lib/ini_set.php';
 }
 
+/* log some debug stats about the page */
+if (DEBUG_MODE) {
+    Hm_Debug::load_page_stats();
+}
+
 /* process the request */
 new Hm_Dispatch($config);
 
 if (empty($config)) {
     $config = new Hm_Site_Config_File();
-}
-
-/* log some debug stats about the page */
-if (DEBUG_MODE or $config->get('debug_log')) {
-    Hm_Debug::load_page_stats();
-    Hm_Debug::show();
 }

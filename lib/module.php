@@ -204,7 +204,7 @@ trait Hm_Handler_Validate {
         // Handle the case where method is null or invalid
         if ($session->loaded) {
             $session->destroy($request);
-            Hm_Debug::add('LOGGED OUT: missing or invalid request method');
+            Hm_Debug::add('LOGGED OUT: missing or invalid request method', 'warning');
         }
         return false;
     }
@@ -257,7 +257,7 @@ trait Hm_Handler_Validate {
     private function validate_target($target, $source, $session, $request) {
         if (!$target || !$source) {
             $session->destroy($request);
-            Hm_Debug::add('LOGGED OUT: missing target origin');
+            Hm_Debug::add('LOGGED OUT: missing target origin', 'warning');
             return false;
         }
         return true;
@@ -272,7 +272,7 @@ trait Hm_Handler_Validate {
         $source = parse_url($source);
         if (!is_array($source) || !array_key_exists('host', $source)) {
             $session->destroy($request);
-            Hm_Debug::add('LOGGED OUT: invalid source origin');
+            Hm_Debug::add('LOGGED OUT: invalid source origin', 'warning');
             return false;
         }
         if (array_key_exists('port', $source)) {
@@ -280,7 +280,7 @@ trait Hm_Handler_Validate {
         }
         if ($source['host'] !== $target) {
             $session->destroy($request);
-            Hm_Debug::add('LOGGED OUT: invalid source origin');
+            Hm_Debug::add('LOGGED OUT: invalid source origin', 'warning');
             return false;
         }
         return true;
@@ -347,8 +347,8 @@ abstract class Hm_Handler_Module {
      * @return string
      */
     private function invalid_ajax_key() {
-        if (DEBUG_MODE or $this->config->get('debug_log')) {
-            Hm_Debug::add('REQUEST KEY check failed');
+        if (DEBUG_MODE) {
+            Hm_Debug::add('REQUEST KEY check failed', 'warning');
             Hm_Debug::load_page_stats();
             Hm_Debug::show();
         }
@@ -362,9 +362,9 @@ abstract class Hm_Handler_Module {
     private function invalid_http_key() {
         if ($this->session->loaded) {
             $this->session->destroy($this->request);
-            Hm_Debug::add('LOGGED OUT: request key check failed');
+            Hm_Debug::add('LOGGED OUT: request key check failed', 'warning');
         }
-        Hm_Dispatch::page_redirect('?page=home');
+        Hm_Dispatch::page_redirect($this->build_page_url('home'));
         return 'redirect';
     }
 
@@ -455,6 +455,14 @@ abstract class Hm_Handler_Module {
             Hm_Msgs::flush();
             $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
         }
+    }
+
+    public function build_page_url($page, $params = []) {
+        $url = '?'.$this->config->get('page_param_name').'='.$page;
+        foreach ($params as $key => $value) {
+            $url .= '&'.urlencode($key).'='.urlencode($value);
+        }
+        return $url;
     }
 
     /**
@@ -572,6 +580,14 @@ abstract class Hm_Output_Module {
             $this->dir = $lang_str['interface_direction'];
         }
         return $this->output();
+    }
+
+    public function build_page_url($page, $params = [], $htm_context = false) {
+        $url = '?'.$this->get('page_param_name', 'page').'='.$page;
+        foreach ($params as $key => $value) {
+            $url .= ($htm_context ? '&amp;': '&').$key.'='.$value;
+        }
+        return $url;
     }
 
     /**

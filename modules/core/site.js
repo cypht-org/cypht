@@ -355,6 +355,16 @@ Hm_Modal.prototype = {
     init: function() {
         this.destroy();
 
+        // Remove any orphaned modal element with the same ID
+        var orphan = document.getElementById(this.opts.modalId);
+        if (orphan) {
+            var orphanBsModal = bootstrap.Modal.getInstance(orphan);
+            if (orphanBsModal) {
+                orphanBsModal.dispose();
+            }
+            orphan.remove();
+        }
+
         const modal = `
             <div id="${this.opts.modalId}" class="modal fade modal-${this.opts.size}" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog">
@@ -1223,7 +1233,9 @@ var Hm_Folders = {
     observer : false,
 
     save_folder_list: function() {
-        Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+        const toSave = $('.folder_list').clone();
+        toSave.find('.temp').remove();
+        Hm_Utils.save_to_local_storage('formatted_folder_list', toSave.html());
     },
 
     load_unread_counts: function() {
@@ -1332,7 +1344,7 @@ var Hm_Folders = {
         $('.folder_list').hide();
         $('.folder_toggle').show();
         if (!forget) {
-            Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+            Hm_Folders.save_folder_list();
             Hm_Utils.save_to_local_storage('hide_folder_list', '1');
             $('main').css('display', 'block');
         }
@@ -1380,6 +1392,7 @@ var Hm_Folders = {
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         Hm_Folders.hl_selected_menu();
         Hm_Folders.folder_list_events();
+        toggleExpandableNavbarItems(Hm_Utils.get_from_local_storage('navbar_collapsed'));
         if (Hm_Folders.expand_after_update) {
             Hm_Utils.toggle_section(Hm_Folders.expand_after_update);
         }
@@ -1389,16 +1402,20 @@ var Hm_Folders = {
     },
 
     update_folder_list: function(reset_cache = false) {
+        Hm_Folders.request_folder_list_update(Hm_Folders.update_folder_list_display, reset_cache);
+        return false;
+    },
+
+    request_folder_list_update: function(callback, reset_cache = false) {
         Hm_Ajax.request(
             [
                 {'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'},
                 {'name': 'reset_cache', 'value': reset_cache}
             ],
-            Hm_Folders.update_folder_list_display,
+            callback,
             [],
             true
         );
-        return false;
     },
 
     folder_list_events: function() {
@@ -1425,7 +1442,6 @@ var Hm_Folders = {
             return false;
         });
         $('.hide_folders').on("click", function() { return Hm_Folders.hide_folder_list(); });
-        $('.logout_link').on("click", function(e) { return Hm_Utils.confirm_logout(); });
         if (hm_search_terms()) {
             $('.search_terms').val(hm_search_terms());
         }
@@ -1471,6 +1487,7 @@ var Hm_Folders = {
         var folder_list = Hm_Utils.get_from_local_storage('formatted_folder_list');
         if (folder_list) {
             $('.folder_list').html(folder_list);
+            toggleExpandableNavbarItems(Hm_Utils.get_from_local_storage('navbar_collapsed'))
             if (Hm_Utils.get_from_local_storage('hide_folder_list') == '1') {
                 $('.folder_list').hide();
                 $('.folder_toggle').show();
@@ -1484,6 +1501,14 @@ var Hm_Folders = {
             return true;
         }
         return false;
+    },
+
+    unload_folder_list: function() {
+        $('.folder_list').html('');
+    },
+
+    folder_list_loaded: function() {
+        return $('.folder_list').html() != '';
     },
 
     toggle_folders_event: function() {
@@ -1523,7 +1548,7 @@ var Hm_Utils = {
         var prefix = window.location.pathname.length;
         for (i in sessionStorage) {
             i = i.substr(prefix);
-            if (i.match(/\..+(_setting|_section)/)) {
+            if (i.match(/\..+(_setting|_section)/) || i == 'navbar_collapsed') {
                 result[i] = Hm_Utils.get_from_local_storage(i);
             }
         }
@@ -1545,7 +1570,7 @@ var Hm_Utils = {
     },
 
     confirm_logout: function() {
-        if (! $('#unsaved_changes').length || $('#unsaved_changes').val() == 0) {
+        if ((! $('#unsaved_changes').length || $('#unsaved_changes').val() == 0) && !$('.save_reminder').length) {
             document.getElementById('logout_without_saving').click();
         }
         else {
@@ -1623,7 +1648,8 @@ var Hm_Utils = {
                 $(class_name).css('display', 'none');
             }
             $(`[data-bs-target="${class_name}"]`).trigger('click');
-            Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+
+            Hm_Folders.save_folder_list();
         }
         return false;
     },
@@ -2034,6 +2060,35 @@ var decrease_servers = function(section) {
     }
 };
 
+/**
+ * Initialize a KindEditor instance for a signature textarea in HTML compose mode.
+ * @param {string} selector - CSS selector for the textarea element
+ * @param {string} storeAs  - window property name to store and guard the editor instance
+ */
+var hm_init_sig_editor = function(selector, storeAs) {
+    if (typeof KindEditor === 'undefined') {
+        return;
+    }
+    // No stale-global guard: K.create() guards internally against double-init on
+    // the same live element, and a guard here would skip init on fresh SPA-injected
+    // textareas that share the selector with a now-stale global.
+    KindEditor.ready(function(K) {
+        if ($(selector).length) {
+            var editor = K.create(selector, {
+                items: ['bold', 'italic', 'underline', 'strikethrough', 'forecolor',
+                        'hilitecolor', 'fontname', 'fontsize', '|',
+                        'link', 'unlink', '|', 'undo', 'redo'],
+                basePath: 'third_party/kindeditor/',
+                resizeType: 1,
+                minHeight: 100,
+            });
+            if (storeAs) {
+                window[storeAs] = editor;
+            }
+        }
+    });
+};
+
 var hm_spinner = function(type = 'border', size = '') {
     return `<div class="d-flex justify-content-center spinner">
         <div class="spinner-${type} text-dark${size ? ` spinner-${type}-${size}` : ''}" role="status">
@@ -2148,9 +2203,6 @@ $(function() {
     })
     $('.reset_factory_button').on('click', function() { return hm_delete_prompt(); });
 
-    /* check for folder reload */
-    var reloaded = Hm_Folders.reload_folders();
-
     /* setup a few page wide event handlers */
     Hm_Utils.cancel_logout_event();
     Hm_Folders.toggle_folders_event();
@@ -2160,11 +2212,6 @@ $(function() {
 
     /* show any pending notices */
     Hm_Notices.showPendingMessages();
-
-    /* load folder list */
-    if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
-        Hm_Folders.update_folder_list();
-    }
 
     hl_save_link();
     if (hm_mailto()) {
@@ -2274,7 +2321,7 @@ function submitSmtpImapServer() {
         { name: 'srv_setup_stepper_imap_sieve_mode_tls', value: $('#srv_setup_stepper_imap_sieve_mode_tls').prop('checked') },
         { name: 'srv_setup_stepper_create_profile', value: $('#srv_setup_stepper_create_profile').prop('checked') },
         { name: 'srv_setup_stepper_profile_is_default', value: $('#srv_setup_stepper_profile_is_default').prop('checked') },
-        { name: 'srv_setup_stepper_profile_signature', value: $('#srv_setup_stepper_profile_signature').val() },
+        { name: 'srv_setup_stepper_profile_signature', value: (function() { if (window.stepperSigEditor) { window.stepperSigEditor.sync(); } return $('#srv_setup_stepper_profile_signature').val(); })() },
         { name: 'srv_setup_stepper_profile_reply_to', value: $('#srv_setup_stepper_profile_reply_to').val() },
         { name: 'srv_setup_stepper_imap_sieve_host', value: $('#srv_setup_stepper_imap_sieve_host').val() },
         { name: 'srv_setup_stepper_only_jmap', value: $('input[name="srv_setup_stepper_only_jmap"]:checked').val() },
@@ -2313,6 +2360,7 @@ function resetQuickSetupForm() {
 
     //Initialize the form
     $("#srv_setup_stepper_profile_reply_to").val('');
+    if (window.stepperSigEditor) { window.stepperSigEditor.html(''); }
     $("#srv_setup_stepper_profile_signature").val('');
     $("#srv_setup_stepper_profile_name").val('');
     $("#srv_setup_stepper_email").val('');
@@ -2640,6 +2688,9 @@ function setupActionSnooze(callback) {
     $(document).on('click', '.nexter_date_helper_snooze', function (e) {
         e.preventDefault();
         $('.nexter_input_snooze').val($(this).attr('data-value')).trigger('change');
+
+        const dropdown = bootstrap.Dropdown.getOrCreateInstance($('#dropdownMenuSnooze')[0]);
+        dropdown.toggle();
     });
     $(document).on('input', '.nexter_input_date_snooze', function (e) {
         var now = new Date();

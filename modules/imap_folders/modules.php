@@ -63,7 +63,7 @@ class Hm_Handler_add_folder_manage_link extends Hm_Handler_Module {
             $folder = $this->request->post['folder'];
         }
         if (($server || $server === 0) && !$folder) {
-            $this->out('imap_folder_manage_link', sprintf('?page=folders&imap_server_id=%s', $server));
+            $this->out('imap_folder_manage_link', $this->build_page_url('folders', array('imap_server_id' => $server)));
         }
     }
 }
@@ -182,6 +182,9 @@ class Hm_Handler_process_folder_create extends Hm_Handler_Module {
                 if ($form['folder'] && $mailbox->create_folder($form['folder'], $parent)) {
                     Hm_Msgs::add('Folder created');
                     $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_');
+                    if ($parent !== false) {
+                        $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_'.bin2hex($parent));
+                    }
                     $this->out('imap_folders_success', true);
                 }
                 else {
@@ -279,7 +282,7 @@ class Hm_Handler_folders_server_id extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('imap_server_id', $this->request->get)) {
             $this->out('folder_server', $this->request->get['imap_server_id']);
-            $this->out('page', $this->request->get['page']);
+            $this->out('page', $this->request->get[$this->config->get('page_param_name')]);
             $this->out('trigger_default_submit', false);
         }
     }
@@ -332,6 +335,82 @@ class Hm_Handler_process_only_subscribed_folders_setting extends Hm_Handler_Modu
 }
 
 /**
+ * @subpackage imap_folders/handler
+ */
+class Hm_Handler_process_folder_list_all extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_id'));
+        if (!$success) {
+            return;
+        }
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+        if (!$mailbox || !$mailbox->authed()) {
+            Hm_Msgs::add('Unable to connect to the selected IMAP server', 'danger');
+            return;
+        }
+        $only_subscribed = $this->user_config->get('only_subscribed_folders_setting', false);
+        $folders = $mailbox->get_subfolders('', $only_subscribed, false, false);
+        $all_folders = array();
+        $this->collect_all_folders($mailbox, $folders, $all_folders, $only_subscribed);
+
+        $specials = $this->user_config->get('special_imap_folders', array());
+        $server_specials = array();
+        if (array_key_exists($form['imap_server_id'], $specials)) {
+            $server_specials = $specials[$form['imap_server_id']];
+        }
+        $this->out('imap_all_folders', $all_folders);
+        $this->out('imap_server_specials', $server_specials);
+        $this->out('imap_server_id_out', $form['imap_server_id']);
+    }
+
+    private function collect_all_folders($mailbox, $folders, &$all_folders, $only_subscribed) {
+        foreach ($folders as $folder_name => $folder) {
+            $all_folders[$folder_name] = $folder;
+            if ($folder['children']) {
+                $sub = $mailbox->get_subfolders($folder_name, $only_subscribed, false, false);
+                if (!empty($sub)) {
+                    $this->collect_all_folders($mailbox, $sub, $all_folders, $only_subscribed);
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage imap_folders/output
+ */
+class Hm_Output_filter_folder_list_all extends Hm_Output_Module {
+    protected function output() {
+        $folders = $this->get('imap_all_folders', array());
+        $specials = $this->get('imap_server_specials', array());
+        $server_id = $this->get('imap_server_id_out', '');
+        if (empty($folders)) {
+            return;
+        }
+        $result = array();
+        foreach ($folders as $folder_name => $folder) {
+            $hex_name = bin2hex($folder_name);
+            $special_type = '';
+            foreach ($specials as $type => $assigned_folder) {
+                if ($assigned_folder && $assigned_folder === $folder_name) {
+                    $special_type = $type;
+                    break;
+                }
+            }
+            $result[] = array(
+                'name' => $folder_name,
+                'hex_name' => $hex_name,
+                'basename' => $folder['basename'],
+                'noselect' => !empty($folder['noselect']),
+                'children' => !empty($folder['children']),
+                'special' => $special_type,
+            );
+        }
+        $this->out('imap_folder_list_all', json_encode($result));
+    }
+}
+
+/**
  * @subpackage imap_folders/output
  */
 class Hm_Output_folders_server_select extends Hm_Output_Module {
@@ -339,7 +418,7 @@ class Hm_Output_folders_server_select extends Hm_Output_Module {
         $server_id = $this->get('folder_server', '');
         $data_auto_submit = !empty($this->get('trigger_default_submit')) ? ' data-auto-submit="1"' : 'data-auto-submit="0"';
         $res = '<div class="folders_page mt-4 row mb-4"><div class="col-xl-6 col-sm-12"><form id="form_folder_imap" method="get"'.$data_auto_submit.'>';
-        $res .= '<input type="hidden" name="page" value="'.$this->get('page', 'folders').'" />';
+        $res .= '<input type="hidden" name="'. $this->get("page_param_name") .'" value="'.$this->get('page', 'folders').'" />';
         $res .= '<div class="form-floating"><select class="form-select" id="imap_server_folder" name="imap_server_id">';
         $res .= '<option ';
         if (empty($server_id)) {
@@ -694,9 +773,8 @@ class Hm_Output_folders_folder_subscription_button extends Hm_Output_Module {
     protected function output() {
         if ($this->get('only_subscribed_folders_setting', 0)) {
             $server = $this->get('folder_server');
-            $results = '<div class="folder_subscription_btn"><a href="?page=folders_subscription';
-            $results .= !is_null($server)? '&imap_server_id='.$server: '';
-            $results .= '" title="'.$this->trans('Folders subscription').'"><i class="bi bi-gear-fill account_icon float-end"></i> ';
+            $url = $this->build_page_url('folders_subscription', !is_null($server) ? array('imap_server_id' => $server) : array());
+            $results = '<div class="folder_subscription_btn"><a href="'.$url.'" title="'.$this->trans('Folders subscription').'"><i class="bi bi-gear-fill account_icon float-end"></i> ';
             $results .= '</a></div>';
             return $results;
         }
@@ -753,6 +831,46 @@ class Hm_Output_folders_subscription_content_start extends Hm_Output_Module {
 class Hm_Output_folders_content_start extends Hm_Output_Module {
     protected function output() {
         $res = '<div class="content_title">'.$this->trans('Folders').'</div>';
+        $res .= '<input type="hidden" id="not_set_string" value="'.$this->trans('Not set').'" />';
+        $res .= '<input type="hidden" id="server_error" value="'.$this->trans('You must select a mail account first').'" />';
+        $res .= '<input type="hidden" id="folder_name_error" value="'.$this->trans('New folder name is required').'" />';
+        $res .= '<input type="hidden" id="delete_folder_error" value="'.$this->trans('Folder to delete is required').'" />';
+        $res .= '<input type="hidden" id="delete_folder_confirm" value="'.$this->trans('Are you sure you want to delete this folder, and all the messages in it?').'" />';
+        $res .= '<input type="hidden" id="rename_folder_error" value="'.$this->trans('Folder to rename is required').'" />';
+        $res .= '<div class="folders_page mt-3">';
+        $res .= '<div class="account_folders_list">';
+        $servers = $this->get('imap_servers', array());
+        $specials = $this->get('special_imap_folders', array());
+        if (empty($servers)) {
+            $res .= '<p class="text-muted">'.$this->trans('No mail accounts configured').'</p>';
+        }
+        foreach ($servers as $id => $server) {
+            $server_specials = isset($specials[$id]) ? $specials[$id] : array();
+            $res .= '<div class="account_folder_block card mb-3" data-server-id="'.$this->html_safe($id).'">';
+            $res .= '<div class="card-header account_folder_header d-flex justify-content-between align-items-center" role="button">';
+            $res .= '<div><i class="bi bi-chevron-right account_expand_icon me-2"></i>';
+            $res .= '<i class="bi bi-envelope-fill me-2"></i>';
+            $res .= '<strong>'.$this->html_safe($server['name']).'</strong></div>';
+            $res .= '<span class="badge bg-secondary folder-count-badge" style="display:none;"></span>';
+            $res .= '</div>';
+            $res .= '<div class="card-body account_folder_body" style="display:none;">';
+            $res .= '<div class="d-flex justify-content-between align-items-center mb-3">';
+            $res .= '<button class="btn btn-primary btn-sm create_folder_btn" data-server-id="'.$this->html_safe($id).'">';
+            $res .= '<i class="bi bi-folder-plus me-1"></i>'.$this->trans('Create Folder').'</button>';
+            $res .= '<div class="spinner-border spinner-border-sm text-info folder_loading_spinner" role="status" style="display:none;"><span class="visually-hidden">Loading...</span></div>';
+            $res .= '</div>';
+            $res .= '<div class="folder_table_container">';
+            $res .= '<table class="table table-sm table-hover folder_table" style="display:none;">';
+            $res .= '<thead><tr>';
+            $res .= '<th>'.$this->trans('Folder').'</th>';
+            $res .= '<th>'.$this->trans('Role').'</th>';
+            $res .= '<th class="text-end">'.$this->trans('Actions').'</th>';
+            $res .= '</tr></thead>';
+            $res .= '<tbody class="folder_table_body"></tbody>';
+            $res .= '</table></div>';
+            $res .= '</div></div>';
+        }
+        $res .= '</div></div>';
         return $res;
     }
 }
@@ -763,7 +881,7 @@ class Hm_Output_folders_content_start extends Hm_Output_Module {
 class Hm_Output_folders_page_link extends Hm_Output_Module {
     protected function output() {
         if ($this->get('imap_support')) {
-            $res = '<li class="menu_folders"><a class="unread_link" href="?page=folders">';
+            $res = '<li class="menu_folders"><a class="unread_link" href="'.$this->build_page_url('folders').'">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-folder-fill menu-icon"></i>';
             }

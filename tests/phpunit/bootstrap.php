@@ -3,13 +3,6 @@
 /* all the things */
 error_reporting(E_ALL);
 
-/* debug mode has to be set to something or include files will die() */
-if (!defined('DEBUG_MODE')) {
-    // Check if we're running a debug test via environment variable
-    $debug_mode = getenv('CYPHT_TEST_DEBUG_MODE') === 'true' ? true : false;
-    define('DEBUG_MODE', $debug_mode);
-}
-
 /* determine current absolute path used for require statements */
 if (!defined('APP_PATH')) {
     define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
@@ -42,6 +35,13 @@ require_once APP_PATH.'tests/phpunit/mocks.php';
 
 /* get the framework */
 require APP_PATH.'lib/framework.php';
+
+/* debug mode has to be set to something or include files will die() */
+if (!defined('DEBUG_MODE')) {
+    // Default to false in tests; debug test classes opt-in via CYPHT_TEST_DEBUG_MODE=true
+    $debug_mode = getenv('CYPHT_TEST_DEBUG_MODE') === 'true';
+    define('DEBUG_MODE', $debug_mode);
+}
 
 /* get the stubs */
 require APP_PATH.'tests/phpunit/stubs.php';

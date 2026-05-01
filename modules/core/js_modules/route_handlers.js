@@ -12,6 +12,9 @@ function applyServersPageHandlers() {
         }
     });
 
+    // Init KindEditor for stepper signature field in HTML compose mode only
+    hm_init_sig_editor('#srv_setup_stepper_profile_signature.html_sig_editor', 'stepperSigEditor');
+
     // Optional modules
     if (window.feedServersPageHandler) feedServersPageHandler();
     if (window.githubServersPageHandler) githubServersPageHandler();
@@ -19,6 +22,11 @@ function applyServersPageHandlers() {
     if (window.smtpServersPageHandler) smtpServersPageHandler();
     if (window.imapServersPageHandler) imapServersPageHandler();
     if (window.wpServersPageHandler) wpServersPageHandler();
+
+    return function() {
+        window.stepperSigEditor = null;
+        window.ewsSigEditor = null;
+    };
 }
 
 function applySettingsPageHandlers(routeParams, hash) {
@@ -148,6 +156,8 @@ function applyMessageListPageHandlers(routeParams) {
         Hm_Message_List.sort($(this).val());
     });
 
+    if (window.handleSieveCustomAction) handleSieveCustomAction();
+
     // TODO: Refactor this handler to be more modular(applicable only for the imap list type)
     return applyImapMessageListPageHandlers(routeParams);
 }
@@ -176,4 +186,40 @@ function applyComposePageHandlers(routeParams) {
     if (hm_module_is_supported('contacts')) {
         applyContactsAutocompleteComposePageHandlers(routeParams);
     }
+}
+
+function applyLogoutPageHandlers() {
+    $('#confirm-logout').on('click', function(e) {
+        e.preventDefault();
+        Hm_Utils.confirm_logout();
+    });
+}
+
+function applyCommonWrappedPageHandlers() {
+    if (! hm_is_logged()) return;
+
+    /* check for folder reload */
+    const reloaded = Hm_Folders.reload_folders();
+
+    if (!Hm_Folders.folder_list_loaded()) {
+        /* load folder list */
+        if ((!reloaded && !Hm_Folders.load_from_local_storage())) {
+            Hm_Folders.update_folder_list();
+        }
+    }
+
+    if (!reloaded) {
+        updateNavbarDynamicContent();
+    }
+
+    if ($('.cypht-layout nav').hasClass('collapsed') || Hm_Utils.get_from_local_storage('navbar_collapsed') === '1') {
+        document.documentElement.style.setProperty('--nav-size', 'var(--nav-collapsed-size)');
+    } else {
+        document.documentElement.style.setProperty('--nav-size', 'var(--nav-expanded-size)');
+    }
+}
+
+function applyCommonUnwrappedPageHandlers() {
+    Hm_Folders.unload_folder_list();
+    document.documentElement.style.setProperty('--nav-size', '0px');
 }

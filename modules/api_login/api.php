@@ -6,13 +6,20 @@
  */
 
 /* Constants */
-define('DEBUG_MODE', false);
 define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
 define('WEB_ROOT', '');
 
 /* Init the framework */
+require_once VENDOR_PATH.'autoload.php';
 require_once APP_PATH.'lib/framework.php';
+
+$environment = Hm_Environment::getInstance();
+$environment->load();
+
+/* Define DEBUG_MODE from environment variable */
+define('DEBUG_MODE', filter_var(env('ENABLE_DEBUG', false), FILTER_VALIDATE_BOOLEAN));
+
 require APP_PATH.'modules/core/functions.php';
 
 /**

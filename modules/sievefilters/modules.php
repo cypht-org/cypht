@@ -1006,6 +1006,7 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
         $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
         $header_obj .= "\n# ".base64_encode($this->request->post['conditions_json']);
         $header_obj .= "\n# ".base64_encode($this->request->post['actions_json']);
+        $header_obj .= "\n# ".base64_encode($this->request->post['filter_source']);
         $script_parsed = $header_obj."\n\n".$script_parsed;
 
         $factory = get_sieve_client_factory($this->config);
@@ -1032,6 +1033,7 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
             save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
             $client->close();
+            Hm_Msgs::add('Filter saved');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
@@ -1069,6 +1071,8 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
                 $script_name,
                 $this->request->post['script']
             );
+            $client->close();
+            Hm_Msgs::add('Script saved');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
@@ -1142,12 +1146,12 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
         if (!$this->get('sieve_filters_enabled')) {
             return '';
         }
-        $res = '<li class="menu_sieve_filters"><a class="unread_link" href="?page=sieve_filters">';
+        $res = '<li class="menu_sieve_filters"><a class="unread_link" href="'.$this->build_page_url('sieve_filters').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-journal-bookmark-fill me-2"></i>';
         }
         $res .= $this->trans('Filters').'</a></li>';
-        $res .= '<li class="menu_block_list"><a class="unread_link" href="?page=block_list">';
+        $res .= '<li class="menu_block_list"><a class="unread_link" href="'.$this->build_page_url('block_list').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-x-circle-fill me-2"></i>';
         }
@@ -1187,25 +1191,27 @@ class Hm_Output_sievefilters_title_start extends Hm_Output_Module {
     }
 }
 
-// /**
-//  * @subpackage sievefilters/output
-//  */
-// class Hm_Output_sievefilters_settings_start extends Hm_Output_Module
-// {
-//     protected function output()
-//     {
-
-//         $res = get_classic_filter_modal_content();
-//         $res .= get_script_modal_content();
-//         return $res;
-//     }
-// }
+/**
+ * @subpackage sievefilters/output
+ */
+class Hm_Output_sievefilters_modal_content_start extends Hm_Output_Module
+{
+    protected function output()
+    {
+        $res = get_classic_filter_modal_content();
+        $res .= get_script_modal_content();
+        return $res;
+    }
+}
 
 /**
  * @subpackage sievefilters/output
  */
 class Hm_Output_new_sieve_filter_for_message_like_this extends Hm_Output_Module {
     public function output() {
+        if (!$this->get('sieve_filters_enabled')) {
+            return '';
+        }
         $mailbox_name = $this->get('mailbox_name') ?? '';
         $headers = $this->get('filter_headers', []);
         
@@ -1361,7 +1367,7 @@ class Hm_Output_account_sieve_filters extends Hm_Output_Module {
         $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 d-flex justify-content-between border-bottom cursor-pointer">' . $mailbox['name'];
         $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
         $res .= '<div class="sievefilters_accounts filter_block p-3 d-none"><div class="filter_subblock">';
-        $res .= '<button class="add_filter btn btn-primary" account="'.$mailbox['name'].'">Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script btn btn-light border">Add Script</button>';
+        $res .= '<button class="add_filter btn btn-primary" account="'.$mailbox['name'].'"  sieve_extensions=\'' . json_encode($mailbox['sieve_extensions']) . '\'>Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script btn btn-light border">Add Script</button>';
         $res .= '<table class="filter_details table my-3"><tbody>';
         $res .= '<tr><th class="text-secondary fw-light col-sm-1">Priority</th><th class="text-secondary fw-light col-sm-9">Name</th><th class="text-secondary fw-light col-sm-2">Actions</th></tr>';
         $res .= $result['list'];
@@ -1389,7 +1395,9 @@ class Hm_Output_account_sieve_filters extends Hm_Output_Module {
         $res .= '</div></div></div>';
 
         $this->out('sieve_detail_display', $res);
-        error_log('Session after: ' . print_r($_SESSION, true));
+        if (DEBUG_MODE) {
+            Hm_Debug::add('Session after: ' . print_r($_SESSION, true), 'debug');
+        }
     }
 }
 
@@ -1620,9 +1628,161 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
         }
         $accounts = $this->get('imap_accounts');
         if (isset($accounts[$form['imap_server_id']])) {
-            $this->out('mailbox', $accounts[$form['imap_server_id']]);
+            $account = $accounts[$form['imap_server_id']];
+            $client = initialize_sieve_client_factory($this->config, null, $account);
+            $account['sieve_extensions'] = [];
+
+            if ($client) {
+                $account['sieve_extensions'] = $client->getExtensions();
+            }
+            $this->out('mailbox', $account);
             $this->session->close_early();
         }
+    }
+}
+
+class Hm_Handler_load_mailbox_name extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+        $imap_server_id = null;
+        if (array_key_exists('list_path', $this->request->get)) {
+            $path = $this->request->get['list_path'];
+            if (preg_match("/^imap_(\w+)_(.+)$/", $path, $matches)) {
+                $imap_server_id = $matches[1];
+            }
+        }
+
+        if ($imap_server_id === null) {
+            return;
+        }
+
+        $imap_servers = $this->user_config->get('imap_servers');
+        if (!isset($imap_servers[$imap_server_id]['name'])) {
+            return;
+        }
+
+        $this->out('mailbox_name', $imap_servers[$imap_server_id]['name']);
+    }
+}
+
+class Hm_Handler_load_custom_actions extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+        $imap_server_id = null;
+        if (array_key_exists('list_path', $this->request->get)) {
+            $path = $this->request->get['list_path'];
+            if (preg_match("/^imap_(\w+)_(.+)$/", $path, $matches)) {
+                $imap_server_id = $matches[1];
+            }
+        }
+
+        if ($imap_server_id === null) {
+            $this->out('custom_actions', []);
+            return;
+        }
+
+        $imap_servers = $this->user_config->get('imap_servers');
+        if (!isset($imap_servers[$imap_server_id])) {
+            $this->out('custom_actions', []);
+            return;
+        }
+
+        $mailbox = $imap_servers[$imap_server_id];
+        if (empty($mailbox['sieve_config_host'])) {
+            $this->out('custom_actions', []);
+            return;
+        }
+
+        $filters = [];
+        $factory = get_sieve_client_factory($this->config);
+        try {
+            $client = $factory->init($this->user_config, $mailbox, $this->module_is_supported('nux'));
+            $scripts = $client->listScripts();
+            
+            foreach ($scripts as $script_name) {
+                // Only include filter scripts (ending with cyphtfilter)
+                if (mb_strstr($script_name, 'cyphtfilter')) {
+                    $raw_script = $client->getScript($script_name); // raw content
+
+                    // Parse the source from line 3 of the script header
+                    $lines = split_script_lines($raw_script);
+                    $source = ''; // default
+                    if (isset($lines[3])) {
+                        $meta_b64 = str_replace("# ", "", $lines[3]);
+                        $source = base64_decode($meta_b64);
+                    }
+
+                    $exp_name = explode('-', $script_name);
+                    $parsed_name = str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2)));
+                    
+                    if (preg_match('/^s(en|dis)abled/', $parsed_name)) {
+                        $parsed_name = str_replace(['senabled ', 'sdisabled '], '', $parsed_name);
+                    }
+
+                    $filters[] = [
+                        'id' => $script_name,
+                        'name' => $parsed_name,
+                        'source' => $source,
+                    ];
+                }
+            }
+            $client->close();
+        } catch (Exception $e) {
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
+        }
+
+        $this->out('custom_actions', $filters);
+    }
+}
+
+class Hm_Output_message_list_custom_actions extends Hm_Output_Module
+{
+    protected function output()
+    {
+        if (!$this->get('sieve_filters_enabled')) {
+            return '';
+        }
+        $custom_actions = $this->get('custom_actions', []);
+        $mailbox_name = $this->get('mailbox_name', '');
+
+        $res = '<div class="dropdown">'
+            .   '<a class="msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle" '
+            .   'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
+            .   $this->trans('Quick Actions')
+            .   '</a>'
+            .   '<div class="dropdown-menu custom-actions p-2" aria-labelledby="filter_message">';
+
+            if (!empty($custom_actions)) {
+                $res .= '<small class="dropdown-header text-muted px-2 py-1">'
+                     .  '<i class="bi bi-info-circle me-1"></i>'.$this->trans('Auto-run on new emails')
+                     .  '</small>';
+                foreach ($custom_actions as $filter) {
+                    $res .= sprintf(
+                        '<button class="dropdown-item msg_filter_action py-2 btn btn-secondary" data-filter-id="%s" data-imap-account="%s" data-filter-name="%s">'
+                        .'<i class="bi bi-play-circle me-2 text-success"></i>%s</button>',
+                        htmlspecialchars($filter['id']),
+                        htmlspecialchars($mailbox_name),
+                        htmlspecialchars($filter['name']),
+                        htmlspecialchars($filter['name'])
+                    );
+                }
+                $res .= '<hr class="dropdown-divider">';
+            }
+
+        $res .= '<button class="dropdown-item add_custom_action text-primary btn btn-secondary py-2" '
+                    .'id="add_custom_action_button" account="'.$mailbox_name.'" '
+                .'>'
+                .   '<i class="bi bi-plus-circle me-2"></i>'.$this->trans('Create from Selected')
+                . '</button>';
+        $res .= '</div></div>';
+ 
+        $this->concat('msg_controls_custom_actions', $res);
     }
 }
 
@@ -1658,7 +1818,7 @@ class Hm_Handler_sieve_remame_folder extends Hm_Handler_Module
                         $script_parsed = $client->getScript($script_name);
                         $script_parsed = str_replace('"'.$form['folder'].'"', '"'.$form['new_folder'].'"', $script_parsed);
 
-                        $old_actions = base64_decode(preg_split('#\r?\n#', $script_parsed, 0)[2]);
+                        $old_actions = base64_decode(split_script_lines($script_parsed)[2]);
                         $new_actions = base64_encode(str_replace('"'.$form['folder'].'"', '"'.$form['folder'].'"', $old_actions));
                         $script_parsed = str_replace(base64_encode($old_actions), $new_actions, $script_parsed);
                         $client->removeScripts($script_name);

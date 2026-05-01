@@ -36,9 +36,6 @@ if (is_array($argv)) {
     die($incorrect_usage_msg);
 }
 
-/* debug mode has to be set to something or include files will die() */
-define('DEBUG_MODE', false);
-
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
@@ -50,6 +47,10 @@ require APP_PATH.'lib/framework.php';
 
 $environment = Hm_Environment::getInstance();
 $environment->load();
+
+/* Define DEBUG_MODE from environment variable */
+define('DEBUG_MODE', filter_var(env('ENABLE_DEBUG', false), FILTER_VALIDATE_BOOLEAN));
+
 /* get config object */
 $config = new Hm_Site_Config_File(merge_config_files(APP_PATH.'config'));
 /* set the default since and per_source values */

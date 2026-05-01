@@ -146,6 +146,11 @@ add_output('message', 'message_end', true, 'core', 'message_start', 'after');
 setup_base_page('notfound');
 add_output('notfound', 'notfound_content', true, 'core', 'version_upgrade_checker', 'after');
 
+/* logout page */
+setup_base_page('logout', 'core');
+add_handler('logout', 'logout', true, 'core');
+add_output('logout', 'logout', true, 'core', 'content_section_start', 'after');
+
 /* message action ajax request */
 setup_base_ajax_page('ajax_message_action', 'core');
 
@@ -218,7 +223,8 @@ return array(
         'search',
         'ajax_quick_servers_setup',
         'ajax_privacy_settings',
-        'ajax_combined_message_list'
+        'ajax_combined_message_list',
+        'logout',
     ),
     'allowed_output' => array(
         'date' => array(FILTER_UNSAFE_RAW, false),
@@ -236,7 +242,9 @@ return array(
         'pages' => array(FILTER_VALIDATE_INT, false),
         'folder_status' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'imap_server_id' => array(FILTER_UNSAFE_RAW, false),
-        'imap_service_name' => array(FILTER_UNSAFE_RAW, false)
+        'imap_service_name' => array(FILTER_UNSAFE_RAW, false),
+        'mailbox' => array(FILTER_UNSAFE_RAW, false),
+        'mailbox_name' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_cookie' => array(
         'CYPHTID' => FILTER_UNSAFE_RAW,
@@ -269,7 +277,7 @@ return array(
     ),
 
     'allowed_get' => array(
-        'page' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        env('PAGE_PARAM_NAME', 'page') => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'msgs' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'list_path' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'list_parent' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -282,6 +290,9 @@ return array(
         'sort' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'screen_emails' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'prompt' => FILTER_VALIDATE_BOOLEAN,
+        'back_query' => FILTER_UNSAFE_RAW,
+        'mailbox_name' => FILTER_UNSAFE_RAW,
     ),
 
     'allowed_post' => array(

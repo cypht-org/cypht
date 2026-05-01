@@ -67,7 +67,7 @@ class Hm_Handler_check_for_lost_settings extends Hm_Handler_login {
 class Hm_Output_recover_settings_page_link extends Hm_Output_Module {
     protected function output() {
         if ($this->get('load_recover_options')) {
-            $res = '<li class="menu_recover_settings"><a class="unread_link" href="?page=recover_settings">'.
+            $res = '<li class="menu_recover_settings"><a class="unread_link" href="'.$this->build_page_url('recover_settings').'">'.
                 '<i class="bi bi-unlock-fill account_icon"></i> '.$this->trans('Recover Settings').'</a></li>';
             if ($this->format == 'HTML5') {
                 return $res;
@@ -90,7 +90,7 @@ class Hm_Output_recover_settings_page extends Hm_Output_Module {
         $res .= '<div class="recover_form">'.$this->trans('Settings detected that we could not decrypt.').' <b>';
         $res .= sprintf($this->trans('Did your %s password change since you last logged into Cypht?'), $type);
         $res .= '</b> Your settings may be recovered by entering your old and new passwords in the form below.';
-        $res .= '<form method="post" action="?page=recover_settings"><br />';
+        $res .= '<form method="post" action="'.$this->build_page_url('recover_settings').'"><br />';
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         $res .= '<input required type="password" name="old_password_recover" placeholder="'.$this->trans('Old password').'" /><br />';
         $res .= '<input required type="password" name="new_password_recover" placeholder="'.$this->trans('Current password').'" /><br />';

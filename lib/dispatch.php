@@ -333,11 +333,13 @@ class Hm_Dispatch {
      */
     public function get_page($filters, $request) {
         $this->page = 'notfound';
+        $page_param = $this->site_config->get('page_param_name');
+
         if ($request->type == 'AJAX' && $this->validate_ajax_request($request, $filters)) {
             $this->page = $request->get['hm_ajax_hook'] ?? $request->post['hm_ajax_hook'];
-        } elseif (array_key_exists('page', $request->get) && in_array($request->get['page'], $this->get_pages($filters), true)) {
-            $this->page = $request->get['page'];
-        } elseif (!array_key_exists('page', $request->get)) {
+        } elseif (array_key_exists($page_param, $request->get) && in_array($request->get[$page_param], $this->get_pages($filters), true)) {
+            $this->page = $request->get[$page_param];
+        } elseif (!array_key_exists($page_param, $request->get)) {
             $this->page = 'home';
         }
         $this->module_exec->page = $this->page;

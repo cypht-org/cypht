@@ -27,6 +27,7 @@ require APP_PATH.'lib/dispatch.php';
 require APP_PATH.'lib/request.php';
 require APP_PATH.'lib/cache.php';
 require APP_PATH.'lib/output.php';
+require APP_PATH.'lib/logging.php';
 require APP_PATH.'lib/crypt.php';
 require APP_PATH.'lib/crypt_sodium.php';
 require APP_PATH.'lib/sodium_compat.php';

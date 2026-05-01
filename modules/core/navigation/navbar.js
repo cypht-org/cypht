@@ -47,12 +47,23 @@ $(() => {
         $(document).on('click', '.cypht-layout .hamburger-toggle', showMobileNavbar);
         $(document).on('click', '.cypht-layout nav .close-toggle', hideMobileNavbar)
     } else {
+
+        if (Hm_Utils.get_from_local_storage('navbar_collapsed') === '1') {
+            $('.cypht-layout nav').addClass('collapsed');
+        }
+
         $(document).on('click', '.menu-toggle', function() {
             $('.cypht-layout nav').toggleClass('collapsed');
             if ($('.cypht-layout nav').hasClass('collapsed')) {
                 document.documentElement.style.setProperty('--nav-size', 'var(--nav-collapsed-size)');
+                toggleExpandableNavbarItems(true);
+
+                Hm_Utils.save_to_local_storage('navbar_collapsed', '1');
             } else {
                 document.documentElement.style.setProperty('--nav-size', 'var(--nav-expanded-size)');
+                toggleExpandableNavbarItems(false);
+                
+                Hm_Utils.remove_from_local_storage('navbar_collapsed');
             }
         })
     }
@@ -74,4 +85,68 @@ function showMobileNavbar() {
     // Hide hamburger, show X
     $('.hamburger-toggle').hide();
     $('.close-toggle').show();
+}
+
+function updateNavbarDynamicContent() {
+    Hm_Folders.request_folder_list_update(({ formatted_folder_list }) => {
+        const serverSideDynamicContent = ['#js-logout_link'];
+
+        serverSideDynamicContent.forEach(selector => {
+            const newElement = $(formatted_folder_list).find(selector).prop('outerHTML');
+            const currentElement = $(selector);
+            if (newElement) {
+                currentElement.replaceWith(newElement);
+            }
+        });
+    });
+}
+
+function toggleExpandableNavbarItems(collapsed) {
+    $(".cypht-layout nav .folder_list .src_name").each(function() {
+        const initial = $(`<div class="src_name_initial temp" role="button">${$(this).text().trim().charAt(0)}</div>`)
+        if (collapsed) {
+            $(this).after(initial);
+
+            const popover = bootstrap.Popover.getOrCreateInstance(initial[0], {
+                title: $(this).text().trim(),
+                html: true,
+                trigger: 'manual',
+                container: '.cypht-layout',
+                customClass: 'navbar-popover',
+                sanitize: false
+            });
+
+            // Cash fails to handle Bootstrap popover events, so using plain JS here.
+            initial[0].addEventListener('shown.bs.popover', function (e) {
+                Hm_Folders.folder_list_events();
+            });
+
+            const target = $(this).data('bs-target');
+            const popoverTitle = $(this).text().trim();
+            // manually set popover content on show, to ensure user state is preserved
+            initial[0].addEventListener('show.bs.popover', function (e) {
+                const srcContent = $(target).clone();
+                srcContent.removeClass('collapse');
+                popover.setContent({
+                    '.popover-body': srcContent[0],
+                    '.popover-header': popoverTitle
+                });
+            });
+
+            let hideTimeout;
+            initial.on('mouseenter', function() {
+                clearTimeout(hideTimeout);
+                popover.show();
+            }).on('mouseleave', function() {
+                hideTimeout = setTimeout(function() { popover.hide(); }, 150);
+            });
+            $(document).on('mouseenter', '.navbar-popover', function() {
+                clearTimeout(hideTimeout);
+            }).on('mouseleave', '.navbar-popover', function() {
+                hideTimeout = setTimeout(function() { popover.hide(); }, 150);
+            });
+        } else {
+            $(this).siblings('.src_name_initial').remove();
+        }
+    });
 }

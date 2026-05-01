@@ -2,6 +2,12 @@ const unMountSubscribers = {};
 
 let previousLocationSearch = window.location.search;
 
+// E2E test hook: a counter that increases on every navigation completion,
+// whether successful or not. Tests capture this value before a click
+// and wait for it to increase, ensuring assertions run only after the
+// navigation they triggered has fully settled.
+window.cyphtNavDone = 0;
+
 function trackLocationSearchChanges() {
     previousLocationSearch = window.location.search;
 }
@@ -72,10 +78,10 @@ function autoAppendParamsForNavigation(href)
     const currentPage = currentUrl.searchParams.toString();
     const target = new URLSearchParams(href.split('?')[1]);
     if (currentPage !== target.toString()) {
-        if ((target.get('page') == 'message' && target.get('list_parent') == 'search') || target.get('page') == 'search') {
+        if ((target.get(hm_page_param_name()) == 'message' && target.get('list_parent') == 'search') || target.get(hm_page_param_name()) == 'search') {
             if ($('.search_form form').length > 0) {
                 for (let field of $('.search_form form').serializeArray()) {
-                    if (field.name != 'page') {
+                    if (field.name != hm_page_param_name()) {
                         target.set(field.name, field.value);
                     }
                 }
@@ -172,6 +178,7 @@ async function navigate(url, loaderMessage) {
         Hm_Notices.show(error.message, 'danger');
         console.log(error);
     } finally {
+        window.cyphtNavDone++;
         hideRoutingToast();
     }
 }
@@ -214,15 +221,14 @@ function renderPage(href) {
 
     const url = new URL(href, window.location.origin);
     const searchParams = url.searchParams;
-    const page = searchParams.get('page');
+    const page = searchParams.get(hm_page_param_name()) || 'home';
 
-    if (page) {
-        const route = ROUTES.find(route => route.page === page);
-        const routeParams = Object.fromEntries(searchParams.entries());
-        
-        if (route) {
-            const unMountCallback = route.handler(routeParams, url.hash?.substring(1));
-            return unMountCallback;
-        }
+    const route = ROUTES.find(route => route.page === page);
+    const routeParams = Object.fromEntries(searchParams.entries());
+    
+    if (route) {
+        route.commonHandler(routeParams, url.hash?.substring(1));
+        const unMountCallback = route.handler(routeParams, url.hash?.substring(1));
+        return unMountCallback;
     }
 }
