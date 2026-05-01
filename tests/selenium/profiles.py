@@ -62,7 +62,7 @@ class ProfileTest(SettingsHelpers):
 
 if __name__ == '__main__':
 
-    print("PROFIILE TEST")
+    print("PROFILE TEST")
     test_runner(ProfileTest, [
         'load_profile_page',
         # 'add_profile',

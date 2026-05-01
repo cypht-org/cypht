@@ -2,6 +2,12 @@ const unMountSubscribers = {};
 
 let previousLocationSearch = window.location.search;
 
+// E2E test hook: a counter that increases on every navigation completion,
+// whether successful or not. Tests capture this value before a click
+// and wait for it to increase, ensuring assertions run only after the
+// navigation they triggered has fully settled.
+window.cyphtNavDone = 0;
+
 function trackLocationSearchChanges() {
     previousLocationSearch = window.location.search;
 }
@@ -172,6 +178,7 @@ async function navigate(url, loaderMessage) {
         Hm_Notices.show(error.message, 'danger');
         console.log(error);
     } finally {
+        window.cyphtNavDone++;
         hideRoutingToast();
     }
 }
