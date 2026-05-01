@@ -165,7 +165,13 @@ class Hm_Handler_process_export_contacts extends Hm_Handler_Module {
             $contacts = $this->get('contact_store');
             $contact_list = $contacts->getAll();
             if ($source != 'all') {
-                $contact_list = $contacts->export($source);
+                $all = $contacts->getAll();
+                $contact_list = array_map(
+                    function($c) { return is_array($c) ? $c : $c->export(); },
+                    array_filter($all, function($contact) use ($source) {
+                        return $contact->value('source') == $source || $contact->value('type') == $source;
+                    })
+                );
             }
 
             Hm_Functions::header('Content-Type: text/csv');

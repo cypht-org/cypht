@@ -24,6 +24,160 @@ var delete_ldap_contact = function(id, source, type, ldap_dn) {
     );
 };
 
+var validateLdapForm = function() {
+    hm_clear_form_errors('#ldap-contact-form');
+    var valid = true;
+
+    var firstName = ($('#ldap_first_name').val() || '').trim();
+    var lastName  = ($('#ldap_last_name').val() || '').trim();
+    var email     = ($('#ldap_mail').val() || '').trim();
+    var phone     = ($('#ldap_phone').val() || '').trim();
+    var mobile    = ($('#ldap_mobile').val() || '').trim();
+    var fax       = ($('#ldap_fax').val() || '').trim();
+    var website   = ($('#ldap_uri').val() || '').trim();
+
+    var namePattern  = /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,50}$/;
+    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    var phonePattern = /^\+?[\d\s\-().]{7,20}$/;
+    var urlPattern   = /^https?:\/\/.+\..+/;
+
+    if (!firstName) {
+        hm_show_field_error('ldap_first_name', 'First name is required.');
+        valid = false;
+    } else if (!namePattern.test(firstName)) {
+        hm_show_field_error('ldap_first_name', 'First name must be 2–50 characters and contain only letters, spaces, hyphens, or apostrophes.');
+        valid = false;
+    }
+
+    if (!lastName) {
+        hm_show_field_error('ldap_last_name', 'Last name is required.');
+        valid = false;
+    } else if (!namePattern.test(lastName)) {
+        hm_show_field_error('ldap_last_name', 'Last name must be 2–50 characters and contain only letters, spaces, hyphens, or apostrophes.');
+        valid = false;
+    }
+
+    if (!email) {
+        hm_show_field_error('ldap_mail', 'Email address is required.');
+        valid = false;
+    } else if (!emailPattern.test(email)) {
+        hm_show_field_error('ldap_mail', 'Please enter a valid email address (e.g. user@example.com).');
+        valid = false;
+    }
+
+    if (phone && !phonePattern.test(phone)) {
+        hm_show_field_error('ldap_phone', 'Please enter a valid phone number (e.g. +1 555 123 4567).');
+        valid = false;
+    }
+
+    if (mobile && !phonePattern.test(mobile)) {
+        hm_show_field_error('ldap_mobile', 'Please enter a valid mobile number (e.g. +1 555 123 4567).');
+        valid = false;
+    }
+
+    if (fax && !phonePattern.test(fax)) {
+        hm_show_field_error('ldap_fax', 'Please enter a valid fax number (e.g. +1 555 123 4567).');
+        valid = false;
+    }
+
+    if (website && !urlPattern.test(website)) {
+        hm_show_field_error('ldap_uri', 'Please enter a valid URL starting with http:// or https://.');
+        valid = false;
+    }
+
+    return valid;
+};
+
+var initLdapContactModal = function() {
+    $('#submit-ldap-contact-btn').off('click');
+    $('#ldapContactModal').off('hidden.bs.modal');
+
+    $('#submit-ldap-contact-btn').on('click', function(e) {
+        e.preventDefault();
+
+        if (isLdapSubmitting) {
+            return;
+        }
+
+        if (!validateLdapForm()) {
+            return;
+        }
+
+        var isEdit = $('#ldap-contact-form input[name="update_ldap_contact"]').length > 0;
+
+        isLdapSubmitting = true;
+        var buttonText = isEdit ? 'Updating...' : 'Adding...';
+        $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> ' + buttonText);
+
+        var formData = $('#ldap-contact-form').serializeArray();
+        formData.push({'name': 'hm_ajax_hook', 'value': isEdit ? 'ajax_update_contact' : 'ajax_add_contact'});
+
+        Hm_Ajax.request(
+            formData,
+            function(res) {
+                var isSuccess = false;
+                if (res.router_user_msgs) {
+                    for (var key in res.router_user_msgs) {
+                        if (res.router_user_msgs[key].type === 'success') {
+                            isSuccess = true;
+                            break;
+                        }
+                    }
+                }
+
+                $('#submit-ldap-contact-btn').prop('disabled', false).text(isEdit ? 'Update' : 'Add');
+                isLdapSubmitting = false;
+
+                if (isSuccess) {
+                    var modalElement = document.getElementById('ldapContactModal');
+                    var modal = bootstrap.Modal.getInstance(modalElement);
+                    if (modal) {
+                        modal.hide();
+                    }
+
+                    var activeTab = $('.category-tab.active').data('target');
+                    var redirectUrl = '?page=contacts';
+                    if (activeTab) {
+                        redirectUrl += '&active_tab=' + activeTab;
+                    }
+                    window.location.href = redirectUrl;
+                }
+            },
+            [],
+            false,
+            function() {
+                $('#submit-ldap-contact-btn').prop('disabled', false).text(isEdit ? 'Update' : 'Add');
+                isLdapSubmitting = false;
+            }
+        );
+    });
+
+    $('#ldap-contact-form').on('input change', '.is-invalid', function() {
+        $(this).removeClass('is-invalid');
+        $(this).next('.invalid-feedback').remove();
+    });
+
+    $('#ldapContactModal').on('hidden.bs.modal', function() {
+        hm_clear_form_errors('#ldap-contact-form');
+        isLdapSubmitting = false;
+        var form = document.getElementById('ldap-contact-form');
+        if (form) {
+            form.reset();
+        }
+
+        var search = window.location.search;
+        if (search.indexOf('contact_type=ldap') !== -1) {
+            var currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.delete('contact_id');
+            currentUrl.searchParams.delete('contact_source');
+            currentUrl.searchParams.delete('contact_type');
+            currentUrl.searchParams.delete('contact_page');
+            currentUrl.searchParams.delete('dn');
+            window.history.replaceState({}, '', currentUrl.toString());
+        }
+    });
+};
+
 $(function() {
     $('.ldap_password_change').on("click", function() {
         $(this).prev().prop('disabled', false);
@@ -109,160 +263,6 @@ $(function() {
             }
         });
     }
-
-    var validateLdapForm = function() {
-        hm_clear_form_errors('#ldap-contact-form');
-        var valid = true;
-
-        var firstName = ($('#ldap_first_name').val() || '').trim();
-        var lastName  = ($('#ldap_last_name').val() || '').trim();
-        var email     = ($('#ldap_mail').val() || '').trim();
-        var phone     = ($('#ldap_phone').val() || '').trim();
-        var mobile    = ($('#ldap_mobile').val() || '').trim();
-        var fax       = ($('#ldap_fax').val() || '').trim();
-        var website   = ($('#ldap_uri').val() || '').trim();
-
-        var namePattern  = /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]{2,50}$/;
-        var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-        var phonePattern = /^\+?[\d\s\-().]{7,20}$/;
-        var urlPattern   = /^https?:\/\/.+\..+/;
-
-        if (!firstName) {
-            hm_show_field_error('ldap_first_name', 'First name is required.');
-            valid = false;
-        } else if (!namePattern.test(firstName)) {
-            hm_show_field_error('ldap_first_name', 'First name must be 2–50 characters and contain only letters, spaces, hyphens, or apostrophes.');
-            valid = false;
-        }
-
-        if (!lastName) {
-            hm_show_field_error('ldap_last_name', 'Last name is required.');
-            valid = false;
-        } else if (!namePattern.test(lastName)) {
-            hm_show_field_error('ldap_last_name', 'Last name must be 2–50 characters and contain only letters, spaces, hyphens, or apostrophes.');
-            valid = false;
-        }
-
-        if (!email) {
-            hm_show_field_error('ldap_mail', 'Email address is required.');
-            valid = false;
-        } else if (!emailPattern.test(email)) {
-            hm_show_field_error('ldap_mail', 'Please enter a valid email address (e.g. user@example.com).');
-            valid = false;
-        }
-
-        if (phone && !phonePattern.test(phone)) {
-            hm_show_field_error('ldap_phone', 'Please enter a valid phone number (e.g. +1 555 123 4567).');
-            valid = false;
-        }
-
-        if (mobile && !phonePattern.test(mobile)) {
-            hm_show_field_error('ldap_mobile', 'Please enter a valid mobile number (e.g. +1 555 123 4567).');
-            valid = false;
-        }
-
-        if (fax && !phonePattern.test(fax)) {
-            hm_show_field_error('ldap_fax', 'Please enter a valid fax number (e.g. +1 555 123 4567).');
-            valid = false;
-        }
-
-        if (website && !urlPattern.test(website)) {
-            hm_show_field_error('ldap_uri', 'Please enter a valid URL starting with http:// or https://.');
-            valid = false;
-        }
-
-        return valid;
-    };
-
-    var initLdapContactModal = function() {
-        $('#submit-ldap-contact-btn').off('click');
-        $('#ldapContactModal').off('hidden.bs.modal');
-
-        $('#submit-ldap-contact-btn').on('click', function(e) {
-            e.preventDefault();
-
-            if (isLdapSubmitting) {
-                return;
-            }
-
-            if (!validateLdapForm()) {
-                return;
-            }
-
-            var isEdit = $('#ldap-contact-form input[name="update_ldap_contact"]').length > 0;
-
-            isLdapSubmitting = true;
-            var buttonText = isEdit ? 'Updating...' : 'Adding...';
-            $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> ' + buttonText);
-
-            var formData = $('#ldap-contact-form').serializeArray();
-            formData.push({'name': 'hm_ajax_hook', 'value': isEdit ? 'ajax_update_contact' : 'ajax_add_contact'});
-
-            Hm_Ajax.request(
-                formData,
-                function(res) {
-                    var isSuccess = false;
-                    if (res.router_user_msgs) {
-                        for (var key in res.router_user_msgs) {
-                            if (res.router_user_msgs[key].type === 'success') {
-                                isSuccess = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    $('#submit-ldap-contact-btn').prop('disabled', false).text(isEdit ? 'Update' : 'Add');
-                    isLdapSubmitting = false;
-
-                    if (isSuccess) {
-                        var modalElement = document.getElementById('ldapContactModal');
-                        var modal = bootstrap.Modal.getInstance(modalElement);
-                        if (modal) {
-                            modal.hide();
-                        }
-
-                        var activeTab = $('.category-tab.active').data('target');
-                        var redirectUrl = '?page=contacts';
-                        if (activeTab) {
-                            redirectUrl += '&active_tab=' + activeTab;
-                        }
-                        window.location.href = redirectUrl;
-                    }
-                },
-                [],
-                false,
-                function() {
-                    $('#submit-ldap-contact-btn').prop('disabled', false).text(isEdit ? 'Update' : 'Add');
-                    isLdapSubmitting = false;
-                }
-            );
-        });
-
-        $('#ldap-contact-form').on('input change', '.is-invalid', function() {
-            $(this).removeClass('is-invalid');
-            $(this).next('.invalid-feedback').remove();
-        });
-
-        $('#ldapContactModal').on('hidden.bs.modal', function() {
-            hm_clear_form_errors('#ldap-contact-form');
-            isLdapSubmitting = false;
-            var form = document.getElementById('ldap-contact-form');
-            if (form) {
-                form.reset();
-            }
-
-            var search = window.location.search;
-            if (search.indexOf('contact_type=ldap') !== -1) {
-                var currentUrl = new URL(window.location.href);
-                currentUrl.searchParams.delete('contact_id');
-                currentUrl.searchParams.delete('contact_source');
-                currentUrl.searchParams.delete('contact_type');
-                currentUrl.searchParams.delete('contact_page');
-                currentUrl.searchParams.delete('dn');
-                window.history.replaceState({}, '', currentUrl.toString());
-            }
-        });
-    };
 
     $(document).ready(function() {
         enhanceLdapContacts();
