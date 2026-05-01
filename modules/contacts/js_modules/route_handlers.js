@@ -73,23 +73,19 @@ function applyContactsPageHandlers(routeParams) {
     
     const activeTab = routeParams?.active_tab;
     if (activeTab) {
-        setTimeout(function() {
-            $('.category-tab').removeClass('active');
-            $('.category-tab[data-target="' + activeTab + '"]').addClass('active');
-            $('.tab-content-section').removeClass('active');
-            $('#' + activeTab).addClass('active');
-            
-            if (typeof updateEditLinksWithActiveTab === 'function') {
-                updateEditLinksWithActiveTab(activeTab);
-            }
-        }, 50);
+        $('.category-tab').removeClass('active');
+        $('.category-tab[data-target="' + activeTab + '"]').addClass('active');
+        $('.tab-content-section').removeClass('active');
+        $('#' + activeTab).addClass('active');
+        
+        if (typeof updateEditLinksWithActiveTab === 'function') {
+            updateEditLinksWithActiveTab(activeTab);
+        }
     } else {
-        setTimeout(function() {
-            var defaultActiveTab = $('.category-tab.active').data('target');
-            if (defaultActiveTab && typeof updateEditLinksWithActiveTab === 'function') {
-                updateEditLinksWithActiveTab(defaultActiveTab);
-            }
-        }, 50);
+        var defaultActiveTab = $('.category-tab.active').data('target');
+        if (defaultActiveTab && typeof updateEditLinksWithActiveTab === 'function') {
+            updateEditLinksWithActiveTab(defaultActiveTab);
+        }
     }
     
     // Initialize local contact modal handlers if available
@@ -97,20 +93,25 @@ function applyContactsPageHandlers(routeParams) {
         initLocalContactModal();
     }
 
+    // Initialize LDAP contact modal handlers if available
+    if (typeof initLdapContactModal === 'function') {
+        initLdapContactModal();
+    }
+
     // Auto-open modal if open_modal parameter is in URL
     const modalType = routeParams?.open_modal;
     
     if (modalType) {
-        // Use setTimeout to ensure modal is in DOM and handlers are attached
-        setTimeout(function() {
-            const modalId = modalType === 'ldap' ? 'ldapContactModal' : 'localContactModal';
+        const modalId = modalType === 'ldap' ? 'ldapContactModal' : 'localContactModal';
+        
+        requestAnimationFrame(function() {
             const modalElement = document.getElementById(modalId);
             
-            if (modalElement && !modalElement.classList.contains('show')) {
+            if (modalElement && typeof bootstrap !== 'undefined' && !modalElement.classList.contains('show')) {
                 const modal = new bootstrap.Modal(modalElement);
                 modal.show();
             }
-        }, 150);
+        });
     }
 }
 
