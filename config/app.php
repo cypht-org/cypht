@@ -442,12 +442,11 @@ return [
     |
     |
     | 'allow_session_cache' => env('ALLOW_SESSION_CACHE', false),
-    | 'cache_class' => env('CACHE_CLASS')
     */
 
     'allow_session_cache' => env('ALLOW_SESSION_CACHE', false),
 
-    'cache_class' => env('CACHE_CLASS'),
+    'enable_custom_cache' => env('ENABLE_CUSTOM_CACHE', false),
     /*
     | -------------
     | Redis Support
@@ -620,15 +619,6 @@ return [
     | Don't use a browser fingerprint
     */
     'disable_fingerprint' => env('DISABLE_FINGERPRINT', false),
-
-    /*
-    | You can create your own custom authentication and session classes using the
-    | site module set, however you might want those classes located somewhere else
-    | outside of the Cypht code base. By setting session_type and auth_type to custom,
-    | you can control what class is used with the following settings
-    */
-    'auth_class' => env('AUTH_CLASS'),
-    'session_class' => env('SESSION_CLASS'),
 
     /*
     | -----------------------------------------------------------------------------
@@ -1374,7 +1364,15 @@ return [
 
     'js_exclude_deps' => env('JS_EXCLUDE_DEPS', ''),
 
+    'enable_mstnef_viewer' => env('ENABLE_MSTNEF_VIEWER', false),
+
     'page_param_name' => env('PAGE_PARAM_NAME', 'page'),
   
-    'enable_mstnef_viewer' => env('ENABLE_MSTNEF_VIEWER', false),
+    'site_module_path' => env('SITE_MODULE_PATH', ''),
+
+    'dispatch_response_mode' => env('DISPATCH_RESPONSE_MODE', 'render'),
+
+    'web_root' => env('WEB_ROOT', ''),
+
+    'enable_custom_sieve_factory' => env('ENABLE_CUSTOM_SIEVE_FACTORY', false)
 ];

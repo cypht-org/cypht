@@ -10,13 +10,15 @@ if (strtolower(php_sapi_name()) !== 'cli') {
 
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
-define('VENDOR_PATH', APP_PATH.'vendor/');
 define('WEB_ROOT', '');
 chdir(APP_PATH);
 
 /* get the framework */
-require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
+
+Hm_Functions::define_vendor_path();
+
+require VENDOR_PATH.'autoload.php';
 
 $environment = Hm_Environment::getInstance();
 $environment->load();
@@ -53,6 +55,8 @@ function build_config() {
     if (is_array($settings) && !empty($settings)) {
         $settings['version'] = VERSION;
 
+        process_site_module($settings);
+        
         /* check all PHP dependencies (fatal framework deps + module/settings-specific) */
         check_dependencies($settings);
 
@@ -80,6 +84,32 @@ function build_config() {
     }
     else {
         printf("\nNo settings found in ini file\n");
+    }
+}
+
+function process_site_module(&$settings) {
+    $site_module_path = $settings['site_module_path'];
+    if ($site_module_path) {
+        $site_module_name = basename($site_module_path);
+        if (file_exists($site_module_path)) {
+            $link_path = APP_PATH . 'modules/' . $site_module_name;
+            
+            if (file_exists($link_path)) {
+                unlink($link_path);
+            }
+
+            // ensure it's absolute path
+            if ($site_module_path[0] !== '/') {
+                $site_module_path = realpath(APP_PATH . $site_module_path);
+            }
+
+            symlink($site_module_path, $link_path);
+
+            if (file_exists($link_path)) {
+                $settings['modules'][] = $site_module_name;
+                printf("Site module '%s' found at %s and added to module list\n", $site_module_name, $link_path);
+            }
+        }
     }
 }
 
@@ -405,6 +435,7 @@ function get_module_assignments($settings) {
         'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
 
     if (isset($settings['modules'])) {
+        echo "modules found in settings: " . implode(', ', $settings['modules']) . "\n";
         $mods = get_modules($settings);
         foreach ($mods as $mod) {
             printf("scanning module %s ...\n", $mod);

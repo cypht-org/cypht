@@ -7,12 +7,14 @@
 
 /* Constants */
 define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
-define('VENDOR_PATH', APP_PATH.'vendor/');
 define('WEB_ROOT', '');
 
 /* Init the framework */
-require_once VENDOR_PATH.'autoload.php';
 require_once APP_PATH.'lib/framework.php';
+
+Hm_Functions::define_vendor_path();
+
+require_once VENDOR_PATH.'autoload.php';
 
 $environment = Hm_Environment::getInstance();
 $environment->load();

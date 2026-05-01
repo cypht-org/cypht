@@ -80,6 +80,10 @@ foreach (array('user_settings_dir', 'attachment_dir') as $dir) {
     }
 }
 
+if ($config->get('site_module_path', false)) {
+    $base .= PATH_SEPARATOR . $config->get('site_module_path');
+}
+
 if (!$disabled) {
     ini_set('open_basedir', $base);
 }
