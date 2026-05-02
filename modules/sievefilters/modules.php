@@ -1033,6 +1033,7 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
             save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
             $client->close();
+            Hm_Msgs::add('Filter saved');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
@@ -1070,6 +1071,8 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
                 $script_name,
                 $this->request->post['script']
             );
+            $client->close();
+            Hm_Msgs::add('Script saved');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
@@ -1143,12 +1146,12 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
         if (!$this->get('sieve_filters_enabled')) {
             return '';
         }
-        $res = '<li class="menu_sieve_filters"><a class="unread_link" href="?page=sieve_filters">';
+        $res = '<li class="menu_sieve_filters"><a class="unread_link" href="'.$this->build_page_url('sieve_filters').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-journal-bookmark-fill me-2"></i>';
         }
         $res .= $this->trans('Filters').'</a></li>';
-        $res .= '<li class="menu_block_list"><a class="unread_link" href="?page=block_list">';
+        $res .= '<li class="menu_block_list"><a class="unread_link" href="'.$this->build_page_url('block_list').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-x-circle-fill me-2"></i>';
         }
@@ -1206,6 +1209,9 @@ class Hm_Output_sievefilters_modal_content_start extends Hm_Output_Module
  */
 class Hm_Output_new_sieve_filter_for_message_like_this extends Hm_Output_Module {
     public function output() {
+        if (!$this->get('sieve_filters_enabled')) {
+            return '';
+        }
         $mailbox_name = $this->get('mailbox_name') ?? '';
         $headers = $this->get('filter_headers', []);
         
@@ -1635,6 +1641,33 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
     }
 }
 
+class Hm_Handler_load_mailbox_name extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+        $imap_server_id = null;
+        if (array_key_exists('list_path', $this->request->get)) {
+            $path = $this->request->get['list_path'];
+            if (preg_match("/^imap_(\w+)_(.+)$/", $path, $matches)) {
+                $imap_server_id = $matches[1];
+            }
+        }
+
+        if ($imap_server_id === null) {
+            return;
+        }
+
+        $imap_servers = $this->user_config->get('imap_servers');
+        if (!isset($imap_servers[$imap_server_id]['name'])) {
+            return;
+        }
+
+        $this->out('mailbox_name', $imap_servers[$imap_server_id]['name']);
+    }
+}
+
 class Hm_Handler_load_custom_actions extends Hm_Handler_Module
 {
     public function process()
@@ -1685,11 +1718,6 @@ class Hm_Handler_load_custom_actions extends Hm_Handler_Module
                         $source = base64_decode($meta_b64);
                     }
 
-                    // Only include filters created from message_list
-                    if ($source !== 'message_list') {
-                        continue;
-                    }
-
                     $exp_name = explode('-', $script_name);
                     $parsed_name = str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2)));
                     
@@ -1717,6 +1745,9 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
 {
     protected function output()
     {
+        if (!$this->get('sieve_filters_enabled')) {
+            return '';
+        }
         $custom_actions = $this->get('custom_actions', []);
         $mailbox_name = $this->get('mailbox_name', '');
 

@@ -160,6 +160,10 @@ class Hm_EWS {
         }
     }
 
+    public function is_inplace_archive_enabled() {
+        return count($this->get_folder_status(Enumeration\DistinguishedFolderIdNameType::ARCHIVE_ROOT, false)) > 0;
+    }
+
     public function get_folder_status($folder, $report_error = true) {
         try {
             if ($this->is_distinguished_folder($folder)) {

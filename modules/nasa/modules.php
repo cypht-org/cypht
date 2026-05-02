@@ -160,7 +160,7 @@ class Hm_Output_nasa_connect_section extends Hm_Output_Module {
 class Hm_Output_nasa_folders extends Hm_Output_Module {
     protected function output() {
         if ($this->get('nasa_api_key')) {
-            $res = '<li class="menu_nasa_apod"><a class="unread_link" href="?page=nasa_apod">';
+            $res = '<li class="menu_nasa_apod"><a class="unread_link" href="'.$this->build_page_url('nasa_apod').'">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-globe-europe-africa account_icon"></i> ';
             }
@@ -184,14 +184,14 @@ function apod_date_form($date, $output_mod) {
             $nextday = strtotime("1995-06-20");
         else
             $nextday = strtotime('+1 days', strtotime($date));
-        $next = sprintf('?page=nasa_apod&amp;apod_date=%s', date('Y-m-d', $nextday));
+        $next = $output_mod->build_page_url('nasa_apod', array('apod_date' => date('Y-m-d', $nextday)), true);
     }
     if (strtotime($date) > strtotime("1995-06-16")) {
         if (date("Y-m-d", strtotime($date)) == "1995-06-20")
             $prevday = strtotime("1995-06-16");
         else
             $prevday = strtotime('-1 days', strtotime($date));
-        $prev = sprintf('?page=nasa_apod&amp;apod_date=%s', date('Y-m-d', $prevday));
+        $prev = $output_mod->build_page_url('nasa_apod', array('apod_date' => date('Y-m-d', $prevday)), true);
     }
     $res = '<form class="apod_date" method="get">';
     // Previous can be empty if the first picture of June 16 1995 has been reached
@@ -199,7 +199,7 @@ function apod_date_form($date, $output_mod) {
         $res .= '<a href="'.$prev.'">'.$output_mod->trans('Previous').'</a>';
     }
     $res .= '<input name="apod_date" class="apod_date_fld" type="date" value="'.$date.'" min="1995-06-16" max="'.dateInESTTZ().'"/>';
-    $res .= '<input type="hidden" name="page" value="nasa_apod" />';
+    $res .= '<input type="hidden" name="'. $output_mod->get("page_param_name") .'" value="nasa_apod" />';
     $res .= '<input type="submit" value="'.$output_mod->trans('Update').'" />';
     // Next can be empty if the day hasn't ticked over at NASA HQ yet
     if ($next) {

@@ -140,7 +140,7 @@ class Hm_Output_developer_doc_link extends Hm_Output_Module {
      * Link to the dev page
      */
     protected function output() {
-        $res = '<li class="menu_dev"><a class="unread_link" href="?page=dev">';
+        $res = '<li class="menu_dev"><a class="unread_link" href="'.$this->build_page_url('dev').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-bug-fill menu-icon"></i>';
         }
@@ -162,7 +162,7 @@ class Hm_Output_info_page_link extends Hm_Output_Module {
      * Info page link
      */
     protected function output() {
-        $res = '<li class="menu_info"><a class="unread_link" href="?page=info">';
+        $res = '<li class="menu_info"><a class="unread_link" href="'.$this->build_page_url('info').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-info-circle menu-icon"></i>';
         }

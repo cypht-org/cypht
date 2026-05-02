@@ -72,13 +72,13 @@ jobs:
           update: true
           fail-fast: true
 
-      - name: "Script: setup.sh"
-        run: bash .github/tests/setup.sh
-
       - name: "Composer Install Dependencies"
         run: |
             composer install
             composer require --dev php-coveralls/php-coveralls
+
+      - name: "Script: setup.sh"
+        run: bash .github/tests/setup.sh
 
       - name: "Script: test.sh"
         run: bash tests/phpunit/run.sh

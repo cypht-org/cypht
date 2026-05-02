@@ -553,7 +553,7 @@ function update_search_label_field($search_term, $output_mod) {
     $res = '<div class="update_search_label_field">';
     $res .= '<div class="update_saved_search_title">'.$output_mod->html_safe('Update saved search label') .'</div>';
     $res .= '<div>
-    <input type="hidden" name="page" value="search">
+    <input type="hidden" name="'. $output_mod->get('page_param_name') .'" value="search">
     <input type="hidden" name="search_terms" value="'. $search_term .'">
     <label class="screen_reader" for="search_terms_label">Current Search Label</label>
     <input required="" disabled id="old_search_terms_label" type="search" value="' . $search_term . '" class="old_search_terms_label form-control form-control-sm" name="old_search_terms_label">

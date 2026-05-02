@@ -18,11 +18,11 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
         $res = '<li class="menu_search mb-2"><form method="get">';
         $res .= '<div class="input-group">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<a href="?page=search" class="input-group-text" id="basic-addon1">' .
+            $res .= '<a href="'.$this->build_page_url('search').'" class="input-group-text" id="basic-addon1">' .
             '<i class="bi bi-search"></i>' .
             '</a>';
         }
-        $res .= '<input type="hidden" name="page" value="search" />'.
+        $res .= '<input type="hidden" name="'. $this->get("page_param_name", 'page') .'" value="search" />'.
             '<input type="search" class="search_terms form-control form-control-sm" aria-describedby="basic-addon1" '.
             'name="search_terms" placeholder="'.$this->trans('Search').'" /></div></form></li>';
         if ($this->format == 'HTML5') {
@@ -71,7 +71,7 @@ class Hm_Output_save_reminder extends Hm_Output_Module {
         $changed = $this->get('changed_settings', array());
         if (!empty($changed)) {
             return '<div class="save_reminder"><a title="'.$this->trans('You have unsaved changes').
-                '" href="?page=save"><i class="bi bi-save2-fill fs-4"></i></a></div>';
+                '" href="'.$this->build_page_url('save').'"><i class="bi bi-save2-fill fs-4"></i></a></div>';
         }
         return '';
     }
@@ -95,7 +95,7 @@ class Hm_Output_search_form_content extends Hm_Output_Module {
     protected function output() {
         $terms = $this->get('search_terms', '');
 
-        return '<input type="hidden" name="page" value="search" />'.
+        return '<input type="hidden" name="'. $this->get("page_param_name", 'page') .'" value="search" />'.
             ' <label class="screen_reader" for="search_terms">'.$this->trans('Search Terms').'</label>'.
             '<input required placeholder="'.$this->trans('Search Terms').'" id="search_terms" type="search" class="search_terms form-control form-control-sm" name="search_terms" value="'.$this->html_safe($terms).'" />'.
             ' <label class="screen_reader" for="search_fld">'.$this->trans('Search Field').'</label>'.
@@ -181,7 +181,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
                 return '<form class="login_form" method="POST">';
             }
             else {
-                return '<form class="logout_form" method="POST" action="?page=logout">';
+                return '<form class="logout_form" method="POST" action="'.$this->build_page_url('logout').'">';
             }
         } else {
             if (!$this->get('router_login_state')) {
@@ -210,7 +210,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
                 return $css.'<div class="form-container"><form class="login_form" method="POST">';
             }
             else {
-                return '<div class="form-container"><form class="logout_form" method="POST" action="?page=logout">';
+                return '<div class="form-container"><form class="logout_form" method="POST" action="'.$this->build_page_url('logout').'">';
             }
         }
     }
@@ -286,7 +286,7 @@ class Hm_Output_login extends Hm_Output_Module {
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />
-                        <p class="text-wrap">'.$this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' <a href="?page=save">'.$this->trans('More info').'</a></p>
+                        <p class="text-wrap">'.$this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' <a href="'.$this->build_page_url('save').'">'.$this->trans('More info').'</a></p>
                         <input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>
                         <div class="my-3 form-floating">
                             <input id="logout_password" autocomplete="current-password" name="password" class="form-control warn_on_paste" type="password" placeholder="'.$this->trans('Password').'">
@@ -448,7 +448,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
             $res .= '<input type="hidden" id="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         }
         if (!$this->get('single_server_mode') && count($this->get('changed_settings', array())) > 0) {
-            $res .= '<a class="unsaved_icon" href="?page=save" title="'.$this->trans('Unsaved Changes').
+            $res .= '<a class="unsaved_icon" href="'.$this->build_page_url('save').'" title="'.$this->trans('Unsaved Changes').
                 '"><i class="bi bi-save2-fill fs-5 unsaved_reminder"></i></a>';
         }
         $res .= '<div class="cypht-layout">';
@@ -665,6 +665,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_flag_image_src = function() { return "<i class=\"bi bi-star-half\"></i>"; };'.
             'var hm_check_dirty_flag = function() { return '.($this->get('warn_for_unsaved_changes', '') ? '1' : '0').'; };'.
             'var hm_special_folders = function() { return '.json_encode($formattedSpecialFolders).'; };'.
+            'var hm_page_param_name = function() { return "'.$this->get('page_param_name').'"; };'.
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {
@@ -1368,7 +1369,7 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
         $res = '';
         $theme = $this->get('theme');
         $logo = $theme === 'darkly' ? 'modules/core/assets/images/logo.svg' : 'modules/core/assets/images/logo_dark.svg' ;
-        $res .= '<a href="?page=home" class="menu_home"><img class="app-logo" src="'.WEB_ROOT.$logo.'"></a>';
+        $res .= '<a href="'.$this->build_page_url('home').'" class="menu_home"><img class="app-logo" src="'.WEB_ROOT.$logo.'"></a>';
         $res .= '<div class="main"><ul class="folders">';
         if ($this->format == 'HTML5') {
             return $res;
@@ -1394,40 +1395,40 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         }
         $total_accounts = count($this->get('imap_servers', array())) + count($this->get('feeds', array()));
         if ($total_accounts > 1) {
-            $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">';
+            $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'combined_inbox'], true) .'">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-box2-fill menu-icon"></i>';
             }
             $res .= '<span class="nav-label">'.$this->trans('Everything').'</span</a><span class="combined_inbox_count"></span></li>';
         }
-        $res .= '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread">';
+        $res .= '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="'. $this->build_page_url('message_list', ['list_path' => 'unread'], true) .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-envelope-fill menu-icon"></i>';
         }
         $res .= '<span class="nav-label">'.$this->trans('Unread').'</span></a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li>';
-        $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">';
+        $res .= '<li class="menu_flagged"><a class="unread_link" href="'.$this->build_page_url('message_list', ['list_path' => 'flagged'], true).'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-flag-fill menu-icon"></i>';
         }
         $res .= '<span class="nav-label">'.$this->trans('Flagged').'</span></a> <span class="flagged_count"></span></li>';
-        $res .= '<li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk">';
+        $res .= '<li class="menu_junk"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'junk'], true) .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-envelope-x-fill menu-icon"></i>';
         }
         $res .= '<span class="nav-label">'.$this->trans('Junk').'</span></a></li>';
-        $res .= '<li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash">';
+        $res .= '<li class="menu_trash"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'trash'], true) .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-trash3-fill menu-icon"></i>';
         }
         $res .= '<span class="nav-label">'.$this->trans('Trash').'</span></a></li>';
-        $res .= '<li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts">';
+        $res .= '<li class="menu_drafts"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'drafts'], true) .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-pencil-square menu-icon"></i>';
         }
         $res .= '<span class="nav-label">'.$this->trans('Drafts').'</span></a></li>';
         $settings = $this->get('user_settings', array());
         if (array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting']) {
-            $res .= '<li class="menu_snoozed"><a class="unread_link" href="?page=message_list&amp;list_path=snoozed">';
+            $res .= '<li class="menu_snoozed"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'snoozed'], true) .'">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-clock-fill menu-icon"></i>';
             }
@@ -1480,7 +1481,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
 
             $res .= '<div class="'.$class.'"><ul class="folders">';
             if ($name == 'Email' && count($this->get('imap_servers', array()))  > 1) {
-                $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">';
+                $res .= '<li class="menu_email"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'email'], true) .'">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-globe-americas menu-icon"></i>';
                 }
@@ -1565,7 +1566,7 @@ class Hm_Output_settings_servers_link extends Hm_Output_Module {
      * Outputs links to the Servers settings pages
      */
     protected function output() {
-        $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">';
+        $res = '<li class="menu_servers"><a class="unread_link" href="'.$this->build_page_url('servers').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-pc-display-horizontal menu-icon"></i>';
         }
@@ -1583,7 +1584,7 @@ class Hm_Output_settings_site_link extends Hm_Output_Module {
      * Outputs links to the Site Settings pages
      */
     protected function output() {
-        $res = '<li class="menu_settings"><a class="unread_link" href="?page=settings">';
+        $res = '<li class="menu_settings"><a class="unread_link" href="'.$this->build_page_url('settings').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-gear-wide-connected menu-icon"></i>';
         }
@@ -1604,7 +1605,7 @@ class Hm_Output_settings_save_link extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return;
         }
-        $res = '<li class="menu_save"><a class="unread_link" href="?page=save">';
+        $res = '<li class="menu_save"><a class="unread_link" href="'.$this->build_page_url('save').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-download menu-icon"></i>';
         }
@@ -1640,7 +1641,10 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<div class="sidebar-footer">';
-        $res .= '<a class="logout_link" id="js-logout_link" href="?page=logout&prompt=true&back_query='. (base64_encode(serialize($this->get('router_get_export')))) .'" title="'. $this->trans('Logout') .'">';
+        $res .= '<a class="logout_link" id="js-logout_link" href="'.$this->build_page_url('logout', [
+            'prompt' => 'true',
+            'back_query' => base64_encode(serialize($this->get('router_get_export'))),
+        ]).'" title="'. $this->trans('Logout') .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-power menu-icon"></i>';
         }
@@ -1830,7 +1834,7 @@ class Hm_Output_message_start extends Hm_Output_Module {
             else {
                 $list_name = $this->trans(ucwords(str_replace('_', ' ', $this->get('list_parent', ''))));
             }
-            $additional = '';
+            $title_params = array('list_path' => $this->html_safe($this->get('list_parent')));
             if ($this->get('list_parent') == 'advanced_search') {
                 $page = 'advanced_search';
             }
@@ -1838,37 +1842,38 @@ class Hm_Output_message_start extends Hm_Output_Module {
                 $page = 'search';
                 foreach (['list_page', 'list_sort', 'search_terms', 'search_fld', 'search_since'] as $field) {
                     if ($value = $this->get($field)) {
-                        $field = $field == 'list_sort' ? 'sort' : $field;
-                        $additional .= "&amp;$field=" . $this->html_safe($value);
+                        $param = $field == 'list_sort' ? 'sort' : $field;
+                        $title_params[$param] = $this->html_safe($value);
                     }
                 }
             }
             else {
                 $page = 'message_list';
             }
-            $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).$additional.'">'.$list_name.'</a>';
+            $title = '<a href="'. $this->build_page_url($page, $title_params, true) .'">'.$list_name.'</a>';
             if (count($this->get('mailbox_list_title', array())) > 0) {
                 $mb_title = array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()));
                 if (($key = array_search($list_name, $mb_title)) !== false) {
                     unset($mb_title[$key]);
                 }
                 $title .= '<i class="bi bi-caret-right-fill path_delim"></i>'.
-                    '<a href="?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path')).'">'.
+                    '<a href="'. $this->build_page_url('message_list', array('list_path' => $this->html_safe($this->get('list_path'))), true) .'">'.
                     implode('<i class="bi bi-caret-right-fill path_delim"></i>',
                     array_map( function($v) { return $this->trans($v); }, $mb_title)).'</a>';
             }
         }
         elseif ($this->get('mailbox_list_title')) {
-            $url = '?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path'));
+            $url_params = array('list_path' => $this->html_safe($this->get('list_path')));
             if ($this->get('list_page', 0)) {
-                $url .= '&list_page='.$this->html_safe($this->get('list_page'));
+                $url_params['list_page'] = $this->html_safe($this->get('list_page'));
             }
             if ($this->get('list_filter', '')) {
-                $url .= '&filter='.$this->html_safe($this->get('list_filter'));
+                $url_params['filter'] = $this->html_safe($this->get('list_filter'));
             }
             if ($this->get('list_sort', '')) {
-                $url .= '&sort='.$this->html_safe($this->get('list_sort'));
+                $url_params['sort'] = $this->html_safe($this->get('list_sort'));
             }
+            $url = $this->build_page_url('message_list', $url_params, true);
             $title = '<a href="'.$url.'">'.
                 implode('<i class="bi bi-caret-right-fill path_delim"></i>',
                 array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()))).'</a>';
@@ -2017,9 +2022,9 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             else {
                 $path = $this->get('list_path');
             }
-            $config_link = '<a title="'.$this->trans('Configure').'" href="?page=settings#'.$path.'_setting"><i class="bi bi-gear-wide refresh_list"></i></a>';
+            $config_link = '<a title="'.$this->trans('Configure').'" href="'.$this->build_page_url('settings').'#'.$path.'_setting"><i class="bi bi-gear-wide refresh_list"></i></a>';
             $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a>';
-            $search_field = '<form method="GET"><input type="hidden" name="page" value="message_list" /><input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/><input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="form-control imap_keyword" name="keyword" value="'.$this->html_safe($terms).'"/></form>';
+            $search_field = '<form method="GET"><input type="hidden" name="'. $this->get("page_param_name", 'page') .'" value="message_list" /><input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/><input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="form-control imap_keyword" name="keyword" value="'.$this->html_safe($terms).'"/></form>';
 
         }
         else {

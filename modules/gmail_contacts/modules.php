@@ -37,28 +37,22 @@ class Hm_Handler_load_gmail_contacts extends Hm_Handler_Module {
  */
 if (!hm_exists('gmail_contacts_request')) {
 function gmail_contacts_request($token, $url) {
-    $headers = array('Authorization: OAuth '.$token, 'GData-Version: 3.0');
-    $api = new Hm_API_Curl('xml');
+    $headers = array('Authorization: Bearer '.$token);
+    $api = new Hm_API_Curl('json');
     return $api->command($url, $headers);
 }}
 
 /**
  * @subpackage gmail_contacts/functions
  */
-if (!hm_exists('parse_contact_xml')) {
-function parse_contact_xml($xml, $source) {
-    $parser = new Hm_Gmail_Contact_XML($xml);
+if (!hm_exists('parse_people_api_contacts')) {
+function parse_people_api_contacts($response, $source) {
+    $parser = new Hm_Gmail_People_API($response);
     $results = array();
     $exists = array();
     foreach ($parser->parse() as $contact) {
-        if (!array_key_exists('email_address', $contact)) {
-            continue;
-        }
         if (in_array($contact['email_address'], $exists, true)) {
             continue;
-        }
-        if (!array_key_exists('display_name', $contact)) {
-            $contact['display_name'] = '';
         }
         $exists[] = $contact['email_address'];
         $contact['source'] = $source;
@@ -71,10 +65,35 @@ function parse_contact_xml($xml, $source) {
 /**
  * @subpackage gmail_contacts/functions
  */
+if (!hm_exists('normalize_gmail_session_contacts')) {
+function normalize_gmail_session_contacts($contacts) {
+    $results = array();
+    foreach ($contacts as $contact) {
+        if (!is_array($contact) || !array_key_exists('email_address', $contact)) {
+            continue;
+        }
+        if (!array_key_exists('display_name', $contact)) {
+            $contact['display_name'] = '';
+        }
+        if (!array_key_exists('phone_number', $contact)) {
+            $contact['phone_number'] = '';
+        }
+        $contact['source'] = 'gmail';
+        $contact['type'] = 'gmail';
+        $results[] = $contact;
+    }
+    return $results;
+}}
+
+/**
+ * @subpackage gmail_contacts/functions
+ */
 if (!hm_exists('fetch_gmail_contacts')) {
 function fetch_gmail_contacts($config, $contact_store, $session=false, $max_google_contacts_number = 500) {
     if ($session && $session->get('gmail_contacts') && is_array($session->get('gmail_contacts')) && count($session->get('gmail_contacts')) > 0) {
-        $contact_store->import($session->get('gmail_contacts'));
+        $cached_contacts = normalize_gmail_session_contacts($session->get('gmail_contacts'));
+        $contact_store->import($cached_contacts);
+        $session->set('gmail_contacts', $cached_contacts);
         return $contact_store;
     }
     $all_contacts = array();
@@ -88,16 +107,31 @@ function fetch_gmail_contacts($config, $contact_store, $session=false, $max_goog
                 }
             }
 
-            $url = 'https://www.google.com/m8/feeds/contacts/' . $server['user'] . '/full?max-results='. $max_google_contacts_number;
-            $contacts = parse_contact_xml(gmail_contacts_request($server['pass'], $url), $server['name']);
-            if (count($contacts) > 0) {
-                $contact_store->import($contacts);
-                $all_contacts = array_merge($all_contacts, $contacts);
-            }
+            $page_size = min((int) $max_google_contacts_number, 1000);
+            $page_token = '';
+            $collected = 0;
+            do {
+                $url = 'https://people.googleapis.com/v1/people/me/connections'
+                     . '?personFields=names,emailAddresses,phoneNumbers'
+                     . '&pageSize=' . $page_size;
+                if ($page_token) {
+                    $url .= '&pageToken=' . urlencode($page_token);
+                }
+                $response = gmail_contacts_request($server['pass'], $url);
+                Hm_Debug::add(sprintf('Gmail People API request for server id %s, page_token: %s', $id, $page_token ? 'yes' : 'none'), 'info');
+                $contacts = parse_people_api_contacts($response, 'gmail');
+                Hm_Debug::add(sprintf('Gmail People API returned %d contacts for server id %s', count($contacts), $id), 'info');
+                if (count($contacts) > 0) {
+                    $contact_store->import($contacts);
+                    $all_contacts = array_merge($all_contacts, $contacts);
+                    $collected += count($contacts);
+                }
+                $page_token = (is_array($response) && array_key_exists('nextPageToken', $response)) ? $response['nextPageToken'] : '';
+            } while ($page_token && $collected < $max_google_contacts_number);
         }
-        if ($session && count($all_contacts) > 0) {
-            $session->set('gmail_contacts', $all_contacts);
-        }
+    }
+    if ($session && count($all_contacts) > 0) {
+        $session->set('gmail_contacts', $all_contacts);
     }
     return $contact_store;
 }}

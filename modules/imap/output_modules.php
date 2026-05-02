@@ -37,7 +37,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             }
 
             $custom = '<form id="imap_filter_form" method="GET" class="d-flex align-content-center">';
-            $custom .= '<input type="hidden" name="page" value="message_list" />';
+            $custom .= '<input type="hidden" name="'. $this->get("page_param_name") .'" value="message_list" />';
             $custom .= '<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'" />';
             $custom .= '<input type="hidden" name="list_page" value="'.$this->html_safe($this->get('list_page')).'" />';
             $custom .= '<input type="search" placeholder="'.$this->trans('Search').
@@ -89,7 +89,10 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
                         $custom .= '<input type="hidden" value="0" id="move_messages_in_screen_email"/>';
                     }
                 } else {
-                    $path = sprintf('?page=message_list&list_path=%s&screen_emails=1', $this->html_safe($this->get('list_path')));
+                    $path = $this->build_page_url('message_list', array(
+                        'list_path' => $this->html_safe($this->get('list_path')),
+                        'screen_emails' => 1,
+                    ));
                     $custom .= '<a title="'.sprintf($this->trans('Screen %s first emails'), $this->get('first_time_screen_emails')).
                     '" href="'. $path .'"><i class="bi bi-hand-thumbs-up-fill"></i></a>';
                 }
@@ -337,7 +340,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
             $is_draft = array_key_exists('flags', lc_headers($headers)) && mb_stristr(lc_headers($headers)['flags'], 'draft');
             if($is_draft) {
-                $txt .= '<div class="row g-0 py-2"><div class="col-12 text-center text-md-start"><a class="btn btn-primary" href="?page=compose'.$reply_args.'&imap_draft=1"><i class="bi bi-pencil"></i> '.$this->trans('Edit Draft').'</a></div></div>';
+                $txt .= '<div class="row g-0 py-2"><div class="col-12 text-center text-md-start"><a class="btn btn-primary" href="'.$this->build_page_url('compose', array(
+                    'imap_draft' => 1,
+                )).$reply_args.'"><i class="bi bi-pencil"></i> '.$this->trans('Edit Draft').'</a></div></div>';
             }
             foreach ($headers as $name => $value) {
                 if (!in_array(mb_strtolower($name), $small_headers)) {
@@ -393,9 +398,13 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
             $txt .= '<div class="d-flex flex-wrap gap-2">';
             if (!array_key_exists('flags', $lc_headers) || !mb_stristr($lc_headers['flags'], 'draft')) {
-                $txt .= '<a class="reply_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
+                $txt .= '<a class="reply_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="'.$this->build_page_url('compose', array(
+                    'reply' => 1,
+                ), true).$reply_args.'">'.$this->trans('Reply').'</a>';
                 if ($size > 1) {
-                    $txt .= '<a class="reply_all_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
+                    $txt .= '<a class="reply_all_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="'.$this->build_page_url('compose', array(
+                        'reply_all' => 1,
+                    ), true).$reply_args.'">'.$this->trans('Reply-all').'</a>';
                 } else {
                     $txt .= '<a class="reply_all_link hlink disabled_link text-decoration-none">'.$this->trans('Reply-all').'</a>';
                 }
@@ -414,7 +423,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<div class="position-relative"><a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="copy_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Copy').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
             $txt .= '<div class="position-relative"><a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="move_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Move').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
             if (!$this->get('is_archive_folder')) {
-                $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+                if ($this->get('ews_inplace_archive_enabled') === false) {
+                    $txt .= '<span class="d-inline-block" tabindex="0" title="'.$this->trans('In-Place Archive is not enabled for this Exchange account. Please contact your administrator.').'"><span class="btn btn-sm btn-outline-secondary disabled">'.$this->trans('Archive').'</span></span>';
+                } else {
+                    $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+                }
             }
 
             if ($this->get('is_trash_folder')) {
