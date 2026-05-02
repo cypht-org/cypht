@@ -112,6 +112,18 @@ setup_postfix() {
 	fi
 }
 
+# setup OpenLDAP test data
+setup_ldap() {
+	STATUS_TITLE "Setup OpenLDAP"
+	bash .github/tests/scripts/ldap.sh
+	if [ $? -eq 0 ]; then
+		STATUS_DONE
+	else
+		STATUS_ERROR
+		echo "Warning: LDAP setup failed - LDAP tests may be skipped"
+	fi
+}
+
 #config site
 setup_site() {
 	STATUS_TITLE "Setup php${PHP_V}-fpm"
@@ -183,6 +195,7 @@ setup_site() {
 setup_unit_tests() {
     setup_cypht
     bootstrap_unit_tests
+    setup_ldap
 }
 
 setup_ui_tests() {
@@ -191,6 +204,7 @@ setup_ui_tests() {
     setup_user
     setup_dovecot
     setup_postfix
+    setup_ldap
     setup_site
 }
 

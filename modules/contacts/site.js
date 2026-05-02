@@ -2,10 +2,18 @@
 
 var existingRecipients = [];
 
-var delete_contact = function(id, source, type) {
+var delete_contact = function(id, source, type, $button) {
     if (!hm_delete_prompt()) {
         return false;
     }
+    
+    var originalContent = $button.html();
+    var originalTitle = $button.attr('title');
+    
+    $button.prop('disabled', true);
+    $button.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+    $button.attr('title', 'Deleting...');
+    
     var request_data = [
         {'name': 'hm_ajax_hook', 'value': 'ajax_delete_contact'},
         {'name': 'contact_id', 'value': id},
@@ -17,8 +25,20 @@ var delete_contact = function(id, source, type) {
         request_data,
         function(res) {
             if (res.contact_deleted && res.contact_deleted === 1) {
-                $('.contact_row_'+id).remove();
+                window.location.reload();
+            } else {
+                $button.prop('disabled', false);
+                $button.html(originalContent);
+                $button.attr('title', originalTitle);
+                Hm_Notices.show('Failed to delete contact', 'danger');
             }
+        },
+        [],
+        false,
+        function() {
+            $button.prop('disabled', false);
+            $button.html(originalContent);
+            $button.attr('title', originalTitle);
         }
     );
 };
@@ -233,19 +253,19 @@ var contact_import_pagination = function() {
     var total_pages = $('#totalPages').val();
     showPage(selected_page, total_pages);
 
-    $('.page_link_selector').on('click', function () {
+    $('.page_link_selector').off('click').on('click', function () {
         selected_page = $(this).data('page');
         showPage(selected_page, total_pages);
     });
 
-    $('.prev_page').on('click', function () {
+    $('.prev_page').off('click').on('click', function () {
         if (selected_page > 1) {
             selected_page--;
             showPage(selected_page, total_pages);
         }
     });
 
-    $('.next_page').on('click', function () {
+    $('.next_page').off('click').on('click', function () {
         if (selected_page < total_pages) {
             selected_page++;
             showPage(selected_page, total_pages);
@@ -277,4 +297,58 @@ var check_cc_exist_in_contacts_list = function() {
     }
     return "";
 };
+
+var initContactTabs = function() {
+    $('.category-tab').off('click').on('click', function(e) {
+        e.preventDefault();
+        
+        var targetId = $(this).data('target');
+        
+        $('.category-tab').removeClass('active');
+        
+        $(this).addClass('active');
+        
+        $('.tab-content-section').removeClass('active');
+        
+        $('#' + targetId).addClass('active');
+        
+        updateEditLinksWithActiveTab(targetId);
+    });
+};
+
+var updateEditLinksWithActiveTab = function(activeTab) {
+    $('.action-btn-edit').each(function() {
+        var href = $(this).attr('href');
+        if (href && href.indexOf('open_modal=') !== -1) {
+            href = href.replace(/&active_tab=[^&]*/, '');
+            $(this).attr('href', href + '&active_tab=' + activeTab);
+        }
+    });
+};
+
+var initPagination = function() {
+    $(document).off('click', '.pagination-btn:not([disabled]), .pagination-number').on('click', '.pagination-btn:not([disabled]), .pagination-number', function(e) {
+        e.preventDefault();
+        var page = $(this).data('page');
+        var currentPage = parseInt(getUrlParameter('contact_page')) || 1;
+        
+        if (page && page !== currentPage) {
+            var currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('contact_page', page);
+            window.location.href = currentUrl.toString();
+        }
+    });
+};
+
+var getUrlParameter = function(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+
+$(document).ready(function() {
+    initContactTabs();
+    initPagination();
+});
 
