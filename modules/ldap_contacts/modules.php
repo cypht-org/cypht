@@ -8,7 +8,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require APP_PATH.'modules/ldap_contacts/hm-ldap-contacts.php';
+require_once APP_PATH.'modules/ldap_contacts/hm-ldap-contacts.php';
 
 /**
  * @subpackage ldap_contacts/handler

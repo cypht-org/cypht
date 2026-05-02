@@ -52,9 +52,19 @@ jobs:
           - 5432:5432
         options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
 
+      openldap:
+        image: osixia/openldap:1.5.0
+        env:
+          LDAP_ORGANISATION: cypht
+          LDAP_DOMAIN: cypht.test
+          LDAP_ADMIN_PASSWORD: cypht_test
+        ports:
+          - 389:389
+        options: --health-cmd="ldapsearch -x -H ldap://localhost:389 -b dc=cypht,dc=test -D cn=admin,dc=cypht,dc=test -w cypht_test" --health-interval=10s --health-timeout=5s --health-retries=5
+
     steps:
       - name: "System Install Dependencies"
-        run: sudo apt-get install -y mysql-client postgresql-client sqlite3 libsodium-dev
+        run: sudo apt-get install -y mysql-client postgresql-client sqlite3 libsodium-dev ldap-utils libldap2-dev
 
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -65,7 +75,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: pdo, sodium, sqlite, pdo_mysql, pdo_pgsql, memcached, redis, gd, gnupg
+          extensions: pdo, sodium, sqlite, pdo_mysql, pdo_pgsql, memcached, redis, gd, gnupg, ldap
           tools: phpunit, composer
           ini-values: cgi.fix_pathinfo=1
         env:
@@ -116,7 +126,7 @@ jobs:
             sudo wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
             sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
             sudo apt-get update
-            sudo apt-get install -y google-chrome-stable dovecot-imapd dovecot-lmtpd postfix python3-pip
+            sudo apt-get install -y google-chrome-stable dovecot-imapd dovecot-lmtpd postfix python3-pip ldap-utils libldap2-dev
             sudo bash .github/tests/selenium/webdriver/webdriver.sh
             pip install -r tests/selenium/requirements.txt
 
@@ -124,7 +134,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.PHP_V }}
-          extensions: pdo, sodium, curl, mbstring, xml, sqlite, pdo_mysql, pdo_pgsql, memcached, redis, gd, gnupg, imagick, bcmath, tidy, soap, xdebug, bcmath
+          extensions: pdo, sodium, curl, mbstring, xml, sqlite, pdo_mysql, pdo_pgsql, memcached, redis, gd, gnupg, imagick, bcmath, tidy, soap, xdebug, bcmath, ldap
           tools: phpunit, composer
           ini-values: cgi.fix_pathinfo=1
         env:
