@@ -1301,7 +1301,10 @@ function decode_folder_str($folder) {
     $folder_name = false;
     $parts = explode('_', $folder, 3);
     if (count($parts) == 3) {
-        $folder_name = hex2bin($parts[2]);
+        $hex_part = $parts[2];
+        if (ctype_xdigit($hex_part) && strlen($hex_part) % 2 == 0) {
+            $folder_name = hex2bin($hex_part);
+        }
     }
     return $folder_name;
 }}
