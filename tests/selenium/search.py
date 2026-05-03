@@ -24,7 +24,8 @@ class SearchTest(WebTest):
         terms = self.by_id('search_terms')
         terms.send_keys('test')
         Select(self.by_name('search_since')).select_by_value('-5 years')
-        self.by_class('search_update').click();
+        # Use JavaScript click to avoid issues with elements being obscured or not interactable
+        self.driver.execute_script("document.querySelector('.search_update').click();")
         self.wait_with_folder_list()
         sleep(1)
         table = self.by_class('message_table_body')
