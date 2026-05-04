@@ -651,7 +651,62 @@ return [
     | Handles page layout, login/logout, and the default settings pages. This set
     | is required.
     */
-    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags')),
+    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags,spam_reporting')),
+    /*
+    | ------------------------------------------
+    | Spam Reporting Allowed Target Types
+    | ------------------------------------------
+    |
+    | Mandatory. Symbolic adapter type IDs allowed instance-wide.
+    | Set via env SPAM_REPORTING_ALLOWED_TARGET_TYPES (comma-separated, e.g.
+    | abuseipdb,email_target,spamcop_email). Empty value = no adapters.
+    */
+    'spam_reporting_allowed_target_types' => array_filter(
+        array_map('trim', explode(',', (string) env('SPAM_REPORTING_ALLOWED_TARGET_TYPES', 'abuseipdb,email_target')))),
+    /*
+    | -------------------------------
+    | Spam Reporting Platform Catalog
+    | -------------------------------
+    |
+    | JSON catalog of known reporting platforms. This is display-only metadata
+    | and does not affect reporting behavior.
+    */
+    'spam_reporting_platforms_file' => env('SPAM_REPORTING_PLATFORMS_FILE', APP_PATH.'data/spam_report_platforms.json'),
+    /*
+    | ------------------------------------
+    | Spam Reporting Provider Mapping
+    | ------------------------------------
+    |
+    | JSON mapping of provider signals to platform_ids for suggestion logic.
+    */
+    'spam_reporting_provider_mapping_file' => env('SPAM_REPORTING_PROVIDER_MAPPING_FILE', APP_PATH.'data/spam_report_provider_mapping.json'),
+    /*
+    | -----------------------------
+    | Spam Reporting SMTP Settings
+    | -----------------------------
+    |
+    | System-level SMTP settings for spam reporting. These must be configured
+    | explicitly and do not use the user's identity.
+    */
+    'spam_reporting_smtp_name' => env('SPAM_REPORTING_SMTP_NAME', 'Spam Reporting'),
+    'spam_reporting_smtp_server' => env('SPAM_REPORTING_SMTP_SERVER', ''),
+    'spam_reporting_smtp_port' => env('SPAM_REPORTING_SMTP_PORT', 587),
+    'spam_reporting_smtp_tls' => env('SPAM_REPORTING_SMTP_TLS', true),
+    'spam_reporting_smtp_user' => env('SPAM_REPORTING_SMTP_USER', ''),
+    'spam_reporting_smtp_pass' => env('SPAM_REPORTING_SMTP_PASS', ''),
+    'spam_reporting_smtp_no_auth' => env('SPAM_REPORTING_SMTP_NO_AUTH', false),
+    'spam_reporting_sender_address' => env('SPAM_REPORTING_SENDER_ADDRESS', ''),
+    'spam_reporting_sender_name' => env('SPAM_REPORTING_SENDER_NAME', ''),
+    'spam_reporting_reply_to' => env('SPAM_REPORTING_REPLY_TO', ''),
+    /*
+    | ----------------------
+    | Spam Reporting Limits
+    | ----------------------
+    |
+    | Conservative per-user rate limits.
+    */
+    'spam_reporting_rate_limit_count' => env('SPAM_REPORTING_RATE_LIMIT_COUNT', 5),
+    'spam_reporting_rate_limit_window' => env('SPAM_REPORTING_RATE_LIMIT_WINDOW', 3600),
     // 'modules' => [
     //     /*
     //     |  ----
