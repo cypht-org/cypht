@@ -57,9 +57,6 @@ ini_set('session.cache_limiter', 'nocache');
 /* session name */
 ini_set('session.name', 'hm_session');
 
-/* disable remote includes */
-ini_set('allow_url_include', 0);
-
 /* when display_errors is on PHP returns a 200 when it should be a 500 */
 ini_set('display_errors', 0);
 ini_set('display_start_up_errors', 0);
