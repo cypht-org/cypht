@@ -54,13 +54,6 @@ ini_set('session.use_trans_sid', 0);
 /* don't allow dynamic page caching */
 ini_set('session.cache_limiter', 'nocache');
 
-/* session hash mechanism */
-if (version_compare(PHP_VERSION, 8.1, '==')) {
-    ini_set('session.hash_function', 1);
-} else {
-    ini_set('session.hash_function', 'sha256');
-}
-
 /* session name */
 ini_set('session.name', 'hm_session');
 
