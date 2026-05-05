@@ -568,26 +568,19 @@ class Hm_SMTP {
 
     /* NTLM compatible DES encryption */
     function des_encrypt($string, $challenge='KGS!@#$%') {
-        $key = array();
         $tmp = array();
         $len = strlen($string);
         for ($i=0; $i<7; ++$i)
             $tmp[] = $i < $len ? ord($string[$i]) : 0;
-        $key[] = $tmp[0] & 254;
-        $key[] = ($tmp[0] << 7) | ($tmp[1] >> 1);
-        $key[] = ($tmp[1] << 6) | ($tmp[2] >> 2);
-        $key[] = ($tmp[2] << 5) | ($tmp[3] >> 3);
-        $key[] = ($tmp[3] << 4) | ($tmp[4] >> 4);
-        $key[] = ($tmp[4] << 3) | ($tmp[5] >> 5);
-        $key[] = ($tmp[5] << 2) | ($tmp[6] >> 6);
-        $key[] = $tmp[6] << 1;
-        $is = mcrypt_get_iv_size(MCRYPT_DES, MCRYPT_MODE_ECB);
-        $iv = mcrypt_create_iv($is, MCRYPT_RAND);
-        $key0 = "";
-        foreach ($key as $k)
-            $key0 .= chr($k);
-        $crypt = mcrypt_encrypt(MCRYPT_DES, $key0, $challenge, MCRYPT_MODE_ECB, $iv);
-        return $crypt;
+        $key  = chr($tmp[0] & 254);
+        $key .= chr(($tmp[0] << 7) | ($tmp[1] >> 1));
+        $key .= chr(($tmp[1] << 6) | ($tmp[2] >> 2));
+        $key .= chr(($tmp[2] << 5) | ($tmp[3] >> 3));
+        $key .= chr(($tmp[3] << 4) | ($tmp[4] >> 4));
+        $key .= chr(($tmp[4] << 3) | ($tmp[5] >> 5));
+        $key .= chr(($tmp[5] << 2) | ($tmp[6] >> 6));
+        $key .= chr($tmp[6] << 1);
+        return openssl_encrypt($challenge, 'DES-ECB', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
     }
 
     /* Send a message */
