@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_sieve_connection_manager extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require_once 'bootstrap.php';
         SieveConnectionManager::closeAllConnections();
         
         SieveConnectionManager::setTimeout(10);

@@ -36,6 +36,7 @@ add_output('ajax_account_sieve_filters', 'check_filter_status', true, 'sievefilt
 
 // block list
 add_output('block_list', 'blocklist_settings_start', true, 'sievefilters', 'version_upgrade_checker', 'after');
+add_output('block_list', 'sievefilters_modal_content_start', true, 'sievefilters', 'blocklist_settings_start', 'after');
 setup_base_ajax_page('ajax_block_account_sieve_filters', 'core');
 add_handler('ajax_block_account_sieve_filters', 'settings_load_imap', true, 'sievefilters', 'load_user_data', 'after');
 add_handler('ajax_block_account_sieve_filters', 'load_behaviour', true, 'sievefilters', 'settings_load_imap', 'after');

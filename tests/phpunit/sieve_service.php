@@ -10,7 +10,7 @@ class Hm_Test_sieve_service extends TestCase {
     private $mockCache;
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require_once 'bootstrap.php';
 
         $this->mockCache = new MockCache();
         
@@ -51,7 +51,7 @@ class Hm_Test_sieve_service extends TestCase {
         $reflection = new ReflectionClass('SieveConnectionManager');
         $configProperty = $reflection->getProperty('config');
         $configProperty->setAccessible(true);
-        $configProperty->setValue([]);
+        $configProperty->setValue(null, []);
         
         SieveService::init($cache, $config);
         
@@ -136,5 +136,33 @@ class Hm_Test_sieve_service extends TestCase {
     public function test_exception_handling() {
         $this->expectException(Exception::class);
         SieveService::getConnection('invalid_server');
+    }
+
+    /**
+     * closeConnection on a key with no active connection must not attempt a new connection
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_closeConnection_no_active_connection_does_not_connect() {
+        // 'server1' is in config but no connection has been established
+        $this->assertFalse(SieveConnectionManager::hasConnection('server1'));
+
+        // Must not throw (no network call triggered)
+        SieveService::closeConnection('server1');
+
+        $this->assertTrue(SieveService::hasAccounts());
+    }
+
+    /**
+     * Delegation: clearScriptCache proxies to SieveScriptCache
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_clearScriptCache_via_service() {
+        SieveScriptCache::cacheScript('server1', 'my.sieve', 'content');
+        $this->assertEquals('content', SieveScriptCache::getCachedScript('server1', 'my.sieve'));
+
+        SieveService::clearScriptCache('server1', 'my.sieve');
+        $this->assertFalse(SieveScriptCache::getCachedScript('server1', 'my.sieve'));
     }
 }

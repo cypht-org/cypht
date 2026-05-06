@@ -75,9 +75,8 @@ class SieveScriptCache
         $cacheData = [
             'data' => $scriptData,
             'time' => time(),
-            'microtime' => microtime(true)
         ];
-        
+
         $result = self::$cache->set($cacheKey, $cacheData, self::$scriptCacheTTL, true);
         
         return $result;
@@ -88,27 +87,15 @@ class SieveScriptCache
      */
     public static function invalidateScript($key, string $scriptName)
     {
-        if (!self::$cache) {
-            return false;
-        }
-
-        $cacheKey = "sieve_script_{$key}_{$scriptName}";
-        return self::$cache->del($cacheKey);
+        return self::clearScriptCache($key, $scriptName);
     }
 
     /**
-     * Invalidate all scripts cache for a connection key
-     * We need to track script names to invalidate, 
-     * for now we'll invalidate the list cache and scripts will be re-fetched
+     * Invalidate all scripts cache for a connection key (only the list, individual scripts expire via TTL)
      */
     public static function invalidateAllScripts($key)
     {
-        if (!self::$cache) {
-            return false;
-        }
-
-        $listCacheKey = "sieve_scripts_list_{$key}";
-        return self::$cache->del($listCacheKey);
+        return self::invalidateScriptsList($key);
     }
 
     /**
@@ -121,7 +108,7 @@ class SieveScriptCache
         }
 
         $cacheKey = "sieve_scripts_list_{$key}";
-        return self::$cache->set($cacheKey, $scripts, 300);
+        return self::$cache->set($cacheKey, $scripts, self::$scriptCacheTTL);
     }
 
     /**
@@ -134,7 +121,8 @@ class SieveScriptCache
         }
 
         $cacheKey = "sieve_scripts_list_{$key}";
-        return self::$cache->get($cacheKey);
+        $cached = self::$cache->get($cacheKey, null);
+        return $cached !== null ? $cached : false;
     }
 
     /**
@@ -299,6 +287,11 @@ class SieveConnectionManager
         self::$connections = [];
         self::$lastConnectionTimes = [];
     }
+
+    public static function hasConnection($key): bool
+    {
+        return isset(self::$connections[$key]) && self::isConnectionAlive($key);
+    }
 }
 
 /**
@@ -398,7 +391,7 @@ class SieveService
      */
     public static function closeConnection($key)
     {
-        if (isset(SieveConnectionManager::getConfig()[$key])) {
+        if (SieveConnectionManager::hasConnection($key)) {
             try {
                 $client = SieveConnectionManager::getConnection($key);
                 $client->close();

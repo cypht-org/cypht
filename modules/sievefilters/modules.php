@@ -1186,14 +1186,11 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
 
 /**
  * @subpackage sievefilters/output
+ * Kept for backward compatibility with pre-compiled configs - outputs modals only (no title)
  */
 class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
     protected function output() {
-        $socked_connected = $this->get('socket_connected', false);
-        $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters').'</div>';
-        $res .= '<div class="p-3">';
-        $res .= '<div id="sieve_accounts"></div>';
-        $res .= get_classic_filter_modal_content();
+        $res = get_classic_filter_modal_content();
         $res .= get_script_modal_content();
         return $res;
     }
@@ -1204,7 +1201,6 @@ class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
  */
 class Hm_Output_sievefilters_title_start extends Hm_Output_Module {
     protected function output() {
-        $socked_connected = $this->get('socket_connected', false);
         $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters').'</div>';
         $res .= '<div class="p-3">';
         $res .= '<div id="sieve_accounts"></div>';
@@ -1300,11 +1296,8 @@ class Hm_Output_new_sieve_filter_for_message_like_this extends Hm_Output_Module 
  */
 class Hm_Output_blocklist_settings_start extends Hm_Output_Module {
     protected function output() {
-        $socked_connected = $this->get('socket_connected', false);
         $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Block List').'</div>';
         $res .= '<div class="p-3" id="sieve_accounts"></div>';
-        $res .= get_classic_filter_modal_content();
-        $res .= get_script_modal_content();
         return $res;
     }
 }
@@ -1731,39 +1724,36 @@ class Hm_Handler_load_custom_actions extends Hm_Handler_Module
         }
 
         $filters = [];
-        $factory = get_sieve_client_factory($this->config);
         try {
-            $client = $factory->init($this->user_config, $mailbox, $this->module_is_supported('nux'));
-            $scripts = $client->listScripts();
-            
+            ensure_sieve_service_initialized($this->user_config, $this->cache);
+            $scripts = SieveService::listScripts($imap_server_id);
+
             foreach ($scripts as $script_name) {
-                // Only include filter scripts (ending with cyphtfilter)
-                if (mb_strstr($script_name, 'cyphtfilter')) {
-                    $raw_script = $client->getScript($script_name); // raw content
-
-                    // Parse the source from line 3 of the script header
-                    $lines = split_script_lines($raw_script);
-                    $source = ''; // default
-                    if (isset($lines[3])) {
-                        $meta_b64 = str_replace("# ", "", $lines[3]);
-                        $source = base64_decode($meta_b64);
-                    }
-
-                    $exp_name = explode('-', $script_name);
-                    $parsed_name = str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2)));
-                    
-                    if (preg_match('/^s(en|dis)abled/', $parsed_name)) {
-                        $parsed_name = str_replace(['senabled ', 'sdisabled '], '', $parsed_name);
-                    }
-
-                    $filters[] = [
-                        'id' => $script_name,
-                        'name' => $parsed_name,
-                        'source' => $source,
-                    ];
+                if (!mb_strstr($script_name, 'cyphtfilter')) {
+                    continue;
                 }
+                $raw_script = SieveService::getScript($imap_server_id, $script_name);
+
+                $lines = split_script_lines($raw_script);
+                $source = '';
+                if (isset($lines[3])) {
+                    $source = base64_decode(str_replace("# ", "", $lines[3]));
+                }
+
+                $exp_name = explode('-', $script_name);
+                $parsed_name = str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2)));
+
+                if (preg_match('/^s(en|dis)abled/', $parsed_name)) {
+                    $parsed_name = str_replace(['senabled ', 'sdisabled '], '', $parsed_name);
+                }
+
+                $filters[] = [
+                    'id'     => $script_name,
+                    'name'   => $parsed_name,
+                    'source' => $source,
+                ];
             }
-            $client->close();
+            SieveService::closeConnection($imap_server_id);
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
         }
@@ -1831,9 +1821,10 @@ class Hm_Handler_sieve_remame_folder extends Hm_Handler_Module
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
         if ($mailbox && $mailbox->authed() && $mailbox->is_imap()) {
-            list($scripts, $current_script) = get_all_scripts($form['imap_server_id'], true);
-            
-            $linked_mailboxes = get_sieve_linked_mailbox($scripts, $current_script);
+            ensure_sieve_service_initialized($this->user_config, $this->cache);
+            list($scripts) = get_all_scripts($form['imap_server_id'], false);
+
+            $linked_mailboxes = get_sieve_linked_mailbox($scripts, $form['imap_server_id']);
             if ($linked_mailboxes && in_array($form['folder'], $linked_mailboxes)) {
                 try {
                     $script_names = array_filter(
@@ -1880,9 +1871,8 @@ class Hm_Handler_sieve_can_delete_folder extends Hm_Handler_Module
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
         if ($mailbox && $mailbox->authed() && $mailbox->is_imap()) {
             $del_folder = prep_folder_name($mailbox->get_connection(), $form['folder'], true);
-            $client  = SieveService::getConnection($form['imap_server_id']);
             list($scripts) = get_all_scripts($form['imap_server_id'], false);
-            if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this, $scripts, $client)) {
+            if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this, $scripts)) {
                 $this->out('sieve_can_delete_folder', false);
                 Hm_Msgs::add('This folder can\'t be deleted because it is used in a Sieve filter.', 'warning');
             }

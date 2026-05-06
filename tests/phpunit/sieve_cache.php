@@ -9,7 +9,7 @@ class Hm_Test_sieve_cache extends TestCase {
     private $mockCache;
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require_once 'bootstrap.php';
         
         $this->mockCache = new MockCache();
         SieveScriptCache::setCache($this->mockCache);
@@ -189,6 +189,74 @@ class Hm_Test_sieve_cache extends TestCase {
     }
 
     /**
+     * getCachedScriptsList returns false (not null) on cache miss
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_getCachedScriptsList_miss_returns_false() {
+        $result = SieveScriptCache::getCachedScriptsList('nonexistent_key');
+        $this->assertFalse($result);
+        $this->assertNotNull($result);
+    }
+
+    /**
+     * An empty array cached in scripts list is distinguishable from a miss
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_getCachedScriptsList_empty_array_not_confused_with_miss() {
+        SieveScriptCache::cacheScriptsList('key', []);
+        $result = SieveScriptCache::getCachedScriptsList('key');
+        $this->assertIsArray($result);
+        $this->assertEmpty($result);
+    }
+
+    /**
+     * invalidateScript behaves identically to clearScriptCache
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_invalidateScript_delegates_to_clearScriptCache() {
+        $key = 'test_server';
+        $name = 'test.sieve';
+
+        SieveScriptCache::cacheScript($key, $name, 'content');
+        $this->assertTrue(SieveScriptCache::isCached($key, $name));
+
+        SieveScriptCache::invalidateScript($key, $name);
+        $this->assertFalse(SieveScriptCache::isCached($key, $name));
+    }
+
+    /**
+     * invalidateAllScripts clears the scripts list via invalidateScriptsList
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_invalidateAllScripts_clears_list() {
+        $key = 'test_server';
+        SieveScriptCache::cacheScriptsList($key, ['a.sieve', 'b.sieve']);
+        $this->assertNotFalse(SieveScriptCache::getCachedScriptsList($key));
+
+        SieveScriptCache::invalidateAllScripts($key);
+        $this->assertFalse(SieveScriptCache::getCachedScriptsList($key));
+    }
+
+    /**
+     * cacheScriptsList respects a custom TTL set via setCacheTTL
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_cacheScriptsList_uses_scriptCacheTTL() {
+        SieveScriptCache::setCacheTTL(900);
+        $key = 'ttl_server';
+        $scripts = ['one.sieve'];
+
+        $result = SieveScriptCache::cacheScriptsList($key, $scripts);
+        $this->assertTrue($result);
+        $this->assertEquals($scripts, SieveScriptCache::getCachedScriptsList($key));
+    }
+
+    /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
@@ -214,7 +282,7 @@ class Hm_Test_sieve_cache extends TestCase {
         $reflection = new ReflectionClass('SieveScriptCache');
         $cacheProperty = $reflection->getProperty('cache');
         $cacheProperty->setAccessible(true);
-        $cacheProperty->setValue(null);
+        $cacheProperty->setValue(null, null);
         
         // All operations should return false
         $this->assertFalse(SieveScriptCache::cacheScript('key', 'script', 'content'));

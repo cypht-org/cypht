@@ -32,16 +32,18 @@ if (!hm_exists('ensure_sieve_service_initialized')) {
         
         $sieve_accounts_configs = [];
         foreach ($sieve_accounts as $key => $item) {
-            $parts = explode(':', $item['sieve_config_host']);
-            $sievePort = isset($parts[2]) ? (int) $parts[2] : (isset($parts[1]) ? (int) $parts[1] : 4190);
+            $url = parse_url($item['sieve_config_host']);
+            $host = $url['host'] ?? $url['path'] ?? $item['sieve_config_host'];
+            $port = (int) ($url['port'] ?? 4190);
+            $secure = isset($url['scheme']) ? ($url['scheme'] === 'tls') : (bool) $item['sieve_tls'];
             $sieve_accounts_configs[$key] = [
-                'host' => isset($parts[2]) ? str_replace('//', '', $parts[1]) : $parts[0],
-                'port' => $sievePort,
+                'host'     => $host,
+                'port'     => $port,
                 'username' => $item['user'],
                 'password' => $item['pass'],
-                'secure' => $item['sieve_tls'],
+                'secure'   => $secure,
                 'authType' => 'PLAIN',
-                'id' => $key
+                'id'       => $key,
             ];
         }
                 
@@ -666,10 +668,10 @@ if (!hm_exists('get_all_scripts')) {
         try {
             $scripts = SieveService::listScripts($imapServer);
             if (!is_array($scripts) || array_search('blocked_senders', $scripts, true) === false) {
-                return '';
+                return [[], ''];
             }
             $current_script = '';
-            if($load_current) {
+            if ($load_current) {
                 $current_script = SieveService::getScript($imapServer, 'blocked_senders');
             }
             if ($return_only === 'scripts') return $scripts;
@@ -679,7 +681,7 @@ if (!hm_exists('get_all_scripts')) {
         } catch (Exception $e) {
             $error_msg = "Failed to get Sieve scripts for server '{$imapServer}': " . $e->getMessage();
             Hm_Msgs::add("Sieve: {$error_msg}", "danger");
-            return null;
+            return [[], ''];
         }
     }
 }
@@ -702,40 +704,34 @@ if (!hm_exists('get_sieve_host_from_services')) {
 }
 
 if (!hm_exists('get_sieve_linked_mailbox')) {
-    function get_sieve_linked_mailbox ($scripts, $client, $accountKey = null) {
+    function get_sieve_linked_mailbox($scripts, $accountKey) {
         try {
             $folders = [];
             foreach ($scripts as $s) {
-                // Use cached script if account key is available
-                if ($accountKey !== null) {
-                    $script = SieveService::getScript($accountKey, $s);
-                } else {
-                    $script = $client->getScript($s);
-                }
+                $script = SieveService::getScript($accountKey, $s);
                 $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
                 $decoded = json_decode(base64_decode($base64_obj));
-                
+
                 $obj = $decoded === null ? null : (is_array($decoded) ? ($decoded[0] ?? null) : (is_object($decoded) ? reset(get_object_vars($decoded)) : null));
                 if ($obj && in_array($obj->action, ['copy', 'move'])) {
                     $folders[$s] = $obj->value;
                 }
             }
-            $client->close();
             return $folders;
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
-            return;
+            return [];
         }
     }
 }
 
 if (!hm_exists('is_mailbox_linked_with_filters')) {
-    function is_mailbox_linked_with_filters ($mailbox, $imap_server_id, $module, $scripts, $client) {
+    function is_mailbox_linked_with_filters($mailbox, $imap_server_id, $module, $scripts) {
         $imap_servers = $module->user_config->get('imap_servers');
         $imap_account = $imap_servers[$imap_server_id];
         if (isset($imap_account['sieve_config_host'])) {
-            $linked_mailboxes = get_sieve_linked_mailbox($scripts, $client);
-            return in_array($mailbox, $linked_mailboxes);
+            $linked_mailboxes = get_sieve_linked_mailbox($scripts, $imap_server_id);
+            return in_array($mailbox, $linked_mailboxes ?? []);
         }
         return false;
     }
