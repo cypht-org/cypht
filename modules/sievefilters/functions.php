@@ -669,7 +669,6 @@ if (!hm_exists('get_all_scripts')) {
                 return '';
             }
             $current_script = '';
-            $scripts = '';
             if($load_current) {
                 $current_script = SieveService::getScript($imapServer, 'blocked_senders');
             }

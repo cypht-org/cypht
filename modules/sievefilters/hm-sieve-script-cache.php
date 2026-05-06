@@ -398,8 +398,15 @@ class SieveService
      */
     public static function closeConnection($key)
     {
-        $client = SieveConnectionManager::getConnection($key);
-        return $client->close();
+        if (isset(SieveConnectionManager::getConfig()[$key])) {
+            try {
+                $client = SieveConnectionManager::getConnection($key);
+                $client->close();
+            } catch (Exception $e) {
+                // ignore close errors
+            }
+        }
+        SieveConnectionManager::closeConnection($key);
     }
 
     /**
@@ -408,17 +415,13 @@ class SieveService
      */
     public static function renameScript($key, string $oldName, string $newName)
     {
-        try {
-            $connection = self::getConnection($key);
-            $result = $connection->renameScript($oldName, $newName);
-            
-            self::clearScriptCache($key, $oldName);
-            self::clearScriptCache($key, $newName);
-            
-            return $result;
-        } catch (Exception $e) {
-            throw $e;
-        }
+        $connection = self::getConnection($key);
+        $result = $connection->renameScript($oldName, $newName);
+
+        self::clearScriptCache($key, $oldName);
+        self::clearScriptCache($key, $newName);
+
+        return $result;
     }
 
     /**
@@ -426,14 +429,8 @@ class SieveService
      */
     public static function getCapabilities($key)
     {
-        try {
-            $connection = self::getConnection($key);
-            $result = $connection->getCapabilities();
-            
-            return $result;
-        } catch (Exception $e) {
-            throw $e;
-        }
+        $connection = self::getConnection($key);
+        return $connection->getCapabilities();
     }
 
     /**

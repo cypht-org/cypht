@@ -123,7 +123,7 @@ class Hm_Handler_sieve_edit_script extends Hm_Handler_Module {
         }
         
         try {
-            
+            ensure_sieve_service_initialized($this->user_config, $this->cache);
             $script = SieveService::getScript($imap_account['id'], $this->request->post['sieve_script_name']);
             SieveService::closeConnection($imap_account['id']);
             $this->out('script', $script);
@@ -213,7 +213,7 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
         }
         
         try {
-
+            ensure_sieve_service_initialized($this->user_config, $this->cache);
             $scripts = SieveService::listScripts($imap_account['id']);
             foreach ($scripts as $script) {
                 if ($script == 'main_script') {
@@ -1085,7 +1085,7 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
         }
         
         try {
-            
+            ensure_sieve_service_initialized($this->user_config, $this->cache);
             $scripts = SieveService::listScripts($imap_account['id']);
             foreach ($scripts as $script) {
                 if ($script == $this->request->post['current_editing_script']) {
@@ -1543,7 +1543,7 @@ class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
         $imap_account = Hm_IMAP_List::dump($form['imap_account']);
         $success = false;
         try {
-            
+            ensure_sieve_service_initialized($this->user_config, $this->cache);
             $state = $form['script_state'] ? 'enabled': 'disabled';
             $scripts = SieveService::listScripts($imap_account['id']);
             foreach ($scripts as $key => $script) {
