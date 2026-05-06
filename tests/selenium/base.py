@@ -23,6 +23,7 @@ import os
 class WebTest:
 
     driver = None
+    _pre_click_nav_count = None
 
     def __init__(self, cap=None):
         self.read_ini()
@@ -228,16 +229,28 @@ class WebTest:
 
     def wait_for_navigation_to_complete(self, timeout=60):
         print(" - waiting for the navigation to complete...")
-        # Wait for the main content to be updated and any loading indicators to disappear
+        # Wait for the SPA navigation to finish. The counter is captured before
+        # the triggering click and checked here so we wait for the specific
+        # navigation we initiated, not a previous one.
+        expected = (self._pre_click_nav_count or 0) + 1
+        self._pre_click_nav_count = None
         try:
             WebDriverWait(self.driver, timeout).until(
-                lambda driver: driver.execute_script("return window.routingToast === null;")
+                lambda d: (d.execute_script("return window.cyphtNavDone || 0;") or 0) >= expected
             )
+        except Exception:
+            print(" - navigation completion check timed out, continuing...")
+            pass
+        # Wait for any background requests to finish. Some pages fetch their
+        # content asynchronously after the page shell has loaded.
+        try:
             WebDriverWait(self.driver, timeout).until(
-                lambda driver: driver.execute_script("return document.getElementById('nprogress') === null;")
+                lambda d: d.execute_script(
+                    "return (typeof Hm_Ajax !== 'undefined') ? Hm_Ajax.active_reqs === 0 : true;"
+                )
             )
-        except:
-            print(" - routing toast or nprogress check failed, continuing...")
+        except Exception:
+            print(" - AJAX idle check timed out, continuing...")
             pass
 
     def wait_for_page_ready(self, timeout=60):
@@ -291,6 +304,7 @@ class WebTest:
 
     def click_when_clickable(self, el):
         print(" - waiting for element to be clickable")
+        self._capture_nav_count()
         try:
             # Scroll element into view
             self.driver.execute_script("arguments[0].scrollIntoView({block: 'center', behavior: 'instant'});", el)
@@ -319,9 +333,17 @@ class WebTest:
                 print(f" - JavaScript click also failed: {js_error}")
                 raise e
 
+    def _capture_nav_count(self):
+        """Capture the current navigation done-count before a click."""
+        try:
+            self._pre_click_nav_count = self.driver.execute_script("return window.cyphtNavDone || 0;")
+        except Exception:
+            self._pre_click_nav_count = None
+
     def safe_click(self, element):
         """Safely click an element with retry logic"""
         print(" - safely clicking element")
+        self._capture_nav_count()
         max_attempts = 3
         for attempt in range(max_attempts):
             try:

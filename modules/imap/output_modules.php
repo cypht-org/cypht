@@ -423,7 +423,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<div class="position-relative"><a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="copy_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Copy').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
             $txt .= '<div class="position-relative"><a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="move_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Move').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
             if (!$this->get('is_archive_folder')) {
-                $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+                if ($this->get('ews_inplace_archive_enabled') === false) {
+                    $txt .= '<span class="d-inline-block" tabindex="0" title="'.$this->trans('In-Place Archive is not enabled for this Exchange account. Please contact your administrator.').'"><span class="btn btn-sm btn-outline-secondary disabled">'.$this->trans('Archive').'</span></span>';
+                } else {
+                    $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+                }
             }
 
             if ($this->get('is_trash_folder')) {

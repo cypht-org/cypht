@@ -1233,7 +1233,9 @@ var Hm_Folders = {
     observer : false,
 
     save_folder_list: function() {
-        Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+        const toSave = $('.folder_list').clone();
+        toSave.find('.temp').remove();
+        Hm_Utils.save_to_local_storage('formatted_folder_list', toSave.html());
     },
 
     load_unread_counts: function() {
@@ -1342,7 +1344,7 @@ var Hm_Folders = {
         $('.folder_list').hide();
         $('.folder_toggle').show();
         if (!forget) {
-            Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+            Hm_Folders.save_folder_list();
             Hm_Utils.save_to_local_storage('hide_folder_list', '1');
             $('main').css('display', 'block');
         }
@@ -1390,6 +1392,7 @@ var Hm_Folders = {
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         Hm_Folders.hl_selected_menu();
         Hm_Folders.folder_list_events();
+        toggleExpandableNavbarItems(Hm_Utils.get_from_local_storage('navbar_collapsed'));
         if (Hm_Folders.expand_after_update) {
             Hm_Utils.toggle_section(Hm_Folders.expand_after_update);
         }
@@ -1484,6 +1487,7 @@ var Hm_Folders = {
         var folder_list = Hm_Utils.get_from_local_storage('formatted_folder_list');
         if (folder_list) {
             $('.folder_list').html(folder_list);
+            toggleExpandableNavbarItems(Hm_Utils.get_from_local_storage('navbar_collapsed'))
             if (Hm_Utils.get_from_local_storage('hide_folder_list') == '1') {
                 $('.folder_list').hide();
                 $('.folder_toggle').show();
@@ -1544,7 +1548,7 @@ var Hm_Utils = {
         var prefix = window.location.pathname.length;
         for (i in sessionStorage) {
             i = i.substr(prefix);
-            if (i.match(/\..+(_setting|_section)/)) {
+            if (i.match(/\..+(_setting|_section)/) || i == 'navbar_collapsed') {
                 result[i] = Hm_Utils.get_from_local_storage(i);
             }
         }
@@ -1644,7 +1648,8 @@ var Hm_Utils = {
                 $(class_name).css('display', 'none');
             }
             $(`[data-bs-target="${class_name}"]`).trigger('click');
-            Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
+
+            Hm_Folders.save_folder_list();
         }
         return false;
     },

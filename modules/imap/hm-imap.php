@@ -29,6 +29,7 @@ class Hm_IMAP_List {
 
     public static function init($user_config, $session) {
         self::initRepo('imap_servers', $user_config, $session, self::$server_list);
+        self::bindServerTypes('imap');
         self::$user_config = $user_config;
         self::$session = $session;
     }

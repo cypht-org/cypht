@@ -401,6 +401,7 @@ button {
   padding-top: 20px;
   position: fixed;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .folders,
@@ -1518,6 +1519,25 @@ nav.collapsed .menu-toggle {
   right: 35%;
   margin: auto;
   /* margin-left: 32px; */
+}
+
+nav.collapsed .src_name_initial {
+  padding: 10px;
+  font-weight: bold;
+  font-size: 80%;
+  background-color: var(--bs-secondary-bg-subtle);
+  margin: 5px 10px;
+  width: 100%;
+  text-align: center;
+  border-radius: var(--bs-border-radius);
+}
+
+.navbar-popover {
+  max-width: unset;
+}
+
+.navbar-popover .email_folders .imap_folder_link {
+  max-width: unset;
 }
 
 nav.collapsed .folders {

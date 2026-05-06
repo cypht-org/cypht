@@ -1,12 +1,71 @@
-/* .folder_dialog { margin-left: 40px; margin-top: 10px; margin-bottom: 30px; } */
-/* .folder_dialog input { display: inline-block; margin-top: 15px; } */
+/* Special folder status and helper boxes */
+.special-folder-status-box {
+    background: #fffbe6;
+    border: 1px solid #ffe58f;
+    border-radius: 6px;
+    padding: 1em 1.5em 1em 1.5em;
+    margin-bottom: 1em;
+    position: relative;
+    font-size: 1em;
+}
+.special-folder-helper-box {
+    background: #f7f7f7;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 1em 1.5em 1em 1.5em;
+    margin-bottom: 1em;
+    position: relative;
+    font-size: 0.95em;
+}
+.special-folder-status-box .btn-close,
+.special-folder-helper-box .btn-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    opacity: 0.5;
+}
+
+.create_folder_btn {
+    margin-left: auto;
+}
+/* Folders page - account list */
+.account_folder_block .card-header { cursor: pointer; transition: background-color 0.2s; }
+.account_folder_block .card-header:hover { background-color: rgba(0,0,0,.05); }
+.account_expand_icon { transition: transform 0.2s; font-size: 0.85rem; }
+.folder_table th { font-size: 0.85rem; white-space: nowrap; }
+.folder_table td { vertical-align: middle; font-size: 0.9rem; }
+.folder_table .btn-group { white-space: nowrap; }
+.folder-count-badge { font-weight: normal; font-size: 0.75rem; }
+
+/* Special folder role badges */
+.badge-role {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+.badge-role-trash { background-color: #fce4e6; color: #b02a37; border: 1px solid #f1aeb5; }
+.badge-role-sent { background-color: #d1f5e0; color: #146c43; border: 1px solid #a3cfbb; }
+.badge-role-archive { background-color: #cfe2ff; color: #084298; border: 1px solid #9ec5fe; }
+.badge-role-draft { background-color: #fff3cd; color: #cc7a00; border: 1px solid #ffe69c; }
+.badge-role-junk { background-color: #e8d6f5; color: #59359a; border: 1px solid #c5a3e0; }
+
+.folder_table .dropdown-item.active,
+.folder_table .dropdown-item:active {
+    background-color: var(--bs-primary);
+    color: #fff;
+}
+
+/* Folders page - old dialogs (subscription page) */
 .sent_folder_select, .draft_folder_select, .trash_folder_select, .folder_dialog, .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select, .archive_folder_select, .junk_folder_select { display: none; }
 .draft_folder_select, .sent_folder_select, .trash_folder_select, .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select, .archive_folder_select { width: fit-content; position: absolute; background-color: #fff; padding: 15px; border: solid 1px #ede8e6; font-weight: normal; padding-left: 10px; min-width: 55px; padding-top: 10px; margin-left: 0px !important; margin-top: 0px; }
 .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .sent_folder_select, .archive_folder_select, .draft_folder_select, .trash_folder_select, .junk_folder_select, .parent_folder_select { z-index: 10; }
 .folder_row { margin-top: 15px; }
 .close { margin-left: 10%; font-size: 100%; color: teal !important; }
 .sp_folder_title { font-size: 110%; color: #777; }
-/* .sp_description { padding-bottom: 20px; } */
 #draft_val, #sent_val, #trash_val, #junk_val { padding-left: 20px; }
 .manage_folder_icon { vertical-align: -3px; opacity: .3 }
 .manage_folder_link { opacity: 0.6; }
