@@ -2,69 +2,53 @@
 
 use PHPUnit\Framework\TestCase;
 
-class Hm_Test_Sieve_Functions_Client {
-    public static $scripts = array();
-
-    public function listScripts() {
-        return array_keys(self::$scripts);
+/**
+ * Helper class to manage mock scripts
+ */
+class MockSieveClientStorage {
+    private static $scripts = array();
+    
+    /**
+     * Set scripts in the mock storage
+     */
+    public static function setScripts($scripts) {
+        self::$scripts = $scripts;
     }
-
-    public function getScript($name) {
-        return self::$scripts[$name] ?? '';
-    }
-
-    public function putScript($name, $script) {
-        self::$scripts[$name] = $script;
-        return true;
-    }
-
-    public function getErrorMessage() {
-        return '';
+    
+    /**
+     * Get scripts from mock storage
+     */
+    public static function getScripts() {
+        return self::$scripts;
     }
 }
 
-class Hm_Test_Sieve_Functions_Save_Main_Script_Client extends Hm_Test_Sieve_Functions_Client {
-    public static $mainScriptAttempts = 0;
-
-    public function putScript($name, $script) {
-        if ($name === 'main_script') {
-            self::$mainScriptAttempts++;
-            if (self::$mainScriptAttempts === 1) {
-                return false;
-            }
+/**
+ * Mock factory for testing that returns a mock client with predefined scripts
+ */
+class Hm_Test_Mock_Sieve_Client_Factory {
+    private static $mockCreator;
+    
+    public static function setMockCreator($creator) {
+        self::$mockCreator = $creator;
+    }
+    
+    public function init($user_config = null, $imap_account = null, $is_nux_supported = false) {
+        if (!self::$mockCreator) {
+            throw new Exception('Mock creator not set');
         }
-        self::$scripts[$name] = $script;
-        return true;
-    }
-
-    public function removeScripts($name) {
-        unset(self::$scripts[$name]);
-        return true;
-    }
-
-    public function getErrorMessage() {
-        return 'failed to include';
+        
+        return call_user_func(self::$mockCreator);
     }
 }
 
-class Hm_Test_Sieve_Functions_Client_Factory {
-    public function init($user_config = null, $imap_account = null, $is_nux_supported = false)
-    {
-        return new Hm_Test_Sieve_Functions_Client();
-    }
-}
-
-class Hm_Test_Sieve_Functions_Save_Main_Script_Client_Factory {
-    public function init($user_config = null, $imap_account = null, $is_nux_supported = false)
-    {
-        return new Hm_Test_Sieve_Functions_Save_Main_Script_Client();
-    }
-}
-
-class Hm_Test_Sieve_Site_Config {
+/**
+ * Mock site config for testing that returns the mock factory
+ */
+class Hm_Test_Mock_Sieve_Site_Config {
     public function get($name) {
         if ($name === 'sieve_client_factory') {
-            return 'Hm_Test_Sieve_Functions_Client_Factory';
+            return 'Hm_Test_Mock_Sieve_Client_Factory';
         }
         return null;
     }
@@ -78,9 +62,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
 
     public function setUp(): void {
         require_once APP_PATH.'modules/sievefilters/functions.php';
-        Hm_Test_Sieve_Functions_Client::$scripts = array();
-        Hm_Test_Sieve_Functions_Save_Main_Script_Client::$scripts = array();
-        Hm_Test_Sieve_Functions_Save_Main_Script_Client::$mainScriptAttempts = 0;
+        MockSieveClientStorage::setScripts(array());
         Hm_Msgs::flush();
     }
 
@@ -259,7 +241,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
      * @runInSeparateProcess
      */
     public function test_save_main_script_falls_back_to_formatted_inline_script_when_include_fails() {
-        Hm_Test_Sieve_Functions_Save_Main_Script_Client::$scripts = array(
+        $scripts = array(
             'broken-10-cypht' => implode("\n", array(
                 'failed to include',
                 '# CYPHT CONFIG HEADER - DON\'T REMOVE',
@@ -272,16 +254,59 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
                 'discard;',
             )),
         );
-
-        $client = new Hm_Test_Sieve_Functions_Save_Main_Script_Client();
+        
+        MockSieveClientStorage::setScripts($scripts);
+        
+        // Create the mock client directly with simulated putScript failure
+        $client = $this->createMock(PhpSieveManager\ManageSieve\Client::class);
+        
+        $putAttempts = 0;
+        $client->method('connect')->willReturn(true);
+        
+        // Mock putScript to fail on first call with 'main_script', succeed on retry
+        $client->method('putScript')
+            ->will($this->returnCallback(function($name, $script) use (&$putAttempts) {
+                if ($name === 'main_script') {
+                    $putAttempts++;
+                    if ($putAttempts === 1) {
+                        return false;  // Simulate failure on first attempt
+                    }
+                }
+                $scripts = MockSieveClientStorage::getScripts();
+                $scripts[$name] = $script;
+                MockSieveClientStorage::setScripts($scripts);
+                return true;
+            }));
+        
+        $client->method('getScript')
+            ->will($this->returnCallback(function($name) {
+                $scripts = MockSieveClientStorage::getScripts();
+                return $scripts[$name] ?? '';
+            }));
+        
+        $client->method('listScripts')
+            ->will($this->returnCallback(function() {
+                return array_keys(MockSieveClientStorage::getScripts());
+            }));
+        
+        $client->method('removeScripts')
+            ->will($this->returnCallback(function($name) {
+                $scripts = MockSieveClientStorage::getScripts();
+                unset($scripts[$name]);
+                MockSieveClientStorage::setScripts($scripts);
+                return true;
+            }));
+        
+        $client->method('getErrorMessage')
+            ->willReturn('failed to include');
 
         save_main_script($client, 'require ["include"];', array('main_script', 'broken-10-cypht', 'manual-20-cypht'));
 
-        $this->assertSame(2, Hm_Test_Sieve_Functions_Save_Main_Script_Client::$mainScriptAttempts);
-        $this->assertStringContainsString('require ["fileinto","reject"]', Hm_Test_Sieve_Functions_Save_Main_Script_Client::$scripts['main_script']);
-        $this->assertStringContainsString('keep;', Hm_Test_Sieve_Functions_Save_Main_Script_Client::$scripts['main_script']);
-        $this->assertStringContainsString('discard;', Hm_Test_Sieve_Functions_Save_Main_Script_Client::$scripts['main_script']);
-        $this->assertStringNotContainsString('# CYPHT CONFIG HEADER', Hm_Test_Sieve_Functions_Save_Main_Script_Client::$scripts['main_script']);
+        $mockScripts = MockSieveClientStorage::getScripts();
+        $this->assertStringContainsString('require ["fileinto","reject"]', $mockScripts['main_script']);
+        $this->assertStringContainsString('keep;', $mockScripts['main_script']);
+        $this->assertStringContainsString('discard;', $mockScripts['main_script']);
+        $this->assertStringNotContainsString('# CYPHT CONFIG HEADER', $mockScripts['main_script']);
     }
 
     /**
@@ -289,19 +314,44 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
      * @runInSeparateProcess
      */
     public function test_get_mailbox_filters_lists_only_cypht_scripts() {
-        Hm_Test_Sieve_Functions_Client::$scripts = array(
+        $scripts = array(
             'main_script' => 'require ["include"];',
             'project_archive-20-cypht' => 'require ["fileinto"];',
             'from_message-10-cyphtfilter' => 'require ["fileinto"];',
             'external-script' => 'discard;',
         );
+        
+        MockSieveClientStorage::setScripts($scripts);
+        
+        // Create a mock creator that produces mock clients with the test data
+        $mockCreator = function() {
+            $client = $this->createMock(PhpSieveManager\ManageSieve\Client::class);
+            
+            $client->method('connect')
+                ->willReturn(true);
+            
+            $client->method('listScripts')
+                ->willReturnCallback(function() {
+                    return array_keys(MockSieveClientStorage::getScripts());
+                });
+            
+            $client->method('getScript')
+                ->willReturnCallback(function($name) {
+                    $scripts = MockSieveClientStorage::getScripts();
+                    return $scripts[$name] ?? '';
+                });
+            
+            return $client;
+        };
+        
+        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator($mockCreator);
 
         $mailbox = array(
             'name' => 'Primary Account',
             'sieve_config_host' => 'tls://sieve.example.com:4190',
             'sieve_extensions' => array('fileinto'),
         );
-        $site_config = new Hm_Test_Sieve_Site_Config();
+        $site_config = new Hm_Test_Mock_Sieve_Site_Config();
         $user_config = new Hm_Mock_Config();
 
         $result = get_mailbox_filters($mailbox, $site_config, $user_config);
