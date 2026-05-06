@@ -18,7 +18,7 @@ function getMessageUidParam() {
 }
 
 function getPageNameParam() {
-    return getParam('page');
+    return getParam(hm_page_param_name());
 }
 
 function getParam(param) {

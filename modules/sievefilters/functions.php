@@ -177,9 +177,14 @@ if (!hm_exists('generate_main_script')) {
     function generate_main_script($script_list)
     {
         $sorted_list = [];
+        $has_blocked_senders = false;
         foreach ($script_list as $script_name) {
             if ($script_name == 'main_script') {
                 continue;
+            }
+
+            if ($script_name == 'blocked_senders') {
+                $has_blocked_senders = true;
             }
 
             if (mb_strstr($script_name, 'cypht')) {
@@ -191,8 +196,10 @@ if (!hm_exists('generate_main_script')) {
         $include_header = 'require ["include"];'."\n\n";
         $include_body = '';
 
-        // Block List MUST be the first script executed
-        $include_body .= 'include :personal "blocked_senders";'."\n";
+        // Block List MUST be the first script executed when it exists.
+        if ($has_blocked_senders) {
+            $include_body .= 'include :personal "blocked_senders";' ."\n";
+        }
 
         foreach ($sorted_list as $script_name => $include_script) {
             $include_body .= 'include :personal "'.$script_name.'";'."\n";
@@ -256,7 +263,10 @@ if (!hm_exists('format_main_script')) {
             return '"' . $req . '"';
         }, $reqs);
 
-        $script = 'require [' . implode(',', $reqs) . '];' . "\n";
+        $script = '';
+        if (!empty($reqs)) {
+            $script .= 'require [' . implode(',', $reqs) . '];' . "\n";
+        }
         $script .= implode("\n", $lines);
         
         return $script;

@@ -619,39 +619,14 @@ const add_filter_action = Hm_Filters.add_filter_action;
 /**************************************************************************************
 *                                      MODAL EVENTS
 **************************************************************************************/
-const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
-    $(document).off('click', '.sievefilters_accounts_title').on('click', '.sievefilters_accounts_title', function() {
-        $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
-    });
 
-    $(document).off('click', '.add_filter').on('click', '.add_filter', function() {
-        edit_filter_modal.setTitle('Add Filter');
-        $('.modal_sieve_filter_priority').val('');
-        $('.modal_sieve_filter_test').val('ALLOF');
-        $('#stop_filtering').prop('checked', false);
-        current_account = $(this).attr('account');
-        current_account_element = $(this);
-        edit_filter_modal.open();
-
-        // Reset the form fields when opening the modal
-        $(".modal_sieve_filter_name").val('');
-        $(".modal_sieve_script_priority").val('');
-        $(".sieve_list_conditions_modal").empty();
-        $(".filter_actions_modal_table").empty();
-    });
-
-    $(document).off('click', '.add_script').on('click', '.add_script', function() {
-        edit_script_modal.setTitle('Add Script');
-        $('.modal_sieve_script_textarea').val('');
-        $('.modal_sieve_script_name').val('');
-        $('.modal_sieve_script_priority').val('');
-        is_editing_script = false;
-        current_editing_script_name = '';
-        current_account = $(this).attr('account');
-        current_account_element = $(this);
-        edit_script_modal.open();
-    });
-
+/**
+ * Shared modal-internal event handlers.
+ * Registers delegated handlers for interactions inside any sieve filter/script
+ * modal (add/delete conditions, add/delete actions, select changes).
+ * Called globally on document ready so they work on every page.
+ */
+const registerSieveModalEvents = () => {
     /**
      * Delete action Button
      */
@@ -837,6 +812,45 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
             }
         }
     });
+};
+
+/**
+ * Page-specific event handlers for the sieve filters page.
+ * These require modal instances or operate on elements that only exist
+ * on the sieve filters settings page.
+ */
+const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
+    $(document).off('click', '.sievefilters_accounts_title').on('click', '.sievefilters_accounts_title', function() {
+        $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
+    });
+
+    $(document).off('click', '.add_filter').on('click', '.add_filter', function() {
+        edit_filter_modal.setTitle('Add Filter');
+        $('.modal_sieve_filter_priority').val('');
+        $('.modal_sieve_filter_test').val('ALLOF');
+        $('#stop_filtering').prop('checked', false);
+        current_account = $(this).attr('account');
+        current_account_element = $(this);
+        edit_filter_modal.open();
+
+        // Reset the form fields when opening the modal
+        $(".modal_sieve_filter_name").val('');
+        $(".modal_sieve_script_priority").val('');
+        $(".sieve_list_conditions_modal").empty();
+        $(".filter_actions_modal_table").empty();
+    });
+
+    $(document).off('click', '.add_script').on('click', '.add_script', function() {
+        edit_script_modal.setTitle('Add Script');
+        $('.modal_sieve_script_textarea').val('');
+        $('.modal_sieve_script_name').val('');
+        $('.modal_sieve_script_priority').val('');
+        is_editing_script = false;
+        current_editing_script_name = '';
+        current_account = $(this).attr('account');
+        current_account_element = $(this);
+        edit_script_modal.open();
+    });
 
     /**
      * Delete filter event
@@ -974,6 +988,7 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
                         }
                     }
                 });
+                add_filter_match_mode();
                 edit_filter_modal.setTitle(current_editing_filter_name);
                 edit_filter_modal.open();
             }
@@ -992,8 +1007,6 @@ const hm_sieve_button_events = (edit_filter_modal, edit_script_modal) => {
             ghostClass: "sortable-ghost",
         });
     }
-
-    return true;
 };
 
 function blockListPageHandlers() {
@@ -1232,7 +1245,7 @@ function sieveFiltersPageHandler() {
     /**************************************************************************************
      * Initialize sieve button events
      **************************************************************************************/
-    hm_sieve_button_events(edit_filter_modal, edit_script_modal);
+    registerSievePageEvents(edit_filter_modal, edit_script_modal);
 
     const save_script = Hm_Filters.save_script;
     // const save_filter = Hm_Filters.save_filter;
@@ -1810,6 +1823,7 @@ $(function () {
                     }
                 });
 
+                add_filter_match_mode();
                 edit_filter_modal.setTitle(
                     hm_trans('Edit Filter') + ': ' + filterName,
                 );
@@ -1818,7 +1832,7 @@ $(function () {
         );
     });
 
-    hm_sieve_button_events();
+    registerSieveModalEvents();
 
     $(document).on('click', '.remove-chip', function () {
         $(this).parent().remove();

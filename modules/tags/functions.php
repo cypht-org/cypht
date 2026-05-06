@@ -14,7 +14,7 @@ if (!hm_exists('add_tag')) {
 }
 
 if (!hm_exists('generate_tree_view')) {
-    function generate_tree_view($folders, $request_Key, $parentId = null) {
+    function generate_tree_view($folders, $request_Key, $output_mod, $parentId = null) {
         static $counter = 0;
         $ulClass = $parentId !== null ? 'list-group pt-2' : 'list-group';
         $html = '<ul class="' . $ulClass . '">';
@@ -34,8 +34,8 @@ if (!hm_exists('generate_tree_view')) {
             $html .= '</span>';
             $html .= '</span>';
             $html .= '<div class="float-end">';
-            $html .= '<a id="edit_tag" href="?page=tags&tag_id='.$folder['id'].'" class="mr-4"><i class="bi bi-pencil-square"></i></a>';
-            $html .= '<form method="POST" action="?page=tags" style="display:inline;">';
+            $html .= '<a id="edit_tag" href="'.$output_mod->build_page_url('tags', array('tag_id' => $folder['id'])).'" class="mr-4"><i class="bi bi-pencil-square"></i></a>';
+            $html .= '<form method="POST" action="'.$output_mod->build_page_url('tags').'" style="display:inline;">';
             $html .= '<input type="hidden" name="tag_delete" value="1">';
             $html .= '<input type="hidden" name="tag_id" value="'.$folder['id'].'">';
             $html .= '<input type="hidden" name="hm_page_key" value="'.$request_Key.'" />';
@@ -46,7 +46,7 @@ if (!hm_exists('generate_tree_view')) {
             
             if ($hasChildren) {
                 $html .= '<div class="collapse" id="collapse-' . $counter . '">';
-                $html .= generate_tree_view($folder['children'], $request_Key, $counter);
+                $html .= generate_tree_view($folder['children'], $request_Key, $output_mod, $counter);
                 $html .= '</div>';
             }
             $html .= '</li>';

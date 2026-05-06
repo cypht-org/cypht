@@ -1,17 +1,5 @@
 function applyFoldersPageHandlers() {
-    $('#imap_server_folder').on("change", function() {
-        $(this).parent().parent().submit();
-    });
-    $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
-    
     bindFoldersEventHandlers();
-    $(function() {
-        const form = $('#form_folder_imap');
-        const autoSubmit = form.data('auto-submit');
-        if (autoSubmit && autoSubmit === 1) {
-            form.submit();
-        }
-    })
 }
 
 function applyFoldersSubscriptionPageHandlers() {
@@ -27,6 +15,4 @@ function applyFoldersSubscriptionPageHandlers() {
     if (email_folder_server && $(email_folder_server[0]).children().length) {
         $($('.subscribe_parent_folder_select .imap_parent_folder_link')[0]).trigger('click');
     }
-
-    bindFoldersEventHandlers();
 }

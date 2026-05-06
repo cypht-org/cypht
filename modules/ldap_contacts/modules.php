@@ -245,7 +245,7 @@ class Hm_Handler_process_update_ldap_server extends Hm_Handler_Module {
             if ($ldap->modify($entry, $dn)) {
                 Hm_Msgs::add('Contact Updated');
                 $this->save_hm_msgs();
-                Hm_Dispatch::page_redirect('?page=contacts');
+                Hm_Dispatch::page_redirect($this->build_page_url('contacts'));
             }
             else {
                 Hm_Msgs::add('Unable to update contact', 'danger');

@@ -1146,12 +1146,12 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
         if (!$this->get('sieve_filters_enabled')) {
             return '';
         }
-        $res = '<li class="menu_sieve_filters"><a class="unread_link" href="?page=sieve_filters">';
+        $res = '<li class="menu_sieve_filters"><a class="unread_link" href="'.$this->build_page_url('sieve_filters').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-journal-bookmark-fill me-2"></i>';
         }
         $res .= $this->trans('Filters').'</a></li>';
-        $res .= '<li class="menu_block_list"><a class="unread_link" href="?page=block_list">';
+        $res .= '<li class="menu_block_list"><a class="unread_link" href="'.$this->build_page_url('block_list').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-x-circle-fill me-2"></i>';
         }
@@ -1209,6 +1209,9 @@ class Hm_Output_sievefilters_modal_content_start extends Hm_Output_Module
  */
 class Hm_Output_new_sieve_filter_for_message_like_this extends Hm_Output_Module {
     public function output() {
+        if (!$this->get('sieve_filters_enabled')) {
+            return '';
+        }
         $mailbox_name = $this->get('mailbox_name') ?? '';
         $headers = $this->get('filter_headers', []);
         
@@ -1742,6 +1745,9 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
 {
     protected function output()
     {
+        if (!$this->get('sieve_filters_enabled')) {
+            return '';
+        }
         $custom_actions = $this->get('custom_actions', []);
         $mailbox_name = $this->get('mailbox_name', '');
 

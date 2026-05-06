@@ -277,7 +277,7 @@ return array(
     ),
 
     'allowed_get' => array(
-        'page' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        env('PAGE_PARAM_NAME', 'page') => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'msgs' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'list_path' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'list_parent' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,

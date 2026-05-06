@@ -135,18 +135,24 @@ class Hm_Cal_Output {
     }
 
     private function prev_next_week() {
-        return array(sprintf('<a href="?page=calendar&date=%s">&lt;</a>', date('Y-m-d', strtotime("-1 week", strtotime($this->date)))),
-            sprintf('<a href="?page=calendar&date=%s">&gt;</a>', date('Y-m-d', strtotime("+1 week", strtotime($this->date)))));
+        return array(
+            sprintf('<a href="%s">&lt;</a>', $this->output_mod->build_page_url('calendar', array('date' => date('Y-m-d', strtotime("-1 week", strtotime($this->date)))))),
+            sprintf('<a href="%s">&gt;</a>', $this->output_mod->build_page_url('calendar', array('date' => date('Y-m-d', strtotime("+1 week", strtotime($this->date))))))
+        );
     }
 
     private function prev_next_month() {
-        return array(sprintf('<a href="?page=calendar&date=%s">&lt;</a>', date('Y-m', strtotime("-1 month", strtotime($this->year.'-'.$this->month)))),
-            sprintf('<a href="?page=calendar&date=%s">&gt;</a>', date('Y-m', strtotime("+1 month", strtotime($this->year.'-'.$this->month)))));
+        return array(
+            sprintf('<a href="%s">&lt;</a>', $this->output_mod->build_page_url('calendar', array('date' => date('Y-m', strtotime("-1 month", strtotime($this->year.'-'.$this->month)))))),
+            sprintf('<a href="%s">&gt;</a>', $this->output_mod->build_page_url('calendar', array('date' => date('Y-m', strtotime("+1 month", strtotime($this->year.'-'.$this->month))))))
+        );
     }
 
     private function prev_next_year() {
-        return array(sprintf('<a href="?page=calendar&date=%s">&lt;</a>', date('Y', strtotime("-1 year", strtotime($this->date)))),
-            sprintf('<a href="?page=calendar&date=%s">&gt;</a>', date('Y', strtotime("+1 year", strtotime($this->date)))));
+        return array(
+            sprintf('<a href="%s">&lt;</a>', $this->output_mod->build_page_url('calendar', array('date' => date('Y', strtotime("-1 year", strtotime($this->date)))))),
+            sprintf('<a href="%s">&gt;</a>', $this->output_mod->build_page_url('calendar', array('date' => date('Y', strtotime("+1 year", strtotime($this->date))))))
+        );
     }
 
     private function prev_next() {

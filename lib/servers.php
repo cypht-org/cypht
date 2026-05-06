@@ -184,6 +184,23 @@ trait Hm_Server_List {
         self::initRepo($name, $user_config, $session, self::$server_list);
     }
 
+
+    /**
+     * Assign a server type to servers that do not have one.
+     * Servers added after the introduction of the type field already include it,
+     * so this only applies to migrating older server lists.
+     * The type field is required because Hm_Mailbox relies on it to construct the connection object.
+     * @param string $type
+     * @return void
+     */
+    protected static function bindServerTypes($type) {
+        foreach (self::$entities as $id => $server) {
+            if (! array_key_exists('type', $server)) {
+                self::edit($id, ['type' => $type]);
+            }
+        }
+    }
+
     /**
      * Add a server definition
      * @param array $atts server details
