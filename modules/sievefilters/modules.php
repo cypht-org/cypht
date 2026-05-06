@@ -419,7 +419,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
             elseif ($default_behaviour == 'Reject') {
                 $filter->addRequirement('reject');
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\RejectFilterAction([""])
+                    new \PhpSieveManager\Filters\Actions\RejectFilterAction(['reason' => ''])
                 );
             }
             $custom_condition->addAction(
