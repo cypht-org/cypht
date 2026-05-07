@@ -145,6 +145,109 @@ var toggle_recip_flds = function() {
     return false;
 }
 
+var mta_sts_status_timer = false;
+var mta_sts_last_recipient_state = false;
+var mta_sts_status_request_id = 0;
+
+var mta_sts_status_check_enabled = function() {
+    return $('.mta-sts-status-container[data-mta-sts-enabled="1"]').length > 0;
+};
+
+var place_mta_sts_status_container = function() {
+    var container = $('.mta-sts-status-container[data-mta-sts-enabled="1"]').first();
+    if (container.length && $('.recipient_fields').length) {
+        container.insertAfter($('.recipient_fields'));
+    }
+};
+
+var compose_recipient_value = function(selector) {
+    var values = [];
+    var input = $(selector);
+    input.prev('.bubbles').children('.bubble').each(function() {
+        var value = $(this).attr('data-value');
+        if (value) {
+            values.push(value);
+        }
+    });
+    if (input.val()) {
+        values.push(input.val());
+    }
+    return values.join(', ');
+};
+
+var compose_recipient_state = function() {
+    return {
+        to: compose_recipient_value('.compose_to'),
+        cc: compose_recipient_value('.compose_cc'),
+        bcc: compose_recipient_value('.compose_bcc')
+    };
+};
+
+var hide_mta_sts_status_container = function() {
+    var container = $('.mta-sts-status-container[data-mta-sts-enabled="1"]').first();
+    container.html('').addClass('d-none');
+    place_mta_sts_status_container();
+};
+
+var update_mta_sts_status_container = function(html) {
+    var container = $('.mta-sts-status-container[data-mta-sts-enabled="1"]').first();
+    if (!container.length) {
+        return;
+    }
+    if (!html) {
+        hide_mta_sts_status_container();
+        return;
+    }
+    container.replaceWith(html);
+    place_mta_sts_status_container();
+};
+
+var refresh_mta_sts_status = function() {
+    if (!mta_sts_status_check_enabled()) {
+        return;
+    }
+    var recipients = compose_recipient_state();
+    var recipient_state = recipients.to + '|' + recipients.cc + '|' + recipients.bcc;
+    if (recipient_state == mta_sts_last_recipient_state) {
+        return;
+    }
+    mta_sts_last_recipient_state = recipient_state;
+    mta_sts_status_request_id++;
+    if (!recipients.to && !recipients.cc && !recipients.bcc) {
+        hide_mta_sts_status_container();
+        return;
+    }
+    var request_id = mta_sts_status_request_id;
+    Hm_Ajax.request([
+        {'name': 'hm_ajax_hook', 'value': 'ajax_mta_sts_status'},
+        {'name': 'compose_to', 'value': recipients.to},
+        {'name': 'compose_cc', 'value': recipients.cc},
+        {'name': 'compose_bcc', 'value': recipients.bcc}
+    ], function(res) {
+        if (request_id != mta_sts_status_request_id) {
+            return;
+        }
+        update_mta_sts_status_container((res && res.mta_sts_status_display) ? res.mta_sts_status_display : '');
+    }, [], true);
+};
+
+var schedule_mta_sts_status_check = function() {
+    if (!mta_sts_status_check_enabled()) {
+        return;
+    }
+    clearTimeout(mta_sts_status_timer);
+    mta_sts_status_timer = setTimeout(refresh_mta_sts_status, 500);
+};
+
+var init_mta_sts_status_check = function() {
+    if (!mta_sts_status_check_enabled()) {
+        return;
+    }
+    place_mta_sts_status_container();
+    $('.compose_to, .compose_cc, .compose_bcc').on('input change', schedule_mta_sts_status_check);
+    schedule_mta_sts_status_check();
+};
+
 function smtpServersPageHandler() {
     $('.test_smtp_connect').on('click', smtp_test_action);
     $('.delete_smtp_connection').on('click', smtp_delete_action);
@@ -163,6 +266,7 @@ var reset_smtp_form = function(save = true) {
     $('.ke-content', $('iframe').contents()).html('');
     $('.uploaded_files').html('');
     $('#compose_delivery_receipt').prop('checked', false);
+    schedule_mta_sts_status_check();
     if (save) {
         save_compose_state(true);
     }
@@ -254,6 +358,7 @@ var move_recipient_to_section = function(e) {
     target.find('.bubbles').append($('#'+id));
     var input = target.find('input');
     input.focus();
+    schedule_mta_sts_status_check();
 };
 
 var allow_drop = function(e) {
@@ -280,6 +385,7 @@ var bubbles_to_text = function(input) {
         $(input).val(value);
     }
     $(input).css('width', '95%');
+    schedule_mta_sts_status_check();
 };
 
 var text_to_bubbles = function(input) {
@@ -303,6 +409,7 @@ var text_to_bubbles = function(input) {
             }
         }
         $(input).val(invalid_recipients);
+        schedule_mta_sts_status_check();
     }
 };
 

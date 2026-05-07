@@ -140,6 +140,17 @@ class Hm_Output_pgp_settings_start extends Hm_Output_Module {
 /**
  * @subpackage pgp/output
  */
+class Hm_Output_pgp_signature_security_notice extends Hm_Output_Module {
+    protected function output() {
+        return '<div class="pgp_signature_notice alert alert-warning m-3 col-lg-7 col-xl-4">'.
+            $this->trans('PGP signature verification is not supported yet. Do not treat signed MIME parts or message senders as verified until Cypht can bind the exact displayed content to a trusted signing key.').
+            '</div>';
+    }
+}
+
+/**
+ * @subpackage pgp/output
+ */
 class Hm_Output_pgp_settings_public_keys extends Hm_Output_Module {
     protected function output() {
         $res = '<div class="public_title settings_subtitle p-3 border-bottom cursor-pointer"><i class="bi bi-filetype-key me-3"></i> '.$this->trans('Public Keys');
@@ -255,4 +266,17 @@ function validate_public_key($file_location) {
 if (!hm_exists('prompt_for_passhrase')) {
 function prompt_for_passhrase($mod) {
     return '<div class="passphrase_prompt"><div class="title">'.$mod->trans('Please enter your passphrase').'</div><div class="input-group"><input type="password" value="" id="pgp_pass" class="form-control" /> <input id="submit_pgp_pass" type="button" value="'.$mod->trans('Submit').'" class="btn btn-primary" /></div></div>';
+}}
+
+/**
+ * @subpackage pgp/functions
+ */
+if (!hm_exists('pgp_signature_verification_requirements')) {
+function pgp_signature_verification_requirements() {
+    return array(
+        'Verify only the exact MIME part that will be displayed to the user.',
+        'Bind the verification result to a trusted key fingerprint, not only to the From header.',
+        'Render signature status outside attacker-controlled message HTML.',
+        'Treat partially signed, multiply signed, or structurally ambiguous messages as unverified unless every displayed part is covered.',
+    );
 }}
