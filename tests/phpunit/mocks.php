@@ -119,19 +119,26 @@ class Hm_Mock_Memcached {
  */
 class MockCache {
     private $data = [];
-    
-    public function get($key, $default = false, $returnArray = false) {
-        return isset($this->data[$key]) ? $this->data[$key] : $default;
+    private $session_data = [];
+
+    public function get($key, $default = false, $session = false) {
+        $store = $session ? $this->session_data : $this->data;
+        return array_key_exists($key, $store) ? $store[$key] : $default;
     }
-    
-    public function set($key, $value, $ttl = 0, $returnArray = false) {
-        $this->data[$key] = $value;
+
+    public function set($key, $value, $ttl = 0, $session = false) {
+        if ($session) {
+            $this->session_data[$key] = $value;
+        } else {
+            $this->data[$key] = $value;
+        }
         return true;
     }
-    
-    public function del($key) {
-        if (isset($this->data[$key])) {
-            unset($this->data[$key]);
+
+    public function del($key, $session = false) {
+        $store = $session ? 'session_data' : 'data';
+        if (array_key_exists($key, $this->$store)) {
+            unset($this->$store[$key]);
             return true;
         }
         return false;
@@ -139,6 +146,7 @@ class MockCache {
     
     public function clear() {
         $this->data = [];
+        $this->session_data = [];
     }
 }
 

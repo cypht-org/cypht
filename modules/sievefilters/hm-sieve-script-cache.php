@@ -147,7 +147,7 @@ class SieveScriptCache
     }
 
     /**
-     * Clear cached script
+     * Clear cached script — must pass $session=true to match where cacheScript stores it
      */
     public static function clearScriptCache($key, string $scriptName)
     {
@@ -155,7 +155,30 @@ class SieveScriptCache
             return false;
         }
         $cacheKey = "sieve_script_{$key}_{$scriptName}";
-        return self::$cache->del($cacheKey);
+        return self::$cache->del($cacheKey, true);
+    }
+
+    /**
+     * Cache server extensions in session — extensions change only on server upgrade
+     */
+    public static function cacheExtensions($key, array $extensions)
+    {
+        if (!self::$cache) {
+            return false;
+        }
+        return self::$cache->set("sieve_extensions_{$key}", $extensions, self::$scriptCacheTTL, true);
+    }
+
+    /**
+     * Get cached extensions, false on miss
+     */
+    public static function getCachedExtensions($key)
+    {
+        if (!self::$cache) {
+            return false;
+        }
+        $cached = self::$cache->get("sieve_extensions_{$key}", null, true);
+        return $cached !== null ? $cached : false;
     }
 
     /**
@@ -166,7 +189,6 @@ class SieveScriptCache
         if (!self::$cache) {
             return false;
         }
-        //TODO: Implement a method to clear all cache entries for a given key
         self::invalidateAllScripts($key);
         return true;
     }
@@ -458,5 +480,20 @@ class SieveService
     public static function hasAccounts()
     {
         return !empty(SieveConnectionManager::getConfig());
+    }
+
+    /**
+     * Get extensions from cache or fetch once and cache them
+     */
+    public static function getExtensions($key)
+    {
+        $cached = SieveScriptCache::getCachedExtensions($key);
+        if ($cached !== false) {
+            return $cached;
+        }
+        $client = SieveConnectionManager::getConnection($key);
+        $extensions = $client->getExtensions();
+        SieveScriptCache::cacheExtensions($key, $extensions);
+        return $extensions;
     }
 }

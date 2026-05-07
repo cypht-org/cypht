@@ -149,15 +149,9 @@ if (!hm_exists('get_classic_filter_modal_content')) {
 if (!hm_exists('get_mailbox_filters')) {
     function get_mailbox_filters($mailbox, $site_config, $user_config)
     {
-        $factory = get_sieve_client_factory($site_config);
         try {
-            $client = $factory->init($user_config, $mailbox, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
-            $scripts = [];
-            foreach ($client->listScripts() as $script) {
-                if (mb_strstr($script, 'cypht')) {
-                    $scripts[] = $script;
-                }
-            }
+            $all_scripts = SieveService::listScripts($mailbox['id']);
+            $scripts = array_filter($all_scripts, fn($s) => mb_strstr($s, 'cypht'));
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return ['count' => 0, 'list' => ''];

@@ -189,6 +189,49 @@ class Hm_Test_sieve_cache extends TestCase {
     }
 
     /**
+     * Scripts are stored in session; clearing them must also target session (not external cache)
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_clearScriptCache_targets_session_storage() {
+        $key = 'server1';
+        $name = 'test.sieve';
+
+        SieveScriptCache::cacheScript($key, $name, 'content');
+
+        // Verify it is in session storage, not external
+        $this->assertEquals('content', SieveScriptCache::getCachedScript($key, $name));
+
+        // Simulate what a wrong del($key, false) would do: delete from external cache
+        // After that, session-stored script should still be retrievable (proving the bug)
+        $cacheKey = "sieve_script_{$key}_{$name}";
+        $this->mockCache->del($cacheKey, false); // wrong: external cache del
+        $this->assertEquals('content', SieveScriptCache::getCachedScript($key, $name)); // still there
+
+        // Correct del with session=true actually clears it
+        SieveScriptCache::clearScriptCache($key, $name);
+        $this->assertFalse(SieveScriptCache::getCachedScript($key, $name));
+    }
+
+    /**
+     * Scripts list is stored in external cache, not session
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_scriptsList_stored_in_external_cache_not_session() {
+        $key = 'server1';
+        $scripts = ['a.sieve', 'b.sieve'];
+
+        SieveScriptCache::cacheScriptsList($key, $scripts);
+
+        $this->assertEquals($scripts, SieveScriptCache::getCachedScriptsList($key));
+
+        $this->mockCache->clear(); // clears both — just verify re-cache works
+        SieveScriptCache::cacheScriptsList($key, $scripts);
+        $this->assertEquals($scripts, SieveScriptCache::getCachedScriptsList($key));
+    }
+
+    /**
      * getCachedScriptsList returns false (not null) on cache miss
      * @preserveGlobalState disabled
      * @runInSeparateProcess

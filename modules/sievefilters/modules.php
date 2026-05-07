@@ -1379,7 +1379,7 @@ class Hm_Output_account_sieve_filters extends Hm_Output_Module {
         $result = get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'));
         $num_filters = $result['count'];
         $res = '<div class="sievefilters_accounts_item">';
-        $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 d-flex justify-content-between border-bottom cursor-pointer">' . $mailbox['name'];
+        $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 px-3 d-flex justify-content-between border-bottom cursor-pointer">' . $mailbox['name'];
         $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
         $res .= '<div class="sievefilters_accounts filter_block p-3 d-none"><div class="filter_subblock">';
         $res .= '<button class="add_filter btn btn-primary" account="'.$mailbox['name'].'"  sieve_extensions=\'' . json_encode($mailbox['sieve_extensions']) . '\'>Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script btn btn-light border">Add Script</button>';
@@ -1653,11 +1653,14 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
         
         if (isset($accounts[$form['imap_server_id']])) {
             $account = $accounts[$form['imap_server_id']];
-            $client = initialize_sieve_client_factory($this->config, null, $account);
             $account['sieve_extensions'] = [];
-
-            if ($client) {
-                $account['sieve_extensions'] = $client->getExtensions();
+            try {
+                $account['sieve_extensions'] = SieveService::getExtensions($form['imap_server_id']);
+                // Pre-warm list cache before session is closed — output modules run after close_early()
+                // so any session writes after that point are lost
+                SieveService::listScripts($form['imap_server_id']);
+            } catch (Exception $e) {
+                Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             }
             $this->out('mailbox', $account);
             $this->session->close_early();
