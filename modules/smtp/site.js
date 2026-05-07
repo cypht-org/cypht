@@ -508,7 +508,67 @@ $(function() {
             );
         }
 
-        sendScheduledMessages();
+        let autoSaveSettings = function () {
+            if (!window.autoSaveEnabled) {
+                return;
+            }
+
+            if (window.autoSaveInProgress) {
+                return;
+            }
+            
+            window.autoSaveInProgress = true;
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_save_auto_save_settings'}],
+                function(res) {
+                    window.autoSaveInProgress = false;
+                    if (res.auto_save_status === 'success') {
+                        console.log('Auto-save completed:', res.auto_save_count, 'settings at', new Date(res.auto_save_timestamp * 1000));
+                    } else {
+                        console.warn('Auto-save failed:', res);
+                    }
+                },
+                function(err) {
+                    window.autoSaveInProgress = false;
+                    console.error('Auto-save request failed:', err);
+                }
+            );
+        }
+
+        let startAutoSaveTimer = function() {
+            if (!window.autoSaveEnabled) {
+                console.log('Auto-save is disabled, not starting timer');
+                return;
+            }
+            
+            if (window.autoSaveTimer) {
+                clearInterval(window.autoSaveTimer);
+            }
+            
+            let interval = (window.currentAutoSaveInterval || 60) * 1000; 
+            console.log('Starting auto-save timer with interval:', interval/1000, 'seconds');
+
+            window.autoSaveTimer = setInterval(function() {
+                autoSaveSettings();
+            }, interval);
+        }
+
+        let get_auto_save_settings = function() { 
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_get_auto_save_settings'}],
+                function(res) {
+                    console.log(res)
+                    if (res.auto_save_enabled !== undefined) {
+                        window.currentAutoSaveInterval = res.auto_save_interval;
+                        window.autoSaveEnabled = res.auto_save_enabled;
+                        startAutoSaveTimer();
+                    }
+                },
+            );
+            
+        }
+
+        get_auto_save_settings();
         setInterval(sendScheduledMessages, 60000);
         window.onbeforeunload = (e) => {
             if (scheduled_msg_count > 0 && e.currentTarget.location.hostname !== document.location.hostname) {

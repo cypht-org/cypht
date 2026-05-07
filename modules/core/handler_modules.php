@@ -564,6 +564,113 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
     }
 }
 
+
+class Hm_Handler_save_auto_save_settings extends Hm_Handler_Module {
+    /**
+     * save new site settings to the session
+     */
+    public function process() {
+        $auto_save_enabled = $this->user_config->get('auto_save_setting_setting', false);
+        $auto_save_interval = $this->user_config->get('auto_save_interval_setting', 60);
+
+        if (!$auto_save_enabled) {
+            return;
+        }
+
+        $current_settings = $this->session->get('user_settings', array());
+        
+        $saved_count = 0;
+        if (!empty($current_settings)) {
+            foreach ($current_settings as $name => $value) {
+                $this->user_config->set($name, $value);
+                $saved_count++;
+            }
+            // $this->session->record_unsaved('Auto-save settings completed');
+        }
+    }
+}
+class Hm_Handler_get_auto_save_settings extends Hm_Handler_Module {
+
+    public function process() {
+        $auto_save_enabled = $this->user_config->get('auto_save_setting', false);
+        $auto_save_interval = $this->user_config->get('auto_save_interval', 60);
+        $this->out('auto_save_enabled', true);
+        $this->out('auto_save_interval', $auto_save_interval);
+    }
+}
+
+/**
+ * Process auto save settings
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_auto_save_settings extends Hm_Handler_Module {
+    public function process() {
+        function process_auto_save_setting_callback($val) { return $val; }
+        function process_auto_save_interval_callback($val) { return $val; }
+
+        process_site_setting('auto_save_setting', $this, 'process_auto_save_setting_callback');
+        process_site_setting('auto_save_interval', $this, 'process_auto_save_interval_callback');
+    }
+}
+
+/**
+ * Validate password and enable auto-save
+ * @subpackage core/handler
+ */
+class Hm_Handler_validate_auto_save_password extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('auto_save_password', 'auto_save_enable', 'auto_save_interval'));
+        $is_saved_auto_save_key = false;
+        if (!$success) {
+            Hm_Msgs::add('Invalid request', 'error');
+            return;
+        }
+
+        if (!$form['auto_save_enable']) {
+            Hm_Msgs::add('Invalid request', 'error');
+            $this->out('is_saved_auto_save_key', false);
+            return;
+        }
+
+        // Check if password is valid using session password
+        if (!is_valid_password($this, $form['auto_save_password'])) {
+            Hm_Msgs::add('Invalid password', 'error');
+            $this->out('is_saved_auto_save_key', false);
+            return;
+        }
+
+        // Save key and interval in user config
+        $this->user_config->set('auto_save_key_setting', $form['auto_save_password']);
+        $this->user_config->set('auto_save_setting', true);
+        
+        // Save interval if provided and valid
+        if (isset($form['auto_save_interval']) && is_numeric($form['auto_save_interval'])) {
+            $interval = (int)$form['auto_save_interval'];
+            if ($interval >= 10 && $interval <= 3600) {
+                $this->user_config->set('auto_save_interval', $interval);
+            }
+        }
+        $this->user_config->save($this->session->get('username'), $form['auto_save_password']);
+        $this->out('is_saved_auto_save_key', true);
+        
+        Hm_Msgs::add('Auto-save enabled successfully', 'success');
+    }
+}
+
+/**
+ * Disable auto-save and remove key
+ * @subpackage core/handler
+ */
+class Hm_Handler_disable_auto_save extends Hm_Handler_Module {
+    public function process() {
+        // Remove key and disable feature
+        $this->user_config->set('auto_save_key_setting', '');
+        $this->user_config->set('auto_save_setting', false);
+        
+        Hm_Msgs::add('Auto-save disabled successfully', 'success');
+    }
+}
+
 /**
  * Do reset factory from the settings page to the session
  * @subpackage core/handler
