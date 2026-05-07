@@ -1666,7 +1666,6 @@ class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
             $msg = 'ERRFailed to schedule sending for messages';
         }
         Hm_Msgs::add($msg);
-        $this->save_hm_msgs();
     }
 }
 
