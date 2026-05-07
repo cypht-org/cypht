@@ -16,6 +16,7 @@ chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_experimental_option("excludeSwitches", ["enable-automation", "enable-logging"])
 chrome_options.add_experimental_option('useAutomationExtension', False)
 chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+chrome_options.add_experimental_option('prefs', {'profile.password_manager_leak_detection': False})
 
 # Enable browser console logs
 chrome_options.set_capability("goog:loggingPrefs", {"browser": "ALL"})
