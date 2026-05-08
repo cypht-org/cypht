@@ -383,7 +383,6 @@ var send_requests = function(requests) {
                     $('.adv_controls').show();
                     $('.core_msg_control').off('click');
                     $('.core_msg_control').on("click", function() { return Hm_Message_List.message_action($(this).data('action')); });
-                    Hm_Message_List.set_checkbox_callback();
                     if (typeof check_select_for_imap !== 'undefined') {
                         check_select_for_imap();
                     }
@@ -543,7 +542,6 @@ $(function() {
             $('.adv_controls').show();
             $('.core_msg_control').off('click');
             $('.core_msg_control').on("click", function() { return Hm_Message_List.message_action($(this).data('action')); });
-            Hm_Message_List.set_checkbox_callback();
             if (typeof check_select_for_imap !== 'undefined') {
                 check_select_for_imap();
             }
