@@ -424,8 +424,8 @@ var remove_from_cached_imap_pages = function(msg_cache_key) {
     });
 }
 
-async function select_imap_folder(path, page = 1, reload, processInTheBackground = false) {
-    const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), []);
+async function select_imap_folder(path, page = 1, reload, processInTheBackground = false, expandSearch = false) {
+    const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), [], expandSearch);
     await messages.load(reload, processInTheBackground, false, () => {
         if (processInTheBackground || Hm_Utils.rows().length) {
             for (let row of messages.rows) {
@@ -475,6 +475,21 @@ async function select_imap_folder(path, page = 1, reload, processInTheBackground
     return messages;
 };
 
+function show_expand_search_button(listPath, listPage) {
+    $('.expand_search_banner').remove();
+    const label = hm_trans ? hm_trans('Search all folders') : 'Search all folders';
+    const banner = $('<div class="expand_search_banner text-center py-2 text-muted small">').append(
+        $('<button class="btn btn-sm btn-link expand_search_btn p-0">').text(label)
+            .on('click', async function() {
+                const btn = $(this);
+                btn.prop('disabled', true).text(hm_trans ? hm_trans('Searching...') : 'Searching...');
+                $('.expand_search_banner').remove();
+                await select_imap_folder(listPath, listPage, true, false, true);
+            })
+    );
+    $('table.message_list, .message_list').last().after(banner);
+}
+
 var setup_imap_folder_page = async function(listPath, listPage = 1) {
     const store = new Hm_MessagesStore(listPath, listPage, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
     $('.remove_source').on("click", remove_imap_combined_source);
@@ -504,6 +519,9 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
 
     // try to fetch from cache but also reload messages, so user don't wait 60 seconds to see the new list (useful for read/unread UI and other updates)
     await select_imap_folder(listPath, listPage, true);
+    if (!listPath.startsWith('imap_') && !listPath.startsWith('feeds') && !listPath.startsWith('github')) {
+        show_expand_search_button(listPath, listPage);
+    }
     handleMessagesDragAndDrop();
 
     // Refresh in the background each 60 seconds

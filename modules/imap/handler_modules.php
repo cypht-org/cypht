@@ -1432,7 +1432,7 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
             $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
 
-        $allow_all_folders = false;
+        $expand_search = !empty($this->request->post['expand_search']);
 
         list($sort, $reverse) = process_sort_arg($this->request->get['sort'], $this->user_config->get('default_sort_order_setting', 'arrival'));
 
@@ -1454,7 +1454,6 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
                 $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
                 break;
             case 'flagged':
-                $allow_all_folders = (bool)$this->user_config->get('allow_search_all_flagged_folder_setting', DEFAULT_FLAGGED_SEARCH_IN_ALL_FOLDERS);
                 $filter = 'FLAGGED';
                 $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_FLAGGED_SINCE));
                 $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_FLAGGED_PER_SOURCE);
@@ -1502,7 +1501,7 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
             }
             $enable_exclude_auto_bcc = $this->user_config->get('enable_exclude_auto_bcc_setting', DEFAULT_SETTING_ENABLE_EXCLUDE_AUTO_BCC);
 
-            if($allow_all_folders) {
+            if($expand_search) {
                 $all_folders = $mailbox->get_folders();
                 foreach (array_keys($all_folders) as $folder) {
                     $uids = $mailbox->search($folder, $filter, $terms, $sort, $reverse, true, $enable_exclude_auto_bcc);
