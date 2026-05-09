@@ -110,26 +110,13 @@ var initLdapContactModal = function() {
         Hm_Ajax.request(
             formData,
             function(res) {
-                var isSuccess = false;
-                if (res.router_user_msgs) {
-                    for (var key in res.router_user_msgs) {
-                        if (res.router_user_msgs[key].type === 'success') {
-                            isSuccess = true;
-                            break;
-                        }
-                    }
-                }
+                var isSuccess = hm_ajax_has_success(res);
 
                 $('#submit-ldap-contact-btn').prop('disabled', false).text(isEdit ? 'Update' : 'Add');
                 isLdapSubmitting = false;
 
                 if (isSuccess) {
-                    var modalElement = document.getElementById('ldapContactModal');
-                    var modal = bootstrap.Modal.getInstance(modalElement);
-                    if (modal) {
-                        modal.hide();
-                    }
-
+                    hm_hide_modal('ldapContactModal');
                     hm_redirect_to_contacts();
                 }
             },
@@ -142,10 +129,7 @@ var initLdapContactModal = function() {
         );
     });
 
-    $('#ldap-contact-form').on('input change', '.is-invalid', function() {
-        $(this).removeClass('is-invalid');
-        $(this).next('.invalid-feedback').remove();
-    });
+    hm_init_field_error_clearing('#ldap-contact-form');
 
     $('#ldapContactModal').on('hidden.bs.modal', function() {
         hm_clear_form_errors('#ldap-contact-form');

@@ -347,6 +347,13 @@ var getUrlParameter = function(name) {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
+var hm_init_field_error_clearing = function(formSelector) {
+    $(formSelector).on('input change', '.is-invalid', function() {
+        $(this).removeClass('is-invalid');
+        $(this).next('.invalid-feedback').remove();
+    });
+};
+
 var hm_remove_url_params = function(params) {
     var currentUrl = new URL(window.location.href);
     params.forEach(function(param) { currentUrl.searchParams.delete(param); });

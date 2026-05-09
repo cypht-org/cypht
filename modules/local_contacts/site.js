@@ -98,28 +98,13 @@ var initLocalContactModal = function() {
             Hm_Ajax.request(
                 ajaxData,
                 function(res) {
-                    console.log(res);
-                    
-                    var isSuccess = false;
-                    if (res.router_user_msgs) {
-                        for (var key in res.router_user_msgs) {
-                            if (res.router_user_msgs[key].type === 'success') {
-                                isSuccess = true;
-                                break;
-                            }
-                        }
-                    }
-                    
+                    var isSuccess = hm_ajax_has_success(res);
+
                     $('#submit-local-contact-btn').prop('disabled', false).text(isEdit ? 'Update Contact' : 'Add Contact');
                     isSubmitting = false;
-                    
+
                     if (isSuccess) {
-                        const modalElement = document.getElementById('localContactModal');
-                        const modal = bootstrap.Modal.getInstance(modalElement);
-                        if (modal) {
-                            modal.hide();
-                        }
-                        
+                        hm_hide_modal('localContactModal');
                         hm_redirect_to_contacts();
                     }
                 },
@@ -145,10 +130,7 @@ var initLocalContactModal = function() {
         }
     });
 
-    $('#manual-contact-form').on('input change', '.is-invalid', function() {
-        $(this).removeClass('is-invalid');
-        $(this).next('.invalid-feedback').remove();
-    });
+    hm_init_field_error_clearing('#manual-contact-form');
 
     $('#localContactModal').on('hidden.bs.modal', function() {
         hm_clear_form_errors('#manual-contact-form');
