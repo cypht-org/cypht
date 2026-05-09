@@ -124,8 +124,7 @@ var initLocalContactModal = function() {
             }
             
             $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Importing...');
-            
-            // Submit the form normally
+            $('#csv-upload-progress').show();
             form.submit();
         }
     });
@@ -135,6 +134,7 @@ var initLocalContactModal = function() {
     $('#localContactModal').on('hidden.bs.modal', function() {
         hm_clear_form_errors('#manual-contact-form');
         isSubmitting = false;
+        $('#csv-upload-progress').hide();
         $('#manual-contact-form')[0].reset();
         $('#manual-entry-btn').addClass('active');
         $('#csv-import-btn').removeClass('active');

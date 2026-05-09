@@ -356,6 +356,11 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             $res .= '<p class="csv-upload-hint">' . $this->trans('CSV files only') . '</p>';
             $res .= '</label>';
             $res .= '</div>';
+            $res .= '<div id="csv-upload-progress" class="mt-3" style="display:none;">';
+            $res .= '<div class="progress" style="height:3px;">';
+            $res .= '<div class="progress-bar progress-bar-striped progress-bar-animated w-100" role="progressbar"></div>';
+            $res .= '</div>';
+            $res .= '</div>';
             $res .= '</form>';
             $res .= '</div>';
         }
