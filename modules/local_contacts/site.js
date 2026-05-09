@@ -120,12 +120,7 @@ var initLocalContactModal = function() {
                             modal.hide();
                         }
                         
-                        var activeTab = $('.category-tab.active').data('target');
-                        var redirectUrl = '?page=contacts';
-                        if (activeTab) {
-                            redirectUrl += '&active_tab=' + activeTab;
-                        }
-                        window.location.href = redirectUrl;
+                        hm_redirect_to_contacts();
                     }
                 },
                 [],
@@ -165,14 +160,8 @@ var initLocalContactModal = function() {
         $('.csv-import-section').hide();
         $('#submit-local-contact-btn').text('Add Contact');
         
-        // Clean URL parameters related to modal if present
         if (window.location.search.indexOf('open_modal=') !== -1) {
-            var currentUrl = new URL(window.location.href);
-            currentUrl.searchParams.delete('open_modal');
-            currentUrl.searchParams.delete('contact_id');
-            currentUrl.searchParams.delete('contact_source');
-            currentUrl.searchParams.delete('contact_type');
-            window.history.replaceState({}, '', currentUrl.toString());
+            hm_remove_url_params(['open_modal', 'contact_id', 'contact_source', 'contact_type']);
         }
     });
 };

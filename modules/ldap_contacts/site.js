@@ -130,12 +130,7 @@ var initLdapContactModal = function() {
                         modal.hide();
                     }
 
-                    var activeTab = $('.category-tab.active').data('target');
-                    var redirectUrl = '?page=contacts';
-                    if (activeTab) {
-                        redirectUrl += '&active_tab=' + activeTab;
-                    }
-                    window.location.href = redirectUrl;
+                    hm_redirect_to_contacts();
                 }
             },
             [],
@@ -160,15 +155,8 @@ var initLdapContactModal = function() {
             form.reset();
         }
 
-        var search = window.location.search;
-        if (search.indexOf('contact_type=ldap') !== -1) {
-            var currentUrl = new URL(window.location.href);
-            currentUrl.searchParams.delete('contact_id');
-            currentUrl.searchParams.delete('contact_source');
-            currentUrl.searchParams.delete('contact_type');
-            currentUrl.searchParams.delete('contact_page');
-            currentUrl.searchParams.delete('dn');
-            window.history.replaceState({}, '', currentUrl.toString());
+        if (window.location.search.indexOf('contact_type=ldap') !== -1) {
+            hm_remove_url_params(['contact_id', 'contact_source', 'contact_type', 'contact_page', 'dn']);
         }
     });
 };

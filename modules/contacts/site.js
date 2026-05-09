@@ -347,6 +347,21 @@ var getUrlParameter = function(name) {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
+var hm_remove_url_params = function(params) {
+    var currentUrl = new URL(window.location.href);
+    params.forEach(function(param) { currentUrl.searchParams.delete(param); });
+    window.history.replaceState({}, '', currentUrl.toString());
+};
+
+var hm_redirect_to_contacts = function() {
+    var activeTab = $('.category-tab.active').data('target');
+    var redirectUrl = '?page=contacts';
+    if (activeTab) {
+        redirectUrl += '&active_tab=' + activeTab;
+    }
+    window.location.href = redirectUrl;
+};
+
 $(document).ready(function() {
     initContactTabs();
     initPagination();
