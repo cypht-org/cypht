@@ -745,11 +745,15 @@ const registerSieveModalEvents = () => {
             }
             if (selected_action.type === 'mailbox') {
                 let mailboxes = null;
-                tr_elem.children().eq(2).html(hm_spinner());
+                elem.html(hm_spinner());
                 Hm_Ajax.request(
                     [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_get_mailboxes'},
                         {'name': 'imap_account', 'value': current_account} ],
                     function(res) {
+                        if (!res.mailboxes) {
+                            elem.html('<input name="sieve_selected_action_value[]" class="form-control form-control-sm" type="text" placeholder="Enter mailbox name..." />');
+                            return;
+                        }
                         mailboxes = JSON.parse(res.mailboxes);
                         options = '';
                         mailboxes.forEach(function(val) {

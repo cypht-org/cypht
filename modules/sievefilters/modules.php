@@ -1355,9 +1355,9 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
         $blocked_senders = get_blocked_senders_array($current_script, $scripts);
         $num_blocked = $blocked_senders ? sizeof($blocked_senders) : 0;
         $res = '<div class="sievefilters_accounts_item">';
-        $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 border-bottom cursor-pointer d-flex justify-content-between" data-num-blocked="' . $num_blocked . '">' . $mailbox['name'];
+        $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 px-3 border-bottom cursor-pointer d-flex justify-content-between" data-num-blocked="' . $num_blocked . '">' . $mailbox['name'];
         $res .= '<span class="filters_count"><span id="filter_num_' . $mailbox['id'] . '">' . $num_blocked . '</span> ' . $this->trans('blocked') . '</span></div>';
-        $res .= '<div class="sievefilters_accounts filter_block py-3 d-none"><div class="filter_subblock">';
+        $res .= '<div class="sievefilters_accounts filter_block p-3 d-none"><div class="filter_subblock">';
         $res .= $default_behaviour_html;
         $res .= '<table class="filter_details table"><tbody>';
         $res .= '<tr><th class="col-sm-6">Sender</th><th class="col-sm-3">Behavior</th><th class="col-sm-3">Actions</th></tr>';
