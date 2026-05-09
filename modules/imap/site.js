@@ -424,8 +424,8 @@ var remove_from_cached_imap_pages = function(msg_cache_key) {
     });
 }
 
-async function select_imap_folder(path, page = 1, reload, processInTheBackground = false) {
-    const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), []);
+async function select_imap_folder(path, page = 1, reload, processInTheBackground = false, expandSearch = false) {
+    const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), [], expandSearch);
     await messages.load(reload, processInTheBackground, false, () => {
         if (processInTheBackground || Hm_Utils.rows().length) {
             for (let row of messages.rows) {
@@ -504,6 +504,19 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
 
     // try to fetch from cache but also reload messages, so user don't wait 60 seconds to see the new list (useful for read/unread UI and other updates)
     await select_imap_folder(listPath, listPage, true);
+
+    const isCombinedView = !listPath.startsWith('imap_') && !listPath.startsWith('feeds') && !listPath.startsWith('github');
+    const banner = $('.expand-search-banner');
+    if (isCombinedView && banner.length) {
+        banner.addClass('d-flex').removeClass('d-none');
+        banner.find('.expand-search-btn').off('click').on('click', async function() {
+            const btn = $(this);
+            btn.prop('disabled', true).find('span').text(btn.find('span').text().replace(/.*/, '...'));
+            banner.addClass('d-none').removeClass('d-flex');
+            await select_imap_folder(listPath, listPage, true, false, true);
+        });
+    }
+
     handleMessagesDragAndDrop();
 
     // Refresh in the background each 60 seconds

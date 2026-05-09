@@ -344,6 +344,16 @@ class Hm_Handler_process_delete_prompt_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Expose the search_all_folders setting to output modules (message_list page)
+ * @subpackage core/handler
+ */
+class Hm_Handler_load_search_all_folders_setting extends Hm_Handler_Module {
+    public function process() {
+        $this->out('search_all_folders_enabled', (bool)$this->user_config->get('search_all_folders_setting', DEFAULT_SEARCH_ALL_FOLDERS));
+    }
+}
+
+/**
  * Process input from the search all folders in combined views setting
  * @subpackage core/handler
  */

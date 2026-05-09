@@ -115,9 +115,11 @@ add_output('settings', 'privacy_settings', 'true', 'core', 'start_unread_setting
 /* message list page */
 setup_base_page('message_list');
 add_handler('message_list', 'default_sort_order_setting', true, 'core', 'load_user_data', 'after');
+add_handler('message_list', 'load_search_all_folders_setting', true, 'core', 'load_user_data', 'after');
 add_output('message_list', 'message_list_heading', true, 'core', 'version_upgrade_checker', 'after');
 add_output('message_list', 'message_list_start', true, 'core', 'message_list_heading', 'after');
 add_output('message_list', 'message_list_end', true, 'core', 'message_list_start', 'after');
+add_output('message_list', 'expand_search_banner', true, 'core', 'message_list_end', 'after');
 
 /* search page */
 setup_base_page('search');
@@ -315,6 +317,7 @@ return array(
         'flagged_per_source' => FILTER_VALIDATE_INT,
         'flagged_since' => FILTER_UNSAFE_RAW,
         'search_all_folders' => FILTER_VALIDATE_INT,
+        'expand_search' => FILTER_VALIDATE_INT,
         'unread_per_source' => FILTER_VALIDATE_INT,
         'unread_since' => FILTER_UNSAFE_RAW,
         'all_email_per_source' => FILTER_VALIDATE_INT,
