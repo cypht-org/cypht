@@ -1432,7 +1432,7 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
             $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
 
-        $expand_search = !empty($this->request->post['expand_search']);
+        $expand_search = (bool)$this->user_config->get('search_all_folders_setting', DEFAULT_SEARCH_ALL_FOLDERS);
 
         list($sort, $reverse) = process_sort_arg($this->request->get['sort'], $this->user_config->get('default_sort_order_setting', 'arrival'));
 

@@ -344,6 +344,19 @@ class Hm_Handler_process_delete_prompt_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process input from the search all folders in combined views setting
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_search_all_folders_setting extends Hm_Handler_Module {
+    public function process() {
+        function search_all_folders_callback($val) {
+            return $val;
+        }
+        process_site_setting('search_all_folders', $this, 'search_all_folders_callback', DEFAULT_SEARCH_ALL_FOLDERS, true);
+    }
+}
+
+/**
  * Process input from the disable delete attachment setting
  * @subpackage core/handler
  */

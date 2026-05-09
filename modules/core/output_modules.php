@@ -1109,6 +1109,28 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option to search all folders in combined views (flagged, unread, etc.)
+ * @subpackage core/output
+ */
+class Hm_Output_search_all_folders_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $checked = '';
+        $reset = '';
+        if (!empty($settings['search_all_folders'])) {
+            $checked = ' checked="checked"';
+            if ($settings['search_all_folders'] !== DEFAULT_SEARCH_ALL_FOLDERS) {
+                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise fs-6 cursor-pointer refresh_list reset_default_value_checkbox"></i></span>';
+            }
+        }
+        return '<tr><td><label class="form-check-label" for="search_all_folders">'.
+            $this->trans('Search all folders in combined views').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.
+            ' value="1" id="search_all_folders" name="search_all_folders" data-default-value="'.(DEFAULT_SEARCH_ALL_FOLDERS ? 'true' : 'false').'"/>'.$reset.'</td></tr>';
+    }
+}
+
+/**
  * Option for the "received since" date range for the Flagged page
  * @subpackage core/output
  */

@@ -68,6 +68,7 @@ add_handler('settings', 'reset_factory', true, 'core', 'save_user_data', 'before
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
 add_handler('settings', 'privacy_settings', true, 'core', 'date', 'after');
+add_handler('settings', 'process_search_all_folders_setting', true, 'core', 'save_user_settings', 'before');
 
 add_output('settings', 'start_settings_form', true, 'core', 'version_upgrade_checker', 'after');
 add_output('settings', 'start_search_settings', true, 'core', 'start_settings_form', 'after');
@@ -83,7 +84,8 @@ add_output('settings', 'delete_prompt_setting', true, 'core', 'list_style_settin
 add_output('settings', 'no_password_setting', true, 'core', 'delete_prompt_setting', 'after');
 add_output('settings', 'start_page_setting', true, 'core', 'no_password_setting', 'after');
 add_output('settings', 'default_sort_order_setting', true, 'core', 'start_page_setting', 'after');
-add_output('settings', 'start_unread_settings', true, 'core', 'default_sort_order_setting', 'after');
+add_output('settings', 'search_all_folders_setting', true, 'core', 'default_sort_order_setting', 'after');
+add_output('settings', 'start_unread_settings', true, 'core', 'search_all_folders_setting', 'after');
 add_output('settings', 'unread_since_setting', true, 'core', 'start_unread_settings', 'after');
 add_output('settings', 'unread_source_max_setting', true, 'core', 'unread_since_setting', 'after');
 add_output('settings', 'start_flagged_settings', true, 'core', 'unread_source_max_setting', 'after');
@@ -312,7 +314,7 @@ return array(
         'language' => FILTER_UNSAFE_RAW,
         'flagged_per_source' => FILTER_VALIDATE_INT,
         'flagged_since' => FILTER_UNSAFE_RAW,
-        'expand_search' => FILTER_VALIDATE_INT,
+        'search_all_folders' => FILTER_VALIDATE_INT,
         'unread_per_source' => FILTER_VALIDATE_INT,
         'unread_since' => FILTER_UNSAFE_RAW,
         'all_email_per_source' => FILTER_VALIDATE_INT,
