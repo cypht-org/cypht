@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d98284078a3e3bcc02e9490c573994d1",
+    "content-hash": "d3539e4c6b70b8961674e11b85633191",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -346,7 +346,7 @@
         },
         {
             "name": "garethp/php-ews",
-            "version": "dev-master",
+            "version": "v0.11.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Garethp/php-ews.git",
@@ -374,7 +374,6 @@
                 "phpunit/phpunit": "11.*|10.*",
                 "squizlabs/php_codesniffer": "3.6.*"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -407,7 +406,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Garethp/php-ews/issues",
-                "source": "https://github.com/Garethp/php-ews/tree/master"
+                "source": "https://github.com/Garethp/php-ews/tree/v0.11.2"
             },
             "time": "2026-03-11T20:23:22+00:00"
         },
@@ -4768,9 +4767,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "garethp/php-ews": 20
-    },
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
