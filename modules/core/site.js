@@ -1355,7 +1355,7 @@ var Hm_Folders = {
         if (document.cookie.indexOf('hm_reload_folders=1') > -1 || force) {
             Hm_Folders.expand_after_update = expand_after_update;
             var ui_state = Hm_Utils.preserve_local_settings();
-            Hm_Folders.update_folder_list();
+            Hm_Folders.update_folder_list(true);
             sessionStorage.clear();
             Hm_Utils.restore_local_settings(ui_state);
             return true;
