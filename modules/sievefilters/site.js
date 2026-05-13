@@ -1327,7 +1327,7 @@ function collectChips(container) {
 }
 
 let current_mailbox_for_filter;
-let edit_filter_modal_for_custom_actions;
+let edit_filter_modal_for_automatic_actions;
 let edit_filter_template_content;
 
 function createFilterFromList(launcherModal) {
@@ -1372,7 +1372,7 @@ function createFilterFromList(launcherModal) {
     };
 
     // Dispose previous modal if it exists
-    if (edit_filter_modal_for_custom_actions) {
+    if (edit_filter_modal_for_automatic_actions) {
         try {
             const existingModal = document.getElementById('myEditFilterModal');
             if (existingModal) {
@@ -1385,12 +1385,12 @@ function createFilterFromList(launcherModal) {
         }
     }
 
-    edit_filter_modal_for_custom_actions = createEditFilterModal(
+    edit_filter_modal_for_automatic_actions = createEditFilterModal(
         save_filter,
         getCurrentAccount,
         { isFromMessageList: true },
     );
-    edit_filter_modal_for_custom_actions.open();
+    edit_filter_modal_for_automatic_actions.open();
     launcherModal.hide();
 
     // Remove any previous dry run results

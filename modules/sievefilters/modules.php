@@ -1668,7 +1668,7 @@ class Hm_Handler_load_mailbox_name extends Hm_Handler_Module
     }
 }
 
-class Hm_Handler_load_custom_actions extends Hm_Handler_Module
+class Hm_Handler_load_automatic_actions extends Hm_Handler_Module
 {
     public function process()
     {
@@ -1683,19 +1683,19 @@ class Hm_Handler_load_custom_actions extends Hm_Handler_Module
         }
 
         if ($imap_server_id === null) {
-            $this->out('custom_actions', []);
+            $this->out('automatic_actions', []);
             return;
         }
 
         $imap_servers = $this->user_config->get('imap_servers');
         if (!isset($imap_servers[$imap_server_id])) {
-            $this->out('custom_actions', []);
+            $this->out('automatic_actions', []);
             return;
         }
 
         $mailbox = $imap_servers[$imap_server_id];
         if (empty($mailbox['sieve_config_host'])) {
-            $this->out('custom_actions', []);
+            $this->out('automatic_actions', []);
             return;
         }
 
@@ -1737,7 +1737,52 @@ class Hm_Handler_load_custom_actions extends Hm_Handler_Module
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
         }
 
-        $this->out('custom_actions', $filters);
+        $this->out('automatic_actions', $filters);
+    }
+}
+
+class Hm_Output_message_list_automatic_actions extends Hm_Output_Module
+{
+    protected function output()
+    {
+        if (!$this->get('sieve_filters_enabled')) {
+            return '';
+        }
+        $automatic_actions = $this->get('automatic_actions', []);
+        $mailbox_name = $this->get('mailbox_name', '');
+
+        $res = '<div class="dropdown">'
+            .   '<a class="msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle" '
+            .   'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
+            .   $this->trans('Automatic actions')
+            .   '</a>'
+            .   '<div class="dropdown-menu custom-actions p-2" aria-labelledby="filter_message">';
+
+            if (!empty($automatic_actions)) {
+                $res .= '<small class="dropdown-header text-muted px-2 py-1">'
+                     .  '<i class="bi bi-info-circle me-1"></i>'.$this->trans('Auto-run on new emails')
+                     .  '</small>';
+                foreach ($automatic_actions as $filter) {
+                    $res .= sprintf(
+                        '<button class="dropdown-item msg_filter_action py-2 btn btn-secondary" data-filter-id="%s" data-imap-account="%s" data-filter-name="%s">'
+                        .'<i class="bi bi-play-circle me-2 text-success"></i>%s</button>',
+                        htmlspecialchars($filter['id']),
+                        htmlspecialchars($mailbox_name),
+                        htmlspecialchars($filter['name']),
+                        htmlspecialchars($filter['name'])
+                    );
+                }
+                $res .= '<hr class="dropdown-divider">';
+            }
+
+        $res .= '<button class="dropdown-item add_automatic_action text-primary btn btn-secondary py-2" '
+                    .'id="add_automatic_action_button" account="'.$mailbox_name.'" '
+                .'>'
+                .   '<i class="bi bi-plus-circle me-2"></i>'.$this->trans('Create from Selected')
+                . '</button>';
+        $res .= '</div></div>';
+ 
+        $this->concat('msg_controls_automatic_actions', $res);
     }
 }
 
@@ -1748,19 +1793,20 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
         if (!$this->get('sieve_filters_enabled')) {
             return '';
         }
-        $custom_actions = $this->get('custom_actions', []);
+        // $custom_actions = $this->get('custom_actions', []);
+        $custom_actions = []; // Custom actions are currently not supported, but the code is left here for future implementation
         $mailbox_name = $this->get('mailbox_name', '');
 
         $res = '<div class="dropdown">'
             .   '<a class="msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle" '
             .   'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
-            .   $this->trans('Quick Actions')
+            .   $this->trans('Custom actions')
             .   '</a>'
             .   '<div class="dropdown-menu custom-actions p-2" aria-labelledby="filter_message">';
 
             if (!empty($custom_actions)) {
                 $res .= '<small class="dropdown-header text-muted px-2 py-1">'
-                     .  '<i class="bi bi-info-circle me-1"></i>'.$this->trans('Auto-run on new emails')
+                     .  '<i class="bi bi-info-circle me-1"></i>'.$this->trans('Customised actions you can apply to selected emails')
                      .  '</small>';
                 foreach ($custom_actions as $filter) {
                     $res .= sprintf(

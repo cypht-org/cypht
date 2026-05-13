@@ -15,7 +15,7 @@ function handleSieveCustomAction() {
         },
     );
 
-    $('#add_custom_action_button').on('click', function (e) {
+    $('#add_automatic_action_button').on('click', function (e) {
         e.preventDefault();
 
         const mailbox = $(this).attr('account');
