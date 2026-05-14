@@ -110,7 +110,7 @@ var initLdapContactModal = function() {
         Hm_Ajax.request(
             formData,
             function(res) {
-                var isSuccess = hm_ajax_has_success(res);
+                var isSuccess = Hm_Ajax.has_success(res);
 
                 $('#submit-ldap-contact-btn').prop('disabled', false).text(isEdit ? 'Update' : 'Add');
                 isLdapSubmitting = false;

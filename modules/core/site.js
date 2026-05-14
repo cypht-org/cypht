@@ -139,6 +139,17 @@ var Hm_Ajax = {
 
     add_callback_hook: function(request_name, hook_function) {
         Hm_Ajax.callback_hooks.push([request_name, hook_function]);
+    },
+
+    has_success: function(res) {
+        if (res.router_user_msgs) {
+            for (var key in res.router_user_msgs) {
+                if (res.router_user_msgs[key].type === 'success') {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 };
 

@@ -98,7 +98,7 @@ var initLocalContactModal = function() {
             Hm_Ajax.request(
                 ajaxData,
                 function(res) {
-                    var isSuccess = hm_ajax_has_success(res);
+                    var isSuccess = Hm_Ajax.has_success(res);
 
                     $('#submit-local-contact-btn').prop('disabled', false).text(isEdit ? 'Update Contact' : 'Add Contact');
                     isSubmitting = false;
