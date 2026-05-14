@@ -118,4 +118,19 @@ public function authenticateScram($scramAlgorithm, $username, $password, $getSer
     }
     return false; // Authentication failed
 }
+
+private function extractChallenge($response, $protocol) {
+    if ($protocol === 'smtp') {
+        // SMTP get_response() returns a chunked array: [['334', ['base64data']], ...]
+        if (!empty($response) && isset($response[0][0]) && $response[0][0] === '334') {
+            return $response[0][1][0] ?? '';
+        }
+        return null;
+    }
+    // IMAP get_response() returns raw strings; continuation lines start with '+ '
+    if (!empty($response) && mb_substr($response[0], 0, 2) === '+ ') {
+        return mb_substr($response[0], 2);
+    }
+    return null;
+}
 }

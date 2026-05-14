@@ -378,7 +378,8 @@ class Hm_SMTP {
                 $username,
                 $password,
                 [$this, 'get_response'],
-                [$this, 'send_command']
+                [$this, 'send_command'],
+                'smtp'
             );
             if ($result) {
                 return 'Authentication successful';
