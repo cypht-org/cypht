@@ -78,13 +78,19 @@ public function authenticateScram($scramAlgorithm, $username, $password, $getSer
         $clientFinalMessage = $channelBindingData . 'r=' . $serverNonce . $clientNonce . ',p=' . $clientProof;
         $clientFinalMessageEncoded = base64_encode($clientFinalMessage);
         $this->log("Sending client final message: " . $clientFinalMessageEncoded);
-        // Send client final message to server
-        $sendCommand($clientFinalMessageEncoded . "\r\n");
+
+        // Send client final message to server (same \r\n handling as the initial command)
+        if ($protocol === 'smtp') {
+            $sendCommand($clientFinalMessageEncoded);
+        } else {
+            $sendCommand($clientFinalMessageEncoded . "\r\n");
+        }
 
         // Verify server's response
         $response = $getServerResponse();
-        if (!empty($response) && mb_substr($response[0], 0, 2) == '+ ') {
-            $serverFinalMessage = base64_decode(mb_substr($response[0], 2));
+        $challenge2 = $this->extractChallenge($response, $protocol);
+        if ($challenge2 !== null) {
+            $serverFinalMessage = base64_decode($challenge2);
             $parts = explode(',', $serverFinalMessage);
             $serverProof = substr($parts[0], strpos($parts[0], "=") + 1);
 
