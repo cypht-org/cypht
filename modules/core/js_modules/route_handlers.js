@@ -156,6 +156,8 @@ function applyMessageListPageHandlers(routeParams) {
         Hm_Message_List.sort($(this).val());
     });
 
+    if (window.handleSieveAutomaticAction) handleSieveAutomaticAction();
+
     Hm_MessagesStore.bindSourceToggleInputs(routeParams.list_path, async () => {
         messagesStore.removeFromLocalStorage();
 
