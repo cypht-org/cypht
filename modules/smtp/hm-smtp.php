@@ -142,16 +142,16 @@ class Hm_SMTP {
             $this->starttls = true;
         }
         $this->request_auths = array(
-            'scram-sha-1',
-            'scram-sha-1-plus',
-            'scram-sha-256',
-            'scram-sha-256-plus',
-            'scram-sha-224',
-            'scram-sha-224-plus',
-            'scram-sha-384',
-            'scram-sha-384-plus',
-            'scram-sha-512',
             'scram-sha-512-plus',
+            'scram-sha-512',
+            'scram-sha-384-plus',
+            'scram-sha-384',
+            'scram-sha-256-plus',
+            'scram-sha-256',
+            'scram-sha-224-plus',
+            'scram-sha-224',
+            'scram-sha-1-plus',
+            'scram-sha-1',
             'cram-md5',
             'login',
             'plain');
