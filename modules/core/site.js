@@ -1788,6 +1788,12 @@ var Hm_Utils = {
         window.location.href = autoAppendParamsForNavigation(path);
     },
 
+    remove_url_params: function(params) {
+        var currentUrl = new URL(window.location.href);
+        params.forEach(function(param) { currentUrl.searchParams.delete(param); });
+        history.replaceState(history.state, '', currentUrl.toString());
+    },
+
     is_valid_email: function (val) {
         var email = val.trim();
         if (!email || email.length > 320) { // RFC 5321: max 320 chars

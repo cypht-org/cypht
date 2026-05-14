@@ -335,7 +335,7 @@ var initPagination = function() {
         if (page && page !== currentPage) {
             var currentUrl = new URL(window.location);
             currentUrl.searchParams.set('contact_page', page);
-            window.location.href = currentUrl.toString();
+            navigate(currentUrl.toString());
         }
     });
 };
@@ -355,9 +355,7 @@ var hm_init_field_error_clearing = function(formSelector) {
 };
 
 var hm_remove_url_params = function(params) {
-    var currentUrl = new URL(window.location.href);
-    params.forEach(function(param) { currentUrl.searchParams.delete(param); });
-    window.history.replaceState({}, '', currentUrl.toString());
+    Hm_Utils.remove_url_params(params);
 };
 
 var hm_redirect_to_contacts = function() {
@@ -366,7 +364,7 @@ var hm_redirect_to_contacts = function() {
     if (activeTab) {
         redirectUrl += '&active_tab=' + activeTab;
     }
-    window.location.href = redirectUrl;
+    navigate(redirectUrl);
 };
 
 $(document).ready(function() {
