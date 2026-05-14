@@ -44,17 +44,24 @@ public function generateClientProof($username, $password, $salt, $clientNonce, $
     return $clientProof;
 }
 
-public function authenticateScram($scramAlgorithm, $username, $password, $getServerResponse, $sendCommand) {
+public function authenticateScram($scramAlgorithm, $username, $password, $getServerResponse, $sendCommand, $protocol = 'imap') {
     $algorithm = $this->getHashAlgorithm($scramAlgorithm);
 
-    // Send initial SCRAM command
-    $scramCommand = 'AUTHENTICATE ' . $scramAlgorithm . "\r\n";
-    $sendCommand($scramCommand);
+    // SMTP uses "AUTH <mech>"; IMAP uses "AUTHENTICATE <mech>".
+    // SMTP's send_command() appends \r\n internally, so we must not include it here.
+    // IMAP's send_command() sends exactly what it receives, so \r\n must be included.
+    if ($protocol === 'smtp') {
+        $sendCommand('AUTH ' . $scramAlgorithm);
+    } else {
+        $sendCommand('AUTHENTICATE ' . $scramAlgorithm . "\r\n");
+    }
     $response = $getServerResponse();
-    if (!empty($response) && mb_substr($response[0], 0, 2) == '+ ') {
-        $this->log("Received server challenge: " . $response[0]);
+
+    $challenge = $this->extractChallenge($response, $protocol);
+    if ($challenge !== null) {
+        $this->log("Received server challenge: " . $challenge);
         // Extract salt and server nonce from the server's challenge
-        $serverChallenge = base64_decode(mb_substr($response[0], 2));
+        $serverChallenge = base64_decode($challenge);
         $parts = explode(',', $serverChallenge);
         $serverNonce = base64_decode(substr($parts[0], strpos($parts[0], "=") + 1));
         $salt = base64_decode(substr($parts[1], strpos($parts[1], "=") + 1));
