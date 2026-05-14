@@ -1804,22 +1804,24 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
             .   '</a>'
             .   '<div class="dropdown-menu custom-actions p-2" aria-labelledby="filter_message">';
 
-            if (!empty($custom_actions)) {
-                $res .= '<small class="dropdown-header text-muted px-2 py-1">'
-                     .  '<i class="bi bi-info-circle me-1"></i>'.$this->trans('Customised actions you can apply to selected emails')
-                     .  '</small>';
-                foreach ($custom_actions as $filter) {
-                    $res .= sprintf(
-                        '<button class="dropdown-item msg_filter_action py-2 btn btn-secondary" data-filter-id="%s" data-imap-account="%s" data-filter-name="%s">'
-                        .'<i class="bi bi-play-circle me-2 text-success"></i>%s</button>',
-                        htmlspecialchars($filter['id']),
-                        htmlspecialchars($mailbox_name),
-                        htmlspecialchars($filter['name']),
-                        htmlspecialchars($filter['name'])
-                    );
-                }
-                $res .= '<hr class="dropdown-divider">';
+        $res .= '<small class="dropdown-header text-muted px-2 py-1">'
+            .  '<i class="bi bi-info-circle me-1"></i>'.$this->trans('Customised actions you can apply to selected emails')
+            .  '</small>';
+        
+        if (!empty($custom_actions)) {
+      
+            foreach ($custom_actions as $filter) {
+                $res .= sprintf(
+                    '<button class="dropdown-item msg_filter_action py-2 btn btn-secondary" data-filter-id="%s" data-imap-account="%s" data-filter-name="%s">'
+                    .'<i class="bi bi-play-circle me-2 text-success"></i>%s</button>',
+                    htmlspecialchars($filter['id']),
+                    htmlspecialchars($mailbox_name),
+                    htmlspecialchars($filter['name']),
+                    htmlspecialchars($filter['name'])
+                );
             }
+            $res .= '<hr class="dropdown-divider">';
+        }
 
         $res .= '<button class="dropdown-item add_custom_action text-primary btn btn-secondary py-2" '
                     .'id="add_custom_action_button" account="'.$mailbox_name.'" '

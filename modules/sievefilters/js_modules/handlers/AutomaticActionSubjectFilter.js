@@ -1,4 +1,4 @@
-function handleCustomActionSubjectFilter() {
+function handleAutomaticActionSubjectFilter() {
     $('.chip-remove')
             .on('click', function () {
                 $(this).closest('.chip').remove();

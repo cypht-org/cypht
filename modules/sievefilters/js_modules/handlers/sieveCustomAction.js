@@ -4,18 +4,18 @@ function handleSieveCustomAction() {
         modalId: 'myCustomActionModal',
     });
 
-    custom_action_modal.setTitle(hm_trans('Setup Filter from selected messages'));
+    custom_action_modal.setTitle(hm_trans('Setup Custom Action from selected messages'));
 
     custom_action_modal.addFooterBtn(
-        hm_trans('Build Filter'),
+        hm_trans('Build Custom Action'),
         'btn-primary ms-auto',
         async function () {
-            createFilterFromList(custom_action_modal);
+            // createCustomActionFromList(custom_action_modal);
             custom_action_modal.hide();
         },
     );
 
-    $('#add_automatic_action_button').on('click', function (e) {
+    $('#add_custom_action_button').on('click', function (e) {
         e.preventDefault();
 
         const mailbox = $(this).attr('account');
@@ -34,31 +34,8 @@ function handleSieveCustomAction() {
                 subject: $row.find('td.subject a').attr('title') || '',
             });
         });
-
-        function extractKeywords(subject) {
-            return subject
-                .toLowerCase()
-                .replace(/[^\w\s]/g, '')
-                .split(/\s+/)
-                .filter((w) => w.length > 3); // ignore small words
-        }
-
-        const fromEmails = [
-            ...new Set(selected.map((m) => m.from_email).filter(Boolean)),
-        ];
-
-        const subjectKeywords = [
-            ...new Set(
-                selected.flatMap((m) => extractKeywords(m.subject || '')),
-            ),
-        ];
-
+        console.log("selected from custom action:", selected);
         custom_action_modal.setContent(sieveCustomActionMarkup(mailbox));
         custom_action_modal.open();
-        
-        renderChips('#filter-from-list', fromEmails);
-        renderChips('#filter-subject-list', subjectKeywords);
-
-        handleCustomActionSubjectFilter();
     });
 }
