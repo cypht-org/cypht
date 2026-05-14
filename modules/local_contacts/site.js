@@ -104,7 +104,7 @@ var initLocalContactModal = function() {
                     isSubmitting = false;
 
                     if (isSuccess) {
-                        hm_hide_modal('localContactModal');
+                        Hm_Modal.hide('localContactModal');
                         hm_redirect_to_contacts();
                     }
                 },

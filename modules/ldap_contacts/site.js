@@ -116,7 +116,7 @@ var initLdapContactModal = function() {
                 isLdapSubmitting = false;
 
                 if (isSuccess) {
-                    hm_hide_modal('ldapContactModal');
+                    Hm_Modal.hide('ldapContactModal');
                     hm_redirect_to_contacts();
                 }
             },

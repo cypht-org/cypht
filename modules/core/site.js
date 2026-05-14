@@ -462,6 +462,13 @@ Hm_Modal.prototype = {
     }
 };
 
+Hm_Modal.hide = function(modalId) {
+    var modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+    if (modal) {
+        modal.hide();
+    }
+};
+
 class Hm_Alert {
     constructor() {
         this.container = document.querySelector('.sys_messages');
