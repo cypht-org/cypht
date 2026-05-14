@@ -769,7 +769,7 @@ function Message_List() {
         if (action_type == 'unsnooze' && getListPathParam() == 'snoozed') {
             remove = true;
         }
-        else if (action_type == 'delete' || ['archive', 'junk'].includes(action_type)) {
+        else if (action_type == 'delete' || ['archive', 'junk', 'not_junk'].includes(action_type)) {
             remove = true;
         }
         if (remove) {
