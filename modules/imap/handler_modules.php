@@ -1504,9 +1504,12 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
 
             if($expand_search) {
                 $all_folders = $mailbox->get_folders();
+                $remaining = $limit;
                 foreach (array_keys($all_folders) as $folder) {
+                    if ($remaining <= 0) break;
                     $uids = $mailbox->search($folder, $filter, $terms, $sort, $reverse, true, $enable_exclude_auto_bcc);
-                    $uids = array_slice($uids, 0, $limit);
+                    $uids = array_slice($uids, 0, $remaining);
+                    $remaining -= count($uids);
                     $headers = $mailbox->get_message_list($folder, $uids);
                     foreach ($uids as $uid) {
                         if (isset($headers[$uid])) {
