@@ -508,12 +508,39 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
     const isCombinedView = !listPath.startsWith('imap_') && !listPath.startsWith('feeds') && !listPath.startsWith('github');
     const banner = $('.expand-search-banner');
     if (isCombinedView && banner.length) {
+        const $main = $('#cypht-main');
+        $main.append(banner);
+
+        const positionBanner = () => {
+            const left = $main.offset().left;
+            banner.css({ position: 'fixed', bottom: 0, left: left, right: 0, 'z-index': 1030 });
+        };
+        positionBanner();
+        $(window).off('resize.expandBanner').on('resize.expandBanner', positionBanner);
+
         banner.addClass('d-flex').removeClass('d-none');
-        banner.find('.expand-search-btn').off('click').on('click', async function() {
-            const btn = $(this);
-            btn.prop('disabled', true).find('span').text(btn.find('span').text().replace(/.*/, '...'));
+
+        const hideBanner = () => {
             banner.addClass('d-none').removeClass('d-flex');
+            $(window).off('resize.expandBanner');
+        };
+
+        banner.find('.expand-search-btn').off('click').on('click', async function() {
+            hideBanner();
             await select_imap_folder(listPath, listPage, true, false, true);
+        });
+
+        banner.find('.expand-search-always').off('click').on('click', function(e) {
+            e.preventDefault();
+            const msg = $(this).data('confirm');
+            if (!window.confirm(msg)) return;
+            hideBanner();
+            Hm_Ajax.request(
+                [{ name: 'hm_ajax_hook', value: 'ajax_save_search_all_folders' },
+                 { name: 'search_all_folders', value: 2 }],
+                () => { location.reload(); },
+                null, true
+            );
         });
     }
 

@@ -158,6 +158,11 @@ add_output('logout', 'logout', true, 'core', 'content_section_start', 'after');
 /* message action ajax request */
 setup_base_ajax_page('ajax_message_action', 'core');
 
+/* save search_all_folders setting (value 0=off, 1=button, 2=always-on) */
+setup_base_ajax_page('ajax_save_search_all_folders', 'core');
+add_handler('ajax_save_search_all_folders', 'ajax_save_search_all_folders', true, 'core', 'load_user_data', 'after');
+add_handler('ajax_save_search_all_folders', 'save_user_data', true, 'core', 'ajax_save_search_all_folders', 'after');
+
 /* password udpates when not saving between logins */
 setup_base_ajax_page('ajax_update_server_pw', 'core');
 add_handler('ajax_update_server_pw', 'save_user_data', true, 'core', 'language', 'before');
@@ -221,6 +226,7 @@ return array(
         'ajax_hm_folders',
         'ajax_message_action',
         'ajax_reset_search',
+        'ajax_save_search_all_folders',
         'ajax_update_server_pw',
         'ajax_no_op',
         'notfound',

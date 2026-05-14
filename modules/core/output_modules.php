@@ -1118,13 +1118,24 @@ class Hm_Output_expand_search_banner extends Hm_Output_Module {
         if (!$this->get('search_all_folders_enabled', false)) {
             return '';
         }
-        return '<div class="expand-search-banner d-none align-items-center gap-3 py-2 px-4 border-top text-muted">'
+        return '<div class="expand-search-banner d-none align-items-center gap-3 py-2 px-4 border-top border-secondary-subtle bg-body-secondary text-muted shadow-sm">'
             .'<i class="bi bi-folder2-open fs-5 text-secondary"></i>'
             .'<span class="small">'.$this->trans('Showing results from the primary folder only.').'</span>'
-            .'<button class="btn btn-sm btn-outline-secondary expand-search-btn ms-auto d-flex align-items-center gap-1">'
+            .'<div class="btn-group ms-auto">'
+            .'<button type="button" class="btn btn-sm btn-outline-secondary expand-search-btn d-flex align-items-center gap-1">'
             .'<i class="bi bi-search"></i>'
             .'<span>'.$this->trans('Search all folders').'</span>'
             .'</button>'
+            .'<button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">'
+            .'<span class="visually-hidden">'.$this->trans('More options').'</span>'
+            .'</button>'
+            .'<ul class="dropdown-menu dropdown-menu-end">'
+            .'<li><a class="dropdown-item expand-search-always" href="#" data-confirm="'
+            .$this->trans('This will make searches on this page more resource-intensive. Are you sure?').'">'
+            .'<i class="bi bi-floppy me-2"></i>'.$this->trans('Always search all folders')
+            .'</a></li>'
+            .'</ul>'
+            .'</div>'
             .'</div>';
     }
 }
