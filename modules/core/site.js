@@ -1970,8 +1970,8 @@ var Hm_Utils = {
             return false;
         }
         
-        // Allow letters (including accented), spaces, hyphens, and apostrophes
-        return /^[A-Za-zÀ-ÖØ-öø-ÿ'\- ]+$/.test(name);
+        // Allow letters (including accented), digits, spaces, hyphens, and apostrophes
+        return /^[A-Za-zÀ-ÖØ-öø-ÿ0-9'\- ]+$/.test(name);
     },
 
     is_valid_phone: function(val) {

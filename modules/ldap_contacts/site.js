@@ -40,7 +40,7 @@ var validateLdapForm = function() {
         hm_show_field_error('ldap_first_name', 'First name is required.');
         valid = false;
     } else if (!Hm_Utils.is_valid_name(firstName, 2, 50)) {
-        hm_show_field_error('ldap_first_name', 'First name must be 2–50 characters and contain only letters, spaces, hyphens, or apostrophes.');
+        hm_show_field_error('ldap_first_name', 'First name must be 2–50 characters and contain only letters, numbers, spaces, hyphens, or apostrophes.');
         valid = false;
     }
 
@@ -48,7 +48,7 @@ var validateLdapForm = function() {
         hm_show_field_error('ldap_last_name', 'Last name is required.');
         valid = false;
     } else if (!Hm_Utils.is_valid_name(lastName, 2, 50)) {
-        hm_show_field_error('ldap_last_name', 'Last name must be 2–50 characters and contain only letters, spaces, hyphens, or apostrophes.');
+        hm_show_field_error('ldap_last_name', 'Last name must be 2–50 characters and contain only letters, numbers, spaces, hyphens, or apostrophes.');
         valid = false;
     }
 
@@ -116,8 +116,13 @@ var initLdapContactModal = function() {
                 isLdapSubmitting = false;
 
                 if (isSuccess) {
-                    Hm_Modal.hide('ldapContactModal');
-                    hm_redirect_to_contacts();
+                    var modalEl = document.getElementById('ldapContactModal');
+                    if (modalEl) {
+                        modalEl.addEventListener('hidden.bs.modal', hm_redirect_to_contacts, { once: true });
+                        Hm_Modal.hide('ldapContactModal');
+                    } else {
+                        hm_redirect_to_contacts();
+                    }
                 }
             },
             [],

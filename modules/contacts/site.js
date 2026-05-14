@@ -360,9 +360,13 @@ var hm_remove_url_params = function(params) {
 
 var hm_redirect_to_contacts = function() {
     var activeTab = $('.category-tab.active').data('target');
+    var contactPage = getUrlParameter('contact_page');
     var redirectUrl = '?page=contacts';
     if (activeTab) {
         redirectUrl += '&active_tab=' + activeTab;
+    }
+    if (contactPage) {
+        redirectUrl += '&contact_page=' + contactPage;
     }
     navigate(redirectUrl);
 };

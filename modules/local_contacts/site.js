@@ -14,7 +14,7 @@ var validateLocalForm = function() {
         hm_show_field_error('contact_name', 'Name is required.');
         valid = false;
     } else if (!Hm_Utils.is_valid_name(name, 2, 100)) {
-        hm_show_field_error('contact_name', 'Name must be 2–100 characters and contain only letters, spaces, hyphens, or apostrophes.');
+        hm_show_field_error('contact_name', 'Name must be 2–100 characters and contain only letters, numbers, spaces, hyphens, or apostrophes.');
         valid = false;
     }
 
@@ -104,8 +104,13 @@ var initLocalContactModal = function() {
                     isSubmitting = false;
 
                     if (isSuccess) {
-                        Hm_Modal.hide('localContactModal');
-                        hm_redirect_to_contacts();
+                        var modalEl = document.getElementById('localContactModal');
+                        if (modalEl) {
+                            modalEl.addEventListener('hidden.bs.modal', hm_redirect_to_contacts, { once: true });
+                            Hm_Modal.hide('localContactModal');
+                        } else {
+                            hm_redirect_to_contacts();
+                        }
                     }
                 },
                 [],
@@ -141,7 +146,7 @@ var initLocalContactModal = function() {
         $('.contact-manual-form').show();
         $('.csv-import-section').hide();
         $('#submit-local-contact-btn').text('Add Contact');
-        
+
         if (window.location.search.indexOf('open_modal=') !== -1) {
             hm_remove_url_params(['open_modal', 'contact_id', 'contact_source', 'contact_type']);
         }
