@@ -84,8 +84,11 @@ function collectActionsFromModal(modal) {
 function applyToSelected(modal, imapAccount, actions) {
     const selectedUids = [];
     $('.message_table input[type=checkbox]:checked').each(function () {
-        const uid = $(this).closest('tr').data('uid');
-        if (uid) { selectedUids.push(uid); }
+        // Use the full checkbox id (imap_{server_id}_{uid}_{hex_folder}) so the
+        // server can extract server, UID and folder without extra lookups.
+        if (this.id && this.id.indexOf('imap') === 0) {
+            selectedUids.push(this.id);
+        }
     });
 
     if (!selectedUids.length) {
