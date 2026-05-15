@@ -1458,6 +1458,7 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
                 $filter = 'FLAGGED';
                 $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_FLAGGED_SINCE));
                 $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_FLAGGED_PER_SOURCE);
+                break;
             case 'unread':
                 $filter = $list_path == 'unread' ? 'UNSEEN' : mb_strtoupper($list_path);
             default:
@@ -1502,37 +1503,23 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
             }
             $enable_exclude_auto_bcc = $this->user_config->get('enable_exclude_auto_bcc_setting', DEFAULT_SETTING_ENABLE_EXCLUDE_AUTO_BCC);
 
-            if($expand_search) {
-                $all_folders = $mailbox->get_folders();
-                $remaining = $limit;
-                foreach (array_keys($all_folders) as $folder) {
-                    if ($remaining <= 0) break;
-                    $uids = $mailbox->search($folder, $filter, $terms, $sort, $reverse, true, $enable_exclude_auto_bcc);
+            $search_folders = $expand_search ? array_keys($mailbox->get_folders()) : [hex2bin($folders[$key])];
+            $remaining = $limit;
+
+            foreach ($search_folders as $folder) {
+                if ($expand_search && $remaining <= 0) break;
+
+                $uids = $mailbox->search($folder, $filter, $terms, $sort, $reverse, true, $enable_exclude_auto_bcc);
+
+                if ($expand_search) {
                     $uids = array_slice($uids, 0, $remaining);
                     $remaining -= count($uids);
-                    $headers = $mailbox->get_message_list($folder, $uids);
-                    foreach ($uids as $uid) {
-                        if (isset($headers[$uid])) {
-                            $msg = $headers[$uid];
-                        } elseif (isset($headers[bin2hex($uid)])) {
-                            $msg = $headers[bin2hex($uid)];
-                        } else {
-                            continue;
-                        }
-                        $msg['server_id'] = $id;
-                        $msg['server_name'] = $details['name'];
-                        $msg['folder'] = $folders[$key];
-                        $messages[] = $msg;
-                    }
-                    $status['imap_'.$id.'_'.bin2hex($folder)] = $mailbox->get_folder_state();
+                } else {
+                    $total = count($uids);
+                    $uids = array_slice($uids, 0, $limit);
                 }
-            } else {
-                $uids = $mailbox->search(hex2bin($folders[$key]), $filter, $terms, $sort, $reverse, true, $enable_exclude_auto_bcc);
 
-                $total = count($uids);
-                $uids = array_slice($uids, 0, $limit);
-
-                $headers = $mailbox->get_message_list(hex2bin($folders[$key]), $uids);
+                $headers = $mailbox->get_message_list($folder, $uids);
                 foreach ($uids as $uid) {
                     if (isset($headers[$uid])) {
                         $msg = $headers[$uid];
@@ -1546,8 +1533,7 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
                     $msg['folder'] = $folders[$key];
                     $messages[] = $msg;
                 }
-
-                $status['imap_'.$id.'_'.$folders[$key]] = $mailbox->get_folder_state(); // this is faster than get_folder_status as search call above already gets this folder's state
+                $status['imap_'.$id.'_'.bin2hex($folder)] = $mailbox->get_folder_state(); // faster than get_folder_status; search already fetches folder state
             }
         }
 
