@@ -1204,6 +1204,19 @@ class Hm_Output_sievefilters_modal_content_start extends Hm_Output_Module
     }
 }
 
+class Hm_output_custom_action_modal_content extends Hm_Output_Module {
+    protected function output() {
+        $res = '<div id="custom_action_template" class="d-none">';
+        $res .= '<div class="sieve-filter-name-group mb-3">';
+        $res .= '<label class="form-label fw-bold">Action Name:</label>';
+        $res .= '<input type="text" class="custom_action_name_input form-control" placeholder="e.g., Move to Important" />';
+        $res .= '</div>';
+        $res .= get_classic_filter_modal_actions_content();
+        $res .= '</div>';
+        return $res;
+    }
+}
+
 /**
  * @subpackage sievefilters/output
  */
