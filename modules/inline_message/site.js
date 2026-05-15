@@ -124,14 +124,6 @@ var update_imap_links = function(uid, details) {
 
 var capture_subject_click = function() {
     $(document).off('click', ".subject a");
-    // Store the real URL in data-src and set href="#" so the SPA navigation
-    // handler ignores these links (it already skips href="#" links natively).
-    $('.subject a').each(function() {
-        if (!$(this).data('src')) {
-            $(this).attr('data-src', $(this).attr('href'));
-            $(this).attr('href', '#');
-        }
-    });
     $(document).on("click", ".subject a", function(e) {
         var msg_details = get_inline_msg_details(this);
         var uid = msg_details[0];
@@ -169,21 +161,13 @@ var capture_subject_click = function() {
             }
             return false;
         }
-        return true;
+        return false;
     });
 };
 
 function inlineMessageMessageListAndSearchPageHandler(routeParams) {
     if (window.inline_msg && inline_msg()) {
-        // Store the real URL in data-src and set href="#" immediately so no
-        // clicks are intercepted by SPA navigation before capture_subject_click fires.
-        $('.subject a').each(function() {
-            if (!$(this).data('src')) {
-                $(this).attr('data-src', $(this).attr('href'));
-                $(this).attr('href', '#');
-            }
-        });
-        setTimeout(capture_subject_click, 100);
+        capture_subject_click();
         $('tr').removeClass('hl');
         Hm_Ajax.add_callback_hook('*', capture_subject_click);
         Hm_Ajax.add_callback_hook('ajax_imap_delete_message', msg_inline_close);
