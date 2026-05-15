@@ -75,8 +75,11 @@ function createCustomActionFromList(custom_action_modal, options) {
     const selectedUids = [];
     if (applyAfterSave) {
         $('.message_table input[type=checkbox]:checked').each(function () {
-            const uid = $(this).closest('tr').data('uid');
-            if (uid) { selectedUids.push(uid); }
+            // Full checkbox id (imap_{server_id}_{uid}_{hex_folder}) carries all
+            // the info the server needs to perform IMAP operations.
+            if (this.id && this.id.indexOf('imap') === 0) {
+                selectedUids.push(this.id);
+            }
         });
         if (!selectedUids.length) {
             Hm_Notices.show(hm_trans('Please select at least one message to apply'), 'warning');
