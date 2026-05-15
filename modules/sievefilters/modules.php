@@ -1780,14 +1780,21 @@ class Hm_Handler_save_custom_action extends Hm_Handler_Module {
         }
 
         $custom_actions = $this->user_config->get('custom_actions', []);
-        $id = uniqid('ca_', true);
+        $posted_id = isset($this->request->post['action_id']) ? trim($this->request->post['action_id']) : '';
+        if ($posted_id && array_key_exists($posted_id, $custom_actions)) {
+            $id = $posted_id;
+            $message = 'Custom action updated';
+        } else {
+            $id = uniqid('ca_', true);
+            $message = 'Custom action created';
+        }
         $custom_actions[$id] = [
             'id' => $id,
             'name' => $form['custom_action_name'],
             'actions' => $actions,
         ];
         $this->user_config->set('custom_actions', $custom_actions);
-        $this->session->record_unsaved('Custom action created');
+        $this->session->record_unsaved($message);
         $this->session->set('user_data', $this->user_config->dump());
         $this->out('custom_action_saved', true);
         $this->out('custom_action_id', $id);
@@ -1908,10 +1915,10 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
             .  '</small>';
 
         if (!empty($custom_actions)) {
-      
+            $res .= '<div class="d-flex flex-column gap-1 mb-2">';
             foreach ($custom_actions as $filter) {
                 $res .= sprintf(
-                    '<button class="dropdown-item custom_action_btn py-2 btn btn-secondary" data-action-id="%s" data-imap-account="%s" data-action-name="%s" data-actions="%s">'
+                    '<button class="custom_action_btn btn btn-sm btn-outline-secondary text-start" data-action-id="%s" data-imap-account="%s" data-action-name="%s" data-actions="%s">'
                     .'<i class="bi bi-play-circle me-2 text-success"></i>%s</button>',
                     htmlspecialchars($filter['id']),
                     htmlspecialchars($mailbox_name),
@@ -1920,7 +1927,7 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
                     htmlspecialchars($filter['name'])
                 );
             }
-            $res .= '<hr class="dropdown-divider">';
+            $res .= '</div><hr class="dropdown-divider">';
         }
 
         $res .= '<button class="dropdown-item add_custom_action text-primary btn btn-secondary py-2" '
@@ -1929,7 +1936,7 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
                 .   '<i class="bi bi-plus-circle me-2"></i>'.$this->trans('Create from Selected')
                 . '</button>';
         $res .= '</div></div>';
- 
+
         $this->concat('msg_controls_custom_actions', $res);
     }
 }
