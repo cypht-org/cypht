@@ -61,6 +61,15 @@ class Hm_Handler_sieve_filters_enabled extends Hm_Handler_Module {
 /**
  * @subpackage sievefilters/handler
  */
+class Hm_Handler_load_custom_actions extends Hm_Handler_Module {
+    public function process() {
+        $this->out('custom_actions', $this->user_config->get('custom_actions', []));
+    }
+}
+
+/**
+ * @subpackage sievefilters/handler
+ */
 class Hm_Handler_sieve_filters_enabled_message_content extends Hm_Handler_Module {
     public function process() {
         $server = $this->user_config->get('imap_servers')[$this->request->post['imap_server_id']];
@@ -126,7 +135,6 @@ class Hm_Output_sieve_edit_output extends Hm_Output_Module {
         $this->out('script', $script);
     }
 }
-
 
 /**
  * @subpackage sievefilters/handler
@@ -1754,6 +1762,85 @@ class Hm_Handler_load_automatic_actions extends Hm_Handler_Module
     }
 }
 
+/**
+ * @subpackage sievefilters/handler
+ */
+class Hm_Handler_save_custom_action extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(['custom_action_name', 'actions_json']);
+        if (!$success) {
+            $this->out('custom_action_error', 'Missing required fields');
+            return;
+        }
+
+        $actions = json_decode($form['actions_json'], true);
+        if (empty($actions)) {
+            $this->out('custom_action_error', 'At least one action is required');
+            return;
+        }
+
+        $custom_actions = $this->user_config->get('custom_actions', []);
+        $id = uniqid('ca_', true);
+        $custom_actions[$id] = [
+            'id' => $id,
+            'name' => $form['custom_action_name'],
+            'actions' => $actions,
+        ];
+        $this->user_config->set('custom_actions', $custom_actions);
+        $this->session->record_unsaved('Custom action created');
+        $this->session->set('user_data', $this->user_config->dump());
+        $this->out('custom_action_saved', true);
+        $this->out('custom_action_id', $id);
+    }
+}
+
+/**
+ * Dummy handler — replace with real IMAP logic later.
+ * @subpackage sievefilters/handler
+ */
+class Hm_Handler_apply_custom_action extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(['imap_account', 'uids', 'actions_json']);
+        if (!$success) {
+            $this->out('custom_action_error', 'Missing required fields');
+            return;
+        }
+        $uids = json_decode($form['uids'], true);
+        if (empty($uids)) {
+            $this->out('custom_action_error', 'No messages selected');
+            return;
+        }
+        // TODO: implement real IMAP operations
+        $this->out('apply_success', true);
+        $this->out('apply_count', count($uids));
+    }
+}
+
+class Hm_Output_apply_custom_action extends Hm_Output_Module {
+    protected function output() {
+        $this->out('apply_success', $this->get('apply_success', false));
+        $this->out('apply_count', $this->get('apply_count', 0));
+        $error = $this->get('custom_action_error', '');
+        if ($error) {
+            $this->out('custom_action_error', $error);
+        }
+    }
+}
+
+/**
+ * @subpackage sievefilters/output
+ */
+class Hm_Output_save_custom_action extends Hm_Output_Module {
+    protected function output() {
+        $this->out('custom_action_saved', $this->get('custom_action_saved', false));
+        $this->out('custom_action_id', $this->get('custom_action_id', ''));
+        $error = $this->get('custom_action_error', '');
+        if ($error) {
+            $this->out('custom_action_error', $error);
+        }
+    }
+}
+
 class Hm_Output_message_list_automatic_actions extends Hm_Output_Module
 {
     protected function output()
@@ -1806,8 +1893,7 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
         if (!$this->get('sieve_filters_enabled')) {
             return '';
         }
-        // $custom_actions = $this->get('custom_actions', []);
-        $custom_actions = []; // Custom actions are currently not supported, but the code is left here for future implementation
+        $custom_actions = $this->get('custom_actions', []);
         $mailbox_name = $this->get('mailbox_name', '');
 
         $res = '<div class="dropdown">'
@@ -1820,16 +1906,17 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
         $res .= '<small class="dropdown-header text-muted px-2 py-1">'
             .  '<i class="bi bi-info-circle me-1"></i>'.$this->trans('Customised actions you can apply to selected emails')
             .  '</small>';
-        
+
         if (!empty($custom_actions)) {
       
             foreach ($custom_actions as $filter) {
                 $res .= sprintf(
-                    '<button class="dropdown-item msg_filter_action py-2 btn btn-secondary" data-filter-id="%s" data-imap-account="%s" data-filter-name="%s">'
+                    '<button class="dropdown-item custom_action_btn py-2 btn btn-secondary" data-action-id="%s" data-imap-account="%s" data-action-name="%s" data-actions="%s">'
                     .'<i class="bi bi-play-circle me-2 text-success"></i>%s</button>',
                     htmlspecialchars($filter['id']),
                     htmlspecialchars($mailbox_name),
                     htmlspecialchars($filter['name']),
+                    htmlspecialchars(json_encode($filter['actions'])),
                     htmlspecialchars($filter['name'])
                 );
             }
