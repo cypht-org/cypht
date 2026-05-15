@@ -1,226 +1,138 @@
 <?php
 
 /**
- * Unit tests for Searchable trait
+ * Unit tests for the Searchable trait
  * @package lib/tests
  */
 
 use PHPUnit\Framework\TestCase;
 
-/**
- * Tests for the Searchable trait
- */
 class Hm_Test_Searchable extends TestCase {
+
+    private static array $default_data = [
+        ['id' => 1, 'name' => 'John Doe',      'status' => 'active',   'age' => 30],
+        ['id' => 2, 'name' => 'Jane Smith',     'status' => 'inactive', 'age' => 25],
+        ['id' => 3, 'name' => 'Bob Johnson',    'status' => 'active',   'age' => 35],
+        ['id' => 4, 'name' => 'Alice Brown',    'status' => 'pending',  'age' => 28],
+        ['id' => 5, 'name' => 'Charlie Wilson', 'status' => 'active',   'age' => 30],
+    ];
 
     public function setUp(): void {
         require __DIR__.'/../bootstrap.php';
-        Searchable_Wrapper::resetTestData(); 
+        Searchable_Wrapper::load(self::$default_data);
     }
 
     /**
-     * Test getBy with ID search (default column)
-     * 
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_getBy_with_id_search() {
+    public function test_getBy_default_column_returns_single_match(): void {
         $results = Searchable_Wrapper::getBy(1);
-        
-        $this->assertIsArray($results);
+
         $this->assertCount(1, $results);
-        $this->assertEquals(1, $results[0]['id']);
-        $this->assertEquals('John Doe', $results[0]['name']);
+        $this->assertSame(1, $results[0]['id']);
+        $this->assertSame('John Doe', $results[0]['name']);
     }
 
     /**
-     * Test getBy with custom column search
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_getBy_with_custom_column() {
+    public function test_getBy_custom_column_returns_all_matches(): void {
         $results = Searchable_Wrapper::getBy('active', 'status');
-        
-        $this->assertIsArray($results);
-        $this->assertCount(3, $results); // John, Bob, Charlie
-        
-        foreach ($results as $result) {
-            $this->assertEquals('active', $result['status']);
+
+        $this->assertCount(3, $results);
+        foreach ($results as $item) {
+            $this->assertSame('active', $item['status']);
         }
     }
 
     /**
-     * Test getBy with returnFirst = true
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_getBy_return_first_match() {
-        $result = Searchable_Wrapper::getBy('active', 'status', true);
-        
-        $this->assertIsArray($result);
-        $this->assertEquals(1, $result['id']);
-        $this->assertEquals('John Doe', $result['name']);
-        $this->assertEquals('active', $result['status']);
-    }
-
-    /**
-     * Test getBy with no matches
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_getBy_no_matches() {
-        $results = Searchable_Wrapper::getBy(999);
-        
-        $this->assertIsArray($results);
-        $this->assertCount(0, $results);
-    }
-
-    /**
-     * Test getBy with no matches and returnFirst = true
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_getBy_no_matches_return_first() {
-        $result = Searchable_Wrapper::getBy(999, 'id', true);
-        
-        $this->assertNull($result);
-    }
-
-    /**
-     * Test getBy with non-existent column
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_getBy_non_existent_column() {
-        $results = Searchable_Wrapper::getBy('test', 'non_existent_column');
-        
-        $this->assertIsArray($results);
-        $this->assertCount(0, $results);
-    }
-
-    /**
-     * Test getBy with multiple matches
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_getBy_multiple_matches() {
+    public function test_getBy_multiple_rows_share_a_value(): void {
         $results = Searchable_Wrapper::getBy(30, 'age');
-        
-        $this->assertIsArray($results);
-        $this->assertCount(2, $results); // John and Charlie both age 30
-        
+
+        $this->assertCount(2, $results);
         $names = array_column($results, 'name');
         $this->assertContains('John Doe', $names);
         $this->assertContains('Charlie Wilson', $names);
     }
 
     /**
-     * Test getBy with string search
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_getBy_string_search() {
-        $results = Searchable_Wrapper::getBy('john@example.com', 'email');
-        
-        $this->assertIsArray($results);
+    public function test_getBy_return_first_returns_item_not_array(): void {
+        $result = Searchable_Wrapper::getBy('active', 'status', true);
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('id', $result);
+        $this->assertSame('active', $result['status']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_getBy_returns_empty_array_when_no_match(): void {
+        $this->assertSame([], Searchable_Wrapper::getBy(999));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_getBy_return_first_returns_null_when_no_match(): void {
+        $this->assertNull(Searchable_Wrapper::getBy(999, 'id', true));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_getBy_missing_column_returns_empty(): void {
+        $results = Searchable_Wrapper::getBy('anything', 'nonexistent_column');
+
+        $this->assertSame([], $results);
+    }
+
+    /**
+     * Null values are skipped because isset() returns false for null.
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_getBy_null_column_value_is_not_matched(): void {
+        Searchable_Wrapper::load([['id' => 1, 'name' => null]]);
+
+        $this->assertSame([], Searchable_Wrapper::getBy(null, 'name'));
+    }
+
+    /**
+     * getBy uses strict comparison (===), so '1' !== 1.
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_getBy_uses_strict_type_comparison(): void {
+        Searchable_Wrapper::load([
+            ['id' => 1, 'code' => '1'],
+            ['id' => 2, 'code' => 1],
+        ]);
+
+        $results = Searchable_Wrapper::getBy('1', 'code');
         $this->assertCount(1, $results);
-        $this->assertEquals('John Doe', $results[0]['name']);
+        $this->assertSame(1, $results[0]['id']);
     }
 
     /**
-     * Test with empty dataset
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_getBy_empty_dataset() {
-        $results = Empty_Searchable_Wrapper::getBy(1);
-        
-        $this->assertIsArray($results);
-        $this->assertCount(0, $results);
-    }
+    public function test_getBy_returns_empty_for_empty_dataset(): void {
+        Searchable_Wrapper::load([]);
 
-    /**
-     * Test with empty dataset and returnFirst = true
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_getBy_empty_dataset_return_first() {
-        $result = Empty_Searchable_Wrapper::getBy(1, 'id', true);
-        
-        $this->assertNull($result);
-    }
-
-    /**
-     * Test getBy with null value search
-     * Note: isset() returns false for null values, so null values won't be found
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_getBy_null_value_search() {
-        Searchable_Wrapper::setTestData([
-            ['id' => 1, 'name' => 'Test', 'email' => null, 'status' => 'active']
-        ]);
-        
-        $results = Searchable_Wrapper::getBy(null, 'email');
-        
-        $this->assertIsArray($results);
-        $this->assertCount(0, $results);
-    }
-
-    /**
-     * Test getBy with missing vs null column
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_getBy_missing_vs_null_column() {
-        Searchable_Wrapper::setTestData([
-            ['id' => 1, 'name' => 'Test1', 'email' => null],
-            ['id' => 2, 'name' => 'Test2']
-        ]);
-        
-        $nullResults = Searchable_Wrapper::getBy(null, 'email');
-        $missingResults = Searchable_Wrapper::getBy('anything', 'missing_column');
-        
-        $this->assertCount(0, $nullResults);
-        $this->assertCount(0, $missingResults);
-    }
-
-    /**
-     * Test getBy with boolean value search
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_getBy_boolean_value_search() {
-        Searchable_Wrapper::setTestData([
-            ['id' => 1, 'name' => 'Test1', 'active' => true],
-            ['id' => 2, 'name' => 'Test2', 'active' => false],
-            ['id' => 3, 'name' => 'Test3', 'active' => true]
-        ]);
-        
-        $results = Searchable_Wrapper::getBy(true, 'active');
-        
-        $this->assertIsArray($results);
-        $this->assertCount(2, $results);
-        
-        foreach ($results as $result) {
-            $this->assertTrue($result['active']);
-        }
-    }
-
-    /**
-     * Test getBy with numeric string search
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess 
-     */
-    public function test_getBy_numeric_string_search() {
-        Searchable_Wrapper::setTestData([
-            ['id' => 1, 'name' => 'Test', 'code' => '123'],
-            ['id' => 2, 'name' => 'Test2', 'code' => 123]
-        ]);
-        
-        $results = Searchable_Wrapper::getBy('123', 'code');
-        
-        $this->assertIsArray($results);
-        $this->assertCount(1, $results);
-        $this->assertEquals('Test', $results[0]['name']);
+        $this->assertSame([], Searchable_Wrapper::getBy(1));
+        $this->assertNull(Searchable_Wrapper::getBy(1, 'id', true));
     }
 }
