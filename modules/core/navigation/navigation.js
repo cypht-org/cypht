@@ -212,7 +212,11 @@ function extractCustomScripts($el) {
 function loadCustomScripts(scripts) {
     for (const script of scripts) {
         const id = $(script).attr('id');
-        $('script#' + id).replaceWith(script);
+        if ($(`script#${id}`).length) {
+            $('script#' + id).replaceWith(script);
+        } else {
+            $('body').append(script);
+        }
     }
 }
 
