@@ -1310,6 +1310,19 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
             $special_folder = 'INBOX';
         }
 
+        /* IMAP STORE -FLAGS (\Junk) when the flag is absent is a no-op; servers normally return OK. */
+        if ($action_type == 'not_junk' && $mailbox->is_imap()) {
+            $flag_result = $mailbox->message_action($folder_name, 'NOT_JUNK', $uids);
+            if (DEBUG_MODE) {
+                Hm_Debug::add(sprintf(
+                    'not_junk: UID STORE -FLAGS (\Junk) folder=%s uids=%s status=%s',
+                    $folder_name,
+                    implode(',', $uids),
+                    !empty($flag_result['status']) ? 'OK' : 'FAILED'
+                ), 'debug');
+            }
+        }
+
         if ($special_folder && $special_folder != $folder_name) {
             if ($this->user_config->get('original_folder_setting', false)) {
                 $special_folder .= '/' . $folder_name;
@@ -1325,7 +1338,11 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 }
             }
         } else {
-            if (!$mailbox->message_action($folder_name, mb_strtoupper($action_type), $uids)['status']) {
+            if ($action_type == 'not_junk') {
+                foreach ($uids as $uid) {
+                    $moved[] = sprintf("imap_%s_%s_%s", $server_details['id'], $uid, $folder);
+                }
+            } elseif (!$mailbox->message_action($folder_name, mb_strtoupper($action_type), $uids)['status']) {
                 $error = true;
             } else {
                 foreach ($uids as $uid) {
