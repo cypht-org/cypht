@@ -1802,7 +1802,6 @@ class Hm_Handler_save_custom_action extends Hm_Handler_Module {
 }
 
 /**
- * Dummy handler — replace with real IMAP logic later.
  * @subpackage sievefilters/handler
  */
 class Hm_Handler_apply_custom_action extends Hm_Handler_Module {
@@ -1817,9 +1816,115 @@ class Hm_Handler_apply_custom_action extends Hm_Handler_Module {
             $this->out('custom_action_error', 'No messages selected');
             return;
         }
-        // TODO: implement real IMAP operations
+        $actions = json_decode($form['actions_json'], true);
+        if (empty($actions)) {
+            $this->out('custom_action_error', 'No actions defined');
+            return;
+        }
+
+        // Parse UIDs: format is imap_{server_id}_{uid}_{hex_folder}
+        $grouped = [];
+        foreach ($uids as $uid_str) {
+            $parts = explode('_', $uid_str);
+            if (count($parts) === 4 && $parts[0] === 'imap') {
+                $grouped[$parts[1]][$parts[3]][] = $parts[2];
+            }
+        }
+        if (empty($grouped)) {
+            $this->out('custom_action_error', 'Could not parse message IDs');
+            return;
+        }
+
+        $errors = [];
+        foreach ($grouped as $server_id => $folders) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
+            if (!$mailbox || !$mailbox->authed()) {
+                $errors[] = "Could not connect to server";
+                continue;
+            }
+            foreach ($folders as $hex_folder => $msg_uids) {
+                $folder = hex2bin($hex_folder);
+                foreach ($actions as $action) {
+                    $action_name = strtolower($action['action'] ?? '');
+                    $value       = trim($action['value'] ?? '');
+                    switch ($action_name) {
+                        case 'keep':
+                            break;
+                        case 'discard':
+                            $res = $mailbox->message_action($folder, 'DELETE', $msg_uids);
+                            if ($res['status']) {
+                                $mailbox->message_action($folder, 'EXPUNGE', $msg_uids);
+                            }
+                            break;
+                        case 'move':
+                            if ($value) {
+                                $mailbox->message_action($folder, 'MOVE', $msg_uids, $value);
+                            }
+                            break;
+                        case 'copy':
+                            if ($value) {
+                                $mailbox->message_action($folder, 'COPY', $msg_uids, $value);
+                            }
+                            break;
+                        case 'flag':
+                        case 'addflag':
+                            $flag_key = strtolower($value);
+                            if ($flag_key === 'draft') {
+                                // \Draft is a system flag; use CUSTOM to add it
+                                $mailbox->message_action($folder, 'CUSTOM', $msg_uids, null, '\Draft');
+                            } elseif ($flag_key !== 'recent') {
+                                // \Recent cannot be set by IMAP clients — skip
+                                $cmd = $this->flag_value_to_cmd($value, true);
+                                if ($cmd) {
+                                    $mailbox->message_action($folder, $cmd, $msg_uids);
+                                }
+                            }
+                            break;
+                        case 'removeflag':
+                            $flag_key = strtolower($value);
+                            // \Draft and \Recent cannot be removed via standard message_action — skip
+                            if ($flag_key !== 'draft' && $flag_key !== 'recent') {
+                                $cmd = $this->flag_value_to_cmd($value, false);
+                                if ($cmd) {
+                                    $mailbox->message_action($folder, $cmd, $msg_uids);
+                                }
+                            }
+                            break;
+                        case 'redirect':
+                        case 'forward':
+                        case 'reject':
+                        case 'autoreply':
+                            // These are delivery-time sieve actions and cannot be
+                            // applied to already-delivered messages via IMAP — skip.
+                            break;
+                    }
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            $this->out('custom_action_error', implode('; ', $errors));
+            return;
+        }
         $this->out('apply_success', true);
         $this->out('apply_count', count($uids));
+    }
+
+    private function flag_value_to_cmd($flag, $add) {
+        $add_map = [
+            'seen'     => 'READ',
+            'flagged'  => 'FLAG',
+            'answered' => 'ANSWERED',
+            'deleted'  => 'DELETE',
+        ];
+        $remove_map = [
+            'seen'     => 'UNREAD',
+            'flagged'  => 'UNFLAG',
+            'answered' => 'UNREAD',   // no UNANSWERED in message_action; best-effort
+            'deleted'  => 'UNDELETE',
+        ];
+        $key = strtolower($flag);
+        return $add ? ($add_map[$key] ?? null) : ($remove_map[$key] ?? null);
     }
 }
 
