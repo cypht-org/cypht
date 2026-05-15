@@ -80,7 +80,8 @@ var get_inline_msg_details = function(link) {
     var pair;
     var uid = false;
     var list_path = false;
-    var pairs = $(link).attr('href').split('&');
+    var src = $(link).data('src') || $(link).attr('href');
+    var pairs = src.split('&');
     for (index in pairs) {
         pair = pairs[index].split('=');
         if (pair[0] == 'uid') {
@@ -160,13 +161,13 @@ var capture_subject_click = function() {
             }
             return false;
         }
-        return true;
+        return false;
     });
 };
 
 function inlineMessageMessageListAndSearchPageHandler(routeParams) {
     if (window.inline_msg && inline_msg()) {
-        setTimeout(capture_subject_click, 100);
+        capture_subject_click();
         $('tr').removeClass('hl');
         Hm_Ajax.add_callback_hook('*', capture_subject_click);
         Hm_Ajax.add_callback_hook('ajax_imap_delete_message', msg_inline_close);
