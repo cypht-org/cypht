@@ -28,6 +28,8 @@ add_handler('ajax_save_custom_action', 'save_custom_action', true, 'sievefilters
 add_output('ajax_save_custom_action', 'save_custom_action', true, 'sievefilters');
 
 setup_base_ajax_page('ajax_apply_custom_action', 'core');
+add_handler('ajax_apply_custom_action', 'load_imap_servers_from_config', true, 'imap');
+add_handler('ajax_apply_custom_action', 'imap_oauth2_token_check', true, 'imap');
 add_handler('ajax_apply_custom_action', 'apply_custom_action', true, 'sievefilters');
 add_output('ajax_apply_custom_action', 'apply_custom_action', true, 'sievefilters');
 
