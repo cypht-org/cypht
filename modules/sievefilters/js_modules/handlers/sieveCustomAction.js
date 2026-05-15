@@ -7,7 +7,7 @@ function handleSieveCustomAction() {
     custom_action_modal.setTitle(hm_trans('Setup Custom Action from selected messages'));
 
     custom_action_modal.addFooterBtn(
-        hm_trans('Build Custom Action'),
+        hm_trans('Save Custom Action'),
         'btn-primary ms-auto',
         async function () {
             // createCustomActionFromList(custom_action_modal);
@@ -35,7 +35,11 @@ function handleSieveCustomAction() {
             });
         });
         console.log("selected from custom action:", selected);
-        custom_action_modal.setContent(sieveCustomActionMarkup(mailbox));
+
+        const templateEl = document.querySelector('#custom_action_template');
+        if (templateEl) {
+            custom_action_modal.setContent(templateEl.innerHTML);
+        }
         custom_action_modal.open();
     });
 }

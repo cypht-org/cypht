@@ -22,6 +22,7 @@ add_handler('message_list', 'load_mailbox_name', true, 'sievefilters', 'load_use
 add_handler('message_list', 'load_automatic_actions', true, 'sievefilters', 'load_mailbox_name', 'after');
 add_output('sieve_filters', 'sievefilters_modal_content_start', true, 'sievefilters', 'version_upgrade_checker', 'after');
 add_output('message_list', 'sievefilters_modal_content_start', true, 'sievefilters', 'message_list_end', 'after');
+add_output('message_list', 'custom_action_modal_content', true, 'sievefilters', 'sievefilters_modal_content_start', 'after');
 add_output('message_list', 'message_list_automatic_actions', true, 'sievefilters', 'imap_custom_controls', 'after');
 add_output('message_list', 'message_list_custom_actions', true, 'sievefilters', 'imap_custom_controls', 'after');
 add_output('sieve_filters', 'sievefilters_title_start', true, 'sievefilters', 'content_section_start', 'after');
