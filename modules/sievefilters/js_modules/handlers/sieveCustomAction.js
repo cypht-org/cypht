@@ -8,10 +8,20 @@ function handleSieveCustomAction() {
 
     custom_action_modal.addFooterBtn(
         hm_trans('Save Custom Action'),
-        'btn-primary ms-auto',
-        async function () {
-            // createCustomActionFromList(custom_action_modal);
-            custom_action_modal.hide();
+        'btn-secondary ms-auto',
+        function () {
+            createCustomActionFromList(custom_action_modal, { applyAfterSave: false });
+        },
+    );
+
+    custom_action_modal.addFooterBtn(
+        hm_trans('Save & Apply to Selected'),
+        'btn-primary save_and_apply_btn',
+        function () {
+            createCustomActionFromList(custom_action_modal, {
+                applyAfterSave: true,
+                imapAccount: custom_action_modal._imapAccount || '',
+            });
         },
     );
 
@@ -20,6 +30,7 @@ function handleSieveCustomAction() {
 
         const mailbox = $(this).attr('account');
         current_mailbox_for_filter = mailbox;
+        custom_action_modal._imapAccount = mailbox;
 
         const selected = [];
 
@@ -35,6 +46,15 @@ function handleSieveCustomAction() {
             });
         });
         console.log("selected from custom action:", selected);
+
+        // Update apply button label with selected count
+        const count = selected.length;
+        const $applyBtn = custom_action_modal.modalFooter.find('.save_and_apply_btn');
+        $applyBtn.text(count > 0
+            ? hm_trans('Save & Apply to') + ' ' + count + ' ' + hm_trans('Selected')
+            : hm_trans('Save & Apply to Selected')
+        );
+        $applyBtn.prop('disabled', count === 0);
 
         const templateEl = document.querySelector('#custom_action_template');
         if (templateEl) {

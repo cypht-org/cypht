@@ -10,8 +10,7 @@ function handleSieveAutomaticAction() {
         hm_trans('Build Filter'),
         'btn-primary ms-auto',
         async function () {
-            createFilterFromList(automatic_action_modal);
-            automatic_action_modal.hide();
+            await createFilterFromList(automatic_action_modal);
         },
     );
 
