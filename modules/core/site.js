@@ -139,6 +139,17 @@ var Hm_Ajax = {
 
     add_callback_hook: function(request_name, hook_function) {
         Hm_Ajax.callback_hooks.push([request_name, hook_function]);
+    },
+
+    has_success: function(res) {
+        if (res.router_user_msgs) {
+            for (var key in res.router_user_msgs) {
+                if (res.router_user_msgs[key].type === 'success') {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 };
 
@@ -448,6 +459,13 @@ Hm_Modal.prototype = {
 
     setTitle: function(title) {
         this.modalTitle.html(title);
+    }
+};
+
+Hm_Modal.hide = function(modalId) {
+    var modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+    if (modal) {
+        modal.hide();
     }
 };
 
@@ -1788,6 +1806,12 @@ var Hm_Utils = {
         window.location.href = autoAppendParamsForNavigation(path);
     },
 
+    remove_url_params: function(params) {
+        var currentUrl = new URL(window.location.href);
+        params.forEach(function(param) { currentUrl.searchParams.delete(param); });
+        history.replaceState(history.state, '', currentUrl.toString());
+    },
+
     is_valid_email: function (val) {
         var email = val.trim();
         if (!email || email.length > 320) { // RFC 5321: max 320 chars
@@ -1931,6 +1955,54 @@ var Hm_Utils = {
         }
 
         return true;
+    },
+
+    is_valid_name: function(val, minLength, maxLength) {
+        minLength = minLength || 2;
+        maxLength = maxLength || 100;
+        
+        if (!val) {
+            return false;
+        }
+        
+        var name = val.trim();
+        if (name.length < minLength || name.length > maxLength) {
+            return false;
+        }
+        
+        // Allow letters (including accented), digits, spaces, hyphens, and apostrophes
+        return /^[A-Za-zÀ-ÖØ-öø-ÿ0-9'\- ]+$/.test(name);
+    },
+
+    is_valid_phone: function(val) {
+        if (!val) {
+            return false;
+        }
+        
+        var phone = val.trim();
+        if (phone.length < 7 || phone.length > 20) {
+            return false;
+        }
+        
+        // Allow optional +, digits, spaces, hyphens, dots, and parentheses
+        return /^\+?[\d\s\-().]+$/.test(phone);
+    },
+
+    is_valid_url: function(val) {
+        if (!val) {
+            return false;
+        }
+        
+        var url = val.trim();
+        
+        // Must start with http:// or https://
+        if (!/^https?:\/\//i.test(url)) {
+            return false;
+        }
+        
+        // Must have at least one dot after the protocol
+        var withoutProtocol = url.replace(/^https?:\/\//i, '');
+        return withoutProtocol.includes('.') && withoutProtocol.length > 3;
     },
 };
 
