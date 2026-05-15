@@ -226,5 +226,6 @@ return array(
         'is_screened' => FILTER_VALIDATE_BOOL,
         'custom_action_name' => FILTER_UNSAFE_RAW,
         'uids' => FILTER_UNSAFE_RAW,
+        'action_id' => FILTER_UNSAFE_RAW,
     )
 );
