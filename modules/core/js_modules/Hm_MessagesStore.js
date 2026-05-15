@@ -87,7 +87,7 @@ class Hm_MessagesStore {
                 this.pages = parseInt(pages);
                 this.newMessages = this.getNewMessages(updatedMessages);
 
-                if (typeof do_not_flag_as_read_on_open == 'booelan') {
+                if (typeof do_not_flag_as_read_on_open == 'boolean') {
                     this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
                 }
 
