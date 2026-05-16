@@ -1943,6 +1943,44 @@ if (!class_exists('Hm_IMAP')) {
             return $parsed;
         }
 
+        /**
+         * PERMANENTFLAGS from the currently selected mailbox (SELECT response).
+         *
+         * @return array|false list of flag/keyword atoms, or false if unknown
+         */
+        public function get_selected_permanentflags() {
+            if (!is_array($this->selected_mailbox) || !isset($this->selected_mailbox['detail']['permanentflags'])) {
+                return false;
+            }
+            $pflags = $this->selected_mailbox['detail']['permanentflags'];
+            return is_array($pflags) ? $pflags : false;
+        }
+
+        /**
+         * Whether the selected mailbox allows storing a permanent keyword (RFC 3501).
+         *
+         * @param string $keyword IMAP keyword, e.g. $NotJunk
+         * @return bool
+         */
+        public function supports_permanent_keyword($keyword) {
+            if ($this->read_only || !$keyword) {
+                return false;
+            }
+            $pflags = $this->get_selected_permanentflags();
+            if ($pflags === false) {
+                return false;
+            }
+            foreach ($pflags as $flag) {
+                if ($flag === '\*' || $flag === '*') {
+                    return true;
+                }
+                if (strcasecmp($flag, $keyword) === 0) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /* TEMP: junk flag investigation — remove when done */
         private function debug_log_uid_flags($uid_string, $context) {
             if (!DEBUG_MODE) {
@@ -2052,10 +2090,13 @@ if (!class_exists('Hm_IMAP')) {
                         $command = "UID STORE $uid_string -FLAGS (\Deleted)\r\n";
                         break;
                     case 'CUSTOM':
-                        /* TODO: check permanentflags of the selected mailbox to
-                         * make sure custom keywords are supported */
-                        if ($keyword && $this->is_clean($keyword, 'mailbox')) {
+                        if ($keyword && $this->is_clean($keyword, 'mailbox') && $this->supports_permanent_keyword($keyword)) {
                             $command = "UID STORE $uid_string +FLAGS ($keyword)\r\n";
+                        }
+                        break;
+                    case 'REMOVE_KEYWORD':
+                        if ($keyword && $this->is_clean($keyword, 'mailbox')) {
+                            $command = "UID STORE $uid_string -FLAGS ($keyword)\r\n";
                         }
                         break;
                     case 'EXPUNGE':
@@ -2107,8 +2148,11 @@ if (!class_exists('Hm_IMAP')) {
                     $this->send_command($command);
                     $res = $this->get_response();
                     $status = $this->check_response($res);
-                    if (DEBUG_MODE && in_array($action, array('JUNK', 'NOT_JUNK'), true)) {
+                    if (DEBUG_MODE && in_array($action, array('JUNK', 'NOT_JUNK', 'REMOVE_KEYWORD'), true)) {
                         $this->debug_log_uid_flags($uid_string, 'after '.$action.' STORE');
+                    }
+                    if (DEBUG_MODE && $action === 'CUSTOM' && $keyword === '$NotJunk') {
+                        $this->debug_log_uid_flags($uid_string, 'after CUSTOM +FLAGS ($NotJunk)');
                     }
                 }
                 if ($status) {
