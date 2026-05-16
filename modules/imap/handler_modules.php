@@ -1312,6 +1312,15 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
 
         /* IMAP STORE -FLAGS (\Junk) when the flag is absent is a no-op; servers normally return OK. */
         if ($action_type == 'not_junk' && $mailbox->is_imap()) {
+            if (DEBUG_MODE) {
+                $pflags = $mailbox->get_permanentflags();
+                Hm_Debug::add(sprintf(
+                    'not_junk: PERMANENTFLAGS folder=%s flags=%s supports_NotJunk=%s',
+                    $folder_name,
+                    is_array($pflags) ? implode(' ', $pflags) : '(unknown)',
+                    $mailbox->supports_permanent_keyword('$NotJunk') ? 'yes' : 'no'
+                ), 'debug');
+            }
             $flag_result = $mailbox->message_action($folder_name, 'NOT_JUNK', $uids);
             if (DEBUG_MODE) {
                 Hm_Debug::add(sprintf(
@@ -1319,6 +1328,26 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                     $folder_name,
                     implode(',', $uids),
                     !empty($flag_result['status']) ? 'OK' : 'FAILED'
+                ), 'debug');
+            }
+            if ($mailbox->supports_permanent_keyword('$NotJunk')) {
+                if ($mailbox->supports_permanent_keyword('$Junk')) {
+                    $mailbox->message_action($folder_name, 'REMOVE_KEYWORD', $uids, false, '$Junk');
+                }
+                $notjunk_kw_result = $mailbox->message_action($folder_name, 'CUSTOM', $uids, false, '$NotJunk');
+                if (DEBUG_MODE) {
+                    Hm_Debug::add(sprintf(
+                        'not_junk: UID STORE +FLAGS ($NotJunk) folder=%s uids=%s status=%s',
+                        $folder_name,
+                        implode(',', $uids),
+                        !empty($notjunk_kw_result['status']) ? 'OK' : 'FAILED'
+                    ), 'debug');
+                }
+            }
+            elseif (DEBUG_MODE) {
+                Hm_Debug::add(sprintf(
+                    'not_junk: skip UID STORE +FLAGS ($NotJunk) folder=%s (not in PERMANENTFLAGS)',
+                    $folder_name
                 ), 'debug');
             }
         }
