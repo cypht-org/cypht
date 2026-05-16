@@ -6,7 +6,7 @@ class Hm_Test_Mock_Mailbox_NotJunk {
     /** @var array<int, array{0: string, 1: string, 2: array, 3: string|false}> */
     public $moves = array();
 
-    /** @var array<int, array{0: string, 1: string, 2: array}> */
+    /** @var array<int, array{0: string, 1: string, 2: array, 3: mixed, 4: mixed}> */
     public $not_junk_flags = array();
 
     /** @var bool */
@@ -15,14 +15,41 @@ class Hm_Test_Mock_Mailbox_NotJunk {
     /** @var bool */
     public $not_junk_succeeds = true;
 
+    /** @var bool */
+    public $supports_notjunk_keyword = false;
+
+    /** @var bool */
+    public $supports_junk_keyword = false;
+
+    /** @var array|false */
+    public $permanentflags = false;
+
     public function is_imap() {
         return $this->imap;
     }
 
-    public function message_action($folder, $action, $uids, $dest = false) {
+    public function get_permanentflags() {
+        return $this->permanentflags;
+    }
+
+    public function supports_permanent_keyword($keyword) {
+        if ($keyword === '$NotJunk') {
+            return $this->supports_notjunk_keyword;
+        }
+        if ($keyword === '$Junk') {
+            return $this->supports_junk_keyword;
+        }
+        return false;
+    }
+
+    public function message_action($folder, $action, $uids, $dest = false, $keyword = false) {
         if ($action === 'NOT_JUNK') {
-            $this->not_junk_flags[] = array($folder, $action, $uids);
+            $this->not_junk_flags[] = array($folder, $action, $uids, $dest, $keyword);
             return array('status' => $this->not_junk_succeeds, 'responses' => array());
+        }
+        if ($action === 'REMOVE_KEYWORD' || $action === 'CUSTOM') {
+            $this->not_junk_flags[] = array($folder, $action, $uids, $dest, $keyword);
+            return array('status' => true, 'responses' => array());
         }
         if ($action === 'MOVE') {
             $this->moves[] = array($folder, $action, $uids, $dest);
@@ -159,6 +186,8 @@ class HandlerImapNotJunkTest extends TestCase {
         $pm->invoke($handler, $mb, 'not_junk', array('9'), $junk_hex, array(), $server_details);
         $this->assertNotEmpty($mb->not_junk_flags);
         $this->assertNotEmpty($mb->moves);
+        $this->assertSame('NOT_JUNK', $mb->not_junk_flags[0][1]);
+        $this->assertSame('MOVE', $mb->moves[0][1]);
     }
 
     /**
@@ -180,6 +209,55 @@ class HandlerImapNotJunkTest extends TestCase {
         $result = $pm->invoke($handler, $mb, 'not_junk', array('3'), $junk_hex, array(), $server_details);
         $this->assertFalse($result['error']);
         $this->assertCount(1, $mb->not_junk_flags);
+        $this->assertCount(1, $mb->moves);
+    }
+
+    /**
+     * Step B: +FLAGS ($NotJunk) when PERMANENTFLAGS allows it, before MOVE.
+     *
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_perform_action_not_junk_sets_notjunk_keyword_when_supported() {
+        $parent = build_parent_mock();
+        $parent->user_config->set('original_folder_setting', false);
+        $handler = new Hm_Handler_imap_message_action($parent, 'home');
+        $pm = new ReflectionMethod($handler, 'perform_action');
+        $pm->setAccessible(true);
+        $mb = new Hm_Test_Mock_Mailbox_NotJunk();
+        $mb->supports_notjunk_keyword = true;
+        $mb->supports_junk_keyword = true;
+        $junk_hex = bin2hex('Spam');
+        $server_details = array('id' => 'srv', 'name' => 'Test');
+        $result = $pm->invoke($handler, $mb, 'not_junk', array('11'), $junk_hex, array(), $server_details);
+        $this->assertFalse($result['error']);
+        $actions = array_column($mb->not_junk_flags, 1);
+        $this->assertSame(array('NOT_JUNK', 'REMOVE_KEYWORD', 'CUSTOM'), $actions);
+        $this->assertSame('$Junk', $mb->not_junk_flags[1][4]);
+        $this->assertSame('$NotJunk', $mb->not_junk_flags[2][4]);
+        $this->assertCount(1, $mb->moves);
+    }
+
+    /**
+     * Step B skipped when $NotJunk not in PERMANENTFLAGS.
+     *
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_perform_action_not_junk_skips_notjunk_keyword_when_unsupported() {
+        $parent = build_parent_mock();
+        $parent->user_config->set('original_folder_setting', false);
+        $handler = new Hm_Handler_imap_message_action($parent, 'home');
+        $pm = new ReflectionMethod($handler, 'perform_action');
+        $pm->setAccessible(true);
+        $mb = new Hm_Test_Mock_Mailbox_NotJunk();
+        $mb->supports_notjunk_keyword = false;
+        $junk_hex = bin2hex('Spam');
+        $server_details = array('id' => 'srv', 'name' => 'Test');
+        $result = $pm->invoke($handler, $mb, 'not_junk', array('12'), $junk_hex, array(), $server_details);
+        $this->assertFalse($result['error']);
+        $this->assertCount(1, $mb->not_junk_flags);
+        $this->assertSame('NOT_JUNK', $mb->not_junk_flags[0][1]);
         $this->assertCount(1, $mb->moves);
     }
 
