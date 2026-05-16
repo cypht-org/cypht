@@ -1266,10 +1266,6 @@ var Hm_Folders = {
         }
     },
 
-    /**
-     * Sum configured junk folder unseen counts (Hm_Folders.unread_counts keys) for the main nav badge.
-     * Uses hm_special_folders() (same source as special folder assignments); no extra IMAP calls.
-     */
     update_junk_nav_unread_badge: function() {
         if (typeof hm_special_folders !== 'function' || !$('.junk_unread_count').length) {
             return;

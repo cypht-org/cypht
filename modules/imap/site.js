@@ -1191,8 +1191,6 @@ var imap_folder_status = function() {
 
 /**
  * Request STATUS (unseen) for each configured junk mailbox via ajax_imap_folder_status,
- * same mechanism as get_imap_folder_status for arbitrary folders. Populates Hm_Folders.unread_counts
- * through the standard Hm_Ajax folder_status merge (no duplicate counting logic).
  */
 var refresh_junk_folder_status_from_special_folders = function() {
     if (typeof hm_is_logged === 'function' && !hm_is_logged()) {
