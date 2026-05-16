@@ -1904,45 +1904,6 @@ if (!class_exists('Hm_IMAP')) {
             }
         }
 
-        /* TEMP: junk flag investigation — remove when done */
-        private function debug_has_junk_flag($flags) {
-            return (bool) preg_match('/\\\\Junk\b/i', $flags);
-        }
-
-        /* TEMP: junk flag investigation — remove when done */
-        private function debug_parse_fetch_flags($res) {
-            $parsed = array();
-            if (!is_array($res)) {
-                return $parsed;
-            }
-            foreach ($res as $vals) {
-                if (!isset($vals[0]) || $vals[0] != '*') {
-                    continue;
-                }
-                $uid = 0;
-                $flags = '';
-                $count = count($vals);
-                for ($i = 0; $i < $count; $i++) {
-                    if (isset($vals[$i]) && mb_strtoupper($vals[$i]) == 'UID' && isset($vals[$i + 1])) {
-                        $uid = (int) $vals[$i + 1];
-                        $i++;
-                    }
-                    elseif (isset($vals[$i]) && mb_strtoupper($vals[$i]) == 'FLAGS' && isset($vals[$i + 1]) && $vals[$i + 1] == '(') {
-                        $n = 2;
-                        while (isset($vals[$i + $n]) && $vals[$i + $n] != ')') {
-                            $flags .= ($flags === '' ? '' : ' ') . $vals[$i + $n];
-                            $n++;
-                        }
-                        $i += $n;
-                    }
-                }
-                if ($uid) {
-                    $parsed[$uid] = array('flags' => $flags, 'raw' => json_encode($vals));
-                }
-            }
-            return $parsed;
-        }
-
         /**
          * PERMANENTFLAGS from the currently selected mailbox (SELECT response).
          *
@@ -1979,45 +1940,6 @@ if (!class_exists('Hm_IMAP')) {
                 }
             }
             return false;
-        }
-
-        /* TEMP: junk flag investigation — remove when done */
-        private function debug_log_uid_flags($uid_string, $context) {
-            if (!DEBUG_MODE) {
-                return;
-            }
-            if (!$uid_string || !$this->is_clean($uid_string, 'uid_list')) {
-                Hm_Debug::add(sprintf('junk_flags: %s fetch_skipped invalid_uid_list', $context), 'debug');
-                return;
-            }
-            $command = "UID FETCH $uid_string (FLAGS)\r\n";
-            $this->send_command($command);
-            $res = $this->get_response(false, true);
-            $fetch_ok = $this->check_response($res, true);
-            $raw = is_array($res) ? mb_substr(json_encode($res), 0, 500) : mb_substr((string) $res, 0, 500);
-            $parsed = $this->debug_parse_fetch_flags($res);
-            if (empty($parsed)) {
-                Hm_Debug::add(sprintf(
-                    'junk_flags: %s uids=%s flags= fetch_ok=%s has_Junk=no raw=%s',
-                    $context,
-                    $uid_string,
-                    $fetch_ok ? 'yes' : 'no',
-                    $raw
-                ), 'debug');
-                return;
-            }
-            foreach ($parsed as $uid => $data) {
-                $flags = $data['flags'];
-                Hm_Debug::add(sprintf(
-                    'junk_flags: %s uid=%d flags=%s has_Junk=%s fetch_ok=%s raw=%s',
-                    $context,
-                    $uid,
-                    $flags === '' ? '(empty)' : $flags,
-                    $this->debug_has_junk_flag($flags) ? 'yes' : 'no',
-                    $fetch_ok ? 'yes' : 'no',
-                    mb_substr($data['raw'], 0, 500)
-                ), 'debug');
-            }
         }
 
         /**
@@ -2140,20 +2062,10 @@ if (!class_exists('Hm_IMAP')) {
                         }
                         break;
                 }
-                if (DEBUG_MODE && $action === 'MOVE' && $move_dest && $command) {
-                    $src = is_array($this->selected_mailbox) ? ($this->selected_mailbox['name'] ?? 'unknown') : 'unknown';
-                    $this->debug_log_uid_flags($uid_string, 'before MOVE from '.$src);
-                }
                 if ($command) {
                     $this->send_command($command);
                     $res = $this->get_response();
                     $status = $this->check_response($res);
-                    if (DEBUG_MODE && in_array($action, array('JUNK', 'NOT_JUNK', 'REMOVE_KEYWORD'), true)) {
-                        $this->debug_log_uid_flags($uid_string, 'after '.$action.' STORE');
-                    }
-                    if (DEBUG_MODE && $action === 'CUSTOM' && $keyword === '$NotJunk') {
-                        $this->debug_log_uid_flags($uid_string, 'after CUSTOM +FLAGS ($NotJunk)');
-                    }
                 }
                 if ($status) {
                     $parseResponseFn($res);
@@ -2162,18 +2074,6 @@ if (!class_exists('Hm_IMAP')) {
                     }
                     if ($mailbox) {
                         $this->bust_cache($mailbox);
-                    }
-                    if (DEBUG_MODE && $action === 'MOVE' && $move_dest && !empty($responses)) {
-                        $prev_mailbox = is_array($this->selected_mailbox) ? ($this->selected_mailbox['name'] ?? false) : false;
-                        $this->select_mailbox($move_dest);
-                        $new_uids = array_column($responses, 'newUid');
-                        $new_uid_string = implode(',', $new_uids);
-                        if ($new_uid_string) {
-                            $this->debug_log_uid_flags($new_uid_string, 'after MOVE to '.$move_dest);
-                        }
-                        if ($prev_mailbox) {
-                            $this->select_mailbox($prev_mailbox);
-                        }
                     }
                 }
             }

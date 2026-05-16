@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-class Hm_Test_Mock_Mailbox_NotJunk {
+class Hm_Test_Mock_Mailbox_Not_Junk {
     /** @var array<int, array{0: string, 1: string, 2: array, 3: string|false}> */
     public $moves = array();
 
@@ -68,9 +68,9 @@ class Hm_Test_Mock_Mailbox_NotJunk {
 }
 
 /**
- * Backend tests for not_junk / inbox resolution on Hm_Handler_imap_message_action
+ * Tests for not_junk on Hm_Handler_imap_message_action
  */
-class HandlerImapNotJunkTest extends TestCase {
+class Hm_Test_Imap_Message_Action_Not_Junk extends TestCase {
 
     public function setUp(): void {
         require_once APP_PATH.'tests/phpunit/helpers.php';
@@ -130,7 +130,7 @@ class HandlerImapNotJunkTest extends TestCase {
         $handler = new Hm_Handler_imap_message_action($parent, 'home');
         $pm = new ReflectionMethod($handler, 'perform_action');
         $pm->setAccessible(true);
-        $mb = new Hm_Test_Mock_Mailbox_NotJunk();
+        $mb = new Hm_Test_Mock_Mailbox_Not_Junk();
         $junk_hex = bin2hex('Spam');
         $uids = array('42');
         $specials = array();
@@ -158,7 +158,7 @@ class HandlerImapNotJunkTest extends TestCase {
         $handler = new Hm_Handler_imap_message_action($parent, 'home');
         $pm = new ReflectionMethod($handler, 'perform_action');
         $pm->setAccessible(true);
-        $mb = new Hm_Test_Mock_Mailbox_NotJunk();
+        $mb = new Hm_Test_Mock_Mailbox_Not_Junk();
         $junk_hex = bin2hex('Spam');
         $specials = array('inbox' => 'Bulk');
         $server_details = array('id' => 'srv', 'name' => 'Test');
@@ -180,7 +180,7 @@ class HandlerImapNotJunkTest extends TestCase {
         $handler = new Hm_Handler_imap_message_action($parent, 'home');
         $pm = new ReflectionMethod($handler, 'perform_action');
         $pm->setAccessible(true);
-        $mb = new Hm_Test_Mock_Mailbox_NotJunk();
+        $mb = new Hm_Test_Mock_Mailbox_Not_Junk();
         $junk_hex = bin2hex('Spam');
         $server_details = array('id' => 'srv', 'name' => 'Test');
         $pm->invoke($handler, $mb, 'not_junk', array('9'), $junk_hex, array(), $server_details);
@@ -202,7 +202,7 @@ class HandlerImapNotJunkTest extends TestCase {
         $handler = new Hm_Handler_imap_message_action($parent, 'home');
         $pm = new ReflectionMethod($handler, 'perform_action');
         $pm->setAccessible(true);
-        $mb = new Hm_Test_Mock_Mailbox_NotJunk();
+        $mb = new Hm_Test_Mock_Mailbox_Not_Junk();
         $mb->not_junk_succeeds = false;
         $junk_hex = bin2hex('Spam');
         $server_details = array('id' => 'srv', 'name' => 'Test');
@@ -224,7 +224,7 @@ class HandlerImapNotJunkTest extends TestCase {
         $handler = new Hm_Handler_imap_message_action($parent, 'home');
         $pm = new ReflectionMethod($handler, 'perform_action');
         $pm->setAccessible(true);
-        $mb = new Hm_Test_Mock_Mailbox_NotJunk();
+        $mb = new Hm_Test_Mock_Mailbox_Not_Junk();
         $mb->supports_notjunk_keyword = true;
         $mb->supports_junk_keyword = true;
         $junk_hex = bin2hex('Spam');
@@ -250,7 +250,7 @@ class HandlerImapNotJunkTest extends TestCase {
         $handler = new Hm_Handler_imap_message_action($parent, 'home');
         $pm = new ReflectionMethod($handler, 'perform_action');
         $pm->setAccessible(true);
-        $mb = new Hm_Test_Mock_Mailbox_NotJunk();
+        $mb = new Hm_Test_Mock_Mailbox_Not_Junk();
         $mb->supports_notjunk_keyword = false;
         $junk_hex = bin2hex('Spam');
         $server_details = array('id' => 'srv', 'name' => 'Test');
@@ -273,7 +273,7 @@ class HandlerImapNotJunkTest extends TestCase {
         $handler = new Hm_Handler_imap_message_action($parent, 'home');
         $pm = new ReflectionMethod($handler, 'perform_action');
         $pm->setAccessible(true);
-        $mb = new Hm_Test_Mock_Mailbox_NotJunk();
+        $mb = new Hm_Test_Mock_Mailbox_Not_Junk();
         $mb->imap = false;
         $junk_hex = bin2hex('Spam');
         $server_details = array('id' => 'srv', 'name' => 'Test');
