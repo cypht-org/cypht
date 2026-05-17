@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Ini_Set extends TestCase {
 
     public function setUp(): void {
-        require __DIR__.'/../bootstrap.php';
+        require_once __DIR__.'/../bootstrap.php';
     }
 
     /**
