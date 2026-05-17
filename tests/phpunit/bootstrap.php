@@ -30,8 +30,11 @@ if (!defined('CACHE_ID')) {
 /* load composer autoloader */
 require_once APP_PATH.'vendor/autoload.php';
 
+/* get mock objects */
+require_once APP_PATH.'tests/phpunit/mocks.php';
+
 /* get the framework */
-require APP_PATH.'lib/framework.php';
+require_once APP_PATH.'lib/framework.php';
 
 /* debug mode has to be set to something or include files will die() */
 if (!defined('DEBUG_MODE')) {
@@ -40,8 +43,6 @@ if (!defined('DEBUG_MODE')) {
     define('DEBUG_MODE', $debug_mode);
 }
 
-/* get mock objects */
-require APP_PATH.'tests/phpunit/mocks.php';
 /* get the stubs */
 require APP_PATH.'tests/phpunit/stubs.php';
 
