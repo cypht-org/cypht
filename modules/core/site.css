@@ -1835,7 +1835,11 @@ pre.msg_source {
   .mobile .terms_section .d-flex { display: inline-block !important; }
   .mobile .terms_section .adv_terms { display: inline-block; }
   .mobile .terms_section .adv_term_nots input { margin-top: 10px; }
-  .mobile .source_section .adv_folder_list .folders > li > .d-flex { display: inline-block !important; }
+  .mobile .source_section .adv_folder_list .folders > li > .wrapper {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+  }
   .mobile .targets_section .adv_targets .form-check-label { display: inline; }
   .mobile .time_section .adv_times { display: inline-block !important; }
   .mobile .time_section .new_time { display: block; }

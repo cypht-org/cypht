@@ -9,4 +9,38 @@
 .adv_search_link { margin-left: 20px; }
 .adv_terms { margin-left: 10px; }
 
+.advanced_search_form .adv_folder_list .wrapper {
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.advanced_search_form .adv_folder_list .adv_folder_link {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: min(240px, 40vw);
+}
+.advanced_search_form .adv_folder_list .wrapper > .unread_count {
+  flex-shrink: 0;
+}
+.advanced_search_form .adv_folder_list .wrapper > .d-flex.gap-3 {
+  flex-shrink: 0;
+}
+.advanced_search_form .adv_folder_list .inner_list .wrapper > a {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: min(220px, 38vw);
+}
+
 .mobile .search_result_title { position: relative !important; z-index: 99 !important;}
+.mobile .advanced_search_form .adv_folder_list .adv_folder_link {
+  max-width: min(180px, 50vw);
+}
+.mobile .advanced_search_form .adv_folder_list .inner_list .wrapper > a {
+  max-width: min(160px, 45vw);
+}
