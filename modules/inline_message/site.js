@@ -95,16 +95,15 @@ var get_inline_msg_details = function(link) {
 };
 
 var msg_inline_close = function() {
-    if ($('.inline_msg').length) {
-        if (inline_msg_style() == 'right') {
-            $('.refresh_link').trigger('click');
-            $('.msg_text').remove();
-            $('.message_table').css('width', '100%');
-        } else {
+    if (inline_msg_style() == 'right' && $('.msg_text').length) {
+        $('.refresh_link').trigger('click');
+        $('.msg_text').remove();
+        $('.message_table').css('width', '100%');
+        $('tr').removeClass('hl');
+    } else if ($('.inline_msg').length) {
         $('.refresh_link').trigger('click');
         $('.inline_msg').remove();
         $('tr').removeClass('hl');
-        }
     } else {
         window.history.back();
     }
