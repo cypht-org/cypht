@@ -125,6 +125,9 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
         $mod = new Hm_Output_Test(array('list_path' => 'imap_0_4a756e6b', 'is_junk_folder' => true, 'foo' => 'bar', 'bar' => 'foo'), array('bar'));
         $html = message_controls($mod);
         $this->assertStringContainsString('msg_not_junk', $html);
+        $this->assertStringContainsString('data-action="not_junk"', $html);
+        $this->assertStringNotContainsString('msg_junk', $html);
+        $this->assertStringNotContainsString('data-action="junk"', $html);
     }
     /**
      * @preserveGlobalState disabled

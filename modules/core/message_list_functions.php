@@ -433,6 +433,9 @@ function message_controls($output_mod) {
         if ($val === 'not_junk') {
             return $output_mod->get('list_path', '') === 'junk' || $output_mod->get('is_junk_folder', false);
         }
+        if ($val === 'junk' && $output_mod->get('is_junk_folder', false)) {
+            return false;
+        }
         if (in_array($val, [$output_mod->get('list_path', ''), strtolower($output_mod->get('core_msg_control_folder', ''))])) {
             return false;
         }
