@@ -1432,6 +1432,9 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
             $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
 
+        $search_all_folders_setting = (int)$this->user_config->get('search_all_folders_setting', 0);
+        $expand_search = !empty($this->request->post['expand_search']) || $search_all_folders_setting === 2;
+
         list($sort, $reverse) = process_sort_arg($this->request->get['sort'], $this->user_config->get('default_sort_order_setting', 'arrival'));
 
         if (isset($this->request->post['list_path'])) {
@@ -1452,6 +1455,10 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
                 $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
                 break;
             case 'flagged':
+                $filter = 'FLAGGED';
+                $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_FLAGGED_SINCE));
+                $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_FLAGGED_PER_SOURCE);
+                break;
             case 'unread':
                 $filter = $list_path == 'unread' ? 'UNSEEN' : mb_strtoupper($list_path);
             default:
@@ -1480,6 +1487,7 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
 
         $messages = [];
         $status = [];
+        $uids = [];
         foreach ($ids as $key => $id) {
             $details = Hm_IMAP_List::dump($id);
             $mailbox = Hm_IMAP_List::get_connected_mailbox($id, $this->cache);
@@ -1494,27 +1502,39 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
                 continue;
             }
             $enable_exclude_auto_bcc = $this->user_config->get('enable_exclude_auto_bcc_setting', DEFAULT_SETTING_ENABLE_EXCLUDE_AUTO_BCC);
-            $uids = $mailbox->search(hex2bin($folders[$key]), $filter, $terms, $sort, $reverse, true, $enable_exclude_auto_bcc);
 
-            $total = count($uids);
-            $uids = array_slice($uids, 0, $limit);
+            $search_folders = $expand_search ? array_keys($mailbox->get_folders()) : [hex2bin($folders[$key])];
+            $remaining = $limit;
 
-            $headers = $mailbox->get_message_list(hex2bin($folders[$key]), $uids);
-            foreach ($uids as $uid) {
-                if (isset($headers[$uid])) {
-                    $msg = $headers[$uid];
-                } elseif (isset($headers[bin2hex($uid)])) {
-                    $msg = $headers[bin2hex($uid)];
+            foreach ($search_folders as $folder) {
+                if ($expand_search && $remaining <= 0) break;
+
+                $uids = $mailbox->search($folder, $filter, $terms, $sort, $reverse, true, $enable_exclude_auto_bcc);
+
+                if ($expand_search) {
+                    $uids = array_slice($uids, 0, $remaining);
+                    $remaining -= count($uids);
                 } else {
-                    continue;
+                    $total = count($uids);
+                    $uids = array_slice($uids, 0, $limit);
                 }
-                $msg['server_id'] = $id;
-                $msg['server_name'] = $details['name'];
-                $msg['folder'] = $folders[$key];
-                $messages[] = $msg;
-            }
 
-            $status['imap_'.$id.'_'.$folders[$key]] = $mailbox->get_folder_state(); // this is faster than get_folder_status as search call above already gets this folder's state
+                $headers = $mailbox->get_message_list($folder, $uids);
+                foreach ($uids as $uid) {
+                    if (isset($headers[$uid])) {
+                        $msg = $headers[$uid];
+                    } elseif (isset($headers[bin2hex($uid)])) {
+                        $msg = $headers[bin2hex($uid)];
+                    } else {
+                        continue;
+                    }
+                    $msg['server_id'] = $id;
+                    $msg['server_name'] = $details['name'];
+                    $msg['folder'] = $folders[$key];
+                    $messages[] = $msg;
+                }
+                $status['imap_'.$id.'_'.bin2hex($folder)] = $mailbox->get_folder_state(); // faster than get_folder_status; search already fetches folder state
+            }
         }
 
         $this->out('folder_status', $status);
