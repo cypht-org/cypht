@@ -31,6 +31,8 @@ function handleSieveCustomAction() {
         const mailbox = $(this).attr('account');
         current_mailbox_for_filter = mailbox;
         custom_action_modal._imapAccount = mailbox;
+        current_account = mailbox;
+        current_account_element = find_account_element(mailbox);
 
         const selected = [];
 
