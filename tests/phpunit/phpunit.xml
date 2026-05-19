@@ -142,6 +142,19 @@
       <file>./modules/saved_searches/functions.php</file>
       <file>./modules/saved_searches/class.php</file>
     </testsuite>
+    <testsuite name="modules_sievefilters">
+      <file>./modules/sievefilters/functions.php</file>
+      <file>./modules/sievefilters/handler_modules.php</file>
+    </testsuite>
+    <testsuite name="modules_brute_force">
+      <file>./modules/brute_force/handler_modules.php</file>
+    </testsuite>
+    <testsuite name="modules_local_contacts">
+      <file>./modules/local_contacts/local_contacts.php</file>
+    </testsuite>
+    <testsuite name="modules_ldap_contacts">
+      <file>./modules/ldap_contacts/ldap_contacts.php</file>
+    </testsuite>
   </testsuites>
   <source>
     <include>

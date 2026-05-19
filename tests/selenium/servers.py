@@ -72,9 +72,9 @@ class ServersTest(WebTest):
         signature.send_keys('Test')
         elem = self.by_id('step_config_action_finish')
         self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant'})", elem)
-        WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(elem))
+        WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable(elem))
         elem.click()
-        wait = WebDriverWait(self.driver, 30)
+        wait = WebDriverWait(self.driver, 60)
         element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "sys_messages")))
         sys_message_text = element.text
         sys_message_texts = sys_message_text.split('\n')

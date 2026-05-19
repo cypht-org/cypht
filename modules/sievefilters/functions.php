@@ -334,7 +334,11 @@ if (!hm_exists('prepare_sieve_script')) {
 if (!hm_exists('get_domain')) {
     function get_domain($email)
     {
-        $domain = explode('@', $email)[1];
+        $parts = explode('@', $email, 2);
+        if (count($parts) < 2 || $parts[1] === '') {
+            return false;
+        }
+        $domain = $parts[1];
         if (preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain, $regs)) {
             return $regs['domain'];
         }
@@ -403,13 +407,13 @@ if (!hm_exists('block_filter')) {
         elseif ($default_behaviour == 'Reject') {
             $filter->addRequirement('reject');
             $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\RejectFilterAction([$reject_message])
+                new \PhpSieveManager\Filters\Actions\RejectFilterAction(['reason' => $reject_message])
             );
         }
         elseif ($default_behaviour == 'Move') {
             $filter->addRequirement('fileinto');
             $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['Blocked'])
+                new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => 'Blocked'])
             );
         }
 

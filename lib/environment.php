@@ -43,6 +43,7 @@ class Hm_Environment {
         define('DEFAULT_UNREAD_PER_SOURCE', $config->get('default_setting_unread_per_source', 20));
         define('DEFAULT_FLAGGED_SINCE', $config->get('default_setting_flagged_since', '-1 week'));
         define('DEFAULT_FLAGGED_PER_SOURCE', $config->get('default_setting_flagged_per_source', 20));
+        define('DEFAULT_SEARCH_ALL_FOLDERS', $config->get('default_setting_search_all_folders', false));
         define('DEFAULT_ALL_SINCE', $config->get('default_setting_all_since', '-1 week'));
         define('DEFAULT_ALL_PER_SOURCE', $config->get('default_setting_all_per_source', 20));
         define('DEFAULT_ALL_EMAIL_SINCE', $config->get('default_setting_all_email_since', '-1 week'));
@@ -89,6 +90,7 @@ class Hm_Environment {
         define('DEFAULT_ENABLE_KEYBOARD_SHORTCUTS', $config->get('default_setting_enable_keyboard_shortcuts', false));
         define('DEFAULT_ENABLE_SIEVE_FILTER', $config->get('default_setting_enable_sieve_filter', false));
         define('DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND', $config->get('default_setting_enable_collect_address_on_send', false));
+        define('DEFAULT_SETTING_ENABLE_EXCLUDE_AUTO_BCC', $config->get('default_setting_enable_exclude_auto_bcc', true));
     }
 
     /**

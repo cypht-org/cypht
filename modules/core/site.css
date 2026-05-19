@@ -1701,6 +1701,17 @@ pre.msg_source {
 #extra-header-buttons { display: inline-block; margin-top: 0; }
 .sievefilters_settings > .p-3 { padding: 0 !important; }
 #sieve_accounts > .p-2 { padding: 0.5rem 1rem; }
+.server_content .quick_add_multiple_server_form { padding-left: 1.5rem; padding-right: 1.5rem; }
+
+.advanced_search_form [id^="adv_target"],
+.advanced_search_form .other_section > div { width: 75%; }
+.advanced_search_form .terms_section .d-flex { flex-wrap: wrap; }
+.advanced_search_form .terms_section .adv_terms { width: 75% !important; }
+.advanced_search_form .table > :not(caption) > * > * { box-shadow: none; }
+.advanced_search_form #term_and_or1 { width: 100%; }
+.advanced_search_form .source_section .inner_list .form-check { margin: 0 0 0 30px !important; }
+.advanced_search_form .source_section .unread_count { padding-top: 4px; }
+
 
 /* some theming changes */
 .allow_image_link .btn-light, .definitive_actions .btn-light,
@@ -1756,6 +1767,11 @@ pre.msg_source {
 .mobile .save_perm_form { margin-bottom: 1.5rem; }
 .mobile .save_perm_form .save_settings { margin-bottom: 0.5rem; }
 .mobile .content_title .list_sources { top: 40px; border: 1px solid var(--bs-border-color); }
+.mobile .content_title .path_delim + a { display: contents; }
+.mobile .calendar > .m-4 { margin: 1rem !important; }
+.mobile .quick_add_multiple_server_form { padding-left: 1.5rem; padding-right: 1.5rem; }
+.mobile .advanced_search_form [id^="adv_target"],
+.mobile .advanced_search_form .other_section > div { width: 100%; }
 
 
 /* Mobile responsive overrides for Bootstrap classes */
@@ -1796,6 +1812,15 @@ pre.msg_source {
   .mobile .msg_text .small_header .col-md-2 { width: 16.667%; }
   .mobile .msg_text .small_header > div + div { width: 83.333%; }
   .mobile #list_controls_menu.show { left: auto; right: -15px; }
+
+  .mobile .adv_folder_list .folders { margin-left: 0px !important; }
+  .mobile .terms_section .d-flex { display: inline-block !important; }
+  .mobile .terms_section .adv_terms { display: inline-block; }
+  .mobile .terms_section .adv_term_nots input { margin-top: 10px; }
+  .mobile .source_section .adv_folder_list .folders > li > .d-flex { display: inline-block !important; }
+  .mobile .targets_section .adv_targets .form-check-label { display: inline; }
+  .mobile .time_section .adv_times { display: inline-block !important; }
+  .mobile .time_section .new_time { display: block; }
 }
 
 @media (max-width: 575.98px) {
@@ -1808,6 +1833,9 @@ pre.msg_source {
   .mobile .msg_text .small_header > div + div { width: 80%; }
   .mobile .msg_text .small_header > div.d-none + div { width: 100%; }
   .mobile .msg_controls .move_to_location { right: -90px; }
+  .mobile .login_form .vh-100 > .card { margin-top: -10px; }
+  .mobile .time_section .adv_times { width: 100%; }
+  .mobile .time_section .adv_times input { width: 100% !important; }
   .notices .definitive_actions {
     margin-left: 0 !important;
   }
