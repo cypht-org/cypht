@@ -995,6 +995,19 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                     new \PhpSieveManager\Filters\Actions\KeepFilterAction()
                 );
             }
+            if ($action->action == 'imap_move') {
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => $action->value])
+                );
+            }
+            if ($action->action == 'imap_copy') {
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => $action->value])
+                );
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\KeepFilterAction()
+                );
+            }
             if ($action->action == 'autoreply') {
                 $custom_condition->addAction(
                     new \PhpSieveManager\Filters\Actions\VacationFilterAction(['reason' => $action->value, 'subject' => $action->extra_option_value])
