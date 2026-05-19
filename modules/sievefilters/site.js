@@ -262,6 +262,20 @@ var hm_sieve_possible_actions = function() {
             extra_field_type: 'string',
             extra_field_placeholder: 'Subject',
             require: 'vacation'
+        },
+        {
+            name: 'imap_copy',
+            description: 'Copy to folder',
+            placeholder: 'Select folder',
+            type: 'mailbox',
+            extra_field: false,
+        },
+        {
+            name: 'imap_move',
+            description: 'Move to folder',
+            placeholder: 'Select folder',
+            type: 'mailbox',
+            extra_field: false,
         }
     ];
 };

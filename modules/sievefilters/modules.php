@@ -1883,11 +1883,13 @@ class Hm_Handler_apply_custom_action extends Hm_Handler_Module {
                             }
                             break;
                         case 'move':
+                        case 'imap_move':
                             if ($value) {
                                 $mailbox->message_action($folder, 'MOVE', $msg_uids, $value);
                             }
                             break;
                         case 'copy':
+                        case 'imap_copy':
                             if ($value) {
                                 $mailbox->message_action($folder, 'COPY', $msg_uids, $value);
                             }
