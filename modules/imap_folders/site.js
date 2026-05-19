@@ -366,7 +366,8 @@ var render_folder_table = function(folders, tbody, server_id) {
         var indentPx = indent * 20;
 
         var row = '<tr data-folder-hex="' + folder.hex_name + '" data-folder-name="' + esc_html(folder.basename) + '" data-server-id="' + server_id + '">';
-        row += '<td style="padding-left:' + (indentPx + 8) + 'px"><i class="bi bi-folder2 me-1"></i>' + esc_html(displayName) + '</td>';
+        row += '<td class="folder-name-cell" style="padding-left:' + (indentPx + 8) + 'px"><i class="bi bi-folder2 me-1"></i>'
+            + '<span class="folder-name-text" title="' + esc_html(displayName) + '">' + esc_html(displayName) + '</span></td>';
         row += '<td>' + specialBadge + '</td>';
         row += '<td class="text-end">';
         row += '<div class="btn-group btn-group-sm" role="group">';

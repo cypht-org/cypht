@@ -32,8 +32,37 @@
 .account_folder_block .card-header { cursor: pointer; transition: background-color 0.2s; }
 .account_folder_block .card-header:hover { background-color: rgba(0,0,0,.05); }
 .account_expand_icon { transition: transform 0.2s; font-size: 0.85rem; }
+.account_folder_title {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+.account_folder_title strong {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+.folder_table {
+  table-layout: fixed;
+  width: 100%;
+}
 .folder_table th { font-size: 0.85rem; white-space: nowrap; }
 .folder_table td { vertical-align: middle; font-size: 0.9rem; }
+.folder_table td.folder-name-cell {
+  max-width: 0;
+  overflow: hidden;
+}
+.folder_table .folder-name-text {
+  display: inline-block;
+  max-width: calc(100% - 1.5rem);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
 .folder_table .btn-group { white-space: nowrap; }
 .folder-count-badge { font-weight: normal; font-size: 0.75rem; }
 
