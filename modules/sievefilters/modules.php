@@ -12,6 +12,8 @@ use PhpSieveManager\Exceptions\SocketException;
 
 require_once APP_PATH.'modules/imap/functions.php';
 require_once APP_PATH.'modules/imap/hm-imap.php';
+require_once APP_PATH.'modules/smtp/hm-smtp.php';
+require_once APP_PATH.'modules/smtp/hm-mime-message.php';
 require_once APP_PATH.'modules/sievefilters/hm-sieve.php';
 require_once APP_PATH.'modules/sievefilters/functions.php';
 
@@ -1835,19 +1837,43 @@ class Hm_Handler_apply_custom_action extends Hm_Handler_Module {
             return;
         }
 
+        // Lazy-init SMTP only if any action needs it
+        $smtp_mailbox = null;
+        $smtp_from    = '';
+        $smtp_actions = ['redirect', 'forward', 'reject', 'autoreply'];
+        $needs_smtp   = (bool) array_filter($actions, function($a) use ($smtp_actions) {
+            return in_array(strtolower($a['action'] ?? ''), $smtp_actions, true);
+        });
+        if ($needs_smtp) {
+            foreach (array_keys(Hm_SMTP_List::dump()) as $smtp_id) {
+                $mb = Hm_SMTP_List::connect($smtp_id, false);
+                if ($mb && $mb->authed()) {
+                    $smtp_mailbox = $mb;
+                    $srv = Hm_SMTP_List::dump($smtp_id, true);
+                    $smtp_from = $srv['user'] ?? '';
+                    break;
+                }
+            }
+        }
+
         $errors = [];
         foreach ($grouped as $server_id => $folders) {
             $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
             if (!$mailbox || !$mailbox->authed()) {
-                $errors[] = "Could not connect to server";
+                $errors[] = 'Could not connect to server';
                 continue;
             }
             foreach ($folders as $hex_folder => $msg_uids) {
-                $folder = hex2bin($hex_folder);
+                $folder          = hex2bin($hex_folder);
+                $stop_processing = false;
                 foreach ($actions as $action) {
+                    if ($stop_processing) break;
                     $action_name = strtolower($action['action'] ?? '');
                     $value       = trim($action['value'] ?? '');
                     switch ($action_name) {
+                        case 'stop':
+                            $stop_processing = true;
+                            break;
                         case 'keep':
                             break;
                         case 'discard':
@@ -1870,10 +1896,8 @@ class Hm_Handler_apply_custom_action extends Hm_Handler_Module {
                         case 'addflag':
                             $flag_key = strtolower($value);
                             if ($flag_key === 'draft') {
-                                // \Draft is a system flag; use CUSTOM to add it
                                 $mailbox->message_action($folder, 'CUSTOM', $msg_uids, null, '\Draft');
                             } elseif ($flag_key !== 'recent') {
-                                // \Recent cannot be set by IMAP clients — skip
                                 $cmd = $this->flag_value_to_cmd($value, true);
                                 if ($cmd) {
                                     $mailbox->message_action($folder, $cmd, $msg_uids);
@@ -1882,7 +1906,6 @@ class Hm_Handler_apply_custom_action extends Hm_Handler_Module {
                             break;
                         case 'removeflag':
                             $flag_key = strtolower($value);
-                            // \Draft and \Recent cannot be removed via standard message_action — skip
                             if ($flag_key !== 'draft' && $flag_key !== 'recent') {
                                 $cmd = $this->flag_value_to_cmd($value, false);
                                 if ($cmd) {
@@ -1892,10 +1915,66 @@ class Hm_Handler_apply_custom_action extends Hm_Handler_Module {
                             break;
                         case 'redirect':
                         case 'forward':
+                            // Re-send the raw RFC822 message to the specified address.
+                            // 'forward' keeps the original copy; 'redirect' does the same
+                            // at the IMAP level (deletion is a separate discard action).
+                            if ($value && $smtp_mailbox) {
+                                foreach ($msg_uids as $uid) {
+                                    $raw = $mailbox->get_message_content($folder, $uid, 0);
+                                    if ($raw) {
+                                        $smtp_mailbox->send_message($smtp_from, [$value], $raw);
+                                    }
+                                }
+                            }
+                            break;
                         case 'reject':
+                            // Send a rejection notice back to the original sender.
+                            if ($smtp_mailbox) {
+                                foreach ($msg_uids as $uid) {
+                                    $hdrs       = array_change_key_case(
+                                        $mailbox->get_message_headers($folder, $uid), CASE_LOWER
+                                    );
+                                    $reply_addr = trim($hdrs['reply-to'] ?? $hdrs['from'] ?? '');
+                                    if ($reply_addr) {
+                                        $orig_subj = $hdrs['subject'] ?? '';
+                                        $body      = $value ?: 'Your message has been rejected.';
+                                        $mime      = new Hm_MIME_Msg(
+                                            $reply_addr,
+                                            'Rejected: ' . $orig_subj,
+                                            $body,
+                                            $smtp_from
+                                        );
+                                        $smtp_mailbox->send_message(
+                                            $smtp_from, [$reply_addr], $mime->get_mime_msg()
+                                        );
+                                    }
+                                }
+                            }
+                            break;
                         case 'autoreply':
-                            // These are delivery-time sieve actions and cannot be
-                            // applied to already-delivered messages via IMAP — skip.
+                            // Send an automated reply to the original sender.
+                            if ($smtp_mailbox) {
+                                foreach ($msg_uids as $uid) {
+                                    $hdrs       = array_change_key_case(
+                                        $mailbox->get_message_headers($folder, $uid), CASE_LOWER
+                                    );
+                                    $reply_addr = trim($hdrs['reply-to'] ?? $hdrs['from'] ?? '');
+                                    if ($reply_addr) {
+                                        $orig_subj = $hdrs['subject'] ?? '';
+                                        $msg_id    = $hdrs['message-id'] ?? '';
+                                        $mime      = new Hm_MIME_Msg(
+                                            $reply_addr,
+                                            'Re: ' . $orig_subj,
+                                            $value,
+                                            $smtp_from,
+                                            false, '', '', $msg_id
+                                        );
+                                        $smtp_mailbox->send_message(
+                                            $smtp_from, [$reply_addr], $mime->get_mime_msg()
+                                        );
+                                    }
+                                }
+                            }
                             break;
                     }
                 }
