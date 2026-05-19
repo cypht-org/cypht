@@ -10,6 +10,7 @@ var current_editing_script_name = "";
 // var hm_sieve_current_account = "";
 var current_account;
 var current_account_element;
+var mailbox_folders_cache = {};
 var is_editing_filter = false;
 var current_editing_filter_name = '';
 
@@ -711,6 +712,51 @@ const registerSieveModalEvents = () => {
     });
 
     /**
+     * Builds <option> HTML for a folder list, rendering the hierarchy as an
+     * indented tree. Each folder is rendered as a clickable list-group item
+     * with a Bootstrap Icons folder icon. The full IMAP path is stored as a
+     * data attribute; a hidden <input> keeps the selected value for form
+     * submission. Delimiter is auto-detected (/ or .).
+     *
+     * @param {string[]} folders      - flat list of full folder path strings
+     * @param {string}   selectedValue - pre-selected folder path (may be empty)
+     * @returns {string} HTML for the custom picker widget
+     */
+    function buildFolderTreeOptions(folders, selectedValue) {
+        if (!folders || !folders.length) {
+            return '<div class="text-muted small p-2">No folders found</div>' +
+                   '<input type="hidden" name="sieve_selected_action_value[]" value="">';
+        }
+        const slashCount = folders.filter(function(f) { return f.includes('/'); }).length;
+        const dotCount   = folders.filter(function(f) { return f.includes('.') && !f.startsWith('.'); }).length;
+        const sep = dotCount > slashCount ? '.' : '/';
+        let items = '';
+        folders.forEach(function(folder) {
+            const parts      = folder.split(sep);
+            const depth      = parts.length - 1;
+            const label      = parts[parts.length - 1];
+            const paddingPx  = (depth * 20 + 10) + 'px';
+            const connector  = depth > 0 ? '\u2514\u00a0' : '';
+            const activeClass = selectedValue === folder ? ' active' : '';
+            const escapedVal  = folder.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+            items += '<a href="#" class="list-group-item list-group-item-action py-1 folder-tree-item' + activeClass + '"' +
+                     ' data-value="' + escapedVal + '" style="padding-left:' + paddingPx + ';padding-right:0.5rem">' +
+                     connector + '<i class="bi bi-folder2 me-1"></i>' + label + '</a>';
+        });
+        const hiddenVal = selectedValue ? selectedValue.replace(/&/g, '&amp;').replace(/"/g, '&quot;') : '';
+        const btnLabel  = selectedValue ? selectedValue.replace(/&/g, '&amp;') : 'Select a folder\u2026';
+        return '<div class="folder-tree-dropdown position-relative">' +
+               '<button type="button" class="btn btn-sm btn-outline-secondary w-100 text-start folder-tree-toggle">' +
+               '<i class="bi bi-folder2 me-1"></i><span class="folder-tree-label">' + btnLabel + '</span>' +
+               '<i class="bi bi-chevron-down ms-1 float-end mt-1"></i></button>' +
+               '<div class="folder-tree-picker list-group list-group-flush border rounded position-absolute w-100" ' +
+               'style="max-height:200px;overflow-y:auto;display:none;z-index:1050;background:#fff">' +
+               items + '</div>' +
+               '</div>' +
+               '<input type="hidden" name="sieve_selected_action_value[]" value="' + hiddenVal + '">';
+    }
+
+    /**
      * Action change
      */
     $(document).off('change', '.sieve_actions_select').on('change', '.sieve_actions_select', function () {
@@ -758,28 +804,57 @@ const registerSieveModalEvents = () => {
                 elem.html('<select name="sieve_selected_action_value[]" class="form-control form-control-sm">'+ options +'</select>');
             }
             if (selected_action.type === 'mailbox') {
-                let mailboxes = null;
-                tr_elem.children().eq(2).html(hm_spinner());
-                Hm_Ajax.request(
-                    [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_get_mailboxes'},
-                        {'name': 'imap_account', 'value': current_account} ],
-                    function(res) {
-                        mailboxes = JSON.parse(res.mailboxes);
-                        options = '';
-                        mailboxes.forEach(function(val) {
-                            if (tr_elem.attr('default_value') === val) {
-                                options = options + '<option value="' + val + '" selected>'+ val +'</option>'
-                            } else {
-                                options = options + '<option value="' + val + '">'+ val +'</option>'
-                            }
-                        });
-                        elem.html('<select name="sieve_selected_action_value[]" class="form-control form-control-sm">'+ options +'</select>');
-                        $("[name^=sieve_selected_action_value]").last().val(elem.parent().attr('default_value'));
-                    }
-                );
+                const defVal = tr_elem.attr('default_value') || '';
+                if (mailbox_folders_cache[current_account]) {
+                    elem.html(buildFolderTreeOptions(mailbox_folders_cache[current_account], defVal));
+                } else {
+                    tr_elem.children().eq(2).html(hm_spinner());
+                    Hm_Ajax.request(
+                        [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_get_mailboxes'},
+                            {'name': 'imap_account', 'value': current_account} ],
+                        function(res) {
+                            const folders = JSON.parse(res.mailboxes);
+                            mailbox_folders_cache[current_account] = folders;
+                            elem.html(buildFolderTreeOptions(folders, defVal));
+                        }
+                    );
+                }
             }
         }
     })
+
+    /**
+     * Folder tree picker — item selection + close
+     */
+    $(document).on('click', '.folder-tree-item', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const $picker = $(this).closest('.folder-tree-picker');
+        $picker.find('.active').removeClass('active');
+        $(this).addClass('active');
+        const value = $(this).data('value');
+        const $dropdown = $picker.closest('.folder-tree-dropdown');
+        $dropdown.next('input[name^="sieve_selected_action_value"]').val(value);
+        $dropdown.find('.folder-tree-label').text(value);
+        $picker.hide();
+    });
+
+    /**
+     * Folder tree dropdown — toggle open/close
+     */
+    $(document).on('click', '.folder-tree-toggle', function(e) {
+        e.stopPropagation();
+        $(this).next('.folder-tree-picker').toggle();
+    });
+
+    /**
+     * Folder tree dropdown — close on outside click
+     */
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.folder-tree-dropdown').length) {
+            $('.folder-tree-picker').hide();
+        }
+    });
 
     /**
      * Condition type change
