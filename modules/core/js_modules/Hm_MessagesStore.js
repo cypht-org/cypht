@@ -15,9 +15,10 @@ class Hm_MessagesStore {
      * @property {RowObject} 1 - An object containing the row message and the IMAP key
      */
 
-    constructor(path, page = 1, filter = '', sortFld = 'arrival', rows = []) {
+    constructor(path, page = 1, filter = '', sortFld = 'arrival', rows = [], expandSearch = false) {
         this.path = path;
-        this.list = path + '_' + (filter ? filter.replace(/\s+/g, '_') + '_' + sortFld + '_': '') + page;
+        this.expandSearch = expandSearch;
+        this.list = path + '_' + (filter ? filter.replace(/\s+/g, '_') + '_' + sortFld + '_': '') + page + (expandSearch ? '_expanded' : '');
         this.sortFld = sortFld;
         this.rows = rows;
         this.sources = {};
@@ -87,7 +88,7 @@ class Hm_MessagesStore {
                 this.pages = parseInt(pages);
                 this.newMessages = this.getNewMessages(updatedMessages);
 
-                if (typeof do_not_flag_as_read_on_open == 'booelan') {
+                if (typeof do_not_flag_as_read_on_open == 'boolean') {
                     this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
                 }
 
@@ -291,6 +292,9 @@ class Hm_MessagesStore {
 
     getRequestConfigs() {
         const config = [{ name: "list_page", value: this.page }, { name: "sort", value: this.sortFld }];
+        if (this.expandSearch) {
+            config.push({ name: "expand_search", value: 1 });
+        }
         const configs = [];
         if (this.path.startsWith('imap')) {
             const detail = Hm_Utils.parse_folder_path(this.path, 'imap');
