@@ -1128,7 +1128,7 @@ class Hm_EWS {
                 $result[] = $this->extract_mailbox($mailbox);
             }
             return $result;
-        } elseif (is_object($data) && $data->Mailbox) {
+        } elseif (is_object($data) && isset($data->Mailbox)) {
             if(is_array($data->Mailbox)) {
                 $result = [];
                 foreach ($data->Mailbox as $mailbox) {

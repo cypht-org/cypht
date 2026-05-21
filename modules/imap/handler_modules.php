@@ -616,24 +616,21 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     }
 
                     $mailbox = Hm_IMAP_List::get_mailbox_without_connection($details);
-                    $label = $mailbox->get_folder_name($folder);
+                    $label = $mailbox->get_folder_name($folder, true);
                     if (!$label) {
-                        if (isset($details['type']) && $details['type'] === 'ews') {
-                            // EWS folders have opaque binary IDs; get_folder_name() only resolves
-                            // distinguished names (inbox, sentitems, etc.) without a connection.
-                            // Use the established session connection for all other folders.
-                            $connected_mailbox = Hm_IMAP_List::get_connected_mailbox($parts[1], $this->cache);
-                            if ($connected_mailbox && $connected_mailbox->authed()) {
-                                $folder_status = $connected_mailbox->get_folder_status($folder, false);
-                                $label = $folder_status['name'] ?? null;
-                            }
-                        } elseif ($this->config->get('allow_session_cache', false)) {
+                        if ($this->config->get('allow_session_cache', false)) {
                             $paths = explode("_", $path);
                             $short_path = $paths[0] . "_" . $paths[1] . "_";
                             $cached_folders = $this->cache->get('imap_folders_'.$short_path, true);
                             $label = !empty($cached_folders['folders'][$folder]['name']) ? $cached_folders['folders'][$folder]['name'] : '';
-                        } else {
-                            Hm_Msgs::add('Folder name loaded directly from the server. This may be slower. Enable session caching for better performance.', 'warning');
+                        }
+                        if (!$label) {
+                            $connected_mailbox = Hm_IMAP_List::get_connected_mailbox($parts[1], $this->cache);
+                            if ($connected_mailbox && $connected_mailbox->authed()) {
+                                $label = $connected_mailbox->get_folder_name($folder);
+                            } else {
+                                Hm_Msgs::add('Folder name loaded directly from the server. This may be slower. Enable session caching for better performance.', 'warning');
+                            }
                         }
                     }
                     $title = array(strtoupper($details['type'] ?? 'IMAP'), $details['name'], $label);
