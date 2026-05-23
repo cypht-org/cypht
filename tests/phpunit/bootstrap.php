@@ -35,6 +35,7 @@ require_once APP_PATH.'tests/phpunit/mocks.php';
 
 /* get the framework */
 require APP_PATH.'lib/framework.php';
+require APP_PATH.'modules/sievefilters/hm-sieve-script-cache.php';
 
 /* debug mode has to be set to something or include files will die() */
 if (!defined('DEBUG_MODE')) {
