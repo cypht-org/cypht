@@ -26,19 +26,21 @@ class MockSieveClientStorage {
 /**
  * Mock factory for testing that returns a mock client with predefined scripts
  */
-class Hm_Test_Mock_Sieve_Client_Factory {
-    private static $mockCreator;
-    
-    public static function setMockCreator($creator) {
-        self::$mockCreator = $creator;
-    }
-    
-    public function init($user_config = null, $imap_account = null, $is_nux_supported = false) {
-        if (!self::$mockCreator) {
-            throw new Exception('Mock creator not set');
+if (!class_exists('Hm_Custom_Sieve_Client_Factory')) {
+    class Hm_Custom_Sieve_Client_Factory {
+        private static $mockCreator;
+
+        public static function setMockCreator($creator) {
+            self::$mockCreator = $creator;
         }
+
+        public function init($user_config = null, $imap_account = null, $is_nux_supported = false) {
+            if (!self::$mockCreator) {
+                throw new Exception('Mock creator not set');
+            }
         
-        return call_user_func(self::$mockCreator);
+            return call_user_func(self::$mockCreator);
+        }
     }
 }
 
@@ -47,8 +49,8 @@ class Hm_Test_Mock_Sieve_Client_Factory {
  */
 class Hm_Test_Mock_Sieve_Site_Config {
     public function get($name) {
-        if ($name === 'sieve_client_factory') {
-            return 'Hm_Test_Mock_Sieve_Client_Factory';
+        if ($name === 'enable_custom_sieve_factory') {
+            return true;
         }
         return null;
     }
@@ -345,7 +347,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
             return $client;
         };
         
-        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator($mockCreator);
+        Hm_Custom_Sieve_Client_Factory::setMockCreator($mockCreator);
 
         $mailbox = array(
             'name' => 'Primary Account',
