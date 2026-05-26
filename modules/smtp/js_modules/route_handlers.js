@@ -220,6 +220,7 @@ function applySmtpComposePageHandlers(routeParams) {
 
     const getSmtpProfileCallback = (res) => {
         const deliveryReceiptCheckBox = $('#compose_delivery_receipt');
+        deliveryReceiptCheckBox.next('label').next('span.badge').remove();
         if (! res.dsn_supported) {
             deliveryReceiptCheckBox.prop('checked', false);
             deliveryReceiptCheckBox.prop('disabled', true);
@@ -227,7 +228,6 @@ function applySmtpComposePageHandlers(routeParams) {
         } else {
             deliveryReceiptCheckBox.prop('disabled', false);
             deliveryReceiptCheckBox.prop('checked', true);
-            deliveryReceiptCheckBox.next('label').next('span.badge').remove();
         }
     };
 
