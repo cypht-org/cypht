@@ -853,10 +853,11 @@ class Hm_Output_folders_content_start extends Hm_Output_Module {
             $server_specials = isset($specials[$id]) ? $specials[$id] : array();
             $res .= '<div class="account_folder_block card mb-3" data-server-id="'.$this->html_safe($id).'">';
             $res .= '<div class="card-header account_folder_header d-flex justify-content-between align-items-center" role="button">';
-            $res .= '<div><i class="bi bi-chevron-right account_expand_icon me-2"></i>';
+            $account_name = $this->html_safe($server['name']);
+            $res .= '<div class="account_folder_title"><i class="bi bi-chevron-right account_expand_icon me-2"></i>';
             $res .= '<i class="bi bi-envelope-fill me-2"></i>';
-            $res .= '<strong>'.$this->html_safe($server['name']).'</strong></div>';
-            $res .= '<span class="badge bg-secondary folder-count-badge" style="display:none;"></span>';
+            $res .= '<strong title="'.$account_name.'">'.$account_name.'</strong></div>';
+            $res .= '<span class="badge bg-secondary folder-count-badge flex-shrink-0" style="display:none;"></span>';
             $res .= '</div>';
             $res .= '<div class="card-body account_folder_body" style="display:none;">';
             $res .= '<div class="d-flex justify-content-between align-items-center mb-3">';
