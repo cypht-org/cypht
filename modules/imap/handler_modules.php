@@ -787,7 +787,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                     $cache_data = array_merge($cache_data, $quota_data);
                 }
 
-                $cached_data = $this->cache->get($cache_key, true) ?: [];
+                $cached_data = $this->cache->get($cache_key, []);
                 if ($folder) {
                     $this->cache->set($cache_key, array_merge($cached_data, [$folder => $cache_data]));
                 } else {
