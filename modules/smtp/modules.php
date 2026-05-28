@@ -1673,10 +1673,8 @@ class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
             return;
         }
         $scheduled_msg_count = 0;
+        // Pass the raw value; reschedule_message_sending() calls get_scheduled_date() internally.
         $new_schedule_date = $form['schedule_date'];
-        if ($form['schedule_date'] != 'now') {
-            $new_schedule_date = get_scheduled_date($form['schedule_date']);
-        }
         $ids = explode(',', $form['scheduled_msg_ids']);
         foreach ($ids as $msg_part) {
             list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
