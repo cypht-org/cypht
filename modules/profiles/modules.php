@@ -377,11 +377,24 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     '<td class="d-none d-sm-table-cell">'.(mb_strlen($profile['sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.(mb_strlen($profile['rmk']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.($profile['default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
-                        '<td class="text-right"><a href="'.$this->build_page_url('profiles', array('profile_id' => $this->html_safe($profile['id'])), true).'" title="'.$this->trans('Edit').'">'.
-                    '<i class="bi bi-pencil-fill"></i></a></td>'.
+                    '<td class="text-end">'.
+                        '<div class="d-flex gap-2 justify-content-end align-items-center">'.
+                            '<a href="'.$this->build_page_url('profiles', array('profile_id' => $this->html_safe($profile['id'])), true).'" title="'.$this->trans('Edit').'">'.
+                            '<i class="bi bi-pencil-fill"></i></a>'.
+                            '<form method="post" action="'.$this->build_page_url('profiles').'">'.
+                                '<input type="hidden" name="profile_id" value="'.$this->html_safe($profile['id']).'">'.
+                                '<input type="hidden" name="profile_delete" value="1">'.
+                                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'">'.
+                                '<button type="submit" class="btn btn-link p-0 text-danger border-0" title="'.$this->trans('Delete').'" '.
+                                    'onclick="return confirm(\''.$this->trans('Are you sure you want to delete this profile?').'\')">'.
+                                    '<i class="bi bi-trash-fill"></i>'.
+                                '</button>'.
+                            '</form>'.
+                        '</div>'.
+                    '</td>'.
                     '</tr>';
             }
-            $res .= '</table></div>';
+            $res .= '</tbody></table></div>';
         }
         else {
             $res .= '<div class="d-flex flex-column align-items-center justify-content-center p-5 mt-5"><i class="bi bi-folder2-open fs-4"></i><span>'.$this->trans('No Profiles Found').'</span></div>';
