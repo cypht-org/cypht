@@ -349,7 +349,8 @@ class Hm_Output_profile_content extends Hm_Output_Module {
         $res = '';
         if (count($profiles) > 0) {
             $smtp_servers = $this->get('smtp_servers', array());
-            $res .= '<div class="table-responsive p-3"><table class="table table-striped"><tr>'.
+            $res .= '<div class="table-responsive p-3"><table class="table table-striped">'.
+                '<thead><tr>'.
                 '<th>'.$this->trans('Display Name').'</th>'.
                 '<th class="d-none d-sm-table-cell">'.$this->trans('IMAP Server').'</th>'.
                 '<th class="d-none d-sm-table-cell">'.$this->trans('Username').'</th>'.
@@ -359,7 +360,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                 '<th class="d-none d-sm-table-cell">'.$this->trans('Signature').'</th>'.
                 '<th class="d-none d-sm-table-cell">'.$this->trans('Remark').'</th>'.
                 '<th class="d-none d-sm-table-cell">'.$this->trans('Default').'</th>'.
-                '<th></th></tr>';
+                '<th></th></tr></thead><tbody>';
 
             foreach ($profiles as $id => $profile) {
                 $smtp = '';
