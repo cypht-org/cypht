@@ -1291,8 +1291,6 @@ $(function() {
         }
     }
     setTimeout(prefetch_imap_folders, 2);
-
-    processNextActionDate();
 });
 
 
