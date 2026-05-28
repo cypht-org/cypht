@@ -498,7 +498,7 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res .= '<div>';
     if ($form_vals['name']) {
         $res .= '<input type="submit" class="btn btn-primary profile_update" value="'.$out_mod->trans('Update').'" /> ';
-        $res .= '<input type="submit" class="btn btn-danger" name="profile_delete" value="'.$out_mod->trans('Delete').'" /> ';
+        $res .= '<input type="submit" class="btn btn-danger" name="profile_delete" value="'.$out_mod->trans('Delete').'" onclick="return confirm(\''.$out_mod->trans('Are you sure you want to delete this profile?').'\')"/> ';
         $res .= '<a href="'.$out_mod->build_page_url('profiles').'" class="btn btn-secondary">'.$out_mod->trans('Cancel').'</a>';
     }
     else {
