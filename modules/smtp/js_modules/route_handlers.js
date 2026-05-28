@@ -6,8 +6,13 @@ function applySmtpComposePageHandlers(routeParams) {
         $('.smtp_send_placeholder').trigger('click');
     });
 
-    if (window.HTMLEditor) {
+    const composeType = Number($('.compose_form').data('compose-type'));
+
+    if (composeType === 1) {
         useKindEditor();
+    }
+    else if (composeType === 2) {
+        useMarkdownEditor();
     }
 
     var interval = Hm_Utils.get_from_global('compose_save_interval', 30);
