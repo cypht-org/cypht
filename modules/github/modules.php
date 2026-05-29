@@ -332,9 +332,19 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
             $repos = $this->user_config->get('github_repos');
             if (in_array($form['github_repo'], $repos, true) && $details) {
                 $limit = $this->user_config->get('github_limit_setting', DEFAULT_GITHUB_PER_SOURCE);
-                $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page='.$limit, $form['github_repo']);
-                $api = new Hm_API_Curl();
-                $this->out('github_data', $api->command($url, array('Authorization: token ' . $details['access_token'])));
+                $cache_key = 'github_events_' . md5($form['github_repo'] . '_' . $limit);
+                $cached = $this->cache->get($cache_key, false);
+                if ($cached !== false) {
+                    $github_data = $cached;
+                } else {
+                    $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page='.$limit, $form['github_repo']);
+                    $api = new Hm_API_Curl();
+                    $github_data = $api->command($url, array('Authorization: token ' . $details['access_token']));
+                    if ($github_data) {
+                        $this->cache->set($cache_key, $github_data, 300);
+                    }
+                }
+                $this->out('github_data', $github_data);
                 $this->out('github_data_source', $form['github_repo']);
                 $this->out('github_data_source_id', array_search($form['github_repo'], $repos, true));
             }
@@ -448,115 +458,264 @@ class Hm_Output_github_folders extends Hm_Output_Module {
 }
 
 /**
+ * Build message-list rows for one repo's events. Used by both single-repo and
+ * batch output modules to avoid duplicating the row-building logic.
+ *
+ * @param array  $events      Raw GitHub API events array
+ * @param string $repo        Full repo name (owner/repo)
+ * @param int    $repo_id     Index of the repo in the user's repo list
+ * @param int    $cutoff      Unix timestamp; events older than this are skipped (0 = no cutoff)
+ * @param int|false $login_time Unix timestamp of last login, or false
+ * @param bool   $unread_only Only include unseen events
+ * @param string|false $list_parent Value for list_parent URL param, or false
+ * @param object $output_mod  Output module instance (for html_safe, build_page_url, etc.)
+ * @return array $id => row HTML
+ * @subpackage github/functions
+ */
+if (!hm_exists('github_build_repo_rows')) {
+function github_build_repo_rows($events, $repo, $repo_id, $cutoff, $login_time, $unread_only, $list_parent, $output_mod) {
+    $res = array();
+    $show_icons = $output_mod->get('msg_list_icons');
+    $repo_parts = explode('/', $repo);
+    $repo_name = count($repo_parts) > 1 ? $repo_parts[1] : $repo;
+    $style = $output_mod->get('news_list_style') ? 'news' : 'email';
+    if ($output_mod->get('is_mobile')) {
+        $style = 'news';
+    }
+    $icon = $show_icons ? 'code' : '';
+
+    foreach ($events as $event) {
+        if (!is_array($event) || !array_key_exists('id', $event)) {
+            continue;
+        }
+        $row_class = 'github';
+        $id = 'github_'.$repo_id.'_'.$event['id'];
+        $subject = build_github_subject($event, $output_mod);
+        $url = $output_mod->build_page_url('message', array(
+            'uid' => $output_mod->html_safe($id),
+            'list_path' => 'github_'.$output_mod->html_safe($repo),
+        ));
+        if ($list_parent) {
+            $url .= '&list_parent='.$output_mod->html_safe($list_parent);
+        }
+        $from = $event['actor']['login'] ?? '';
+        $ts = strtotime($event['created_at'] ?? '');
+        if ($cutoff && $ts < $cutoff) {
+            continue;
+        }
+        if (Hm_Github_Uid_Cache::is_read($event['id'])) {
+            $flags = array();
+        }
+        elseif (Hm_Github_Uid_Cache::is_unread($event['id'])) {
+            $flags = array('unseen');
+            $row_class .= ' unseen';
+        }
+        elseif ($ts && $login_time && $ts <= $login_time) {
+            $flags = array();
+        }
+        else {
+            $row_class .= ' unseen';
+            $flags = array('unseen');
+        }
+        if ($unread_only && !in_array('unseen', $flags)) {
+            continue;
+        }
+        $date = date('r', $ts);
+        $row_class .= ' '.$repo_name;
+        if ($style == 'news') {
+            $res[$id] = message_list_row(array(
+                    array('checkbox_callback', $id),
+                    array('icon_callback', $flags),
+                    array('subject_callback', $subject, $url, $flags, $icon),
+                    array('safe_output_callback', 'source', $repo_name),
+                    array('safe_output_callback', 'from', $from),
+                    array('date_callback', translate_time_str(human_readable_interval($date), $output_mod), $ts),
+                ),
+                $id, $style, $output_mod, $row_class
+            );
+        }
+        else {
+            $res[$id] = message_list_row(array(
+                    array('checkbox_callback', $id),
+                    array('safe_output_callback', 'source', $repo_name, $icon),
+                    array('safe_output_callback', 'from', $from),
+                    array('subject_callback', $subject, $url, $flags),
+                    array('date_callback', translate_time_str(human_readable_interval($date), $output_mod), $ts),
+                    array('icon_callback', $flags)
+                ),
+                $id, $style, $output_mod, $row_class
+            );
+        }
+    }
+    return $res;
+}}
+
+/**
+ * Fetch all configured GitHub repos in parallel (curl_multi) and output a
+ * combined formatted_message_list in a single AJAX round-trip.
+ * @subpackage github/handler
+ */
+class Hm_Handler_github_all_list_data extends Hm_Handler_Module {
+    public function process() {
+        $repos_raw = array_key_exists('github_repos', $this->request->post)
+            ? trim($this->request->post['github_repos']) : '';
+        if (!$repos_raw) {
+            return;
+        }
+
+        $details = $this->user_config->get('github_connect_details');
+        if (!$details) {
+            return;
+        }
+
+        $configured_repos = $this->user_config->get('github_repos', array());
+        $repos_requested = array_filter(array_map('trim', explode(',', $repos_raw)));
+        // Only process repos the user actually has configured (security check)
+        $repos = array_values(array_filter($repos_requested, function($r) use ($configured_repos) {
+            return in_array($r, $configured_repos, true);
+        }));
+
+        if (empty($repos)) {
+            return;
+        }
+
+        Hm_Github_Uid_Cache::load($this->cache->get('github_read_uids', array(), true));
+
+        $limit = $this->user_config->get('github_limit_setting', DEFAULT_GITHUB_PER_SOURCE);
+        $token = $details['access_token'];
+
+        // Serve cache hits immediately; collect cache misses for parallel fetch
+        $results = array();
+        $to_fetch = array();
+        foreach ($repos as $repo) {
+            $cache_key = 'github_events_' . md5($repo . '_' . $limit);
+            $cached = $this->cache->get($cache_key, false);
+            if ($cached !== false) {
+                $results[$repo] = $cached;
+            } else {
+                $to_fetch[] = $repo;
+            }
+        }
+
+        // Fetch cache-miss repos in parallel using curl_multi
+        if (!empty($to_fetch)) {
+            $mh = curl_multi_init();
+            $handles = array();
+            foreach ($to_fetch as $repo) {
+                $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page=%d', $repo, $limit);
+                $ch = curl_init();
+                curl_setopt_array($ch, array(
+                    CURLOPT_URL            => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_HTTPHEADER     => array(
+                        'Authorization: token ' . $token,
+                        'User-Agent: Cypht/1.0',
+                        'Accept: application/vnd.github.v3+json',
+                    ),
+                    CURLOPT_TIMEOUT        => 15,
+                    CURLOPT_SSL_VERIFYPEER => true,
+                ));
+                curl_multi_add_handle($mh, $ch);
+                $handles[$repo] = $ch;
+            }
+
+            $running = null;
+            do {
+                curl_multi_exec($mh, $running);
+                if ($running) {
+                    curl_multi_select($mh, 1.0);
+                }
+            } while ($running > 0);
+
+            foreach ($handles as $repo => $ch) {
+                $body = curl_multi_getcontent($ch);
+                $data = $body ? json_decode($body, true) : null;
+                // Skip API error responses (rate-limit, auth failure, etc.)
+                if (is_array($data) && !isset($data['message'])) {
+                    $cache_key = 'github_events_' . md5($repo . '_' . $limit);
+                    $this->cache->set($cache_key, $data, 300);
+                    $results[$repo] = $data;
+                }
+                curl_multi_remove_handle($mh, $ch);
+                curl_close($ch);
+            }
+            curl_multi_close($mh);
+        }
+
+        $login_time = $this->session->get('login_time', false);
+        if ($login_time) {
+            $this->out('login_time', $login_time);
+        }
+
+        $github_list_since = '';
+        if (array_key_exists('list_path', $this->request->get) &&
+            $this->request->get['list_path'] === 'github_all') {
+            $github_list_since = process_since_argument(
+                $this->user_config->get('github_since_setting', DEFAULT_GITHUB_SINCE)
+            );
+        }
+
+        $this->out('github_all_results', $results);
+        $this->out('github_repos_index', array_flip($configured_repos));
+        $this->out('github_list_since', $github_list_since);
+    }
+}
+
+/**
+ * Output module for the batched github_all endpoint. Combines rows from all
+ * repos into a single formatted_message_list response.
+ * @subpackage github/output
+ */
+class Hm_Output_filter_github_all_data extends Hm_Output_Module {
+    protected function output() {
+        $all_results  = $this->get('github_all_results', array());
+        $repos_index  = $this->get('github_repos_index', array());
+        $login_time   = $this->get('login_time', false);
+        $unread_only  = ($this->get('list_path', '') === 'unread' || $this->get('github_unread', false));
+        $cutoff_raw   = $this->get('github_list_since', '');
+        $cutoff       = $cutoff_raw ? strtotime($cutoff_raw) : 0;
+        $list_parent  = $this->get('list_parent', '') ?: false;
+
+        $res = array();
+        foreach ($all_results as $repo => $events) {
+            $repo_id = $repos_index[$repo] ?? 0;
+            $rows = github_build_repo_rows(
+                $events, $repo, $repo_id, $cutoff,
+                $login_time, $unread_only, $list_parent, $this
+            );
+            $res = array_merge($res, $rows);
+        }
+
+        $this->out('formatted_message_list', $res);
+    }
+}
+
+/**
  * @subpackage github/output
  */
 class Hm_Output_filter_github_data extends Hm_Output_Module {
     protected function output() {
-        $res = array();
-        $login_time = false;
-        $unread_only = false;
-        $show_icons = $this->get('msg_list_icons');
-        if ($this->get('login_time')) {
-            $login_time = $this->get('login_time');
-        }
-        if ($this->get('list_path', '') == 'unread' || $this->get('github_unread', false)) {
-            $unread_only = true;
-        }
-        $repo_id = $this->get('github_data_source_id');
-        $repo = $this->get('github_data_source', 'Github');
-        $repo_parts = explode('/', $repo);
-        $repo_name = count($repo_parts) > 1 ? $repo_parts[1] : $repo;
-        $cutoff = $this->get('github_list_since', '');
-        if ($cutoff) {
-            $cutoff = strtotime($cutoff);
-        }
-        else {
-            $cutoff = 0;
-        }
+        $repo_id     = $this->get('github_data_source_id');
+        $repo        = $this->get('github_data_source', 'Github');
+        $login_time  = $this->get('login_time', false);
+        $unread_only = ($this->get('list_path', '') === 'unread' || $this->get('github_unread', false));
+        $cutoff_raw  = $this->get('github_list_since', '');
+        $cutoff      = $cutoff_raw ? strtotime($cutoff_raw) : 0;
+
         $list_parent = false;
         if ($this->get('list_parent', '')) {
             $list_parent = $this->get('list_parent');
         }
-        elseif ($this->get('list_path') == 'github_all') {
+        elseif ($this->get('list_path') === 'github_all') {
             $list_parent = $this->get('list_path');
         }
-        foreach ($this->get('github_data', array()) as $event) {
-            if (!is_array($event) || !array_key_exists('id', $event)) {
-                continue;
-            }
-            $row_class = 'github';
-            $id = 'github_'.$repo_id.'_'.$event['id'];
-            $subject = build_github_subject($event, $this);
-            $url = $this->build_page_url('message', array(
-                'uid' => $$this->html_safe($id),
-                'list_path' => 'github_'.$this->html_safe($repo),
-            ));
-            if ($list_parent) {
-                $url .= '&list_parent='.$this->html_safe($list_parent);
-            }
-            $from = $event['actor']['login'];
-            $ts = strtotime($event['created_at']);
-            if ($ts < $cutoff) {
-                continue;
-            }
-            if (Hm_Github_Uid_Cache::is_read($event['id'])) {
-                $flags = array();
-            }
-            elseif (Hm_Github_Uid_Cache::is_unread($event['id'])) {
-                $flags = array('unseen');
-                $row_class .= ' unseen';
-            }
-            elseif ($ts && $login_time && $ts <= $login_time) {
-                $flags = array();
-            }
-            else {
-                $row_class .= ' unseen';
-                $flags = array('unseen');
-            }
-            if ($unread_only && !in_array('unseen', $flags)) {
-                continue;
-            }
-            $date = date('r', $ts);
-            $style = $this->get('news_list_style') ? 'news' : 'email';
-            if ($this->get('is_mobile')) {
-                $style = 'news';
-            }
-            $row_class .= ' '.$repo_name;
-            $icon = 'code';
-            if (!$show_icons) {
-                $icon = '';
-            }
-            if ($style == 'news') {
-                $res[$id] = message_list_row(array(
-                        array('checkbox_callback', $id),
-                        array('icon_callback', $flags),
-                        array('subject_callback', $subject, $url, $flags, $icon),
-                        array('safe_output_callback', 'source', $repo_name),
-                        array('safe_output_callback', 'from', $from),
-                        array('date_callback', translate_time_str(human_readable_interval($date), $this), $ts),
-                    ),
-                    $id,
-                    $style,
-                    $this,
-                    $row_class
-                );
-            }
-            else {
-                $res[$id] = message_list_row(array(
-                        array('checkbox_callback', $id),
-                        array('safe_output_callback', 'source', $repo_name, $icon),
-                        array('safe_output_callback', 'from', $from),
-                        array('subject_callback', $subject, $url, $flags),
-                        array('date_callback', translate_time_str(human_readable_interval($date), $this), $ts),
-                        array('icon_callback', $flags)
-                    ),
-                    $id,
-                    $style,
-                    $this,
-                    $row_class
-                );
-            }
-        }
+
+        $res = github_build_repo_rows(
+            $this->get('github_data', array()),
+            $repo, $repo_id, $cutoff,
+            $login_time, $unread_only, $list_parent, $this
+        );
+
         $this->out('formatted_message_list', $res);
         $this->out('github_server_id', $repo_id);
     }
