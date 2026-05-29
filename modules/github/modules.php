@@ -763,14 +763,15 @@ function build_github_subject($event, $output_mod) {
 
     switch ($type) {
         case 'pushevent':
-            $commit_count = count($event['payload']['commits']);
+            $commits = $event['payload']['commits'] ?? array();
+            $commit_count = count($commits);
             if ($commit_count > 1) {
                 $post = sprintf('%d new commits to %s', $commit_count, $repo_name);
                 if ($ref) {
                     $post .= $ref;
                 }
             } else {
-                $commit_msg = html_entity_decode($event['payload']['commits'][0]['message'], ENT_QUOTES | ENT_HTML401, 'UTF-8');
+                $commit_msg = html_entity_decode($commits[0]['message'] ?? '', ENT_QUOTES | ENT_HTML401, 'UTF-8');
                 $commit_msg = mb_substr($commit_msg, 0, $max);
                 $post = sprintf('New commit: %s', $commit_msg);
                 if ($ref) {
@@ -780,69 +781,69 @@ function build_github_subject($event, $output_mod) {
             break;
 
         case 'issuesevent':
-            $issue_title = html_entity_decode($event['payload']['issue']['title'], ENT_QUOTES | ENT_HTML401, 'UTF-8');
+            $issue_title = html_entity_decode($event['payload']['issue']['title'] ?? '', ENT_QUOTES | ENT_HTML401, 'UTF-8');
             $issue_title = mb_substr($issue_title, 0, $max);
-            $action = ucfirst($event['payload']['action']);
-            $issue_number = $event['payload']['issue']['number'];
+            $action = ucfirst($event['payload']['action'] ?? '');
+            $issue_number = $event['payload']['issue']['number'] ?? 0;
             $post = sprintf('Issue #%d %s: %s', $issue_number, strtolower($action), $issue_title);
             break;
 
         case 'issuecommentevent':
-            $issue_title = html_entity_decode($event['payload']['issue']['title'], ENT_QUOTES | ENT_HTML401, 'UTF-8');
+            $issue_title = html_entity_decode($event['payload']['issue']['title'] ?? '', ENT_QUOTES | ENT_HTML401, 'UTF-8');
             $issue_title = mb_substr($issue_title, 0, $max);
-            $issue_number = $event['payload']['issue']['number'];
+            $issue_number = $event['payload']['issue']['number'] ?? 0;
             $post = sprintf('Comment on issue #%d: %s', $issue_number, $issue_title);
             break;
 
         case 'pullrequestevent':
-            $pr_title = html_entity_decode($event['payload']['pull_request']['title'], ENT_QUOTES | ENT_HTML401, 'UTF-8');
+            $pr_title = html_entity_decode($event['payload']['pull_request']['title'] ?? '', ENT_QUOTES | ENT_HTML401, 'UTF-8');
             $pr_title = mb_substr($pr_title, 0, $max);
-            $action = ucfirst($event['payload']['action']);
-            $pr_number = $event['payload']['pull_request']['number'];
+            $action = ucfirst($event['payload']['action'] ?? '');
+            $pr_number = $event['payload']['pull_request']['number'] ?? 0;
             $post = sprintf('Pull request #%d %s: %s', $pr_number, strtolower($action), $pr_title);
             break;
 
         case 'pullrequestcommentevent':
         case 'pullrequestreviewcommentevent':
-            $pr_title = mb_substr($event['payload']['pull_request']['title'], 0, $max);
-            $pr_number = $event['payload']['pull_request']['number'];
+            $pr_title = mb_substr($event['payload']['pull_request']['title'] ?? '', 0, $max);
+            $pr_number = $event['payload']['pull_request']['number'] ?? 0;
             $post = sprintf('Comment on pull request #%d: %s', $pr_number, $pr_title);
             break;
 
         case 'releaseevent':
-            $release_name = mb_substr($event['payload']['release']['name'] ?: $event['payload']['release']['tag_name'], 0, $max);
-            $action = ucfirst($event['payload']['action']);
+            $release_name = mb_substr(($event['payload']['release']['name'] ?? '') ?: ($event['payload']['release']['tag_name'] ?? ''), 0, $max);
+            $action = ucfirst($event['payload']['action'] ?? '');
             $post = sprintf('Release %s: %s', strtolower($action), $release_name);
             break;
 
         case 'createevent':
-            $ref_type = $event['payload']['ref_type'];
+            $ref_type = $event['payload']['ref_type'] ?? '';
             if ($ref_type === 'repository') {
                 $post = sprintf('Repository %s created', $repo_name);
             } elseif ($ref_type === 'branch') {
-                $branch_name = html_entity_decode($event['payload']['ref'], ENT_QUOTES | ENT_HTML401, 'UTF-8');
+                $branch_name = html_entity_decode($event['payload']['ref'] ?? '', ENT_QUOTES | ENT_HTML401, 'UTF-8');
                 $post = sprintf('Branch %s created in %s', $branch_name, $repo_name);
             } elseif ($ref_type === 'tag') {
-                $tag_name = html_entity_decode($event['payload']['ref'], ENT_QUOTES | ENT_HTML401, 'UTF-8');
+                $tag_name = html_entity_decode($event['payload']['ref'] ?? '', ENT_QUOTES | ENT_HTML401, 'UTF-8');
                 $post = sprintf('Tag %s created in %s', $tag_name, $repo_name);
             } else {
-                $post = sprintf('%s %s created in %s', ucfirst($ref_type), $event['payload']['ref'], $repo_name);
+                $post = sprintf('%s %s created in %s', ucfirst($ref_type), $event['payload']['ref'] ?? '', $repo_name);
             }
             break;
 
         case 'deleteevent':
-            $ref_type = $event['payload']['ref_type'];
-            $ref_name = html_entity_decode($event['payload']['ref'], ENT_QUOTES | ENT_HTML401, 'UTF-8');
+            $ref_type = $event['payload']['ref_type'] ?? '';
+            $ref_name = html_entity_decode($event['payload']['ref'] ?? '', ENT_QUOTES | ENT_HTML401, 'UTF-8');
             $post = sprintf('%s %s deleted in %s', ucfirst($ref_type), $ref_name, $repo_name);
             break;
 
         case 'forkevent':
-            $fork_name = $event['payload']['forkee']['full_name'];
+            $fork_name = $event['payload']['forkee']['full_name'] ?? $repo_name;
             $post = sprintf('Repository forked to %s', $fork_name);
             break;
 
         case 'watchevent':
-            if ($event['payload']['action'] == 'started') {
+            if (($event['payload']['action'] ?? '') == 'started') {
                 $post = sprintf('%s started watching %s', $actor, $repo_name);
             } else {
                 $post = sprintf('%s stopped watching %s', $actor, $repo_name);
@@ -850,25 +851,25 @@ function build_github_subject($event, $output_mod) {
             break;
 
         case 'commitcommentevent':
-            $commit_sha = mb_substr($event['payload']['comment']['commit_id'], 0, 7);
+            $commit_sha = mb_substr($event['payload']['comment']['commit_id'] ?? '', 0, 7);
             $post = sprintf('Comment on commit %s in %s', $commit_sha, $repo_name);
             break;
 
         case 'gollumwikievent':
         case 'gollumevent':
-            $page_count = count($event['payload']['pages']);
+            $page_count = count($event['payload']['pages'] ?? array());
             if ($page_count > 1) {
                 $post = sprintf('%d wiki pages updated in %s', $page_count, $repo_name);
             } else {
-                $page_name = $event['payload']['pages'][0]['page_name'];
-                $action = $event['payload']['pages'][0]['action'];
+                $page_name = html_entity_decode($event['payload']['pages'][0]['page_name'] ?? '', ENT_QUOTES | ENT_HTML401, 'UTF-8');
+                $action = $event['payload']['pages'][0]['action'] ?? '';
                 $post = sprintf('Wiki page "%s" %s in %s', $page_name, $action, $repo_name);
             }
             break;
 
         case 'memberevent':
-            $member = $event['payload']['member']['login'];
-            $action = $event['payload']['action'];
+            $member = $event['payload']['member']['login'] ?? '';
+            $action = $event['payload']['action'] ?? '';
             $post = sprintf('Member %s %s in %s', $member, $action, $repo_name);
             break;
 
@@ -880,9 +881,10 @@ function build_github_subject($event, $output_mod) {
             break;
     }
 
-    $post = html_entity_decode($post, ENT_QUOTES | ENT_HTML401, 'UTF-8');
-
-    return $output_mod->html_safe($post);
+    // Return plain text. Call sites that need HTML-safe output (subject_callback,
+    // github_parse_headers) already apply html_safe() themselves; returning
+    // pre-encoded HTML caused double-encoding (&quot; showing literally).
+    return html_entity_decode($post, ENT_QUOTES | ENT_HTML401, 'UTF-8');
 }}
 
 /**
@@ -1211,8 +1213,8 @@ function github_format_issue_event($payload, $output_mod) {
     if (!empty($issue)) {
         $res .= '<div class="card">';
         $res .= '<div class="card-body">';
-        $res .= '<h5 class="card-title">'.$output_mod->html_safe($issue['title']).'</h5>';
-        $res .= '<h6 class="card-subtitle mb-2 text-muted">Issue #'.$issue['number'].'</h6>';
+        $res .= '<h5 class="card-title">'.$output_mod->html_safe($issue['title'] ?? '').'</h5>';
+        $res .= '<h6 class="card-subtitle mb-2 text-muted">Issue #'.($issue['number'] ?? 0).'</h6>';
         if (isset($issue['body']) && $issue['body']) {
             $res .= '<p class="card-text">'.$output_mod->html_safe(mb_substr($issue['body'], 0, 500)).'</p>';
         }
@@ -1239,14 +1241,14 @@ function github_format_issue_comment_event($payload, $output_mod) {
 
     if (!empty($issue)) {
         $res .= '<div class="mb-3">';
-        $res .= '<h6>Issue: '.$output_mod->html_safe($issue['title']).' (#'.$issue['number'].')</h6>';
+        $res .= '<h6>Issue: '.$output_mod->html_safe($issue['title'] ?? '').' (#'.($issue['number'] ?? 0).')</h6>';
         $res .= '</div>';
     }
 
     if (!empty($comment)) {
         $res .= '<div class="card">';
         $res .= '<div class="card-body">';
-        $res .= '<p class="card-text">'.$output_mod->html_safe(mb_substr($comment['body'], 0, 500)).'</p>';
+        $res .= '<p class="card-text">'.$output_mod->html_safe(mb_substr($comment['body'] ?? '', 0, 500)).'</p>';
         if (isset($comment['html_url'])) {
             $res .= '<a href="'.$output_mod->html_safe($comment['html_url']).'" target="_blank" rel="noopener" class="btn btn-primary text-white">View Comment</a>';
         }
@@ -1271,8 +1273,8 @@ function github_format_pull_request_event($payload, $output_mod) {
     if (!empty($pr)) {
         $res .= '<div class="card">';
         $res .= '<div class="card-body">';
-        $res .= '<h5 class="card-title">'.$output_mod->html_safe($pr['title']).'</h5>';
-        $res .= '<h6 class="card-subtitle mb-2 text-muted">Pull Request #'.$pr['number'].'</h6>';
+        $res .= '<h5 class="card-title">'.$output_mod->html_safe($pr['title'] ?? '').'</h5>';
+        $res .= '<h6 class="card-subtitle mb-2 text-muted">Pull Request #'.($pr['number'] ?? 0).'</h6>';
         if (isset($pr['body']) && $pr['body']) {
             $res .= '<p class="card-text">'.$output_mod->html_safe(mb_substr($pr['body'], 0, 500)).'</p>';
         }
@@ -1299,14 +1301,14 @@ function github_format_pull_request_comment_event($payload, $output_mod) {
 
     if (!empty($pr)) {
         $res .= '<div class="mb-3">';
-        $res .= '<h6>Pull Request: '.$output_mod->html_safe($pr['title']).' (#'.$pr['number'].')</h6>';
+        $res .= '<h6>Pull Request: '.$output_mod->html_safe($pr['title'] ?? '').' (#'.($pr['number'] ?? 0).')</h6>';
         $res .= '</div>';
     }
 
     if (!empty($comment)) {
         $res .= '<div class="card">';
         $res .= '<div class="card-body">';
-        $res .= '<p class="card-text">'.$output_mod->html_safe(mb_substr($comment['body'], 0, 500)).'</p>';
+        $res .= '<p class="card-text">'.$output_mod->html_safe(mb_substr($comment['body'] ?? '', 0, 500)).'</p>';
         if (isset($comment['html_url'])) {
             $res .= '<a href="'.$output_mod->html_safe($comment['html_url']).'" target="_blank" rel="noopener" class="btn btn-primary text-white">View Comment</a>';
         }
@@ -1331,8 +1333,8 @@ function github_format_release_event($payload, $output_mod) {
     if (!empty($release)) {
         $res .= '<div class="card">';
         $res .= '<div class="card-body">';
-        $res .= '<h5 class="card-title">'.$output_mod->html_safe($release['name'] ?: $release['tag_name']).'</h5>';
-        $res .= '<h6 class="card-subtitle mb-2 text-muted">Version '.$output_mod->html_safe($release['tag_name']).'</h6>';
+        $res .= '<h5 class="card-title">'.$output_mod->html_safe(($release['name'] ?? '') ?: ($release['tag_name'] ?? '')).'</h5>';
+        $res .= '<h6 class="card-subtitle mb-2 text-muted">Version '.$output_mod->html_safe($release['tag_name'] ?? '').'</h6>';
         if (isset($release['body']) && $release['body']) {
             $res .= '<div class="card-text"><pre class="bg-light p-2">'.$output_mod->html_safe(mb_substr($release['body'], 0, 1000)).'</pre></div>';
         }
@@ -1387,7 +1389,7 @@ function github_format_fork_event($payload, $output_mod) {
     if (!empty($forkee)) {
         $res .= '<div class="card">';
         $res .= '<div class="card-body">';
-        $res .= '<h5 class="card-title">'.$output_mod->html_safe($forkee['full_name']).'</h5>';
+        $res .= '<h5 class="card-title">'.$output_mod->html_safe($forkee['full_name'] ?? '').'</h5>';
         if (isset($forkee['description']) && $forkee['description']) {
             $res .= '<p class="card-text">'.$output_mod->html_safe($forkee['description']).'</p>';
         }
@@ -1427,14 +1429,14 @@ function github_format_commit_comment_event($payload, $output_mod) {
     $res .= '</div>';
 
     if (!empty($comment)) {
-        $commit_sha = substr($comment['commit_id'], 0, 7);
+        $commit_sha = substr($comment['commit_id'] ?? '', 0, 7);
         $res .= '<div class="mb-3">';
         $res .= '<h6>Commit: <code>'.$output_mod->html_safe($commit_sha).'</code></h6>';
         $res .= '</div>';
 
         $res .= '<div class="card">';
         $res .= '<div class="card-body">';
-        $res .= '<p class="card-text">'.$output_mod->html_safe(mb_substr($comment['body'], 0, 500)).'</p>';
+        $res .= '<p class="card-text">'.$output_mod->html_safe(mb_substr($comment['body'] ?? '', 0, 500)).'</p>';
         if (isset($comment['html_url'])) {
             $res .= '<a href="'.$output_mod->html_safe($comment['html_url']).'" target="_blank" rel="noopener" class="btn btn-primary text-white">View Comment</a>';
         }
@@ -1458,8 +1460,8 @@ function github_format_wiki_event($payload, $output_mod) {
     foreach ($pages as $page) {
         $res .= '<div class="card mb-2">';
         $res .= '<div class="card-body">';
-        $res .= '<h6 class="card-title">'.$output_mod->html_safe($page['page_name']).'</h6>';
-        $res .= '<p class="card-text"><span class="badge bg-secondary">'.ucfirst($page['action']).'</span></p>';
+        $res .= '<h6 class="card-title">'.$output_mod->html_safe($page['page_name'] ?? '').'</h6>';
+        $res .= '<p class="card-text"><span class="badge bg-secondary">'.ucfirst($page['action'] ?? '').'</span></p>';
         if (isset($page['html_url'])) {
             $res .= '<a href="'.$output_mod->html_safe($page['html_url']).'" target="_blank" rel="noopener" class="btn btn-sm btn-primary text-white">View Page</a>';
         }
@@ -1484,7 +1486,7 @@ function github_format_member_event($payload, $output_mod) {
     if (!empty($member)) {
         $res .= '<div class="card">';
         $res .= '<div class="card-body">';
-        $res .= '<h6 class="card-title">'.$output_mod->html_safe($member['login']).'</h6>';
+        $res .= '<h6 class="card-title">'.$output_mod->html_safe($member['login'] ?? '').'</h6>';
         if (isset($member['html_url'])) {
             $res .= '<a href="'.$output_mod->html_safe($member['html_url']).'" target="_blank" rel="noopener" class="btn btn-primary text-white">View Profile</a>';
         }
