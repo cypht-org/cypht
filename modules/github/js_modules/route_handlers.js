@@ -24,10 +24,6 @@ function applyGithubMessageContentPageHandlers(routeParams) {
 }
 
 function applyGithubMessageListPageHandler(routeParams) {
-    /*
-    TODO:
-    - Actually the message list for a particular repo is handled by the imap module, it should be moved to the github module.
-    */   
     if (routeParams.list_path === 'github_all') {
         // Single Hm_MessagesStore for the whole view.  getRequestConfigs() falls
         // through to the hm_data_sources() loop (same as combined_inbox) and fires
@@ -53,7 +49,7 @@ function applyGithubMessageListPageHandler(routeParams) {
         });
 
         const refreshIntervalId = setInterval(() => {
-            refreshAll(dataSources, true);
+            if (!navigatedAway) refreshGithubAll(messages, true, () => navigatedAway);
         }, 30000);
 
         $('.refresh_link').on("click", function(e) {
@@ -62,8 +58,10 @@ function applyGithubMessageListPageHandler(routeParams) {
         });
 
         return () => {
+            window.removeEventListener('page-change', onPageChange);
+            messages.abort();
             clearInterval(refreshIntervalId);
-        }
+        };
     }
 }
 

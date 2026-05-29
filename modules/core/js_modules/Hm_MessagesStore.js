@@ -27,6 +27,17 @@ class Hm_MessagesStore {
         this.pages = 0;
         this.page = page;
         this.newMessages = [];
+        // Resolvers for in-flight load() outer promises; abort() drains these so Promise.all settles.
+        this._cancelResolvers = new Set();
+    }
+
+    /**
+     * Cancel all in-flight load() calls by settling their pending promises immediately.
+     * Call this on page teardown to prevent stale DOM writes and unblock the event loop.
+     */
+    abort() {
+        this._cancelResolvers.forEach(resolve => resolve());
+        this._cancelResolvers.clear();
     }
 
     /**
@@ -125,7 +136,9 @@ class Hm_MessagesStore {
 
         await Promise.all(this.fetch(hideLoadingState).map((req) => {
             return new Promise((resolve) => {
+                this._cancelResolvers.add(resolve);
                 req.then((response) => {
+                    this._cancelResolvers.delete(resolve);
                     response.resolvePromise = resolve;
                     pendingResponses.set(response.sourceId, response);
 
@@ -136,10 +149,16 @@ class Hm_MessagesStore {
                     // Process after a short delay to allow batching
                     processingTimeout = setTimeout(processPendingResponses, 10);
                 }, (error) => {
+                    // A source failed (network error, server error, rate-limit, etc.).
+                    // Resolve with no data so Promise.all can settle and other sources
+                    // that did succeed are still rendered.
+                    this._cancelResolvers.delete(resolve);
                     console.error('Error loading messages from source:', error);
+                    resolve();
                 });
             });
         }));
+        this._cancelResolvers.clear();
 
         return this;
     }
