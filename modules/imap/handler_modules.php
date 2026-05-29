@@ -1489,6 +1489,13 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
         $uids = [];
         foreach ($ids as $key => $id) {
             $details = Hm_IMAP_List::dump($id);
+
+            if (empty($details)) {
+                // Server ID is not a known IMAP server (e.g. a GitHub repo name leaked
+                // from a data source of another module). Skip silently.
+                continue;
+            }
+
             $mailbox = Hm_IMAP_List::get_connected_mailbox($id, $this->cache);
 
             if (!$mailbox || !$mailbox->authed()) {
