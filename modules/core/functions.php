@@ -810,7 +810,9 @@ if (!hm_exists('get_scheduled_date')) {
                 $label = 'Next month';
                 break;
             default:
-                $date_string = $format;
+                // Strip sub-second precision (e.g. .000Z) from ISO 8601 strings;
+                // PHP's strtotime() does not support milliseconds.
+                $date_string = preg_replace('/\.\d+(?=Z|[+\-]\d{2}:?\d{2}|$)/', '', $format);
                 $label = 'Certain date';
                 break;
         }

@@ -334,6 +334,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         $uploaded_files = array_key_exists('uploaded_files', $this->request->post) ? $this->request->post['uploaded_files'] : false;
         $delivery_receipt = array_key_exists('compose_delivery_receipt', $this->request->post) ? $this->request->post['compose_delivery_receipt'] : false;
         $schedule = array_key_exists('schedule', $this->request->post) ? $this->request->post['schedule'] : '';
+        $body_type = $this->get('smtp_compose_type', DEFAULT_SMTP_COMPOSE_TYPE);
 
         if (array_key_exists('delete_uploaded_files', $this->request->post) && $this->request->post['delete_uploaded_files']) {
             delete_uploaded_files($this->session, $draft_id);
@@ -362,7 +363,8 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
             }
             $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
                     'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
-                    'draft_in_reply_to' => $inreplyto, 'delivery_receipt' => $delivery_receipt, 'schedule' => $schedule), $draft_id, $this->session,
+                    'draft_in_reply_to' => $inreplyto, 'delivery_receipt' => $delivery_receipt, 'schedule' => $schedule,
+                    'body_type' => $body_type), $draft_id, $this->session,
                     $this, $this->cache, $uploaded_files, $profile);
             if ($new_draft_id >= 0) {
                 if ($draft_notice) {
@@ -1671,10 +1673,8 @@ class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
             return;
         }
         $scheduled_msg_count = 0;
+        // Pass the raw value; reschedule_message_sending() calls get_scheduled_date() internally.
         $new_schedule_date = $form['schedule_date'];
-        if ($form['schedule_date'] != 'now') {
-            $new_schedule_date = get_scheduled_date($form['schedule_date']);
-        }
         $ids = explode(',', $form['scheduled_msg_ids']);
         foreach ($ids as $msg_part) {
             list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
@@ -2051,14 +2051,14 @@ function get_uploaded_files_from_array($uploaded_files) {
 }
 }
 
-function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '', $profile_id = null) {
+function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '', $profile_id = null, $body_type = false) {
     $uploaded_files = get_uploaded_files_from_array($uploaded_files);
     $mime = new Hm_MIME_Msg(
         $atts['draft_to'],
         $atts['draft_subject'],
         $atts['draft_body'],
         $from,
-        false,
+        $body_type,
         $atts['draft_cc'],
         $atts['draft_bcc'],
         '',
@@ -2126,8 +2126,25 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     } else {
         $folder = $specials['draft'];
     }
-    
-    $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name, $profile['id']);
+
+    // For scheduled messages, use the real outbound format so the message is stored
+    // with proper MIME structure (multipart/alternative for HTML/markdown).
+    // Regular drafts stay as plain text so they re-open correctly in the compose form.
+    $body_type_for_mime = false;
+    if (!empty($atts['schedule'])) {
+        $body_type_for_mime = isset($atts['body_type']) ? (int) $atts['body_type'] : false;
+        // Markdown (type 2) must be pre-converted to HTML; Hm_MIME_Msg then wraps
+        // it in a multipart/alternative part, matching what direct send does.
+        if ($body_type_for_mime === 2 && !empty($atts['draft_body'])) {
+            $converter = new GithubFlavoredMarkdownConverter([
+                'html_input' => 'strip',
+                'allow_unsafe_links' => false,
+            ]);
+            $atts['draft_body'] = $converter->convert($atts['draft_body']);
+        }
+    }
+
+    $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name, $profile['id'], $body_type_for_mime);
     $res = $mime->process_attachments();
 
     if (! empty($atts['schedule']) && empty($mime->get_recipient_addresses())) {
