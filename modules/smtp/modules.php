@@ -1026,7 +1026,7 @@ class Hm_Output_compose_form_start extends Hm_Output_Module {
         $res = '<div class="container">';
         $res .= '<div class="row justify-content-md-center">';
         $res .= '<div class="col col-lg-10 col-xl-8">';
-        $res .= '<form class="compose_form p-4" method="post" action="'.$this->build_page_url('compose').'" data-reminder="' . $this->get('enable_attachment_reminder', 0) . '">';
+        $res .= '<form class="compose_form p-4" method="post" action="'.$this->build_page_url('compose').'" data-reminder="' . $this->get('enable_attachment_reminder', 0) . '" data-compose-type="'.$this->get('smtp_compose_type', DEFAULT_SMTP_COMPOSE_TYPE).'">';
         return $res;
     }
 }
@@ -1185,13 +1185,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         if (count($this->get('smtp_servers', array())) == 0) {
             $send_disabled = 'disabled="disabled" ';
         }
-        $res = '';
-        if ($html == 1) {
-            // TODO: The client should be provided all relevant configs so it can tell what appropriate js code to execute. This should not be handled by backend modules.
-            $res .= '<script type="text/javascript">window.HTMLEditor = true</script>';
-        }
-
-        $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+        $res = '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<input type="hidden" name="compose_msg_path" value="'.$this->html_safe($msg_path).'" />'.
                 '<input type="hidden" name="post_archive" class="compose_post_archive" value="0" />'.
                 '<input type="hidden" name="next_email_post" class="compose_next_email_data" value="" />'.
@@ -1232,12 +1226,6 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 if($this->get('enable_compose_delivery_receipt_setting')) {
                     $res .= '<div class="form-check mb-3"><input value="1" name="compose_delivery_receipt" disabled id="compose_delivery_receipt" type="checkbox" class="form-check-input" checked/><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
                 }
-        if ($html == 2) {
-            $res .= '<link href="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
-                '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.js"></script>'.
-                '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/markdown/marked.js"></script>'.
-                '<script type="text/javascript">window.mdEditor = new Editor(); mdEditor.render();</script>';
-        }
         $res .= '<table class="uploaded_files">';
 
         foreach ($files as $file) {
