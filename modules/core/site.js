@@ -1149,7 +1149,7 @@ function Message_List() {
         $('.total').text(Hm_Utils.rows().length);
         self.update_title();
         if (list_type == 'formatted_unread_data') {
-            self.adjust_unread_total(Hm_Utils.rows().length, true);
+            Hm_Folders.update_unread_counts();
         }
     };
 
@@ -1324,6 +1324,24 @@ var Hm_Folders = {
             }
 
             // Update the display for each server
+
+            var grand_total = 0;
+
+            for (name in Hm_Folders.unread_counts) {
+                if (
+                    name.startsWith('imap_') ||
+                    name.startsWith('jmap_') ||
+                    name.startsWith('ews_')
+                ) {
+                    grand_total += parseInt(Hm_Folders.unread_counts[name]) || 0;
+                }
+            }
+
+            if (grand_total > 0) {
+                $('.total_unread_count').html('&#160;' + grand_total + '&#160;');
+            } else {
+                $('.total_unread_count').html('');
+            }
             for (var server_id in server_totals) {
                 var total = server_totals[server_id];
                 if (total > 0) {
