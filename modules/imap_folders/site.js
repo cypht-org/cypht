@@ -400,8 +400,8 @@ var render_folder_table = function(folders, tbody, server_id) {
 var bind_folder_table_actions = function(tbody, server_id) {
         tbody.find('.folder_create_child_btn').off('click').on('click', function() {
             var tr = $(this).closest('tr');
-            var folderHex = tr.data('folder-hex');
-            var folderName = tr.data('folder-name');
+            var folderHex = tr.attr('data-folder-hex');
+            var folderName = tr.attr('data-folder-name');
             var block = tr.closest('.account_folder_block');
             // Pass parent folder hex to modal
             show_create_folder_modal(server_id, block, folderHex, tr);
@@ -409,8 +409,8 @@ var bind_folder_table_actions = function(tbody, server_id) {
         });
     tbody.find('.folder_rename_btn').off('click').on('click', function() {
         var tr = $(this).closest('tr');
-        var folderHex = tr.data('folder-hex');
-        var folderName = tr.data('folder-name');
+        var folderHex = tr.attr('data-folder-hex');
+        var folderName = tr.attr('data-folder-name');
         var fullFolderName = 'imap_' + server_id + '_' + folderHex;
         show_rename_modal(server_id, fullFolderName, folderName, tr);
         return false;
@@ -418,8 +418,8 @@ var bind_folder_table_actions = function(tbody, server_id) {
 
     tbody.find('.folder_delete_btn').off('click').on('click', function() {
         var tr = $(this).closest('tr');
-        var folderHex = tr.data('folder-hex');
-        var folderName = tr.data('folder-name');
+        var folderHex = tr.attr('data-folder-hex');
+        var folderName = tr.attr('data-folder-name');
         var fullFolderName = 'imap_' + server_id + '_' + folderHex;
         show_delete_modal(server_id, fullFolderName, folderName, tr);
         return false;
@@ -428,8 +428,8 @@ var bind_folder_table_actions = function(tbody, server_id) {
     tbody.find('.set_special_btn').off('click').on('click', function(e) {
         e.preventDefault();
         var tr = $(this).closest('tr');
-        var folderHex = tr.data('folder-hex');
-        var folderName = tr.data('folder-name');
+        var folderHex = tr.attr('data-folder-hex');
+        var folderName = tr.attr('data-folder-name');
         var type = $(this).data('type');
         var block = tr.closest('.account_folder_block');
         var fullFolderName = 'imap_' + server_id + '_' + folderHex;
@@ -439,8 +439,8 @@ var bind_folder_table_actions = function(tbody, server_id) {
     tbody.find('.clear_special_btn').off('click').on('click', function(e) {
         e.preventDefault();
         var tr = $(this).closest('tr');
-        var folderHex = tr.data('folder-hex');
-        var folderName = tr.data('folder-name');
+        var folderHex = tr.attr('data-folder-hex');
+        var folderName = tr.attr('data-folder-name');
         var type = $(this).data('type');
         var block = tr.closest('.account_folder_block');
         if (!type) return;
