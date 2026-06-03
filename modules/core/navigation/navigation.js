@@ -117,6 +117,10 @@ function autoAppendParamsForNavigation(href)
                     }
                 }
             }
+            const sidebarSearchTerms = $('.menu_search form [name=search_terms]').val();
+            if (sidebarSearchTerms && sidebarSearchTerms.trim()) {
+                target.set('search_terms', sidebarSearchTerms.trim());
+            }
             return href.split('?')[0] + '?' + target.toString();
         }
     }
