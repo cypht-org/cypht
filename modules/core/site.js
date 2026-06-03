@@ -139,6 +139,17 @@ var Hm_Ajax = {
 
     add_callback_hook: function(request_name, hook_function) {
         Hm_Ajax.callback_hooks.push([request_name, hook_function]);
+    },
+
+    has_success: function(res) {
+        if (res.router_user_msgs) {
+            for (var key in res.router_user_msgs) {
+                if (res.router_user_msgs[key].type === 'success') {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 };
 
@@ -448,6 +459,13 @@ Hm_Modal.prototype = {
 
     setTitle: function(title) {
         this.modalTitle.html(title);
+    }
+};
+
+Hm_Modal.hide = function(modalId) {
+    var modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+    if (modal) {
+        modal.hide();
     }
 };
 
@@ -1131,7 +1149,7 @@ function Message_List() {
         $('.total').text(Hm_Utils.rows().length);
         self.update_title();
         if (list_type == 'formatted_unread_data') {
-            self.adjust_unread_total(Hm_Utils.rows().length, true);
+            Hm_Folders.update_unread_counts();
         }
     };
 
@@ -1306,6 +1324,24 @@ var Hm_Folders = {
             }
 
             // Update the display for each server
+
+            var grand_total = 0;
+
+            for (name in Hm_Folders.unread_counts) {
+                if (
+                    name.startsWith('imap_') ||
+                    name.startsWith('jmap_') ||
+                    name.startsWith('ews_')
+                ) {
+                    grand_total += parseInt(Hm_Folders.unread_counts[name]) || 0;
+                }
+            }
+
+            if (grand_total > 0) {
+                $('.total_unread_count').html('&#160;' + grand_total + '&#160;');
+            } else {
+                $('.total_unread_count').html('');
+            }
             for (var server_id in server_totals) {
                 var total = server_totals[server_id];
                 if (total > 0) {
@@ -1788,6 +1824,12 @@ var Hm_Utils = {
         window.location.href = autoAppendParamsForNavigation(path);
     },
 
+    remove_url_params: function(params) {
+        var currentUrl = new URL(window.location.href);
+        params.forEach(function(param) { currentUrl.searchParams.delete(param); });
+        history.replaceState(history.state, '', currentUrl.toString());
+    },
+
     is_valid_email: function (val) {
         var email = val.trim();
         if (!email || email.length > 320) { // RFC 5321: max 320 chars
@@ -1931,6 +1973,54 @@ var Hm_Utils = {
         }
 
         return true;
+    },
+
+    is_valid_name: function(val, minLength, maxLength) {
+        minLength = minLength || 2;
+        maxLength = maxLength || 100;
+        
+        if (!val) {
+            return false;
+        }
+        
+        var name = val.trim();
+        if (name.length < minLength || name.length > maxLength) {
+            return false;
+        }
+        
+        // Allow letters (including accented), digits, spaces, hyphens, and apostrophes
+        return /^[A-Za-zÀ-ÖØ-öø-ÿ0-9'\- ]+$/.test(name);
+    },
+
+    is_valid_phone: function(val) {
+        if (!val) {
+            return false;
+        }
+        
+        var phone = val.trim();
+        if (phone.length < 7 || phone.length > 20) {
+            return false;
+        }
+        
+        // Allow optional +, digits, spaces, hyphens, dots, and parentheses
+        return /^\+?[\d\s\-().]+$/.test(phone);
+    },
+
+    is_valid_url: function(val) {
+        if (!val) {
+            return false;
+        }
+        
+        var url = val.trim();
+        
+        // Must start with http:// or https://
+        if (!/^https?:\/\//i.test(url)) {
+            return false;
+        }
+        
+        // Must have at least one dot after the protocol
+        var withoutProtocol = url.replace(/^https?:\/\//i, '');
+        return withoutProtocol.includes('.') && withoutProtocol.length > 3;
     },
 };
 
@@ -2655,14 +2745,17 @@ function getEmailProviderKey(email) {
 }
 
 function setupActionSchedule(callback) {
-    $(document).on('click', '.nexter_date_picker', function (e) {
+    // Remove any previously registered handlers to prevent duplicate firings
+    // when this function is called multiple times (e.g. after navigating between pages).
+    $(document).off('.scheduleAction');
+    $(document).on('click.scheduleAction', '.nexter_date_picker', function (e) {
         document.querySelector('.nexter_input_date').showPicker();
     });
-    $(document).on('click', '.nexter_date_helper', function (e) {
+    $(document).on('click.scheduleAction', '.nexter_date_helper', function (e) {
         e.preventDefault();
         $('.nexter_input').val($(this).attr('data-value')).trigger('change');
     });
-    $(document).on('input', '.nexter_input_date', function (e) {
+    $(document).on('input.scheduleAction', '.nexter_input_date', function (e) {
         var now = new Date();
         now.setMinutes(now.getMinutes() + 1);
         $(this).attr('min', now.toJSON().slice(0, 16));
@@ -2672,27 +2765,29 @@ function setupActionSchedule(callback) {
             $('.nexter_date_picker').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
         }
     });
-    $(document).on('change', '.nexter_input_date', function (e) {
+    $(document).on('change.scheduleAction', '.nexter_input_date', function (e) {
         const selectedDate = new Date($(this).val());
         if ($(this).val() && new Date().getTime() < selectedDate.getTime()) {
             $('.nexter_input').val(selectedDate.toISOString()).trigger('change');
         }
     });
-    $(document).on('change', '.nexter_input', callback);
+    $(document).on('change.scheduleAction', '.nexter_input', callback);
 }
 
 function setupActionSnooze(callback) {
-    $(document).on('click', '.nexter_date_picker_snooze', function (e) {
+    // Remove any previously registered handlers to prevent duplicate firings.
+    $(document).off('.snoozeAction');
+    $(document).on('click.snoozeAction', '.nexter_date_picker_snooze', function (e) {
         document.querySelector('.nexter_input_date_snooze').showPicker();
     });
-    $(document).on('click', '.nexter_date_helper_snooze', function (e) {
+    $(document).on('click.snoozeAction', '.nexter_date_helper_snooze', function (e) {
         e.preventDefault();
         $('.nexter_input_snooze').val($(this).attr('data-value')).trigger('change');
 
         const dropdown = bootstrap.Dropdown.getOrCreateInstance($('#dropdownMenuSnooze')[0]);
         dropdown.toggle();
     });
-    $(document).on('input', '.nexter_input_date_snooze', function (e) {
+    $(document).on('input.snoozeAction', '.nexter_input_date_snooze', function (e) {
         var now = new Date();
         now.setMinutes(now.getMinutes() + 1);
         $(this).attr('min', now.toJSON().slice(0, 16));
@@ -2702,13 +2797,13 @@ function setupActionSnooze(callback) {
             $('.nexter_date_picker_snooze').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
         }
     });
-    $(document).on('change', '.nexter_input_date_snooze', function (e) {
+    $(document).on('change.snoozeAction', '.nexter_input_date_snooze', function (e) {
         const selectedDate = new Date($(this).val());
         if ($(this).val() && new Date().getTime() < selectedDate.getTime()) {
             $('.nexter_input_snooze').val(selectedDate.toISOString()).trigger('change');
         }
     });
-    $(document).on('change', '.nexter_input_snooze', callback);
+    $(document).on('change.snoozeAction', '.nexter_input_snooze', callback);
 }
 
 document.addEventListener("show.bs.dropdown", function (event) {

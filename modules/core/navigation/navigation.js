@@ -49,6 +49,30 @@ window.addEventListener('load', function() {
 });
 
 
+/**
+ * SPA navigation click interceptor — intercepts every anchor inside .cypht-layout
+ * and loads the target page via fetch() so the shell (sidebar, header…) is not re-rendered.
+ *
+ * To opt a link OUT of SPA navigation, use one of the following patterns:
+ *
+ *  1. href="#"  +  data-src="<real-url>"
+ *     The interceptor ignores href="#" links. Store the real URL in data-src and
+ *     handle clicks with a direct (non-delegated) JS listener in your module:
+ *
+ *       PHP:  <a href="#" data-src="<?= $url ?>">…</a>
+ *       JS:   $('.subject a').on('click.mymodule', function(e) { … });
+ *
+ *  2. target="_blank"
+ *     Opens in a new tab; the interceptor lets these through automatically.
+ *
+ *  3. data-external="1"  (any truthy value)
+ *     Explicit opt-out for same-domain links that need a full page load:
+ *       <a href="/path" data-external="1">…</a>
+ *
+ *  4. Absolute URL pointing to a different hostname
+ *     Links starting with http://, https://, or // that reference a different
+ *     host are bypassed automatically (see isExternalDomain below).
+ */
 $(document).on('click', '.cypht-layout a', function(event) {
     const href = $(this).attr('href');
     const target = $(this).attr('target');
@@ -59,7 +83,7 @@ $(document).on('click', '.cypht-layout a', function(event) {
         href.startsWith('https://') || 
         href.startsWith('//')
     ) && !href.includes(window.location.hostname);
-    
+
     if (href !== "#" && target !== '_blank' && !isExternal && !isExternalDomain) {
         event.preventDefault();
         const currentUrl = new URL(window.location.href);
@@ -212,7 +236,11 @@ function extractCustomScripts($el) {
 function loadCustomScripts(scripts) {
     for (const script of scripts) {
         const id = $(script).attr('id');
-        $('script#' + id).replaceWith(script);
+        if ($(`script#${id}`).length) {
+            $('script#' + id).replaceWith(script);
+        } else {
+            $('body').append(script);
+        }
     }
 }
 

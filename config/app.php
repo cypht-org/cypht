@@ -129,8 +129,8 @@ return [
 
     /*
     |
-    | Enable TLS/SSL connections. Leave blank or set to false to disable. Set to
-    | true to enable TLS connections. If you want to use IMAP STARTTLS, do NOT
+    | Enable TLS/SSL connections. Set to false to disable. Leave blank (or set to
+    | true) to enable TLS connections by default. If you want to use IMAP STARTTLS, do NOT
     | enable this. This is only for TLS enabled sockets (typically on port 993).
     |
     */
@@ -1235,6 +1235,12 @@ return [
     | Defaults to 20
     */
     'default_setting_flagged_per_source' => env('DEFAULT_SETTING_FLAGGED_PER_SOURCE', 20),
+
+    /*
+    | Search all folders in combined views (flagged, unread, etc.)
+    | Defaults to false
+    */
+    'default_setting_search_all_folders' => env('DEFAULT_SETTING_SEARCH_ALL_FOLDERS', false),
 
     /*
     |
