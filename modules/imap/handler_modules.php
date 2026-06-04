@@ -1304,21 +1304,18 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
         $error = false;
         $moved = array();
         $folder_name = hex2bin($folder);
-        $special_folder = $this->get_special_folder($action_type, $specials, $server_details);
 
-        if (($action_type == "restore" || $action_type == "not_junk") && !$special_folder) {
-            $special_folder = 'INBOX';
+        if ($action_type === 'not_junk') {
+            if ($mailbox->is_imap()) {
+                $mailbox->message_action($folder_name, 'NOT_JUNK', $uids);
+            }
+            $action_type = 'restore';
         }
 
-        /* IMAP STORE -FLAGS (\Junk) when the flag is absent is a no-op; servers normally return OK. */
-        if ($action_type == 'not_junk' && $mailbox->is_imap()) {
-            $mailbox->message_action($folder_name, 'NOT_JUNK', $uids);
-            if ($mailbox->supports_permanent_keyword('$NotJunk')) {
-                if ($mailbox->supports_permanent_keyword('$Junk')) {
-                    $mailbox->message_action($folder_name, 'REMOVE_KEYWORD', $uids, false, '$Junk');
-                }
-                $mailbox->message_action($folder_name, 'CUSTOM', $uids, false, '$NotJunk');
-            }
+        $special_folder = $this->get_special_folder($action_type, $specials, $server_details);
+
+        if ($action_type == "restore" && !$special_folder) {
+            $special_folder = 'INBOX';
         }
 
         if ($special_folder && $special_folder != $folder_name) {
@@ -1336,11 +1333,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 }
             }
         } else {
-            if ($action_type == 'not_junk') {
-                foreach ($uids as $uid) {
-                    $moved[] = sprintf("imap_%s_%s_%s", $server_details['id'], $uid, $folder);
-                }
-            } elseif (!$mailbox->message_action($folder_name, mb_strtoupper($action_type), $uids)['status']) {
+            if (!$mailbox->message_action($folder_name, mb_strtoupper($action_type), $uids)['status']) {
                 $error = true;
             } else {
                 foreach ($uids as $uid) {
@@ -1353,7 +1346,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
         }
 
         $folderNotFoundError = false;
-        if (!$special_folder && $action_type != 'read' && $action_type != 'unread' && $action_type != 'flag' && $action_type != 'unflag' && $action_type != 'restore' && $action_type != 'not_junk') {
+        if (!$special_folder && $action_type != 'read' && $action_type != 'unread' && $action_type != 'flag' && $action_type != 'unflag' && $action_type != 'restore') {
             Hm_Msgs::add(sprintf('No %s folder configured for %s. Please go to <a href="%s">Folders settings</a> and configure one', $action_type, $server_details['name'], $this->build_page_url('folders', array('imap_server_id' => $server_details['id']))), empty($moved) ? 'danger' : 'warning');
             $folderNotFoundError = true;
         }
@@ -1382,10 +1375,8 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
             $folder = $specials['archive'];
         } elseif ($action_type == 'junk' && array_key_exists('junk', $specials)) {
             $folder = $specials['junk'];
-        } elseif ($action_type == 'restore' || $action_type == 'not_junk') {
-            $folder = is_array($specials)
-                ? ($specials['inbox'] ?? false)
-                : false;
+        } elseif ($action_type == 'restore') {
+            $folder = is_array($specials) ? ($specials['inbox'] ?? false) : false;
         }
         return $folder;
     }
