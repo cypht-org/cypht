@@ -424,20 +424,6 @@ class Hm_Mailbox {
         return $this->connection->message_action($action, $uids, $mailbox, $keyword);
     }
 
-    public function get_permanentflags() {
-        if ($this->is_imap()) {
-            return $this->connection->get_selected_permanentflags();
-        }
-        return false;
-    }
-
-    public function supports_permanent_keyword($keyword) {
-        if ($this->is_imap()) {
-            return $this->connection->supports_permanent_keyword($keyword);
-        }
-        return false;
-    }
-
     public function stream_message_part($folder, $msg_id, $part_id, $start_cb) {
         if (! $this->select_folder($folder)) {
             return;

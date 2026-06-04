@@ -131,7 +131,6 @@
       <!-- <file>./modules/imap/hm-imap.php</file> -->
       <file>./modules/imap/is_imap_junk_folder.php</file>
       <file>./modules/imap/imap_message_action_not_junk.php</file>
-      <file>./modules/imap/supports_permanent_keyword.php</file>
     </testsuite>
     <testsuite name="modules_core">
       <file>./modules/core/functions.php</file>
