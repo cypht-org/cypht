@@ -291,11 +291,20 @@ td {
   font-size: 100%;
 }
 .server_content,
-.profile_content,
 .user_settings {
   position: relative;
   display: table;
   table-layout: fixed;
+  width: 100%;
+  min-height: 500px;
+  background: #fff;
+  height: 100%;
+  margin-right: 20px;
+  padding-bottom: 20px;
+}
+.profile_content {
+  position: relative;
+  display: block;
   width: 100%;
   min-height: 500px;
   background: #fff;

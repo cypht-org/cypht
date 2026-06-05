@@ -129,8 +129,8 @@ return [
 
     /*
     |
-    | Enable TLS/SSL connections. Leave blank or set to false to disable. Set to
-    | true to enable TLS connections. If you want to use IMAP STARTTLS, do NOT
+    | Enable TLS/SSL connections. Set to false to disable. Leave blank (or set to
+    | true) to enable TLS connections by default. If you want to use IMAP STARTTLS, do NOT
     | enable this. This is only for TLS enabled sockets (typically on port 993).
     |
     */
