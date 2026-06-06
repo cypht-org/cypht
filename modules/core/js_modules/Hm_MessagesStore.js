@@ -27,6 +27,7 @@ class Hm_MessagesStore {
         this.pages = 0;
         this.page = page;
         this.newMessages = [];
+        this.forceGithubRefresh = false;
         // Resolvers for in-flight load() outer promises; abort() drains these so Promise.all settles.
         this._cancelResolvers = new Set();
     }
@@ -338,6 +339,9 @@ class Hm_MessagesStore {
             // Use slice instead of split('_')[1] so repo names/owners with underscores
             // (e.g. "my_org/my_repo") are passed through intact.
             config.push({ name: "github_repo", value: this.path.slice('github_'.length) });
+            if (this.forceGithubRefresh) {
+                config.push({ name: "github_force_refresh", value: 1 });
+            }
             configs.push(config);
         } else {
             if (this.path == 'tag') {
@@ -367,6 +371,9 @@ class Hm_MessagesStore {
                         cfg.push({ name: "github_repo", value: ds.id });
                         if (this.path === 'unread') {
                             cfg.push({ name: "github_unread", value: 1 });
+                        }
+                        if (this.forceGithubRefresh) {
+                            cfg.push({ name: "github_force_refresh", value: 1 });
                         }
                     } else {
                         cfg.push({ name: "hm_ajax_hook", value: this.path == 'search' ? 'ajax_imap_search' : 'ajax_imap_message_list' });

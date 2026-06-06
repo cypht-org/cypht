@@ -66,6 +66,7 @@ function applyGithubMessageListPageHandler(routeParams) {
 }
 
 function refreshGithubAll(messages, background = false, isAborted = () => false) {
+    messages.forceGithubRefresh = !background;
     messages.load(true, background).then(store => {
         if (isAborted()) return;
         for (let row of store.rows) {
@@ -79,5 +80,7 @@ function refreshGithubAll(messages, background = false, isAborted = () => false)
                 tableRow.replaceWith(row);
             }
         }
+    }).finally(() => {
+        messages.forceGithubRefresh = false;
     });
 }

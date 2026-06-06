@@ -8,6 +8,10 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+if (!defined('GITHUB_EVENTS_CACHE_TTL')) {
+    define('GITHUB_EVENTS_CACHE_TTL', 300);
+}
+
 /**
  * Used to cache "read" github items
  * @subpackage github/lib
@@ -333,6 +337,9 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
             if (in_array($form['github_repo'], $repos, true) && $details) {
                 $limit = $this->user_config->get('github_limit_setting', DEFAULT_GITHUB_PER_SOURCE);
                 $cache_key = 'github_events_' . md5($form['github_repo'] . '_' . $limit);
+                if (!empty($this->request->post['github_force_refresh'])) {
+                    $this->cache->del($cache_key);
+                }
                 $cached = $this->cache->get($cache_key, false);
                 if ($cached !== false) {
                     $github_data = $cached;
@@ -341,7 +348,7 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
                     $api = new Hm_API_Curl();
                     $github_data = $api->command($url, array('Authorization: token ' . $details['access_token']));
                     if ($github_data) {
-                        $this->cache->set($cache_key, $github_data, 300);
+                        $this->cache->set($cache_key, $github_data, GITHUB_EVENTS_CACHE_TTL);
                     }
                 }
                 $this->out('github_data', $github_data);
@@ -633,7 +640,7 @@ class Hm_Handler_github_all_list_data extends Hm_Handler_Module {
                 // Skip API error responses (rate-limit, auth failure, etc.)
                 if (is_array($data) && !isset($data['message'])) {
                     $cache_key = 'github_events_' . md5($repo . '_' . $limit);
-                    $this->cache->set($cache_key, $data, 300);
+                    $this->cache->set($cache_key, $data, GITHUB_EVENTS_CACHE_TTL);
                     $results[$repo] = $data;
                 }
                 curl_multi_remove_handle($mh, $ch);
