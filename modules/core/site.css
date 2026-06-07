@@ -1717,7 +1717,7 @@ pre.msg_source {
 .menu_search.selected_menu { background-color: transparent; }
 #dropdownMenuForward + ul .forward_link span,
 #contact_info + #contact_popup span { white-space: nowrap; }
-#extra-header-buttons { display: inline-block; margin-top: 0; }
+#extra-header-buttons { margin-top: 0; }
 .sievefilters_settings > .p-3 { padding: 0 !important; }
 #sieve_accounts > .p-2 { padding: 0.5rem 1rem; }
 .server_content .quick_add_multiple_server_form { padding-left: 1.5rem; padding-right: 1.5rem; }
