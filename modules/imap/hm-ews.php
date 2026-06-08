@@ -361,7 +361,10 @@ class Hm_EWS {
         $request = array(
             'Traversal' => 'Shallow',
             'ItemShape' => array(
-                'BaseShape' => 'IdOnly'
+                'BaseShape' => 'IdOnly',
+                'AdditionalProperties' => [
+                    'FieldURI' => ['FieldURI' => 'item:ItemClass'],
+                ],
             ),
             'IndexedPageItemView' => [
                 'MaxEntriesReturned' => $limit,
@@ -536,6 +539,13 @@ class Hm_EWS {
 
         $itemIds = [];
         foreach ($items as $item) {
+            // Skip contacts — they cannot be rendered as mail messages and requesting
+            // their full properties via GetItem crashes the EWS library when a contact
+            // has a single email address (SOAP returns stdClass instead of array).
+            $itemClass = method_exists($item, 'getItemClass') ? (string) $item->getItemClass() : '';
+            if (stripos($itemClass, 'IPM.Contact') === 0 || stripos($itemClass, 'IPM.DistList') === 0) {
+                continue;
+            }
             $itemIds[] = bin2hex($item->getItemId()->getId());
         }
         return [$result->getTotalItemsInView(), $itemIds];
