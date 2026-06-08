@@ -24,8 +24,8 @@ add_handler('ajax_github_data', 'login', false, 'core');
 add_handler('ajax_github_data', 'load_user_data', true, 'core');
 add_handler('ajax_github_data', 'message_list_type', true, 'core');
 add_handler('ajax_github_data', 'language', true, 'core');
-add_handler('ajax_github_data', 'github_list_data', true);
 add_handler('ajax_github_data', 'close_session_early',  true, 'core');
+add_handler('ajax_github_data', 'github_list_data', true);
 add_handler('ajax_github_data', 'date', true, 'core');
 add_handler('ajax_github_data', 'http_headers', true, 'core');
 add_output('ajax_github_data', 'filter_github_data', true);
@@ -82,6 +82,7 @@ return array(
         'github_remove_repo' => FILTER_UNSAFE_RAW,
         'github_add_repo' => FILTER_UNSAFE_RAW,
         'github_repo' => FILTER_UNSAFE_RAW,
+        'github_force_refresh' => FILTER_VALIDATE_INT,
         'unread_exclude_github' => FILTER_VALIDATE_INT,
     )
 );
