@@ -3,6 +3,8 @@
  */
 class Hm_MessagesStore {
 
+    static SOURCE_PREFS_KEY = 'combined_view_source_prefs';
+
     /**
      * @typedef {Object} RowObject
      * @property {String} 0 - The HTML string of the row
@@ -350,12 +352,7 @@ class Hm_MessagesStore {
                 configs.push(config);
             } else {
                 let sources = hm_data_sources();
-                if (this.path != 'combined_inbox' && this.path != 'search') {
-                    sources = sources.filter(s => s.type != 'feeds');
-                }
-                if (this.path === 'github_all') {
-                    sources = sources.filter(s => s.type === 'github');
-                }
+                sources = sources.filter((source) => Hm_MessagesStore.isSourceEnabledForPath(this.path, source));
                 sources.forEach((ds) => {
                     const cfg = config.slice();
                     if (ds.type == 'feeds') {
@@ -386,6 +383,143 @@ class Hm_MessagesStore {
             }
         }
         return configs;
+    }
+
+    static isMultiSourcePath(path) {
+        return !(
+            path == 'tag' ||
+            path.startsWith('imap') ||
+            path.startsWith('feeds') ||
+            path.startsWith('github') ||
+            path.startsWith('wp_')
+        );
+    }
+
+    static getSourceKey(source) {
+        if (!source?.type) {
+            return '';
+        }
+
+        const { type, id = '', folder = '', hook = '', params = {} } = source;
+
+        switch (type) {
+            case 'feeds':
+            case 'github':
+            case 'wordpress':
+                return `${type}:${id}`;
+
+            case 'imap':
+                return `imap:${id}:${folder}`;
+
+            case 'custom':
+                return `custom:${hook}:${JSON.stringify(params)}`;
+
+            default:
+                return `${type}:${id}:${folder}`;
+        }
+    }
+
+    static defaultSourceEnabledForPath(path, source) {
+        if (!Hm_MessagesStore.isMultiSourcePath(path)) {
+            return true;
+        }
+
+        if (Object.prototype.hasOwnProperty.call(source, 'default_enabled')) {
+            return [true, 1, '1', 'true'].includes(source.default_enabled);
+        }
+
+        const allowedPaths = ['combined_inbox', 'unread', 'search'];
+
+        if (
+            ['feeds', 'wordpress', 'github'].includes(source.type) &&
+            !allowedPaths.includes(path)
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    static getSourcePrefs() {
+        const raw = Hm_Utils.get_from_local_storage(Hm_MessagesStore.SOURCE_PREFS_KEY);
+        if (!raw) {
+            return {};
+        }
+        try {
+            const parsed = JSON.parse(raw);
+            return parsed && typeof parsed == 'object' ? parsed : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    static setSourceEnabledForPath(path, sourceKey, enabled) {
+        const prefs = Hm_MessagesStore.getSourcePrefs();
+        if (!prefs[path] || typeof prefs[path] != 'object') {
+            prefs[path] = {};
+        }
+        prefs[path][sourceKey] = !!enabled;
+        Hm_Utils.save_to_local_storage(Hm_MessagesStore.SOURCE_PREFS_KEY, JSON.stringify(prefs));
+    }
+
+    static isSourceEnabledForPath(path, source) {
+        if (!Hm_MessagesStore.isMultiSourcePath(path)) {
+            return true;
+        }
+        const sourceKey = Hm_MessagesStore.getSourceKey(source);
+        if (!sourceKey) {
+            return true;
+        }
+        const prefs = Hm_MessagesStore.getSourcePrefs();
+        if (prefs[path] && Object.prototype.hasOwnProperty.call(prefs[path], sourceKey)) {
+            return !!prefs[path][sourceKey];
+        }
+        return Hm_MessagesStore.defaultSourceEnabledForPath(path, source);
+    }
+
+    static syncSourceToggleInputs(path) {
+        if (!Hm_MessagesStore.isMultiSourcePath(path)) {
+            return;
+        }
+        $('.combined_source_toggle').each(function() {
+            const $toggle = $(this);
+            try {
+                const rawSource = $toggle.attr('data-source') || '';
+                const source = rawSource ? JSON.parse(decodeURIComponent(rawSource)) : {};
+                $toggle.prop('checked', Hm_MessagesStore.isSourceEnabledForPath(path, source));
+            } catch (e) {
+                $toggle.prop('checked', true);
+                console.warn('Unable to parse source toggle payload', e);
+            }
+        });
+    }
+
+    static bindSourceToggleInputs(path, onChange = null) {
+        if (!Hm_MessagesStore.isMultiSourcePath(path)) {
+            return;
+        }
+
+        Hm_MessagesStore.syncSourceToggleInputs(path);
+
+        $('.combined_source_toggle').off('change').on('change', function() {
+            const $toggle = $(this);
+            const listPath = $toggle.attr('data-list-path') || path;
+
+            try {
+                const rawSource = $toggle.attr('data-source') || '';
+                const source = rawSource ? JSON.parse(decodeURIComponent(rawSource)) : {};
+                const sourceKey = Hm_MessagesStore.getSourceKey(source);
+                if (sourceKey) {
+                    Hm_MessagesStore.setSourceEnabledForPath(listPath, sourceKey, $toggle.is(':checked'));
+                }
+                if (onChange) {
+                    onChange(source, $toggle.is(':checked'));
+                }
+            } catch (e) {
+                // Invalid source payload should not break the page.
+                console.warn('Unable to update source preference from toggle', e);
+            }
+        });
     }
 
     saveToLocalStorage() {
