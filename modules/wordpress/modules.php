@@ -80,14 +80,12 @@ class Hm_Handler_wp_load_sources extends Hm_Handler_Module {
         else {
             $path = '';
         }
-        if ($path == 'combined_inbox' || $path == 'unread') {
-            $excluded = false;
-            if ($path == 'unread' && $this->user_config->get('unread_exclude_wordpress_setting', DEFAULT_UNREAD_EXCLUDE_WORDPRESS)) {
-                $excluded = true;
+        if ($path && !preg_match('/^(?:imap|feeds|github|wp_|tag$)/', $path)) {
+            $default_enabled = true;
+            if ($path == 'unread') {
+                $default_enabled = !$this->user_config->get('unread_exclude_wordpress_setting', DEFAULT_UNREAD_EXCLUDE_WORDPRESS);
             }
-            if (!$excluded) {
-                $this->append('data_sources', array('load_wp_notices_for_combined_list', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
-            }
+            $this->append('data_sources', array('load_wp_notices_for_combined_list', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0, 'default_enabled' => $default_enabled));
         }
     }
 }
@@ -138,7 +136,7 @@ class Hm_Handler_wordpress_list_type extends Hm_Handler_Module {
             if (array_key_exists('list_parent', $this->request->get)) {
                 $parent = $this->request->get['list_parent'];
             }
-            elseif (in_array($path, array('combined_inbox', 'unread'), true)) {
+            elseif ($path && !preg_match('/^(?:imap|feeds|github|wp_|tag$)/', $path)) {
                 $parent = $path;
             }
             if ($path == 'wp_notifications') {
@@ -169,14 +167,15 @@ class Hm_Handler_wp_notification_data extends Hm_Handler_Module {
             $res = $details['notes'];
         }
         $this->out('wp_notice_data', $res);
-        if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'unread') {
-            $this->out('wp_list_since', process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE)));
-        }
-        elseif (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'combined_inbox') {
-            $this->out('wp_list_since', process_since_argument($this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE)));
-        }
-        elseif (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'wp_notifications') {
-            $this->out('wp_list_since', process_since_argument($this->user_config->get('wordpress_since_setting', DEFAULT_WORDPRESS_SINCE)));
+        if (array_key_exists('list_path', $this->request->get)) {
+            $path = $this->request->get['list_path'];
+            if ($path == 'wp_notifications') {
+                $this->out('wp_list_since', process_since_argument($this->user_config->get('wordpress_since_setting', DEFAULT_WORDPRESS_SINCE)));
+            }
+            elseif (!preg_match('/^(?:imap|feeds|github|wp_|tag$)/', $path)) {
+                $since = $this->user_config->get($path.'_since_setting', $this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE));
+                $this->out('wp_list_since', process_since_argument($since));
+            }
         }
     }
 }
