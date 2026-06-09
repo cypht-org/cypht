@@ -615,6 +615,10 @@ if (!hm_exists('get_sieve_linked_mailbox')) {
             $scripts = $client->listScripts();
             $folders = [];
             foreach ($scripts as $s) {
+                if (! mb_strstr($s, 'cypht')) {
+                    continue;
+                }
+
                 $script = $client->getScript($s);
                 $base64_obj = str_replace("# ", "", split_script_lines($script)[2]);
                 $obj = json_decode(base64_decode($base64_obj))[0];
