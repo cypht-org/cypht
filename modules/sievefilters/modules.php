@@ -12,6 +12,8 @@ use PhpSieveManager\Exceptions\SocketException;
 
 require_once APP_PATH.'modules/imap/functions.php';
 require_once APP_PATH.'modules/imap/hm-imap.php';
+require_once APP_PATH.'modules/smtp/hm-smtp.php';
+require_once APP_PATH.'modules/smtp/hm-mime-message.php';
 require_once APP_PATH.'modules/sievefilters/hm-sieve.php';
 require_once APP_PATH.'modules/sievefilters/functions.php';
 
@@ -55,6 +57,15 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
 class Hm_Handler_sieve_filters_enabled extends Hm_Handler_Module {
     public function process() {
         $this->out('sieve_filters_enabled', $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER));
+    }
+}
+
+/**
+ * @subpackage sievefilters/handler
+ */
+class Hm_Handler_load_custom_actions extends Hm_Handler_Module {
+    public function process() {
+        $this->out('custom_actions', $this->user_config->get('custom_actions', []));
     }
 }
 
@@ -126,7 +137,6 @@ class Hm_Output_sieve_edit_output extends Hm_Output_Module {
         $this->out('script', $script);
     }
 }
-
 
 /**
  * @subpackage sievefilters/handler
@@ -985,6 +995,19 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                     new \PhpSieveManager\Filters\Actions\KeepFilterAction()
                 );
             }
+            if ($action->action == 'imap_move') {
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => $action->value])
+                );
+            }
+            if ($action->action == 'imap_copy') {
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => $action->value])
+                );
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\KeepFilterAction()
+                );
+            }
             if ($action->action == 'autoreply') {
                 $custom_condition->addAction(
                     new \PhpSieveManager\Filters\Actions\VacationFilterAction(['reason' => $action->value, 'subject' => $action->extra_option_value])
@@ -1200,6 +1223,19 @@ class Hm_Output_sievefilters_modal_content_start extends Hm_Output_Module
     {
         $res = get_classic_filter_modal_content();
         $res .= get_script_modal_content();
+        return $res;
+    }
+}
+
+class Hm_output_custom_action_modal_content extends Hm_Output_Module {
+    protected function output() {
+        $res = '<div id="custom_action_template" class="d-none">';
+        $res .= '<div class="sieve-filter-name-group mb-3">';
+        $res .= '<label class="form-label fw-bold">Action Name:</label>';
+        $res .= '<input type="text" class="custom_action_name_input form-control" placeholder="e.g., Move to Important" />';
+        $res .= '</div>';
+        $res .= get_classic_filter_modal_actions_content();
+        $res .= '</div>';
         return $res;
     }
 }
@@ -1668,7 +1704,7 @@ class Hm_Handler_load_mailbox_name extends Hm_Handler_Module
     }
 }
 
-class Hm_Handler_load_custom_actions extends Hm_Handler_Module
+class Hm_Handler_load_automatic_actions extends Hm_Handler_Module
 {
     public function process()
     {
@@ -1683,19 +1719,19 @@ class Hm_Handler_load_custom_actions extends Hm_Handler_Module
         }
 
         if ($imap_server_id === null) {
-            $this->out('custom_actions', []);
+            $this->out('automatic_actions', []);
             return;
         }
 
         $imap_servers = $this->user_config->get('imap_servers');
         if (!isset($imap_servers[$imap_server_id])) {
-            $this->out('custom_actions', []);
+            $this->out('automatic_actions', []);
             return;
         }
 
         $mailbox = $imap_servers[$imap_server_id];
         if (empty($mailbox['sieve_config_host'])) {
-            $this->out('custom_actions', []);
+            $this->out('automatic_actions', []);
             return;
         }
 
@@ -1737,7 +1773,322 @@ class Hm_Handler_load_custom_actions extends Hm_Handler_Module
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
         }
 
-        $this->out('custom_actions', $filters);
+        $this->out('automatic_actions', $filters);
+    }
+}
+
+/**
+ * @subpackage sievefilters/handler
+ */
+class Hm_Handler_save_custom_action extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(['custom_action_name', 'actions_json']);
+        if (!$success) {
+            $this->out('custom_action_error', 'Missing required fields');
+            return;
+        }
+
+        $actions = json_decode($form['actions_json'], true);
+        if (empty($actions)) {
+            $this->out('custom_action_error', 'At least one action is required');
+            return;
+        }
+
+        $custom_actions = $this->user_config->get('custom_actions', []);
+        $posted_id = isset($this->request->post['action_id']) ? trim($this->request->post['action_id']) : '';
+        if ($posted_id && array_key_exists($posted_id, $custom_actions)) {
+            $id = $posted_id;
+            $message = 'Custom action updated';
+        } else {
+            $id = uniqid('ca_', true);
+            $message = 'Custom action created';
+        }
+        $custom_actions[$id] = [
+            'id' => $id,
+            'name' => $form['custom_action_name'],
+            'actions' => $actions,
+        ];
+        $this->user_config->set('custom_actions', $custom_actions);
+        $this->session->record_unsaved($message);
+        $this->session->set('user_data', $this->user_config->dump());
+        $this->out('custom_action_saved', true);
+        $this->out('custom_action_id', $id);
+    }
+}
+
+/**
+ * @subpackage sievefilters/handler
+ */
+class Hm_Handler_apply_custom_action extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(['imap_account', 'uids', 'actions_json']);
+        if (!$success) {
+            $this->out('custom_action_error', 'Missing required fields');
+            return;
+        }
+        $uids = json_decode($form['uids'], true);
+        if (empty($uids)) {
+            $this->out('custom_action_error', 'No messages selected');
+            return;
+        }
+        $actions = json_decode($form['actions_json'], true);
+        if (empty($actions)) {
+            $this->out('custom_action_error', 'No actions defined');
+            return;
+        }
+
+        // Parse UIDs: format is imap_{server_id}_{uid}_{hex_folder}
+        $grouped = [];
+        foreach ($uids as $uid_str) {
+            $parts = explode('_', $uid_str);
+            if (count($parts) === 4 && $parts[0] === 'imap') {
+                $grouped[$parts[1]][$parts[3]][] = $parts[2];
+            }
+        }
+        if (empty($grouped)) {
+            $this->out('custom_action_error', 'Could not parse message IDs');
+            return;
+        }
+
+        // Lazy-init SMTP only if any action needs it
+        $smtp_mailbox = null;
+        $smtp_from    = '';
+        $smtp_actions = ['redirect', 'forward', 'reject', 'autoreply'];
+        $needs_smtp   = (bool) array_filter($actions, function($a) use ($smtp_actions) {
+            return in_array(strtolower($a['action'] ?? ''), $smtp_actions, true);
+        });
+        if ($needs_smtp) {
+            foreach (array_keys(Hm_SMTP_List::dump()) as $smtp_id) {
+                $mb = Hm_SMTP_List::connect($smtp_id, false);
+                if ($mb && $mb->authed()) {
+                    $smtp_mailbox = $mb;
+                    $srv = Hm_SMTP_List::dump($smtp_id, true);
+                    $smtp_from = $srv['user'] ?? '';
+                    break;
+                }
+            }
+        }
+
+        $errors = [];
+        foreach ($grouped as $server_id => $folders) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
+            if (!$mailbox || !$mailbox->authed()) {
+                $errors[] = 'Could not connect to server';
+                continue;
+            }
+            foreach ($folders as $hex_folder => $msg_uids) {
+                $folder          = hex2bin($hex_folder);
+                $stop_processing = false;
+                foreach ($actions as $action) {
+                    if ($stop_processing) break;
+                    $action_name = strtolower($action['action'] ?? '');
+                    $value       = trim($action['value'] ?? '');
+                    switch ($action_name) {
+                        case 'stop':
+                            $stop_processing = true;
+                            break;
+                        case 'keep':
+                            break;
+                        case 'discard':
+                            $res = $mailbox->message_action($folder, 'DELETE', $msg_uids);
+                            if ($res['status']) {
+                                $mailbox->message_action($folder, 'EXPUNGE', $msg_uids);
+                            }
+                            break;
+                        case 'move':
+                        case 'imap_move':
+                            if ($value) {
+                                $mailbox->message_action($folder, 'MOVE', $msg_uids, $value);
+                            }
+                            break;
+                        case 'copy':
+                        case 'imap_copy':
+                            if ($value) {
+                                $mailbox->message_action($folder, 'COPY', $msg_uids, $value);
+                            }
+                            break;
+                        case 'flag':
+                        case 'addflag':
+                            $flag_key = strtolower($value);
+                            if ($flag_key === 'draft') {
+                                $mailbox->message_action($folder, 'CUSTOM', $msg_uids, null, '\Draft');
+                            } elseif ($flag_key !== 'recent') {
+                                $cmd = $this->flag_value_to_cmd($value, true);
+                                if ($cmd) {
+                                    $mailbox->message_action($folder, $cmd, $msg_uids);
+                                }
+                            }
+                            break;
+                        case 'removeflag':
+                            $flag_key = strtolower($value);
+                            if ($flag_key !== 'draft' && $flag_key !== 'recent') {
+                                $cmd = $this->flag_value_to_cmd($value, false);
+                                if ($cmd) {
+                                    $mailbox->message_action($folder, $cmd, $msg_uids);
+                                }
+                            }
+                            break;
+                        case 'redirect':
+                        case 'forward':
+                            // Re-send the raw RFC822 message to the specified address.
+                            // 'forward' keeps the original copy; 'redirect' does the same
+                            // at the IMAP level (deletion is a separate discard action).
+                            if ($value && $smtp_mailbox) {
+                                foreach ($msg_uids as $uid) {
+                                    $raw = $mailbox->get_message_content($folder, $uid, 0);
+                                    if ($raw) {
+                                        $smtp_mailbox->send_message($smtp_from, [$value], $raw);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'reject':
+                            // Send a rejection notice back to the original sender.
+                            if ($smtp_mailbox) {
+                                foreach ($msg_uids as $uid) {
+                                    $hdrs       = array_change_key_case(
+                                        $mailbox->get_message_headers($folder, $uid), CASE_LOWER
+                                    );
+                                    $reply_addr = trim($hdrs['reply-to'] ?? $hdrs['from'] ?? '');
+                                    if ($reply_addr) {
+                                        $orig_subj = $hdrs['subject'] ?? '';
+                                        $body      = $value ?: 'Your message has been rejected.';
+                                        $mime      = new Hm_MIME_Msg(
+                                            $reply_addr,
+                                            'Rejected: ' . $orig_subj,
+                                            $body,
+                                            $smtp_from
+                                        );
+                                        $smtp_mailbox->send_message(
+                                            $smtp_from, [$reply_addr], $mime->get_mime_msg()
+                                        );
+                                    }
+                                }
+                            }
+                            break;
+                        case 'autoreply':
+                            // Send an automated reply to the original sender.
+                            if ($smtp_mailbox) {
+                                foreach ($msg_uids as $uid) {
+                                    $hdrs       = array_change_key_case(
+                                        $mailbox->get_message_headers($folder, $uid), CASE_LOWER
+                                    );
+                                    $reply_addr = trim($hdrs['reply-to'] ?? $hdrs['from'] ?? '');
+                                    if ($reply_addr) {
+                                        $orig_subj = $hdrs['subject'] ?? '';
+                                        $msg_id    = $hdrs['message-id'] ?? '';
+                                        $mime      = new Hm_MIME_Msg(
+                                            $reply_addr,
+                                            'Re: ' . $orig_subj,
+                                            $value,
+                                            $smtp_from,
+                                            false, '', '', $msg_id
+                                        );
+                                        $smtp_mailbox->send_message(
+                                            $smtp_from, [$reply_addr], $mime->get_mime_msg()
+                                        );
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            $this->out('custom_action_error', implode('; ', $errors));
+            return;
+        }
+        $this->out('apply_success', true);
+        $this->out('apply_count', count($uids));
+    }
+
+    private function flag_value_to_cmd($flag, $add) {
+        $add_map = [
+            'seen'     => 'READ',
+            'flagged'  => 'FLAG',
+            'answered' => 'ANSWERED',
+            'deleted'  => 'DELETE',
+        ];
+        $remove_map = [
+            'seen'     => 'UNREAD',
+            'flagged'  => 'UNFLAG',
+            'answered' => 'UNREAD',   // no UNANSWERED in message_action; best-effort
+            'deleted'  => 'UNDELETE',
+        ];
+        $key = strtolower($flag);
+        return $add ? ($add_map[$key] ?? null) : ($remove_map[$key] ?? null);
+    }
+}
+
+class Hm_Output_apply_custom_action extends Hm_Output_Module {
+    protected function output() {
+        $this->out('apply_success', $this->get('apply_success', false));
+        $this->out('apply_count', $this->get('apply_count', 0));
+        $error = $this->get('custom_action_error', '');
+        if ($error) {
+            $this->out('custom_action_error', $error);
+        }
+    }
+}
+
+/**
+ * @subpackage sievefilters/output
+ */
+class Hm_Output_save_custom_action extends Hm_Output_Module {
+    protected function output() {
+        $this->out('custom_action_saved', $this->get('custom_action_saved', false));
+        $this->out('custom_action_id', $this->get('custom_action_id', ''));
+        $error = $this->get('custom_action_error', '');
+        if ($error) {
+            $this->out('custom_action_error', $error);
+        }
+    }
+}
+
+class Hm_Output_message_list_automatic_actions extends Hm_Output_Module
+{
+    protected function output()
+    {
+        if (!$this->get('sieve_filters_enabled')) {
+            return '';
+        }
+        $automatic_actions = $this->get('automatic_actions', []);
+        $mailbox_name = $this->get('mailbox_name', '');
+
+        $res = '<div class="dropdown">'
+            .   '<a class="msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle" '
+            .   'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
+            .   $this->trans('Automatic actions')
+            .   '</a>'
+            .   '<div class="dropdown-menu custom-actions p-2" aria-labelledby="filter_message">';
+
+            if (!empty($automatic_actions)) {
+                $res .= '<small class="dropdown-header text-muted px-2 py-1">'
+                     .  '<i class="bi bi-info-circle me-1"></i>'.$this->trans('Auto-run on new emails')
+                     .  '</small>';
+                foreach ($automatic_actions as $filter) {
+                    $res .= sprintf(
+                        '<button class="dropdown-item msg_filter_action py-2 btn btn-secondary" data-filter-id="%s" data-imap-account="%s" data-filter-name="%s">'
+                        .'<i class="bi bi-play-circle me-2 text-success"></i>%s</button>',
+                        htmlspecialchars($filter['id']),
+                        htmlspecialchars($mailbox_name),
+                        htmlspecialchars($filter['name']),
+                        htmlspecialchars($filter['name'])
+                    );
+                }
+                $res .= '<hr class="dropdown-divider">';
+            }
+
+        $res .= '<button class="dropdown-item add_automatic_action text-primary btn btn-secondary py-2" '
+                    .'id="add_automatic_action_button" account="'.$mailbox_name.'" '
+                .'>'
+                .   '<i class="bi bi-plus-circle me-2"></i>'.$this->trans('Create from Selected')
+                . '</button>';
+        $res .= '</div></div>';
+ 
+        $this->concat('msg_controls_automatic_actions', $res);
     }
 }
 
@@ -1754,26 +2105,29 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
         $res = '<div class="dropdown">'
             .   '<a class="msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle" '
             .   'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
-            .   $this->trans('Quick Actions')
+            .   $this->trans('Custom actions')
             .   '</a>'
             .   '<div class="dropdown-menu custom-actions p-2" aria-labelledby="filter_message">';
 
-            if (!empty($custom_actions)) {
-                $res .= '<small class="dropdown-header text-muted px-2 py-1">'
-                     .  '<i class="bi bi-info-circle me-1"></i>'.$this->trans('Auto-run on new emails')
-                     .  '</small>';
-                foreach ($custom_actions as $filter) {
-                    $res .= sprintf(
-                        '<button class="dropdown-item msg_filter_action py-2 btn btn-secondary" data-filter-id="%s" data-imap-account="%s" data-filter-name="%s">'
-                        .'<i class="bi bi-play-circle me-2 text-success"></i>%s</button>',
-                        htmlspecialchars($filter['id']),
-                        htmlspecialchars($mailbox_name),
-                        htmlspecialchars($filter['name']),
-                        htmlspecialchars($filter['name'])
-                    );
-                }
-                $res .= '<hr class="dropdown-divider">';
+        $res .= '<small class="dropdown-header text-muted px-2 py-1">'
+            .  '<i class="bi bi-info-circle me-1"></i>'.$this->trans('Customised actions you can apply to selected emails')
+            .  '</small>';
+
+        if (!empty($custom_actions)) {
+            $res .= '<div class="d-flex flex-column gap-1 mb-2">';
+            foreach ($custom_actions as $filter) {
+                $res .= sprintf(
+                    '<button class="custom_action_btn btn btn-sm btn-outline-secondary text-start" data-action-id="%s" data-imap-account="%s" data-action-name="%s" data-actions="%s">'
+                    .'<i class="bi bi-play-circle me-2 text-success"></i>%s</button>',
+                    htmlspecialchars($filter['id']),
+                    htmlspecialchars($mailbox_name),
+                    htmlspecialchars($filter['name']),
+                    htmlspecialchars(json_encode($filter['actions'])),
+                    htmlspecialchars($filter['name'])
+                );
             }
+            $res .= '</div><hr class="dropdown-divider">';
+        }
 
         $res .= '<button class="dropdown-item add_custom_action text-primary btn btn-secondary py-2" '
                     .'id="add_custom_action_button" account="'.$mailbox_name.'" '
@@ -1781,7 +2135,7 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
                 .   '<i class="bi bi-plus-circle me-2"></i>'.$this->trans('Create from Selected')
                 . '</button>';
         $res .= '</div></div>';
- 
+
         $this->concat('msg_controls_custom_actions', $res);
     }
 }

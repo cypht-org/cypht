@@ -36,6 +36,26 @@ if (!hm_exists('get_script_modal_content')) {
     }
 }
 
+if (!hm_exists('get_classic_filter_modal_actions_content')) {
+    function get_classic_filter_modal_actions_content()
+    {
+        return '<div class="p-3">
+            <div class="d-flex">
+                <div class="col-sm-10">
+                    <h4 class="mt-0">Actions</h4>
+                    </div>
+                </div>
+                <div class="sieve-filter-actions-block d-block mt-3 table-responsive">
+                    <table class="filter_actions_modal_table table">
+                    </table>
+                    <div class="flex-grow-1 text-end">
+                        <button class="filter_modal_add_action_btn btn btn-sm border btn-primary"><i class="bi bi-plus-lg me-1"></i> Add Action</button>
+                    </div>
+                </div>
+            </div>';
+    }
+}
+
 
 if (!hm_exists('get_classic_filter_modal_content')) {
     function get_classic_filter_modal_content()
@@ -67,20 +87,7 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                     </div>
                 </div>
                 <hr/>
-                <div class="p-3">
-                    <div class="d-flex">
-                        <div class="col-sm-10">
-                            <h4 class="mt-0">Actions</h4>
-                        </div>
-                    </div>
-                    <div class="sieve-filter-actions-block d-block mt-3 table-responsive">
-                        <table class="filter_actions_modal_table table">
-                        </table>
-                        <div class="flex-grow-1 text-end">
-                            <button class="filter_modal_add_action_btn btn btn-sm border btn-primary"><i class="bi bi-plus-lg me-1"></i> Add Action</button>
-                        </div>
-                    </div>
-                </div>
+                '.get_classic_filter_modal_actions_content().'
                 <hr/>
                 <div class="p-3">
                     <div class="d-flex">
