@@ -1,0 +1,146 @@
+{
+  "entities": {
+    "amazon": {
+      "id": "amazon",
+      "name": "Amazon",
+      "vendor_ids": [
+        "amazon_ses",
+        "amazon_aws"
+      ],
+      "entries": {
+        "amazon-fr": {
+          "slug": "amazon-fr",
+          "name": "Amazon Europe Core SARL",
+          "type": "controller",
+          "country": "FR",
+          "domains": [
+            "amazon.fr"
+          ],
+          "datarequests_url": "https://www.datarequests.org/company/amazon-fr/",
+          "gdpr": {
+            "email": "eu-privacy@amazon.fr"
+          }
+        },
+        "amazon-es": {
+          "slug": "amazon-es",
+          "name": "Amazon Europe Core SARL",
+          "type": "controller",
+          "country": "ES",
+          "domains": [
+            "amazon.es"
+          ],
+          "datarequests_url": "https://www.datarequests.org/company/amazon-es/",
+          "gdpr": {
+            "email": "eu-privacy@amazon.es"
+          }
+        },
+        "amazon-de": {
+          "slug": "amazon-de",
+          "name": "Amazon EU S.à r.l.",
+          "type": "controller",
+          "country": "DE",
+          "domains": [
+            "amazon.de"
+          ],
+          "datarequests_url": "https://www.datarequests.org/company/amazon-de/"
+        },
+        "amazon-aws": {
+          "slug": "amazon-aws",
+          "name": "Amazon Web Services EMEA SARL",
+          "type": "processor",
+          "domains": [
+            "amazonaws.com"
+          ],
+          "datarequests_url": "https://www.datarequests.org/company/amazon-aws/"
+        }
+      }
+    },
+    "salesforce": {
+      "id": "salesforce",
+      "name": "Salesforce",
+      "vendor_ids": [
+        "salesforce"
+      ],
+      "entries": {
+        "salesforce": {
+          "slug": "salesforce",
+          "name": "Salesforce",
+          "type": "processor",
+          "domains": [
+            "salesforce.com",
+            "pardot.com",
+            "exacttarget.com"
+          ],
+          "datarequests_url": "https://www.datarequests.org/company/salesforce/"
+        }
+      }
+    },
+    "microsoft": {
+      "id": "microsoft",
+      "name": "Microsoft",
+      "vendor_ids": [
+        "microsoft_365"
+      ],
+      "entries": {
+        "microsoft": {
+          "slug": "microsoft",
+          "name": "Microsoft Corporation",
+          "type": "controller",
+          "domains": [
+            "microsoft.com",
+            "outlook.com",
+            "hotmail.com",
+            "live.com",
+            "office.com"
+          ],
+          "datarequests_url": "https://www.datarequests.org/company/microsoft/"
+        }
+      }
+    },
+    "coinmarketcap": {
+      "id": "coinmarketcap",
+      "name": "CoinMarketCap",
+      "entries": {
+        "coinmarketcap": {
+          "slug": "coinmarketcap",
+          "name": "CoinMarketCap",
+          "type": "controller",
+          "domains": [
+            "coinmarketcap.com"
+          ],
+          "datarequests_url": "https://www.datarequests.org/company/coinmarketcap/"
+        }
+      }
+    },
+    "123greetings": {
+      "id": "123greetings",
+      "name": "123Greetings.com",
+      "entries": {
+        "123greetings": {
+          "slug": "123greetings",
+          "name": "123Greetings.com",
+          "type": "controller",
+          "domains": [
+            "123greetings.com"
+          ],
+          "datarequests_url": "https://www.datarequests.org/company/123greetings/"
+        }
+      }
+    },
+    "numberly": {
+      "id": "numberly",
+      "name": "Numberly",
+      "entries": {
+        "numberly": {
+          "slug": "numberly",
+          "name": "Numberly",
+          "type": "controller",
+          "domains": [
+            "numberly.com"
+          ],
+          "datarequests_url": "https://www.datarequests.org/company/numberly/"
+        }
+      }
+    }
+  }
+}
