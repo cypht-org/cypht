@@ -609,13 +609,18 @@ if (!hm_exists('get_sieve_host_from_services')) {
 
 if (!hm_exists('get_sieve_linked_mailbox')) {
     function get_sieve_linked_mailbox ($imap_account, $module) {
-        $factory = get_sieve_client_factory($site_config);
+        $factory = get_sieve_client_factory($module->config);
         try {
             $client = $factory->init($module->user_config, $imap_account, $module->module_is_supported('nux'));
             $scripts = $client->listScripts();
             $folders = [];
             foreach ($scripts as $s) {
                 $script = $client->getScript($s);
+
+                if (! mb_strstr($script, 'CYPHT GENERATED CONDITION')) {
+                    continue;
+                }
+
                 $base64_obj = str_replace("# ", "", split_script_lines($script)[2]);
                 $obj = json_decode(base64_decode($base64_obj))[0];
                 if ($obj && in_array($obj->action, ['copy', 'move'])) {
