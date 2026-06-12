@@ -111,6 +111,28 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_message_controls_shows_not_junk_on_aggregate_junk_list() {
+        $mod = new Hm_Output_Test(array('list_path' => 'junk', 'foo' => 'bar', 'bar' => 'foo'), array('bar'));
+        $html = message_controls($mod);
+        $this->assertStringContainsString('msg_not_junk', $html);
+        $this->assertStringContainsString('data-action="not_junk"', $html);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_message_controls_shows_not_junk_when_is_junk_folder() {
+        $mod = new Hm_Output_Test(array('list_path' => 'imap_0_4a756e6b', 'is_junk_folder' => true, 'foo' => 'bar', 'bar' => 'foo'), array('bar'));
+        $html = message_controls($mod);
+        $this->assertStringContainsString('msg_not_junk', $html);
+        $this->assertStringContainsString('data-action="not_junk"', $html);
+        $this->assertStringNotContainsString('msg_junk', $html);
+        $this->assertStringNotContainsString('data-action="junk"', $html);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_message_since_dropdown() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
         $this->assertEquals('<select name="foo" id="foo" class="message_list_since form-select form-select-sm" data-default-value="-1 week"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select>', message_since_dropdown('-1 week', 'foo', $mod));

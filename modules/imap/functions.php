@@ -1707,6 +1707,16 @@ if (!hm_exists('is_imap_trash_folder')) {
     }
 }
 
+if (!hm_exists('is_imap_junk_folder')) {
+    function is_imap_junk_folder($handler, $server_id, $folder) {
+        $specials = get_special_folders($handler, $server_id);
+        if (array_key_exists('junk', $specials) && $specials['junk']) {
+            return $specials['junk'] === $folder;
+        }
+        return false;
+    }
+}
+
 if (!hm_exists('parse_mstnef')) {
     function parse_mstnef($config) {
         [
