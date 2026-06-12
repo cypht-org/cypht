@@ -465,6 +465,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $txt .= '<span class="text-decoration-none btn btn-sm btn-outline-danger" data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
             }
+            if ($this->get('message_actions_extra')) {
+                $txt .= $this->get('message_actions_extra');
+            }
             $txt .= '<a class="hlink text-decoration-none btn btn-sm btn-outline-secondary" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
             $txt .= '<span id="extra-header-buttons" class="d-flex gap-2">'. $this->get('extra_header_buttons', '') . '</span></div>';
