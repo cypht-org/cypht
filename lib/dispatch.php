@@ -193,12 +193,12 @@ class Hm_Dispatch {
      * @return void
      */
     private function load_site_lib() {
-        if (!is_array($this->site_config->get_modules()) || !in_array('site', $this->site_config->get_modules(), true)) {
-            return;
-        }
-        if (is_readable(APP_PATH.'modules/site/lib.php')) {
+        $site_module = basename($this->site_config->get('site_module_path'));
+        if (is_readable(APP_PATH. "modules/$site_module/lib.php")) {
             Hm_Debug::add('Including site module set lib.php', 'info');
-            require APP_PATH.'modules/site/lib.php';
+            require_once APP_PATH . "modules/$site_module/lib.php";
+
+            $this->site_config->set('modules', array_merge($this->site_config->get('modules', []), [$site_module]));
         }
     }
 
@@ -284,9 +284,14 @@ class Hm_Dispatch {
         $class = $this->site_config->get('output_class', 'Hm_Output_HTTP');
         $renderer = new $class;
         $content = $formatter->content($this->module_exec->output_response, $this->request->allowed_output);
-        /* TODO: might be a good idea to use a custom render class that can return
-         * the output on demand */
-        $this->output = $renderer->send_response($content, $this->module_exec->output_data);
+        $renderer = new Hm_Output_HTTP($content, $this->module_exec->output_data);
+
+        if ($this->site_config->get('dispatch_response_mode') == 'store') {
+            $this->output = $renderer->get_content();
+            return;
+        }
+
+        return $renderer->send_response();
     }
 
     /**

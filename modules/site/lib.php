@@ -1,132 +1,144 @@
 <?php
-
 /**
- * To use these overrides, you must first enable the "site" module in your
- * config/app.php file to activate the module.
+ * Custom session class. To use this, you must set the SESSION_TYPE environment variable to 'custom'.
  */
+class Hm_Custom_Session extends Hm_Session {
 
-/**
- * Override the session class. These are the methods that must be overriden to
- * create a new session backend. The "session_type" value in your config/app.php must
- * be set to "custom" to activate this class. There are several other
- * properties and methods that can be modified to create custom sessions:
- *
- *  https://cypht.org/docs/code_docs/class-Hm_Session.html
- *
- * This example extends the standard PHP session class. You can also extend the
- * DB or Memcached classes, or the base session class. In this example we just
- * defer to the PHP session class methods.
- *
- * @package modules
- * @subpackage site
- */
-class Custom_Session extends Hm_PHP_Session {
-
-    /**
-     * check for an active session or an attempt to start one
-     * @param object $request request object
-     * @return bool
-     */
-    public function check($request, $user=false, $pass=false, $fingerprint=true) {
+    public function check($request, $user = false, $pass = false, $fingerprint = true)
+    {
         return parent::check($request, $user, $pass, $fingerprint);
     }
 
-    /**
-     * Start the session. This could be an existing session or a new login
-     * @param object $request request details
-     * @return void
-     */
-    public function start($request, $existing_session=false) {
-        return parent::start($request, $existing_session);
+    public function start($request)
+    {
+        return parent::start($request);
     }
 
-    /**
-     * Call the configured authentication method to check user credentials
-     * @param string $user username
-     * @param string $pass password
-     * @return bool true if the authentication was successful
-     */
-    public function auth($user, $pass) {
+    public function auth($user, $pass)
+    {
         return parent::auth($user, $pass);
     }
 
-    /**
-     * Return a session value, or a user settings value stored in the session
-     * @param string $name session value name to return
-     * @param mixed $default value to return if $name is not found
-     * @return mixed the value if found, otherwise $defaultHm_Auth
-     */
-    public function get($name, $default=false, $user=false) {
+    public function get($name, $default = false, $user = false)
+    {
         return parent::get($name, $default, $user);
     }
 
-    /**
-     * Save a value in the session
-     * @param string $name the name to save
-     * @param string $value the value to save
-     * @return void
-     */
-    public function set($name, $value, $user=false) {
-        return parent::set($name, $value);
+    public function set($name, $value, $user = false)
+    {
+        return parent::set($name, $value, $user);
     }
 
-    /**
-     * Delete a value from the session
-     * @param string $name name of value to deleteHm_Auth
-     * @return void
-     */
-    public function del($name) {
+    public function del($name)
+    {
         return parent::del($name);
     }
 
-    /**
-     * End a session after a page request is complete. This only closes the session and
-     * does not destroy it
-     * @return void
-     */
-    public function end() {
+    public function end()
+    {
         return parent::end();
     }
 
-    /**
-     * Destroy a session for good
-     * @param object $request request details
-     * @return void
-     */
-    public function destroy($request) {
+    public function destroy($request)
+    {
         return parent::destroy($request);
     }
-
 }
 
 /**
- * Override the authentication class. This method needs to be overriden to
- * create a custom authentication backend. You must set the "auth_type" setting
- * in your config/app.php file to "custom" to activate this class. More information
- * about the base class for authentication is located here:
- *
- * https://cypht.org/docs/code_docs/class-Hm_Auth.html
- *
- * This example extends the auth DB class, and simply defers the parent class
- * method
- * @package modules
- * @subpackage site
+ * Custom auth class. To use this, you must set the AUTH_TYPE environment variable to 'custom'.
  */
-class Custom_Auth extends Hm_Auth_DB {
+class Hm_Custom_Auth extends Hm_Auth {
 
-    /**
-     * This is the method new auth mechs need to override.
-     * @param string $user username
-     * @param string $pass password
-     * @return bool true if the user is authenticated, false otherwise
-     */
-    public function check_credentials($user, $pass) {
-        return parent::check_credentials($user, $pass);
+    public function check_credentials($user, $pass)
+    {
+        throw new \Exception('Not implemented');
     }
 }
 
-/*
-function format_msg_html($str, $images=false) {
-    return '';
+/**
+ * Custom cache class. To use this, you must set the ENABLE_CUSTOM_CACHE environment variable to true.
+ */
+class Hm_Custom_Cache extends Hm_Noop_Cache {
+
+    public function get($key, $default = false)
+    {
+        return $default;
+    }
+
+    public function set($key, $val, $lifetime, $crypt_key)
+    {
+        return parent::set($key, $val, $lifetime, $crypt_key);
+    }
+
+    public function del($key)
+    {
+        return parent::del($key);
+    }
 }
-*/
+
+/**
+ * Custom site configuration class. To use this, you must set the SITE_CONFIG_TYPE environment variable to 'custom'.
+ */
+class Hm_Custom_Site_Config extends Hm_Site_Config_File {
+    public function get($name, $default = false)
+    {
+        return parent::get($name, $default);
+    }
+
+    public function set($name, $value)
+    {
+        return parent::set($name, $value);
+    }
+
+    public function load($all_configs, $key)
+    {
+        return parent::load($all_configs, $key);
+    }
+}
+
+/**
+ * Custom user configuration class. To use this, you must set the USER_CONFIG_TYPE environment variable to 'custom'.
+ */
+class Hm_Custom_User_Config extends Hm_Config {
+    private $site_config;
+
+    public function __construct($site_config)
+    {
+        $this->site_config = $site_config;
+    }
+
+    public function get($name, $default = false)
+    {
+        return parent::get($name, $default);
+    }
+
+    public function set($name, $value)
+    {
+        return parent::set($name, $value);
+    }
+
+    public function load($source, $key)
+    {
+        throw new \Exception('Not implemented');
+    }
+}
+
+/**
+ * =======
+ * 
+ * Just skip this part if sieve filters module is not enabled
+ * 
+ * =======
+ */
+
+include_once APP_PATH . 'modules/sievefilters/hm-sieve.php';
+/**
+ * Custom sieve client factory class. To use this, you must set the ENABLE_CUSTOM_SIEVE_FACTORY environment variable to true.
+ */
+class Hm_Custom_Sieve_Client_Factory extends Hm_Sieve_Client_Factory {
+    public function init($user_config = null, $imap_account = null, $is_nux_supported = false)
+    {
+        return parent::init($user_config, $imap_account, $is_nux_supported);
+    }
+}

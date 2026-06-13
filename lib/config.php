@@ -470,11 +470,26 @@ class Hm_Site_Config_File extends Hm_Config {
 
     public $user_defaults = [];
 
+    protected $initCallback;
+
     /**
      * @param array $all_configs
      */
     public function __construct($all_configs = []) {
         $this->load(empty($all_configs) ? merge_config_files(APP_PATH.'config') : $all_configs, false);
+    }
+
+    /**
+     * Trigger the init callback if it exists. This is used to allow dynamic configuration of the site before any request handling occurs.
+     */
+    public function triggerInit() {
+        if (is_callable($this->initCallback)) {
+            return call_user_func($this->initCallback, $this);
+        }
+    }
+
+    public function setInitCallback($callback) {
+        $this->initCallback = $callback;
     }
 
     /**
@@ -519,21 +534,18 @@ class Hm_Site_Config_File extends Hm_Config {
  */
 function load_user_config_object($config) {
     $type = $config->get('user_config_type', 'file');
-    if (mb_strstr($type, ':')) {
-        list($type, $class) = explode(':', $type);
-    }
-    switch ($type) {
-        case 'DB':
+    switch (strtolower($type)) {
+        case 'db':
             $user_config = new Hm_User_Config_DB($config);
             Hm_Debug::add("Using DB user configuration", 'info');
             break;
         case 'custom':
-            if (class_exists($class)) {
-                $user_config = new $class($config);
-                Hm_Debug::add("Using custom user configuration: {$class}", 'info');
+            if (class_exists('Hm_Custom_User_Config')) {
+                $user_config = new Hm_Custom_User_Config($config);
+                Hm_Debug::add("Using custom user configuration: Hm_Custom_User_Config", 'info');
                 break;
             } else {
-                Hm_Debug::add("User configuration class does not exist: {$class}");
+                Hm_Debug::add("User configuration class does not exist: Hm_Custom_User_Config");
             }
         default:
             $user_config = new Hm_User_Config_File($config);
