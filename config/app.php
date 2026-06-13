@@ -1035,6 +1035,13 @@ return [
 
     /*
     |
+    | Automatically save settings to permanent storage when enabled by the user
+    | Defaults to false
+    */
+    'default_setting_auto_save' => env('DEFAULT_SETTING_AUTO_SAVE', false),
+
+    /*
+    |
     | Number of messages per page when viewing IMAP folders
     | Defaults to 20
     */

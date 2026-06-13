@@ -72,6 +72,7 @@ class Hm_Environment {
         define('DEFAULT_REVIEW_SENT_EMAIL', $config->get('default_setting_review_sent_email', true));
         define('DEFAULT_TEXT_ONLY', $config->get('default_setting_text_only', false));
         define('DEFAULT_NO_PASSWORD_SAVE', $config->get('default_setting_no_password_save', false));
+        define('DEFAULT_AUTO_SAVE', $config->get('default_setting_auto_save', false));
         define('DEFAULT_SHOW_LIST_ICONS', $config->get('default_setting_show_list_icons', true));
         define('DEFAULT_START_PAGE', $config->get('default_setting_start_page', "none"));
         define('DEFAULT_DISABLE_DELETE_PROMPT', $config->get('default_setting_disable_delete_prompt', false));
