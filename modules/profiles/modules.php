@@ -349,7 +349,8 @@ class Hm_Output_profile_content extends Hm_Output_Module {
         $res = '';
         if (count($profiles) > 0) {
             $smtp_servers = $this->get('smtp_servers', array());
-            $res .= '<div class="table-responsive p-3"><table class="table table-striped"><tr>'.
+            $res .= '<div class="table-responsive p-3"><table class="table table-striped">'.
+                '<thead><tr>'.
                 '<th>'.$this->trans('Display Name').'</th>'.
                 '<th class="d-none d-sm-table-cell">'.$this->trans('IMAP Server').'</th>'.
                 '<th class="d-none d-sm-table-cell">'.$this->trans('Username').'</th>'.
@@ -359,7 +360,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                 '<th class="d-none d-sm-table-cell">'.$this->trans('Signature').'</th>'.
                 '<th class="d-none d-sm-table-cell">'.$this->trans('Remark').'</th>'.
                 '<th class="d-none d-sm-table-cell">'.$this->trans('Default').'</th>'.
-                '<th></th></tr>';
+                '<th></th></tr></thead><tbody>';
 
             foreach ($profiles as $id => $profile) {
                 $smtp = '';
@@ -376,11 +377,24 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     '<td class="d-none d-sm-table-cell">'.(mb_strlen($profile['sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.(mb_strlen($profile['rmk']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.($profile['default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
-                        '<td class="text-right"><a href="'.$this->build_page_url('profiles', array('profile_id' => $this->html_safe($profile['id'])), true).'" title="'.$this->trans('Edit').'">'.
-                    '<i class="bi bi-pencil-fill"></i></a></td>'.
+                    '<td class="text-end">'.
+                        '<div class="d-flex gap-2 justify-content-end align-items-center">'.
+                            '<a href="'.$this->build_page_url('profiles', array('profile_id' => $this->html_safe($profile['id'])), true).'" title="'.$this->trans('Edit').'">'.
+                            '<i class="bi bi-pencil-fill"></i></a>'.
+                            '<form method="post" action="'.$this->build_page_url('profiles').'">'.
+                                '<input type="hidden" name="profile_id" value="'.$this->html_safe($profile['id']).'">'.
+                                '<input type="hidden" name="profile_delete" value="1">'.
+                                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'">'.
+                                '<button type="submit" class="btn btn-link p-0 text-danger border-0" title="'.$this->trans('Delete').'" '.
+                                    'onclick="return confirm(\''.$this->trans('Are you sure you want to delete this profile?').'\')">'.
+                                    '<i class="bi bi-trash-fill"></i>'.
+                                '</button>'.
+                            '</form>'.
+                        '</div>'.
+                    '</td>'.
                     '</tr>';
             }
-            $res .= '</table></div>';
+            $res .= '</tbody></table></div>';
         }
         else {
             $res .= '<div class="d-flex flex-column align-items-center justify-content-center p-5 mt-5"><i class="bi bi-folder2-open fs-4"></i><span>'.$this->trans('No Profiles Found').'</span></div>';
@@ -484,7 +498,7 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res .= '<div>';
     if ($form_vals['name']) {
         $res .= '<input type="submit" class="btn btn-primary profile_update" value="'.$out_mod->trans('Update').'" /> ';
-        $res .= '<input type="submit" class="btn btn-danger" name="profile_delete" value="'.$out_mod->trans('Delete').'" /> ';
+        $res .= '<input type="submit" class="btn btn-danger" name="profile_delete" value="'.$out_mod->trans('Delete').'" onclick="return confirm(\''.$out_mod->trans('Are you sure you want to delete this profile?').'\')"/> ';
         $res .= '<a href="'.$out_mod->build_page_url('profiles').'" class="btn btn-secondary">'.$out_mod->trans('Cancel').'</a>';
     }
     else {

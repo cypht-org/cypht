@@ -291,11 +291,20 @@ td {
   font-size: 100%;
 }
 .server_content,
-.profile_content,
 .user_settings {
   position: relative;
   display: table;
   table-layout: fixed;
+  width: 100%;
+  min-height: 500px;
+  background: #fff;
+  height: 100%;
+  margin-right: 20px;
+  padding-bottom: 20px;
+}
+.profile_content {
+  position: relative;
+  display: block;
   width: 100%;
   min-height: 500px;
   background: #fff;
@@ -1341,6 +1350,16 @@ div.unseen,
   font-size: 85%;
   padding: 15px 20px;
   display: none;
+  box-sizing: border-box;
+  max-width: min(320px, calc(100vw - 2rem));
+}
+.list_sources .list_src {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .step_config-title {
@@ -1698,7 +1717,7 @@ pre.msg_source {
 .menu_search.selected_menu { background-color: transparent; }
 #dropdownMenuForward + ul .forward_link span,
 #contact_info + #contact_popup span { white-space: nowrap; }
-#extra-header-buttons { display: inline-block; margin-top: 0; }
+#extra-header-buttons { margin-top: 0; }
 .sievefilters_settings > .p-3 { padding: 0 !important; }
 #sieve_accounts > .p-2 { padding: 0.5rem 1rem; }
 .server_content .quick_add_multiple_server_form { padding-left: 1.5rem; padding-right: 1.5rem; }
@@ -1728,7 +1747,11 @@ pre.msg_source {
   color: var(--bs-body-bg) !important;
   background: var(--bs-link-color);
 }
-.content_title .list_sources.w-100 { width: auto !important; }
+.content_title .list_sources.w-100 {
+  width: auto !important;
+  max-width: min(320px, calc(100vw - 2rem));
+  min-width: 0;
+}
 .content_title .list_sources .src_title { font-weight: bold; }
 .total_unread_count, .total_unread_count.badge, .unread_count { color: var(--bs-body-bg) !important; background-color: var(--bs-link-hover-color) !important; }
 .folders a, .unread_link, .logout_link { color: rgba(var(--bs-body-color-rgb), 0.85); }
@@ -1766,7 +1789,11 @@ pre.msg_source {
 .mobile .msg_text_inner { font-size: 120%; padding: 0px !important; }
 .mobile .save_perm_form { margin-bottom: 1.5rem; }
 .mobile .save_perm_form .save_settings { margin-bottom: 0.5rem; }
-.mobile .content_title .list_sources { top: 40px; border: 1px solid var(--bs-border-color); }
+.mobile .content_title .list_sources {
+  top: 40px;
+  border: 1px solid var(--bs-border-color);
+  max-width: min(300px, calc(100vw - 1.5rem));
+}
 .mobile .content_title .path_delim + a { display: contents; }
 .mobile .calendar > .m-4 { margin: 1rem !important; }
 .mobile .quick_add_multiple_server_form { padding-left: 1.5rem; padding-right: 1.5rem; }
@@ -1817,7 +1844,11 @@ pre.msg_source {
   .mobile .terms_section .d-flex { display: inline-block !important; }
   .mobile .terms_section .adv_terms { display: inline-block; }
   .mobile .terms_section .adv_term_nots input { margin-top: 10px; }
-  .mobile .source_section .adv_folder_list .folders > li > .d-flex { display: inline-block !important; }
+  .mobile .source_section .adv_folder_list .folders > li > .wrapper {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+  }
   .mobile .targets_section .adv_targets .form-check-label { display: inline; }
   .mobile .time_section .adv_times { display: inline-block !important; }
   .mobile .time_section .new_time { display: block; }

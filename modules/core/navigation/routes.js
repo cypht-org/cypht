@@ -90,6 +90,9 @@ const routes = [
         page: 'save'
     },
     {
+        page: 'change_password'
+    },
+    {
         page: 'highlights',
         handler: 'applyHighlightsPageHandlers'
     },

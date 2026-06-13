@@ -118,20 +118,23 @@ class Hm_Mailbox {
         }
     }
 
-    public function get_folder_name($folder) {
+    public function get_folder_name($folder, $quick = false) {
         if ($this->is_imap()) {
             return $folder;
         } else {
             $result = $this->connection->get_folder_name_quick($folder);
             if ($result) {
                 return $result;
-            } else {
-                if (! $this->connection->authed()) {
-                    $this->connect();
-                }
-                $result = $this->connection->get_folder_status($folder);
-                return $result['name'];
             }
+
+            if ($quick) {
+                return null;
+            }
+            if (!$this->connection->authed()) {
+                $this->connect();
+            }
+            $result = $this->connection->get_folder_status($folder);
+            return $result['name'];
         }
     }
 

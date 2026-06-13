@@ -257,13 +257,27 @@
     padding-top: 20px;
 } */
 
-.unblock_button {
-    width: 16px;
-    cursor: pointer;
+.blocked_senders_table .blocked_sender_fld {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.block_domain_button {
-    width: 16px;
+.blocked_senders_table .blocked_behavior_fld {
+    max-width: 180px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.mobile .blocked_senders_table .blocked_sender_fld {
+    max-width: 120px;
+}
+
+.blocked_senders_table .blocked_sender_actions a {
     cursor: pointer;
 }
 

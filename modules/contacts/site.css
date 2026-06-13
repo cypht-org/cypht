@@ -632,7 +632,7 @@
 
 .table-responsive {
   border-radius: 4px;
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 .table-responsive::-webkit-scrollbar {
