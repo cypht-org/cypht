@@ -76,7 +76,8 @@ add_output('settings', 'start_general_settings', true, 'core', 'start_search_set
 add_output('settings', 'language_setting', true, 'core', 'start_general_settings', 'after');
 add_output('settings', 'timezone_setting', true, 'core', 'language_setting', 'after');
 add_output('settings', 'warn_for_unsaved_changes_setting', true, 'core', 'timezone_setting', 'after');
-add_output('settings', 'no_folder_icon_setting', true, 'core', 'warn_for_unsaved_changes_setting', 'after');
+add_output('settings', 'auto_save_setting', true, 'core', 'warn_for_unsaved_changes_setting', 'after');
+add_output('settings', 'no_folder_icon_setting', true, 'core', 'auto_save_setting', 'after');
 add_output('settings', 'mailto_handler_setting', true, 'core', 'no_folder_icon_setting', 'after');
 add_output('settings', 'list_style_setting', true, 'core', 'mailto_handler_setting', 'after');
 add_output('settings', 'msg_list_icons_setting', true, 'core', 'list_style_setting', 'before');

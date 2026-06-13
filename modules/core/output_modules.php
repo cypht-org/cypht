@@ -65,7 +65,7 @@ class Hm_Output_search_content_end extends Hm_Output_Module {
  */
 class Hm_Output_save_reminder extends Hm_Output_Module {
     protected function output() {
-        if ($this->get('single_server_mode')) {
+        if ($this->get('single_server_mode') || $this->get('auto_save_key_ready')) {
             return '';
         }
         $changed = $this->get('changed_settings', array());
@@ -74,6 +74,26 @@ class Hm_Output_save_reminder extends Hm_Output_Module {
                 '" href="'.$this->build_page_url('save').'"><i class="bi bi-save2-fill fs-4"></i></a></div>';
         }
         return '';
+    }
+}
+
+/**
+ * Prompt to resume auto-save when enabled but the session key is missing
+ * @subpackage core/output
+ */
+class Hm_Output_auto_save_resume_notice extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
+        if (!$this->get('auto_save_setting', false) || $this->get('auto_save_key_ready', false)) {
+            return '';
+        }
+        return '<div class="auto_save_resume_notice alert alert-info alert-dismissible fade show" role="alert">'.
+            '<p class="mb-2 me-4">'.$this->trans('Auto-save needs your password again. This is often after a password change. Enter it once to resume.').'</p>'.
+            '<button type="button" class="btn btn-sm btn-primary auto_save_resume_btn">'.
+            $this->trans('Resume auto-save').'</button>'.
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
     }
 }
 
@@ -272,10 +292,15 @@ class Hm_Output_login extends Hm_Output_Module {
         else {
             $settings = $this->get('changed_settings', array());
             $single = $this->get('single_server_mode');
+            $auto_save = $this->get('auto_save_key_ready', false);
             $changed = 0;
-            if (!$single && count($settings) > 0) {
+            if (!$single && !$auto_save && count($settings) > 0) {
                 $changed = 1;
             }
+
+        $logout_msg = $auto_save
+            ? $this->trans('Pending changes will be saved automatically when you log out.')
+            : $this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' <a href="'.$this->build_page_url('save').'">'.$this->trans('More info').'</a>';
 
         return '<div class="modal fade" id="confirmLogoutModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmLogoutModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
@@ -286,9 +311,9 @@ class Hm_Output_login extends Hm_Output_Module {
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />
-                        <p class="text-wrap">'.$this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' <a href="'.$this->build_page_url('save').'">'.$this->trans('More info').'</a></p>
+                        <p class="text-wrap logout_warning_text">'.$logout_msg.'</p>
                         <input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>
-                        <div class="my-3 form-floating">
+                        <div class="my-3 form-floating logout_password_row'.($auto_save ? ' d-none' : '').'">
                             <input id="logout_password" autocomplete="current-password" name="password" class="form-control warn_on_paste" type="password" placeholder="'.$this->trans('Password').'">
                             <label for="logout_password" class="form-label screen-reader">'.$this->trans('Password').'</label>
                         </div>
@@ -296,7 +321,7 @@ class Hm_Output_login extends Hm_Output_Module {
                     <div class="modal-footer">
                         <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="'.$this->trans('Cancel').'" />
                         <input class="save_settings btn btn-primary" id="logout_without_saving" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />
-                        <input class="save_settings btn btn-primary" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />
+                        <input class="save_settings btn btn-primary logout_save_and_exit'.($auto_save ? ' d-none' : '').'" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />
                     </div>
                 </div>
                 </div>
@@ -447,7 +472,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
         else {
             $res .= '<input type="hidden" id="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         }
-        if (!$this->get('single_server_mode') && count($this->get('changed_settings', array())) > 0) {
+        if (!$this->get('single_server_mode') && !$this->get('auto_save_key_ready') && count($this->get('changed_settings', array())) > 0) {
             $res .= '<a class="unsaved_icon" href="'.$this->build_page_url('save').'" title="'.$this->trans('Unsaved Changes').
                 '"><i class="bi bi-save2-fill fs-5 unsaved_reminder"></i></a>';
         }
@@ -664,6 +689,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_web_root_path = function() { return "'.WEB_ROOT.'"; };'.
             'var hm_flag_image_src = function() { return "<i class=\"bi bi-star-half\"></i>"; };'.
             'var hm_check_dirty_flag = function() { return '.($this->get('warn_for_unsaved_changes', '') ? '1' : '0').'; };'.
+            'var hm_auto_save_ready = function() { return '.($this->get('auto_save_key_ready', false) ? '1' : '0').'; };'.
             'var hm_special_folders = function() { return '.json_encode($formattedSpecialFolders).'; };'.
             'var hm_page_param_name = function() { return "'.$this->get('page_param_name').'"; };'.
             format_data_sources($this->get('data_sources', array()), $this);
@@ -2387,6 +2413,35 @@ class Hm_Output_warn_for_unsaved_changes_setting extends Hm_Output_Module {
         }
         return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="warn_for_unsaved_changes">'.
             $this->trans('Warn for unsaved changes').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.' id="warn_for_unsaved_changes" name="warn_for_unsaved_changes" value="1" data-default-value="false" />'.$reset.'</div></td></tr>';
+    }
+}
+
+/**
+ * Option to automatically save settings to permanent storage
+ * @subpackage core/output
+ */
+class Hm_Output_auto_save_setting extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
+        $checked = '';
+        $status = '';
+        if ($this->get('auto_save_setting', false)) {
+            $checked = ' checked="checked"';
+            if ($this->get('auto_save_key_ready', false)) {
+                $status = '<span class="text-muted small ms-2 auto_save_status">'.$this->trans('Active').'</span>';
+            }
+            else {
+                $status = '<span class="text-warning small ms-2 auto_save_status">'.$this->trans('Password required').'</span>';
+            }
+        }
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="auto_save_setting">'.
+            $this->trans('Automatically save settings').'</label></td><td class="d-block d-md-table-cell">'.
+            '<div class="d-flex align-items-center"><input class="form-check-input me-2 auto_save_setting_toggle" type="checkbox" '.
+            $checked.' id="auto_save_setting" value="1" data-default-value="false" />'.$status.'</div>'.
+            '<div class="text-muted small">'.$this->trans('Save settings without visiting the save page. Your password is kept in this session to encrypt saves and is removed on logout. Only enable on a trusted device.').'</div>'.
+            '</td></tr>';
     }
 }
 
