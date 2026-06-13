@@ -29,8 +29,8 @@ add_output('message', 'sievefilters_modal_content_start', true, 'sievefilters', 
 add_output('message', 'sievefilters_settings_link', true, 'sievefilters', 'settings_menu_end', 'before');
 setup_base_ajax_page('ajax_account_sieve_filters', 'core');
 add_handler('ajax_account_sieve_filters', 'settings_load_imap', true, 'sievefilters', 'load_user_data', 'after');
-add_handler('ajax_account_sieve_filters', 'load_account_sieve_filters', true, 'sievefilters', 'settings_load_imap', 'after');
-add_handler('ajax_account_sieve_filters', 'sieve_filters_enabled', true, 'sievefilters', 'load_account_sieve_filters', 'after');
+add_handler('ajax_account_sieve_filters', 'sieve_filters_enabled', true, 'sievefilters', 'settings_load_imap', 'after');
+add_handler('ajax_account_sieve_filters', 'load_account_sieve_filters', true, 'sievefilters', 'sieve_filters_enabled', 'after');
 add_output('ajax_account_sieve_filters', 'account_sieve_filters', true, 'sievefilters');
 add_output('ajax_account_sieve_filters', 'check_filter_status', true, 'sievefilters');
 
@@ -40,8 +40,8 @@ add_output('block_list', 'sievefilters_modal_content_start', true, 'sievefilters
 setup_base_ajax_page('ajax_block_account_sieve_filters', 'core');
 add_handler('ajax_block_account_sieve_filters', 'settings_load_imap', true, 'sievefilters', 'load_user_data', 'after');
 add_handler('ajax_block_account_sieve_filters', 'load_behaviour', true, 'sievefilters', 'settings_load_imap', 'after');
-add_handler('ajax_block_account_sieve_filters', 'load_account_sieve_filters', true, 'sievefilters', 'load_behaviour', 'after');
-add_handler('ajax_block_account_sieve_filters', 'sieve_filters_enabled', true, 'sievefilters', 'load_account_sieve_filters', 'after');
+add_handler('ajax_block_account_sieve_filters', 'sieve_filters_enabled', true, 'sievefilters', 'load_behaviour', 'after');
+add_handler('ajax_block_account_sieve_filters', 'load_account_sieve_filters', true, 'sievefilters', 'sieve_filters_enabled', 'after');
 add_output('ajax_block_account_sieve_filters', 'blocklist_settings_accounts', true, 'sievefilters');
 add_output('ajax_block_account_sieve_filters', 'check_filter_status', true, 'sievefilters');
 

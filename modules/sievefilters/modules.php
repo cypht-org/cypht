@@ -10,7 +10,6 @@ if (!defined('DEBUG_MODE')) { die(); }
 require_once APP_PATH.'modules/imap/functions.php';
 require_once APP_PATH.'modules/imap/hm-imap.php';
 require_once APP_PATH.'modules/sievefilters/hm-sieve.php';
-require_once APP_PATH.'modules/sievefilters/hm-sieve-script-cache.php';
 require_once APP_PATH.'modules/sievefilters/functions.php';
 
 /**
@@ -35,19 +34,14 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
         }
 
         try {
-            //we need this for sieve_filters page edit script
-            ensure_sieve_service_initialized($this->user_config, $this->cache);
-            $script = SieveService::getScript($imap_account['id'], $this->request->post['sieve_script_name']);
-            $list = prepare_sieve_script ($script, 1, "encode");
+            $client = get_sieve_client($imap_account, $this->config, $this->cache);
+            if (!$client) return;
+            $script = $client->getScript($this->request->post['sieve_script_name']);
+            $list = prepare_sieve_script($script, 1, "encode");
             $this->out('conditions', $list);
-            $list = prepare_sieve_script ($script, 2, "encode");
+            $list = prepare_sieve_script($script, 2, "encode");
             $this->out('actions', $list);
-            if (mb_strstr($script, 'allof')) {
-                $this->out('test_type', 'ALLOF');
-            } else {
-                $this->out('test_type', 'ANYOF');
-            }
-            SieveService::closeConnection($imap_account['id']);
+            $this->out('test_type', mb_strstr($script, 'allof') ? 'ALLOF' : 'ANYOF');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
@@ -60,8 +54,20 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_filters_enabled extends Hm_Handler_Module {
     public function process() {
-        $this->out('sieve_filters_enabled', $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER));
-        ensure_sieve_service_initialized($this->user_config, $this->cache);
+        $enabled = $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER);
+        $this->out('sieve_filters_enabled', $enabled);
+        if (!$enabled) return;
+        $factory = get_sieve_client_factory($this->config);
+        $is_nux = in_array('nux', $this->config->get_modules(true), true);
+        foreach ((array) $this->user_config->get('imap_servers') as $idx => $account) {
+            if (!empty($account['sieve_config_host'])) {
+                try {
+                    $factory->init($account + ['id' => $idx], $is_nux, $this->cache);
+                } catch (Exception $e) {
+                    // skip accounts that fail to connect
+                }
+            }
+        }
     }
 }
 
@@ -73,14 +79,10 @@ class Hm_Handler_sieve_filters_enabled_message_content extends Hm_Handler_Module
         $server = $this->user_config->get('imap_servers')[$this->request->post['imap_server_id']];
         $sieve_filters_enabled = $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER);
         if ($sieve_filters_enabled && !empty($server['sieve_config_host'])) {
-            try {
-                // we need this for message page block sender button view to work
-                ensure_sieve_service_initialized($this->user_config, $this->cache);
-                $client = SieveService::getConnection($server['id']);
+            $client = Hm_Sieve_Client_Factory::get($server['id']);
+            if ($client) {
                 $sieve_filters_enabled = true;
                 $this->out('sieve_filters_client', $client);
-            } catch (Exception $e) {
-                Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             }
         }
         $this->out('sieve_filters_enabled', $sieve_filters_enabled);
@@ -123,10 +125,9 @@ class Hm_Handler_sieve_edit_script extends Hm_Handler_Module {
         }
         
         try {
-            ensure_sieve_service_initialized($this->user_config, $this->cache);
-            $script = SieveService::getScript($imap_account['id'], $this->request->post['sieve_script_name']);
-            SieveService::closeConnection($imap_account['id']);
-            $this->out('script', $script);
+            $client = get_sieve_client($imap_account, $this->config, $this->cache);
+            if (!$client) return;
+            $this->out('script', $client->getScript($this->request->post['sieve_script_name']));
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
         }
@@ -166,23 +167,18 @@ class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
         }
         
         try {
-            //we need this for sieve_filters page delete script action to work
-            ensure_sieve_service_initialized($this->user_config, $this->cache);
-            $scripts = SieveService::listScripts($imap_account['id']);
-            foreach ($scripts as $script) {
-                if ($script == 'main_script') {
-                    SieveService::removeScripts($imap_account['id'], 'main_script');
-                }
+            $client = get_sieve_client($imap_account, $this->config, $this->cache);
+            if (!$client) return;
+            foreach ($client->listScripts() as $script) {
+                if ($script == 'main_script') $client->removeScripts('main_script');
                 if ($script == $this->request->post['sieve_script_name']) {
-                    SieveService::removeScripts($imap_account['id'], $this->request->post['sieve_script_name']);
+                    $client->removeScripts($this->request->post['sieve_script_name']);
                     $this->out('script_removed', true);
                 }
             }
-            $scripts = SieveService::listScripts($imap_account['id']);
-            $main_script = generate_main_script($scripts);
-            save_main_script(null, $main_script, $scripts, $imap_account['id']);
-            SieveService::activateScript($imap_account['id'], 'main_script');
-            SieveService::closeConnection($imap_account['id']);
+            $scripts = $client->listScripts();
+            save_main_script($client, generate_main_script($scripts), $scripts);
+            $client->activateScript('main_script');
             Hm_Msgs::add('Script removed');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
@@ -213,23 +209,18 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
         }
         
         try {
-            ensure_sieve_service_initialized($this->user_config, $this->cache);
-            $scripts = SieveService::listScripts($imap_account['id']);
-            foreach ($scripts as $script) {
-                if ($script == 'main_script') {
-                    SieveService::removeScripts($imap_account['id'], 'main_script');
-                }
+            $client = get_sieve_client($imap_account, $this->config, $this->cache);
+            if (!$client) return;
+            foreach ($client->listScripts() as $script) {
+                if ($script == 'main_script') $client->removeScripts('main_script');
                 if ($script == $this->request->post['sieve_script_name']) {
-                    SieveService::removeScripts($imap_account['id'], $this->request->post['sieve_script_name']);
+                    $client->removeScripts($this->request->post['sieve_script_name']);
                     $this->out('script_removed', true);
                 }
             }
-            $scripts = SieveService::listScripts($imap_account['id']);
-            $main_script = generate_main_script($scripts);
-
-            save_main_script(null, $main_script, $scripts, $imap_account['id']);
-            SieveService::activateScript($imap_account['id'], 'main_script');
-            SieveService::closeConnection($imap_account['id']);
+            $scripts = $client->listScripts();
+            save_main_script($client, generate_main_script($scripts), $scripts);
+            $client->activateScript('main_script');
             Hm_Msgs::add('Script removed');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
@@ -252,13 +243,11 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
             }
         }
 
-        $email_sender = $this->request->post['sender'];
         try {
-            //we need this block for block domain action to work
-            ensure_sieve_service_initialized($this->user_config, $this->cache);
-            $scripts = SieveService::listScripts($imap_account['id']);
-
-            $current_script = SieveService::getScript($imap_account['id'], 'blocked_senders');
+            $client = get_sieve_client($imap_account, $this->config, $this->cache);
+            if (!$client) return;
+            $scripts = $client->listScripts();
+            $current_script = $client->getScript('blocked_senders');
             $blocked_list = prepare_sieve_script ($current_script);
 
             $domain = get_domain($this->request->post['sender']);
@@ -271,8 +260,8 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
             }
             $new_blocked_list[] = $blocked_wildcard;
 
-            if(array_search('blocked_senders', $scripts, true) === false) {
-                SieveService::putScript($imap_account['id'], 'blocked_senders', '');
+            if (array_search('blocked_senders', $scripts, true) === false) {
+                $client->putScript('blocked_senders', '');
             }
 
             // Create Block List Filter
@@ -285,12 +274,8 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
                 $cond->contains('"From" ["'.$blocked_sender.'"]');
                 $custom_condition->addCriteria($cond);
             }
-            $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\DiscardFilterAction()
-            );
-            $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\StopFilterAction()
-            );
+            $custom_condition->addAction(new \PhpSieveManager\Filters\Actions\DiscardFilterAction());
+            $custom_condition->addAction(new \PhpSieveManager\Filters\Actions\StopFilterAction());
             $filter->setCondition($custom_condition);
             $script_parsed = $filter->toScript();
 
@@ -299,11 +284,10 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
             $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
             $header_obj .= "\n# ".base64_encode(json_encode($new_blocked_list));
             $script_parsed = $header_obj."\n\n".$script_parsed;
-            
-            SieveService::putScript($imap_account['id'], 'blocked_senders', $script_parsed);
-            save_main_script(null, $main_script, $scripts, $imap_account['id']);
-            SieveService::activateScript($imap_account['id'], 'main_script');
-            SieveService::closeConnection($imap_account['id']);
+
+            $client->putScript('blocked_senders', $script_parsed);
+            save_main_script($client, $main_script, $scripts);
+            $client->activateScript('main_script');
             $this->out('reload_page', true);
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
@@ -389,16 +373,16 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
         }
 
         try {
-            // we need this for block_list page for unblock sender action to work
-            ensure_sieve_service_initialized($this->user_config, $this->cache);
-            $scripts = SieveService::listScripts($imap_account['id']);
+            $client = get_sieve_client($imap_account, $this->config, $this->cache);
+            if (!$client) return;
+            $scripts = $client->listScripts();
 
-            if(array_search('blocked_senders', $scripts, true) === false) {
-                SieveService::putScript($imap_account['id'], 'blocked_senders', '');
+            if (array_search('blocked_senders', $scripts, true) === false) {
+                $client->putScript('blocked_senders', '');
             }
 
             $blocked_senders = [];
-            $current_script = SieveService::getScript($imap_account['id'], 'blocked_senders');
+            $current_script = $client->getScript('blocked_senders');
             $unblock_sender = false;
             if ($current_script != '') {
                 $blocked_list = prepare_sieve_script ($current_script);
@@ -415,7 +399,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
             }
 
             if (count($blocked_senders) == 0 && $unblock_sender) {
-                SieveService::putScript($imap_account['id'], 'blocked_senders', '');
+                $client->putScript('blocked_senders', '');
                 Hm_Msgs::add('Sender Unblocked');
                 return;
             }
@@ -432,19 +416,12 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
             }
 
             if ($default_behaviour == 'Discard') {
-                $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\DiscardFilterAction()
-                );
-            }
-            elseif ($default_behaviour == 'Reject') {
+                $custom_condition->addAction(new \PhpSieveManager\Filters\Actions\DiscardFilterAction());
+            } elseif ($default_behaviour == 'Reject') {
                 $filter->addRequirement('reject');
-                $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\RejectFilterAction([""])
-                );
+                $custom_condition->addAction(new \PhpSieveManager\Filters\Actions\RejectFilterAction([""]));
             }
-            $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\StopFilterAction()
-            );
+            $custom_condition->addAction(new \PhpSieveManager\Filters\Actions\StopFilterAction());
             $filter->setCondition($custom_condition);
             $script_parsed = $filter->toScript();
 
@@ -453,10 +430,9 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
             $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
             $header_obj .= "\n# ".base64_encode(json_encode($blocked_senders));
             $script_parsed = $header_obj."\n\n".$script_parsed;
-            SieveService::putScript($imap_account['id'], 'blocked_senders', $script_parsed);
-            save_main_script(null, $main_script, $scripts, $imap_account['id']);
-            SieveService::activateScript($imap_account['id'], 'main_script');
-            SieveService::closeConnection($imap_account['id']);
+            $client->putScript('blocked_senders', $script_parsed);
+            save_main_script($client, $main_script, $scripts);
+            $client->activateScript('main_script');
 
             if ($unblock_sender) {
                 Hm_Msgs::add('Sender Unblocked');
@@ -520,17 +496,16 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
         $scope_title = ucfirst($scope);
 
         try {
-            // we need this for message page block sender action to work
-            ensure_sieve_service_initialized($this->user_config, $this->cache);
-            
-            $scripts = SieveService::listScripts($imap_account['id']);
+            $client = get_sieve_client($imap_account, $this->config, $this->cache);
+            if (!$client) return;
+            $scripts = $client->listScripts();
 
-            if(array_search('blocked_senders', $scripts, true) === false) {
-                SieveService::putScript($imap_account['id'], 'blocked_senders', '');
+            if (array_search('blocked_senders', $scripts, true) === false) {
+                $client->putScript('blocked_senders', '');
             }
 
             $blocked_senders = [];
-            $current_script = SieveService::getScript($imap_account['id'], 'blocked_senders');
+            $current_script = $client->getScript('blocked_senders');
 
             $blocked_list_actions = [];
             $unblock_sender = false;
@@ -568,7 +543,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             $blocked_senders = array_unique($blocked_senders);
 
             if (count($blocked_senders) == 0 && $unblock_sender) {
-                SieveService::putScript($imap_account['id'], 'blocked_senders', '');
+                $client->putScript('blocked_senders', '');
                 Hm_Msgs::add($scope_title . ' Unblocked');
                 return;
             }
@@ -616,10 +591,9 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             $header_obj .= "\n# ".base64_encode(json_encode($blocked_list_actions));
             $script_parsed = $header_obj."\n\n".$script_parsed;
 
-            SieveService::putScript($imap_account['id'], 'blocked_senders', $script_parsed);
-            save_main_script(null, $main_script, $scripts, $imap_account['id']);
-            SieveService::activateScript($imap_account['id'], 'main_script');
-            SieveService::closeConnection($imap_account['id']);
+            $client->putScript('blocked_senders', $script_parsed);
+            save_main_script($client, $main_script, $scripts);
+            $client->activateScript('main_script');
 
             if (isset($this->request->post['change_behavior'])) {
                 Hm_Msgs::add($scope_title . ' Behavior Changed');
@@ -1029,27 +1003,18 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
         $script_parsed = $header_obj."\n\n".$script_parsed;
 
         try {
-            //we need this for sieve_filters page add script
-            ensure_sieve_service_initialized($this->user_config, $this->cache);
-            
-            $scripts = SieveService::listScripts($imap_account['id']);
-            foreach ($scripts as $script) {
-                if ($script == 'main_script') {
-                    SieveService::removeScripts($imap_account['id'], 'main_script');
-                }
+            $client = get_sieve_client($imap_account, $this->config, $this->cache);
+            if (!$client) return;
+            foreach ($client->listScripts() as $script) {
+                if ($script == 'main_script') $client->removeScripts('main_script');
                 if ($script == $this->request->post['current_editing_filter_name']) {
-                    SieveService::removeScripts($imap_account['id'], $this->request->post['current_editing_filter_name']);
+                    $client->removeScripts($this->request->post['current_editing_filter_name']);
                 }
             }
-
-            SieveService::putScript($imap_account['id'], $script_name, $script_parsed);
-
-            $scripts = SieveService::listScripts($imap_account['id']);
-            $main_script = generate_main_script($scripts);
-
-            save_main_script(null, $main_script, $scripts, $imap_account['id']);
-            SieveService::activateScript($imap_account['id'], 'main_script');
-            SieveService::closeConnection($imap_account['id']);
+            $client->putScript($script_name, $script_parsed);
+            $scripts = $client->listScripts();
+            save_main_script($client, generate_main_script($scripts), $scripts);
+            $client->activateScript('main_script');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
@@ -1085,15 +1050,14 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
         }
         
         try {
-            ensure_sieve_service_initialized($this->user_config, $this->cache);
-            $scripts = SieveService::listScripts($imap_account['id']);
-            foreach ($scripts as $script) {
+            $client = get_sieve_client($imap_account, $this->config, $this->cache);
+            if (!$client) return;
+            foreach ($client->listScripts() as $script) {
                 if ($script == $this->request->post['current_editing_script']) {
-                    SieveService::removeScripts($imap_account['id'], $this->request->post['current_editing_script']);
+                    $client->removeScripts($this->request->post['current_editing_script']);
                 }
             }
-            SieveService::putScript($imap_account['id'], $script_name, $this->request->post['script']);
-            SieveService::closeConnection($imap_account['id']);
+            $client->putScript($script_name, $this->request->post['script']);
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
@@ -1351,7 +1315,8 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
             $default_behaviour_html .= '<input type="text" class="select_default_reject_message form-control" value="' . $default_reject_message . '" placeholder="' . $this->trans('Reject message') . '" />';
         }
         $default_behaviour_html .= '<button class="submit_default_behavior btn btn-primary">' . $this->trans('Submit') . '</button></div></div>';
-        list($scripts, $current_script) = get_all_scripts($mailbox['id'], true);
+        $sieve_client = Hm_Sieve_Client_Factory::get($mailbox['id']);
+        list($scripts, $current_script) = get_all_scripts($sieve_client, true);
         $blocked_senders = get_blocked_senders_array($current_script, $scripts);
         $num_blocked = $blocked_senders ? sizeof($blocked_senders) : 0;
         $res = '<div class="sievefilters_accounts_item">';
@@ -1486,16 +1451,11 @@ class Hm_Handler_sieve_status extends Hm_Handler_Module {
                         continue;
                     }
 
-                    try {
-                        // we need this for info page to load the capabilities
-                        ensure_sieve_service_initialized($this->user_config, $this->cache);
-                        
-                        $capabilities = SieveService::getCapabilities($id);
+                    $client = get_sieve_client($imap_account + ['id' => $id], $this->config, $this->cache);
+                    if ($client) {
+                        $capabilities = $client->getCapabilities();
                         $this->out('sieve_server_capabilities', $capabilities);
                         self::$capabilities[$imap_account['sieve_config_host']] = $capabilities;
-                        SieveService::closeConnection($id);
-                    } catch (Exception $e) {
-                        // Connection failed, skip this server
                     }
                 }
             }
@@ -1512,11 +1472,7 @@ class Hm_Handler_sieve_connect extends Hm_Handler_Module {
         if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
 
         if ($imap_details = $this->get('imap_connect_details')) {
-            try {
-                // Test connection
-                $client = SieveService::getConnection($imap_details['id']);
-                SieveService::closeConnection($imap_details['id']);
-            } catch (Exception $e) {
+            if (!Hm_Sieve_Client_Factory::get($imap_details['id'])) {
                 Hm_Msgs::add("Failed to authenticate to the Sieve host", "danger");
             }
         }
@@ -1536,26 +1492,19 @@ class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
         $imap_account = Hm_IMAP_List::dump($form['imap_account']);
         $success = false;
         try {
-            ensure_sieve_service_initialized($this->user_config, $this->cache);
-            $state = $form['script_state'] ? 'enabled': 'disabled';
-            $scripts = SieveService::listScripts($imap_account['id']);
-            foreach ($scripts as $key => $script) {
-                if ($script == 'main_script') {
-                    SieveService::removeScripts($imap_account['id'], 'main_script');
-                }
+            $client = get_sieve_client($imap_account, $this->config, $this->cache);
+            if (!$client) { $this->out('success', false); return; }
+            $state = $form['script_state'] ? 'enabled' : 'disabled';
+            foreach ($client->listScripts() as $key => $script) {
+                if ($script == 'main_script') $client->removeScripts('main_script');
                 if ($script == $form['sieve_script_name']) {
-                    if (! $form['script_state']) {
-                        unset($scripts[$key]);
-                    }
-                    SieveService::renameScript($imap_account['id'], $script, "s{$state}_");
+                    $client->renameScript($script, "s{$state}_");
                     $success = true;
                 }
             }
-            $scripts = SieveService::listScripts($imap_account['id']);
-            $main_script = generate_main_script($scripts);
-            save_main_script(null, $main_script, $scripts, $imap_account['id']);
-            SieveService::activateScript($imap_account['id'], 'main_script');
-            SieveService::closeConnection($imap_account['id']);
+            $scripts = $client->listScripts();
+            save_main_script($client, generate_main_script($scripts), $scripts);
+            $client->activateScript('main_script');
 
             Hm_Msgs::add("Script $state");
         } catch (Exception $e) {
@@ -1576,23 +1525,14 @@ class Hm_Handler_list_block_sieve_script extends Hm_Handler_Module {
         Hm_IMAP_List::init($this->user_config, $this->session);
         $imap_account = Hm_IMAP_List::get($form['imap_server_id'], true);
 
-        if (empty($imap_account['sieve_config_host'])) {
-            return;
-        }else{
-            ensure_sieve_service_initialized($this->user_config, $this->cache);
-        }
-        
-        try {
-            list($scripts, $current_script) = get_all_scripts($form['imap_server_id'], true);
+        if (empty($imap_account['sieve_config_host'])) return;
 
-            $blocked_senders = [];
-            if ($current_script != '') {
-                $blocked_list = prepare_sieve_script ($current_script);
-                foreach ($blocked_list as $blocked_sender) {
-                    $blocked_senders[] = $blocked_sender;
-                }
-            }
-            $this->out('ajax_list_block_sieve', json_encode($blocked_senders));
+        try {
+            $client = get_sieve_client($imap_account + ['id' => $form['imap_server_id']], $this->config, $this->cache);
+            if (!$client) return;
+            list($scripts, $current_script) = get_all_scripts($client, true);
+            $blocked_senders = $current_script != '' ? prepare_sieve_script($current_script) : [];
+            $this->out('ajax_list_block_sieve', json_encode(array_values((array) $blocked_senders)));
         } catch (Exception $e) {
             Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
             return;
@@ -1648,19 +1588,30 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
         }
         $accounts = $this->get('imap_accounts');
         
-        // Initialize SieveService with all sieve-enabled accounts
-        ensure_sieve_service_initialized($this->user_config, $this->cache);
-        
         if (isset($accounts[$form['imap_server_id']])) {
             $account = $accounts[$form['imap_server_id']];
             $account['sieve_extensions'] = [];
-            try {
-                $account['sieve_extensions'] = SieveService::getExtensions($form['imap_server_id']);
-                // Pre-warm list cache before session is closed — output modules run after close_early()
-                // so any session writes after that point are lost
-                SieveService::listScripts($form['imap_server_id']);
-            } catch (Exception $e) {
-                Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
+            $client = Hm_Sieve_Client_Factory::get($form['imap_server_id']);
+            if (!$client && !empty($account['sieve_config_host'])) {
+                try {
+                    $is_nux = in_array('nux', $this->config->get_modules(true), true);
+                    $client = get_sieve_client_factory($this->config)->init(
+                        $account + ['id' => $form['imap_server_id']],
+                        $is_nux,
+                        $this->cache
+                    );
+                } catch (Exception $e) {}
+            }
+            if ($client) {
+                try {
+                    $account['sieve_extensions'] = $client->getExtensions();
+                    $scripts = $client->listScripts();
+                    if (is_array($scripts) && in_array('blocked_senders', $scripts, true)) {
+                        $client->getScript('blocked_senders');
+                    }
+                } catch (Exception $e) {
+                    Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
+                }
             }
             $this->out('mailbox', $account);
             $this->session->close_early();
@@ -1728,14 +1679,13 @@ class Hm_Handler_load_custom_actions extends Hm_Handler_Module
 
         $filters = [];
         try {
-            ensure_sieve_service_initialized($this->user_config, $this->cache);
-            $scripts = SieveService::listScripts($imap_server_id);
+            $client = get_sieve_client($mailbox + ['id' => $imap_server_id], $this->config, $this->cache);
+            if (!$client) { $this->out('custom_actions', []); return; }
+            $scripts = $client->listScripts();
 
             foreach ($scripts as $script_name) {
-                if (!mb_strstr($script_name, 'cyphtfilter')) {
-                    continue;
-                }
-                $raw_script = SieveService::getScript($imap_server_id, $script_name);
+                if (!mb_strstr($script_name, 'cyphtfilter')) continue;
+                $raw_script = $client->getScript($script_name);
 
                 $lines = split_script_lines($raw_script);
                 $source = '';
@@ -1756,7 +1706,6 @@ class Hm_Handler_load_custom_actions extends Hm_Handler_Module
                     'source' => $source,
                 ];
             }
-            SieveService::closeConnection($imap_server_id);
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
         }
@@ -1824,10 +1773,12 @@ class Hm_Handler_sieve_remame_folder extends Hm_Handler_Module
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
         if ($mailbox && $mailbox->authed() && $mailbox->is_imap()) {
-            ensure_sieve_service_initialized($this->user_config, $this->cache);
-            list($scripts) = get_all_scripts($form['imap_server_id'], false);
+            $sieve_account = $this->user_config->get('imap_servers')[$form['imap_server_id']] ?? [];
+            $client = get_sieve_client($sieve_account + ['id' => $form['imap_server_id']], $this->config, $this->cache);
+            if (!$client) return;
+            list($scripts) = get_all_scripts($client, false);
 
-            $linked_mailboxes = get_sieve_linked_mailbox($scripts, $form['imap_server_id']);
+            $linked_mailboxes = get_sieve_linked_mailbox($scripts, $client);
             if ($linked_mailboxes && in_array($form['folder'], $linked_mailboxes)) {
                 try {
                     $script_names = array_filter(
@@ -1838,16 +1789,15 @@ class Hm_Handler_sieve_remame_folder extends Hm_Handler_Module
                     );
                     $script_names = array_keys($script_names);
                     foreach ($script_names as $script_name) {
-                        $script_parsed = SieveService::getScript($form['imap_server_id'], $script_name);
+                        $script_parsed = $client->getScript($script_name);
                         $script_parsed = str_replace('"'.$form['folder'].'"', '"'.$form['new_folder'].'"', $script_parsed);
 
                         $old_actions = base64_decode(split_script_lines($script_parsed)[2]);
                         $new_actions = base64_encode(str_replace('"'.$form['folder'].'"', '"'.$form['folder'].'"', $old_actions));
                         $script_parsed = str_replace(base64_encode($old_actions), $new_actions, $script_parsed);
-                        SieveService::removeScripts($form['imap_server_id'], $script_name);
-                        SieveService::putScript($form['imap_server_id'], $script_name, $script_parsed);
+                        $client->removeScripts($script_name);
+                        $client->putScript($script_name, $script_parsed);
                     }
-                    SieveService::closeConnection($form['imap_server_id']);
                     Hm_Msgs::add('Sieve filters using the folder were also updated to use the new folder name.', 'info');
                 } catch (Exception $e) {
                     Hm_Msgs::add("Failed to rename folder in sieve scripts", "warning");
@@ -1869,12 +1819,13 @@ class Hm_Handler_sieve_can_delete_folder extends Hm_Handler_Module
             return;
         }
 
-        ensure_sieve_service_initialized($this->user_config, $this->cache);
-
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
         if ($mailbox && $mailbox->authed() && $mailbox->is_imap()) {
+            $sieve_account = $this->user_config->get('imap_servers')[$form['imap_server_id']] ?? [];
+            $client = get_sieve_client($sieve_account + ['id' => $form['imap_server_id']], $this->config, $this->cache);
+            if (!$client) return;
             $del_folder = prep_folder_name($mailbox->get_connection(), $form['folder'], true);
-            list($scripts) = get_all_scripts($form['imap_server_id'], false);
+            list($scripts) = get_all_scripts($client, false);
             if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this, $scripts)) {
                 $this->out('sieve_can_delete_folder', false);
                 Hm_Msgs::add('This folder can\'t be deleted because it is used in a Sieve filter.', 'warning');
