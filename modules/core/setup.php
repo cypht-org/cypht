@@ -208,6 +208,14 @@ add_handler('ajax_quick_servers_setup', 'http_headers', true, 'core');
 setup_base_ajax_page('ajax_privacy_settings', 'core');
 add_handler('ajax_privacy_settings', 'privacy_settings',  true, 'core');
 
+/* auto-save settings control */
+setup_base_ajax_page('ajax_auto_save_settings', 'core');
+add_handler('ajax_auto_save_settings', 'ajax_auto_save_settings', true, 'core', 'load_user_data', 'after');
+add_handler('ajax_auto_save_settings', 'save_user_data', true, 'core', 'ajax_auto_save_settings', 'after');
+setup_base_ajax_page('ajax_resume_auto_save', 'core');
+add_handler('ajax_resume_auto_save', 'ajax_resume_auto_save', true, 'core', 'load_user_data', 'after');
+add_handler('ajax_resume_auto_save', 'save_user_data', true, 'core', 'ajax_resume_auto_save', 'after');
+
 setup_base_ajax_page('ajax_combined_message_list', 'core');
 add_handler('ajax_combined_message_list', 'load_user_data', true, 'core');
 add_output('ajax_combined_message_list', 'combined_message_list', true, 'core');
@@ -233,6 +241,8 @@ return array(
         'search',
         'ajax_quick_servers_setup',
         'ajax_privacy_settings',
+        'ajax_auto_save_settings',
+        'ajax_resume_auto_save',
         'ajax_combined_message_list',
         'logout',
     ),
@@ -356,6 +366,8 @@ return array(
         'drafts_per_source' => FILTER_UNSAFE_RAW,
         'drafts_since' => FILTER_UNSAFE_RAW,
         'warn_for_unsaved_changes' => FILTER_VALIDATE_BOOLEAN,
+        'auto_save' => FILTER_VALIDATE_BOOLEAN,
+        'auto_save_setting' => FILTER_VALIDATE_BOOLEAN,
         'srv_setup_stepper_imap_server_id'  => FILTER_UNSAFE_RAW,
         'srv_setup_stepper_smtp_server_id' => FILTER_UNSAFE_RAW,
         'srv_setup_stepper_profile_name'  => FILTER_UNSAFE_RAW,
