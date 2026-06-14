@@ -168,7 +168,10 @@ class Hm_Mock_Config {
     }
     public function load() {
     }
-    public function reload() {
+    public function reload($data = [], $user = null) {
+        if (!empty($data)) {
+            $this->data = $data;
+        }
     }
 }
 class Hm_Mock_Request {
@@ -259,7 +262,8 @@ class Hm_Functions {
         'Jtoy6+MWo8dB+btO0PulIqXNz6WEBnuWa0/KHrelM2O/6N+9sdANg2CNUYo2ZsOtOZ4jEF9G27qZM2ILlnXwa1HCRDYByzmvk4Teg+PA=='; }
     public static function session_destroy() { return true; }
     public static function error_log($str=true) { return $str; }
-    public static function c_init() { return true; }
+    public static $curl_fail = false;
+    public static function c_init() { return self::$curl_fail ? false : true; }
     public static function c_setopt() { return true; }
     public static function c_status() { return 200; }
     public static function c_exec() { return self::$exec_res; }
