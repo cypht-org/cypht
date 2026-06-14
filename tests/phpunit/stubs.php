@@ -89,6 +89,16 @@ if (!defined("IMAP_TEST")) {
         public function get_state() { if (self::$allow_auth) { return $this->connected ? 'authenticated' : false; } return 'connected'; }
         public function connect() { if (self::$allow_connection) { $this->connected = true; return true; } return false; }
         public function show_debug() {}
+        public function get_mailbox_status() { return null; }
+        public function get_mailbox_list() { return null; }
+        public function select_mailbox() { return null; }
+        public function get_mailbox_page() { return null; }
+        public function mailbox_subscription() { return null; }
+        public function is_supported() { return null; }
+        public function get_message_sort_order() { return null; }
+        public function search() { return null; }
+        public function sort_by_fetch() { return null; }
+        public function message_action() { return null; }
     }
 }
 
