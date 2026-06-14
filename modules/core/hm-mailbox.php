@@ -583,7 +583,7 @@ class Hm_Mailbox {
         // Handle JMAP specifically since it's "IMAP-like" but has different method signatures
         if ($this->type === self::TYPE_JMAP) {
             // JMAP search uses IMAP-like parameters but handles sorting internally
-            $uids = $this->connection->search($target, false, $terms, [], $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
+            $uids = $this->connection->search($target, false, $terms, [], $exclude_deleted, true, $only_auto_bcc);
             return $uids;
         }
         
