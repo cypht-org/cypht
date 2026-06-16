@@ -44,21 +44,29 @@ function handleInvisibleResource(element, inline = false) {
 
 const handleExternalResources = (inline) => {
     const messageContainer = document.querySelector('.msg_text_inner');
+    if (!messageContainer) {
+        return;
+    }
+
+    document.getElementById('externalNoticesAccordion')?.remove();
+
     const externalNoticesAccordion = document.createElement('div');
     externalNoticesAccordion.classList.add('accordion');
     externalNoticesAccordion.id = 'externalNoticesAccordion';
     messageContainer.insertAdjacentElement('afterbegin', externalNoticesAccordion);
     externalNoticesAccordion.innerHTML = '<div class="external_notices accordion-collapse collapse"></div>';
 
-    const senderEmail = document.querySelector('#contact_info')?.textContent.match(EMAIL_REGEX)[0];
+    const senderEmail = document.querySelector('#contact_info')?.textContent?.match(EMAIL_REGEX)?.[0] || '';
 
     if (handleBlockedStatus(inline, senderEmail)) {
         return;
     }
 
     const sender = senderEmail + '_external_resources_allowed';
-    const elements = messageContainer.querySelectorAll('[data-src]');
+    const elements = messageContainer.querySelectorAll('img[data-src]');
     const blockedResources = [];
+    const autoAllowImages = messageContainer.dataset.autoAllowImages === '1';
+    const pendingBlocked = Number(messageContainer.dataset.blockedRemoteResources || 0);
 
     elements.forEach(function (element) {
 
@@ -66,7 +74,7 @@ const handleExternalResources = (inline) => {
         const senderAllowed = Hm_Utils.get_from_local_storage(sender);
         const allowed = Hm_Utils.get_from_local_storage(dataSrc);
 
-        switch (Number(allowed) || Number(senderAllowed)) {
+        switch (Number(allowed) || Number(senderAllowed) || Number(autoAllowImages)) {
             case 1:
                 element.src = dataSrc;
                 break;
@@ -83,11 +91,25 @@ const handleExternalResources = (inline) => {
     const noticesElement = document.createElement('div');
     noticesElement.classList.add('notices');
 
-    if (blockedResources.length) {
+    if (blockedResources.length || pendingBlocked) {
         const allowAll = document.createElement('div');
         allowAll.classList.add('allow_image_link', 'all', 'fw-bold');
         allowAll.textContent = 'For security reasons, external resources have been blocked.';
-        if (blockedResources.length > 1) {
+        if (blockedResources.length === 1) {
+            const allowOneLink = document.createElement('a');
+            allowOneLink.classList.add('btn', 'btn-light', 'btn-sm', 'text-decoration-none');
+            allowOneLink.href = '#';
+            allowOneLink.dataset.src = blockedResources[0];
+            allowOneLink.textContent = 'Allow';
+
+            const linksWrapper = document.createElement('div');
+            linksWrapper.classList.add('d-inline-flex', 'ms-2');
+            linksWrapper.appendChild(allowOneLink);
+            allowAll.appendChild(linksWrapper);
+
+            handleAllowResource(allowAll, getParam('part'), inline);
+        }
+        else if (blockedResources.length > 1) {
             const allowAllLink = document.createElement('a');
             allowAllLink.classList.add('btn', 'btn-light', 'btn-sm', 'text-decoration-none');
             allowAllLink.href = '#';
@@ -116,34 +138,36 @@ const handleExternalResources = (inline) => {
         }
         noticesElement.insertAdjacentElement('afterbegin', allowAll);
 
-        const definitiveActions = $('<div class="definitive_actions ms-auto">From this sender always:</div>');
+        if (blockedResources.length) {
+            const definitiveActions = $('<div class="definitive_actions ms-auto">From this sender always:</div>');
 
-        const button = document.createElement('a');
-        button.setAttribute('href', '#');
-        button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm', 'text-decoration-none');
-        button.innerHTML = '<i class="bi bi-check"></i> Allow';
-        definitiveActions.append(button);
-        const popover = sessionAvailableOnlyActionInfo(button)
+            const button = document.createElement('a');
+            button.setAttribute('href', '#');
+            button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm', 'text-decoration-none');
+            button.innerHTML = '<i class="bi bi-check"></i> Allow';
+            definitiveActions.append(button);
+            const popover = sessionAvailableOnlyActionInfo(button)
 
-        button.addEventListener('click', function (e) {
-            e.preventDefault();
-            addSenderToImagesWhitelist(senderEmail).then(refreshMessageContent.bind(null, inline)).finally(() => {
-                popover.dispose();
-            })
-        });
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                addSenderToImagesWhitelist(senderEmail).then(refreshMessageContent.bind(null, inline)).finally(() => {
+                    popover.dispose();
+                })
+            });
 
-        const alwaysBlockButton = $('<a href="#" class="btn btn-light btn-sm ms-2 text-decoration-none"><i class="bi bi-shield-lock"></i> Block</a>');
-        const blockPopover = sessionAvailableOnlyActionInfo(alwaysBlockButton[0]);
-        definitiveActions.append(alwaysBlockButton[0]);
+            const alwaysBlockButton = $('<a href="#" class="btn btn-light btn-sm ms-2 text-decoration-none"><i class="bi bi-shield-lock"></i> Block</a>');
+            const blockPopover = sessionAvailableOnlyActionInfo(alwaysBlockButton[0]);
+            definitiveActions.append(alwaysBlockButton[0]);
 
-        alwaysBlockButton.on('click', function (e) {
-            e.preventDefault();
-            addSenderToImagesBlackList(senderEmail).then(refreshMessageContent.bind(null, inline)).finally(() => {
-                blockPopover.dispose();
-            })
-        });
+            alwaysBlockButton.on('click', function (e) {
+                e.preventDefault();
+                addSenderToImagesBlackList(senderEmail).then(refreshMessageContent.bind(null, inline)).finally(() => {
+                    blockPopover.dispose();
+                })
+            });
 
-        noticesElement.appendChild(definitiveActions[0]);
+            noticesElement.appendChild(definitiveActions[0]);
+        }
     }
 
     document.querySelector('.external_notices').insertAdjacentElement('beforebegin', noticesElement);
