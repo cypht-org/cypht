@@ -251,8 +251,12 @@ class Hm_Carddav {
         $parsed = parse_url($this->url);
         $host = $parsed['host'];
         // If parsed URL contains a port, reappend it to host.
-        if (!empty($parsed['port'])) { 
-            $host .= ':' . $parsed['port']; 
+        if (!empty($parsed['port'])) {
+            // Wrap IPv6 addresses in brackets before appending port
+            if (strpos($host, ':') !== false) {
+                $host = '[' . $host . ']';
+            }
+            $host .= ':' . $parsed['port'];
         }
         return sprintf('%s://%s/%s', $parsed['scheme'], $host, preg_replace('#^/#', '', $path));
     }
