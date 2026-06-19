@@ -12,10 +12,8 @@
  * CACHE_ID   unique string to bust js/css browser caching for a new build
  * SITE_ID    random site id used for page keys
  */
-define('APP_PATH', '');
-define('VENDOR_PATH', APP_PATH.'vendor/');
+define('APP_PATH', dirname(__FILE__).'/');
 define('CONFIG_PATH', APP_PATH.'config/');
-define('WEB_ROOT', '');
 define('ASSETS_THEMES_ROOT', '');
 define('CACHE_ID', '');
 define('SITE_ID', '');
@@ -26,9 +24,13 @@ define('ASSETS_PATH', APP_PATH.'assets/');
 /* don't let anything output content until we are ready */
 ob_start();
 
-require VENDOR_PATH.'autoload.php';
 /* get includes */
 require APP_PATH.'lib/framework.php';
+
+Hm_Functions::define_vendor_path();
+
+require VENDOR_PATH.'autoload.php';
+
 $environment = Hm_Environment::getInstance();
 $environment->load();
 
@@ -50,12 +52,24 @@ if (DEBUG_MODE) {
 }
 
 /* get configuration */
-$config = new Hm_Site_Config_File();
+if (env('SITE_CONFIG_TYPE') == 'custom') {
+    $site_module = basename(env('SITE_MODULE_PATH', ''));
+    if (is_readable(APP_PATH. "modules/$site_module/lib.php")) {
+        require_once APP_PATH . "modules/$site_module/lib.php";
+        $config = new Hm_Custom_Site_Config();
+    }
+}
+
+if (! isset($config)) {
+    $config = new Hm_Site_Config_File();
+}
 
 /* set default TZ */
 date_default_timezone_set($config->get('default_setting_timezone', 'UTC'));
 /* set the default since and per_source values */
 $environment->define_default_constants($config);
+
+define('WEB_ROOT', $config->get('web_root'));
 
 /* setup ini settings */
 if (!$config->get('disable_ini_settings')) {
@@ -67,8 +81,14 @@ if (DEBUG_MODE) {
     Hm_Debug::load_page_stats();
 }
 
-/* process the request */
-new Hm_Dispatch($config);
+$config->setInitCallback(function($config) {
+    // /* process the request */
+    return new Hm_Dispatch($config);
+});
+
+if (! is_a($config, 'Hm_Custom_Site_Config')) {
+    $config->triggerInit();
+} // Let custom site configs trigger their own init when ready
 
 if (empty($config)) {
     $config = new Hm_Site_Config_File();
