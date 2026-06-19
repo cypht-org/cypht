@@ -75,6 +75,7 @@ class Hm_Mock_Memcached_No {
 class Hm_Mock_Memcached {
     protected $data = array();
     public static $set_failure = false;
+    public static $result_code = 16;
     const RES_NOTFOUND = 1;
     const OPT_BINARY_PROTOCOL = false;
     function addServer($server, $port) {
@@ -88,9 +89,14 @@ class Hm_Mock_Memcached {
         return true;
     }
     function get($key) {
+        if (self::$result_code === 3) {
+            return false;
+        }
         if (array_key_exists($key, $this->data)) {
+            self::$result_code = 0;
             return $this->data[$key];
         }
+        self::$result_code = 16;
         return false;
     }
     function delete($key) {
@@ -110,7 +116,7 @@ class Hm_Mock_Memcached {
         return true;
     }
     function getResultCode() {
-        return 16;
+        return self::$result_code;
     }
 }
 
