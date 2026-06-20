@@ -9,10 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class Hm_Test_Ini_Set extends TestCase {
 
-    public function setUp(): void {
-        require_once __DIR__.'/../bootstrap.php';
-    }
-
     /**
      * Require the real lib/ini_set.php with the given config overrides applied to
      * a Hm_Mock_Config instance set as the global $config that ini_set.php reads.
