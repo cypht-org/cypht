@@ -16,7 +16,7 @@ class Hm_Test_Repository extends TestCase {
         $this->user_config = new Hm_Mock_Config();
         $this->session     = new Hm_Mock_Session();
 
-        Hm_Tags_Wrapper::init($this->user_config, $this->session);
+        Hm_Repository_Wrapper::init($this->user_config, $this->session);
     }
 
     /**
@@ -24,7 +24,7 @@ class Hm_Test_Repository extends TestCase {
      * @runInSeparateProcess
      */
     public function test_count_returns_zero_on_empty_repo(): void {
-        $this->assertSame(0, Hm_Tags_Wrapper::count());
+        $this->assertSame(0, Hm_Repository_Wrapper::count());
     }
 
     /**
@@ -32,9 +32,9 @@ class Hm_Test_Repository extends TestCase {
      * @runInSeparateProcess
      */
     public function test_count_reflects_added_entities(): void {
-        Hm_Tags_Wrapper::add(['name' => 'A']);
-        Hm_Tags_Wrapper::add(['name' => 'B']);
-        $this->assertSame(2, Hm_Tags_Wrapper::count());
+        Hm_Repository_Wrapper::add(['name' => 'A']);
+        Hm_Repository_Wrapper::add(['name' => 'B']);
+        $this->assertSame(2, Hm_Repository_Wrapper::count());
     }
 
     /**
@@ -42,9 +42,9 @@ class Hm_Test_Repository extends TestCase {
      * @runInSeparateProcess
      */
     public function test_add_generates_id_when_not_provided(): void {
-        $id = Hm_Tags_Wrapper::add(['name' => 'Tag']);
+        $id = Hm_Repository_Wrapper::add(['name' => 'Tag']);
         $this->assertNotEmpty($id);
-        $entity = Hm_Tags_Wrapper::get($id);
+        $entity = Hm_Repository_Wrapper::get($id);
         $this->assertSame('Tag', $entity['name']);
     }
 
@@ -53,8 +53,8 @@ class Hm_Test_Repository extends TestCase {
      * @runInSeparateProcess
      */
     public function test_add_preserves_explicit_id(): void {
-        Hm_Tags_Wrapper::add(['id' => 'my-id', 'name' => 'Named']);
-        $entity = Hm_Tags_Wrapper::get('my-id');
+        Hm_Repository_Wrapper::add(['id' => 'my-id', 'name' => 'Named']);
+        $entity = Hm_Repository_Wrapper::get('my-id');
         $this->assertSame('Named', $entity['name']);
         $this->assertSame('my-id', $entity['id']);
     }
@@ -72,10 +72,10 @@ class Hm_Test_Repository extends TestCase {
             public function update(string $key, $val): void { $this->data[$key] = $val; }
         };
 
-        $id = Hm_Tags_Wrapper::add($entity);
+        $id = Hm_Repository_Wrapper::add($entity);
         $this->assertNotEmpty($id);
 
-        $stored = Hm_Tags_Wrapper::get($id);
+        $stored = Hm_Repository_Wrapper::get($id);
         $this->assertSame('ObjectTag', $stored->value('name'));
     }
 
@@ -85,7 +85,7 @@ class Hm_Test_Repository extends TestCase {
      */
     public function test_add_throws_for_unsupported_entity_type(): void {
         $this->expectException(Exception::class);
-        Hm_Tags_Wrapper::add('unsupported string entity');
+        Hm_Repository_Wrapper::add('unsupported string entity');
     }
 
     /**
@@ -93,7 +93,7 @@ class Hm_Test_Repository extends TestCase {
      * @runInSeparateProcess
      */
     public function test_get_returns_false_for_missing_id(): void {
-        $this->assertFalse(Hm_Tags_Wrapper::get('nonexistent-id'));
+        $this->assertFalse(Hm_Repository_Wrapper::get('nonexistent-id'));
     }
 
     /**
@@ -101,10 +101,10 @@ class Hm_Test_Repository extends TestCase {
      * @runInSeparateProcess
      */
     public function test_edit_merges_fields_for_array_entity(): void {
-        $id = Hm_Tags_Wrapper::add(['name' => 'Original', 'color' => 'red']);
-        Hm_Tags_Wrapper::edit($id, ['color' => 'blue']);
+        $id = Hm_Repository_Wrapper::add(['name' => 'Original', 'color' => 'red']);
+        Hm_Repository_Wrapper::edit($id, ['color' => 'blue']);
 
-        $entity = Hm_Tags_Wrapper::get($id);
+        $entity = Hm_Repository_Wrapper::get($id);
         $this->assertSame('Original', $entity['name']);
         $this->assertSame('blue', $entity['color']);
     }
@@ -121,16 +121,16 @@ class Hm_Test_Repository extends TestCase {
             public function value(string $k) { return $this->data[$k] ?? null; }
             public function update(string $k, $v): void { $this->data[$k] = $v; }
         };
-        $id = Hm_Tags_Wrapper::add($original);
+        $id = Hm_Repository_Wrapper::add($original);
 
         $replacement = new class {
             private array $data = ['name' => 'Replaced'];
             public function value(string $k) { return $this->data[$k] ?? null; }
             public function update(string $k, $v): void { $this->data[$k] = $v; }
         };
-        Hm_Tags_Wrapper::edit($id, $replacement);
+        Hm_Repository_Wrapper::edit($id, $replacement);
 
-        $stored = Hm_Tags_Wrapper::get($id);
+        $stored = Hm_Repository_Wrapper::get($id);
         $this->assertSame('Replaced', $stored->value('name'));
     }
 
@@ -139,7 +139,7 @@ class Hm_Test_Repository extends TestCase {
      * @runInSeparateProcess
      */
     public function test_edit_returns_false_for_missing_id(): void {
-        $this->assertFalse(Hm_Tags_Wrapper::edit('no-such-id', ['name' => 'X']));
+        $this->assertFalse(Hm_Repository_Wrapper::edit('no-such-id', ['name' => 'X']));
     }
 
     /**
@@ -147,10 +147,10 @@ class Hm_Test_Repository extends TestCase {
      * @runInSeparateProcess
      */
     public function test_del_removes_entity_and_returns_true(): void {
-        $id = Hm_Tags_Wrapper::add(['name' => 'ToDelete']);
-        $this->assertTrue(Hm_Tags_Wrapper::del($id));
-        $this->assertFalse(Hm_Tags_Wrapper::get($id));
-        $this->assertSame(0, Hm_Tags_Wrapper::count());
+        $id = Hm_Repository_Wrapper::add(['name' => 'ToDelete']);
+        $this->assertTrue(Hm_Repository_Wrapper::del($id));
+        $this->assertFalse(Hm_Repository_Wrapper::get($id));
+        $this->assertSame(0, Hm_Repository_Wrapper::count());
     }
 
     /**
@@ -158,7 +158,7 @@ class Hm_Test_Repository extends TestCase {
      * @runInSeparateProcess
      */
     public function test_del_returns_false_for_missing_id(): void {
-        $this->assertFalse(Hm_Tags_Wrapper::del('no-such-id'));
+        $this->assertFalse(Hm_Repository_Wrapper::del('no-such-id'));
     }
 
     /**
@@ -166,10 +166,10 @@ class Hm_Test_Repository extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getAll_returns_all_entities_keyed_by_id(): void {
-        $id1 = Hm_Tags_Wrapper::add(['name' => 'First']);
-        $id2 = Hm_Tags_Wrapper::add(['name' => 'Second']);
+        $id1 = Hm_Repository_Wrapper::add(['name' => 'First']);
+        $id2 = Hm_Repository_Wrapper::add(['name' => 'Second']);
 
-        $all = Hm_Tags_Wrapper::getAll();
+        $all = Hm_Repository_Wrapper::getAll();
         $this->assertArrayHasKey($id1, $all);
         $this->assertArrayHasKey($id2, $all);
         $this->assertCount(2, $all);
@@ -188,7 +188,7 @@ class Hm_Test_Repository extends TestCase {
             1 => ['server' => 'imap2.example.com', 'port' => 993],
         ]);
 
-        Hm_Tags_Wrapper::init($this->user_config, $this->session);
+        Hm_Repository_Wrapper::init($this->user_config, $this->session);
 
         $servers = $this->user_config->get('imap_servers', []);
         foreach (array_keys($servers) as $key) {
@@ -208,7 +208,7 @@ class Hm_Test_Repository extends TestCase {
             0 => ['server' => 'smtp.example.com', 'port' => 587],
         ]);
 
-        Hm_Tags_Wrapper::init($this->user_config, $this->session);
+        Hm_Repository_Wrapper::init($this->user_config, $this->session);
 
         $servers = $this->user_config->get('smtp_servers', []);
         foreach (array_keys($servers) as $key) {
@@ -231,7 +231,7 @@ class Hm_Test_Repository extends TestCase {
             'p1' => ['name' => 'Work', 'smtp_id' => 0],
         ]);
 
-        Hm_Tags_Wrapper::init($this->user_config, $this->session);
+        Hm_Repository_Wrapper::init($this->user_config, $this->session);
 
         $profiles = $this->user_config->get('profiles', []);
         $smtpId   = $profiles['p1']['smtp_id'] ?? null;
@@ -250,7 +250,7 @@ class Hm_Test_Repository extends TestCase {
             $existingId => ['server' => 'imap.example.com', 'port' => 993],
         ]);
 
-        Hm_Tags_Wrapper::init($this->user_config, $this->session);
+        Hm_Repository_Wrapper::init($this->user_config, $this->session);
 
         $servers = $this->user_config->get('imap_servers', []);
         $this->assertArrayHasKey($existingId, $servers);
