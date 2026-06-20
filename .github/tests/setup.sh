@@ -55,6 +55,7 @@ setup_db() {
     fi
     if [ "$DB" = "sqlite" ]; then
         touch /tmp/test.db
+        chmod 666 /tmp/test.db
         sqlite3 /tmp/test.db 'create table hm_user (username varchar(255), hash varchar(255), primary key (username));'
         sqlite3 /tmp/test.db 'create table hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));'
         sqlite3 /tmp/test.db 'create table hm_user_settings(username varchar(255), settings longblob, primary key (username));'
@@ -94,19 +95,6 @@ setup_user() {
 # test dovecot user authentication
 test_user_setup() {
     STATUS_TITLE "Test MailUser After Setup"
-
-    # Create system user with password
-    # sudo useradd -m -p "$(openssl passwd -1 testuser)" testuser
-
-    # Setup mail directory and permissions
-    # sudo mkdir -p /home/testuser/mail/.imap/INBOX
-    # sudo chown -R testuser:testuser /home/testuser
-    # sudo chmod 700 /home/testuser/mail/.imap
-    # sudo usermod -aG mail testuser
-    # sudo usermod -aG postdrop testuser
-
-    # Restart Dovecot to pick up the new user
-    # sudo systemctl restart dovecot
 
     # Test authentication with doveadm
     echo "Testing Dovecot authentication for 'testuser@localhost'..."
