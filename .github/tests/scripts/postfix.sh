@@ -6,9 +6,6 @@ sudo systemctl stop postfix.service
 # Enable myorigin if commented
 sudo sed -i 's/#myorigin/myorigin/g' /etc/postfix/main.cf
 
-# Set virtual transport to Dovecot LMTP
-sudo -H postconf virtual_transport=lmtp:unix:private/dovecot-lmtp
-
 # Enable SMTP AUTH via Dovecot
 sudo -H postconf smtpd_sasl_type=dovecot
 sudo -H postconf smtpd_sasl_path=private/auth
@@ -19,14 +16,18 @@ sudo -H postconf broken_sasl_auth_clients=yes
 # Allow authenticated users to relay mail
 sudo -H postconf "smtpd_recipient_restrictions=permit_sasl_authenticated,permit_mynetworks,reject_unauth_destination"
 
-# Ensure Dovecot provides the Postfix auth socket with correct permissions
-sudo sed -i '/^service auth {/,/^}/ {
-    /unix_listener \/var\/spool\/postfix\/private\/auth/!b
-    n
-    s/mode = .*/mode = 0660/
-    s/user = .*/user = postfix/
-    s/group = .*/group = postfix/
-}' /etc/dovecot/conf.d/10-master.conf || true
+# Ensure Dovecot provides the Postfix auth socket with correct permissions.
+# Adding a separate conf.d file is more reliable than patching 10-master.conf
+# (which has this block commented-out by default on Ubuntu).
+sudo tee /etc/dovecot/conf.d/99-postfix-auth.conf > /dev/null << 'EOF'
+service auth {
+  unix_listener /var/spool/postfix/private/auth {
+    mode = 0660
+    user = postfix
+    group = postfix
+  }
+}
+EOF
 
 # Enable TLS for SMTP with fallback
 sudo postconf -e "smtpd_use_tls=no"

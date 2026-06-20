@@ -109,7 +109,7 @@ test_user_setup() {
     # sudo systemctl restart dovecot
 
     # Test authentication with doveadm
-    echo "🔐 Testing Dovecot authentication for 'testuser@localhost'..."
+    echo "Testing Dovecot authentication for 'testuser@localhost'..."
     sudo doveadm auth test testuser testuser
 
     # Try SMTP login manually via STARTTLS
@@ -121,7 +121,7 @@ test_user_setup() {
       openssl s_client -connect localhost:143 -crlf
 
     # Check if Postfix auth socket exists
-    echo "🔐 Checking Postfix auth socket..."
+    echo "Checking Postfix auth socket..."
     sudo ls -l /var/spool/postfix/private/auth
     sudo test -S /var/spool/postfix/private/auth && echo "Socket exists"
 

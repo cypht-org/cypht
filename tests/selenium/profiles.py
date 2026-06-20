@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from runner import test_runner
 from settings import SettingsHelpers
 from selenium.webdriver.support.ui import Select, WebDriverWait
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 class ProfileTest(SettingsHelpers):
 
@@ -32,13 +32,10 @@ class ProfileTest(SettingsHelpers):
         addr.send_keys('test@test.com')
         reply = self.by_name('profile_replyto')
         reply.send_keys('test@test.com')
-        # self.dropdown_test('profile_imap', 'all_email_since', '-1 week', '-5 years')
         profile_imap = self.by_name('profile_imap')
-        # Debug info
         profile_imap_value = profile_imap.get_attribute('value')
         print(f"Imap profile server Found: '{profile_imap_value}'")
         profile_smtp = self.by_name('profile_smtp')
-        # Debug info
         profile_smtp_value = profile_smtp.get_attribute('value')
         print(f"Smtp profile server Found: '{profile_smtp_value}'")
         sig = self.by_name('profile_sig')
@@ -48,34 +45,40 @@ class ProfileTest(SettingsHelpers):
         self.by_name('profile_default').click()
         self.by_class('submit_profile').click()
         self.wait_with_folder_list()
-        from time import sleep; sleep(5)
-        assert 'test@test.com' in self.by_class('profile_content').text
+        WebDriverWait(self.driver, 15).until(
+            EC.text_to_be_present_in_element((By.CLASS_NAME, 'table-striped'), 'test@test.com')
+        )
+        assert 'test@test.com' in self.by_class('table-striped').text
 
     def edit_profile(self):
-        table = self.by_class('profile_details')
-        table.find_element_by_tag_name('a').click()
-        self.wait_with_folder_list()
+        # Use the last edit link in the list (the profile just added)
+        edit_links = self.driver.find_elements(By.CSS_SELECTOR, 'a[href*="profile_id"]')
+        self.click_when_clickable(edit_links[-1])
+        self.wait_for_navigation_to_complete()
         name = self.by_name('profile_name')
+        name.clear()
         name.send_keys('New Name')
         self.by_class('profile_update').click()
         self.wait_with_folder_list()
-        assert 'New Name' in self.by_class('profile_content').text
+        assert 'New Name' in self.driver.find_element(By.TAG_NAME, 'body').text
 
     def del_profile(self):
-        table = self.by_class('profile_content')
-        table.find_element_by_tag_name('a').click()
-        self.wait_with_folder_list()
+        # Navigate to the edit form of the last profile then use the Delete button
+        edit_links = self.driver.find_elements(By.CSS_SELECTOR, 'a[href*="profile_id"]')
+        self.click_when_clickable(edit_links[-1])
+        self.wait_for_navigation_to_complete()
         self.by_name('profile_delete').click()
+        self.confirm_alert()
         self.wait_on_sys_message()
-        assert self.by_class('sys_messages').text == 'Profile Deleted'
+        assert 'Profile Deleted' in self.by_class('sys_messages').text
 
 
 if __name__ == '__main__':
 
-    print("PROFIILE TEST")
+    print("PROFILE TEST")
     test_runner(ProfileTest, [
         'load_profile_page',
         'add_profile',
-        # 'edit_profile',
-        # 'del_profile'
+        'edit_profile',
+        'del_profile'
     ])

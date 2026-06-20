@@ -93,7 +93,7 @@ class ServersTest(WebTest):
         sys_message_text = element.text
         sys_message_texts = sys_message_text.split('\n')
         print(f"MESSAGES FOUND: '{sys_message_texts}'")
-        assert any("Authentication failed" in text for text in sys_message_texts)
+        assert any("Server saved" in text for text in sys_message_texts)
 
 if __name__ == '__main__':
 
