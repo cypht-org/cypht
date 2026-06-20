@@ -24,7 +24,6 @@ class Hm_Test_Mailbox extends TestCase {
 
     public function setUp(): void {
         define('IMAP_TEST', true);
-        require_once __DIR__.'/../../bootstrap.php';
         require_once APP_PATH.'modules/imap/hm-imap.php';
         require_once APP_PATH.'modules/imap/hm-jmap.php';
         require_once APP_PATH.'modules/imap/hm-ews.php';
