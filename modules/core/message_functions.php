@@ -25,10 +25,8 @@ function format_msg_html($str, $images=false) {
     $config->set('HTML.TargetNoopener', true);
     $config->set('HTML.ForbiddenElements', ['html', 'head']);
     $config->set('CSS.AllowTricky', true);
-
-    if (!$images) {
-        $config->set('URI.DisableExternalResources', true);
-    }
+    // Always block external CSS/resources; <img> loading is gated separately via data-src.
+    $config->set('URI.DisableExternalResources', true);
     $config->set('URI.AllowedSchemes', array('mailto' => true, 'data' => true, 'http' => true, 'https' => true));
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
 
@@ -52,18 +50,70 @@ function format_msg_html($str, $images=false) {
  * Sanitize HTML for email
  * @subpackage core/functions
  * @param string $html content to sanitize
+ * @param int|null $blocked_count running count of stripped remote resources
  * @return string
  */
+if (!hm_exists('count_blocked_remote_email_resources')) {
+function count_blocked_remote_email_resources($html) {
+    $count = 0;
+    $count += preg_match_all('/src="(https?:\/\/[^"]*)"|src=\'(https?:\/\/[^\']*)\'/i', $html, $m);
+    $count += count_blocked_remote_email_css_resources($html);
+    return $count;
+}}
+
+if (!hm_exists('count_blocked_remote_email_css_resources')) {
+function count_blocked_remote_email_css_resources($html) {
+    $count = 0;
+    $count += preg_match_all(
+        '/\s(?:background|dynsrc|lowsrc)\s*=\s*(["\']?)(?:https?:)?\/\/[^"\'>\s]+\1?/i',
+        $html,
+        $m
+    );
+    $count += preg_match_all(
+        '/url\(\s*["\']?(?:https?:\/\/|\/\/)[^)"\']*["\']?\s*\)/i',
+        $html,
+        $m
+    );
+    return $count;
+}}
+
 if (!hm_exists('sanitize_email_html')) {
-function sanitize_email_html($html) {
+function sanitize_email_html($html, &$blocked_count = null) {
+    $blocked = 0;
+
+    $html = preg_replace(
+        '/\s(?:background|dynsrc|lowsrc)\s*=\s*(["\']?)(?:https?:)?\/\/[^"\'>\s]+\1?/i',
+        '',
+        $html,
+        -1,
+        $attr_count
+    );
+    $blocked += $attr_count;
+
     $html = preg_replace_callback(
         '/<([^>]+)\s*style\s*=\s*(["\'])(.*?)\2/i',
-        function($matches) {
-            $content = preg_replace('/background-image\s*:\s*url\([^)]*\)\s*;?\s*/i', '', $matches[3]);
+        function($matches) use (&$blocked) {
+            $content = preg_replace_callback(
+                '/url\(\s*["\']?(?:https?:\/\/|\/\/)[^)"\']*["\']?\s*\)/i',
+                function($url_match) use (&$blocked) {
+                    $blocked++;
+                    return '';
+                },
+                $matches[3]
+            );
+            $content = preg_replace('/\s*;\s*;/', ';', $content);
+            $content = trim($content, " ;");
+            if ($content === '') {
+                return '<' . $matches[1];
+            }
             return '<' . $matches[1] . ' style=' . $matches[2] . $content . $matches[2];
         },
         $html
     );
+
+    if ($blocked_count !== null) {
+        $blocked_count = $blocked;
+    }
 
     return $html;
 }}
