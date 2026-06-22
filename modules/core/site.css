@@ -455,8 +455,8 @@ button {
   padding-right: 11px;
 }
 .account_icon {
-  opacity: 0.5;
-  vertical-align: -2px;
+  opacity: 1;
+  vertical-align: 0;
   padding-right: 6px;
 }
 .small_account_icon {
@@ -864,7 +864,7 @@ div.unseen,
   display: none;
 }
 .debug_title {
-  color: var(--bs-primary);
+  color: var(--bs-link-color);
   position: fixed;
   background-color: var(--bs-secondary-bg);
   bottom: 0px;
@@ -1049,7 +1049,6 @@ div.unseen,
 .mobile .account_icon {
   width: 16px;
   height: 16px;
-  vertical-align: -5px;
 }
 .mobile .folder_toggle {
   display: block;
@@ -1538,7 +1537,7 @@ nav.collapsed .app-logo, nav.collapsed .menu_search, nav.collapsed .nav-label, n
 }
 
 nav.collapsed .menu-toggle {
-  right: 35%;
+  right: 33%;
   margin: auto;
   /* margin-left: 32px; */
 }
@@ -1547,19 +1546,12 @@ nav.collapsed .src_name_initial {
   padding: 10px;
   font-weight: bold;
   font-size: 80%;
-  background-color: var(--bs-secondary-bg-subtle);
+  background-color: var(--bs-link-hover-color);
+  color: var(--bs-body-bg);
   margin: 5px 10px;
   width: 100%;
   text-align: center;
   border-radius: var(--bs-border-radius);
-}
-
-.navbar-popover {
-  max-width: unset;
-}
-
-.navbar-popover .email_folders .imap_folder_link {
-  max-width: unset;
 }
 
 nav.collapsed .folders {
@@ -1592,6 +1584,12 @@ nav.collapsed .sidebar-footer a {
   text-align: center;
 }
 
+.navbar-popover { max-width: unset; }
+.navbar-popover .email_folders .imap_folder_link { max-width: unset; }
+.navbar-popover .popover-body .folders { margin: 0 !important; }
+
+
+
 /* End collapsed navbar state */
 
 .sidebar-footer {
@@ -1599,7 +1597,7 @@ nav.collapsed .sidebar-footer a {
   display: flex;
   justify-content: space-between;
   padding: 0 15px 0 25px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 
 .logout_link {
@@ -1757,8 +1755,12 @@ pre.msg_source {
   min-width: 0;
 }
 .content_title .list_sources .src_title { font-weight: bold; }
-.total_unread_count, .total_unread_count.badge, .junk_unread_count, .junk_unread_count.badge, .unread_count { color: var(--bs-body-bg) !important; background-color: var(--bs-link-hover-color) !important; }
-.folders a, .unread_link, .logout_link { color: rgba(var(--bs-body-color-rgb), 0.85); }
+.total_unread_count, .total_unread_count.badge, .junk_unread_count, .junk_unread_count.badge, .unread_count {
+  color: var(--bs-body-bg) !important; background-color: var(--bs-link-hover-color) !important;
+  border-radius: 4px !important;
+}
+.folders a, .logout_link { color: rgba(var(--bs-body-color-rgb), 1); }
+.unread_link { color: rgba(var(--bs-body-color-rgb), 0.85); }
 .msg_text .js-header_subject { color: var(--bs-body-color) !important; font-size: 1.4rem !important; }
 .plink, .nlink { color: var(--bs-link-color); }
 .plink:hover, .nlink:hover { color: var(--bs-link-hover-color); text-decoration: none; }
@@ -1772,6 +1774,7 @@ pre.msg_source {
 }
 .input-group-text { border: var(--bs-border-width) solid var(--bs-border-color); }
 .compose_to { color: inherit; }
+.add_contact_row { background-color: var(--bs-body-bg); }
 
 /* some mobile changes */
 .mobile .no_mobile { display: none !important; }
@@ -1782,9 +1785,9 @@ pre.msg_source {
 .mobile .search_form { padding-left: 0; }
 .mobile .folders { margin-top: 1rem; margin-left: 1rem !important; }
 .mobile .folders_page.row { margin-left: 0; margin-right: 0; }
+.mobile .folders_page { margin-bottom: 50px; }
 .mobile .server_section { overflow: hidden; }
 .mobile .add_server .txt_fld { width: 100%; }
-.mobile .user_settings table td { padding: 5px 10px; }
 .mobile .reset_factory_button { margin-right: 1rem; }
 .mobile .message_list .list_controls.on_mobile form { display: inline-block; }
 .mobile .message_list > .p-3 { padding-top: 10px !important; }
@@ -1803,6 +1806,20 @@ pre.msg_source {
 .mobile .quick_add_multiple_server_form { padding-left: 1.5rem; padding-right: 1.5rem; }
 .mobile .advanced_search_form [id^="adv_target"],
 .mobile .advanced_search_form .other_section > div { width: 100%; }
+.mobile .advanced_search_form .terms_section,
+.mobile .advanced_search_form .source_section,
+.mobile .advanced_search_form .targets_section,
+.mobile .advanced_search_form .time_section,
+.mobile .advanced_search_form .other_section { margin-left: 2rem !important; margin-right: 2rem !important; }
+.mobile .general_setting .d-block { display: table-cell !important; }
+.mobile .user_settings table td { padding: 5px 10px; }
+.mobile .user_settings > form > .px-3 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+.mobile .user_settings select { max-width: 150px; }
+.mobile .user_settings input[type='text'],
+.mobile .user_settings input[type='number'] { max-width: 150px; }
+.mobile .user_settings textarea { max-width: 150px; }
+.mobile .save_settings_page { margin-bottom: 40px; }
+
 
 
 /* Mobile responsive overrides for Bootstrap classes */

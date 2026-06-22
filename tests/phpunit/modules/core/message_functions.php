@@ -19,6 +19,30 @@ class Hm_Test_Core_Message_Functions extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_sanitize_email_html_blocks_css_tracking() {
+        $test = '<ul style="list-style-image: url(https://tracker.example.com/test)"><li>x</li></ul>';
+        $this->assertEquals(1, count_blocked_remote_email_css_resources($test));
+        $this->assertStringNotContainsString('tracker.example.com', sanitize_email_html($test));
+
+        $test = '<div style="background: url(https://tracker.example.com/bg)">x</div>';
+        $this->assertStringNotContainsString('tracker.example.com', sanitize_email_html($test));
+
+        $allowed = true;
+        $msgText = '<img src="https://tracker.example.com/pixel.gif"><ul style="list-style-image: url(https://tracker.example.com/list)"><li>x</li></ul>';
+        $externalResRegexp = '/src="(https?:\/\/[^"]*)"|src=\'(https?:\/\/[^\']*)\'/i';
+        $msgText = preg_replace_callback($externalResRegexp, function ($matches) {
+            return 'data-src="' . $matches[1] . '" src=""';
+        }, $msgText);
+        $msgText = sanitize_email_html($msgText);
+        $out = format_msg_html($msgText, $allowed);
+        $this->assertStringNotContainsString('list-style-image', $out);
+        $this->assertDoesNotMatchRegularExpression('/\ssrc="https?:\/\//', $out);
+        $this->assertStringContainsString('data-src="https://tracker.example.com/pixel.gif"', $out);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_convert_html_to_text() {
         $test = '<script></script><body>foo</body>';
         $this->assertEquals('foo', convert_html_to_text($test));
