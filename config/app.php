@@ -567,7 +567,7 @@ return [
     | formatted message, you will now have a link before the message body called "Allow
     | Images" that will reload the message part with external images visible.
     */
-    'allow_external_image_sources' => env('ALLOW_EXTERNAL_IMAGE_SOURCES', false),
+    'allow_external_image_sources' => env('ALLOW_EXTERNAL_IMAGE_SOURCES', true),
 
     /*
     | ------------------
