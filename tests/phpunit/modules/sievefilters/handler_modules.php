@@ -159,7 +159,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
 
     private function imapServersConfig() {
         return array(
-            'serverA' => array(
+            array(
                 'name' => 'Primary Account',
                 'sieve_config_host' => 'tls://sieve.example.com:4190',
                 'server' => 'imap.example.com',
@@ -206,10 +206,10 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
      */
     public function test_load_mailbox_name_from_list_path() {
         $test = new Sieve_Handler_Test('load_mailbox_name', 'sievefilters');
-        $test->get = array('list_path' => 'imap_serverA_INBOX');
+        $test->get = array('list_path' => 'imap_0_INBOX');
         $test->user_config = array(
             'imap_servers' => array(
-                'serverA' => array('name' => 'Primary Account', 'sieve_config_host' => 'tls://sieve.example.com:4190'),
+                array('name' => 'Primary Account', 'sieve_config_host' => 'tls://sieve.example.com:4190'),
             ),
             'enable_sieve_filter_setting' => true,
         );
@@ -232,7 +232,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
 
         $test = new Sieve_Handler_Test('load_custom_actions', 'sievefilters');
         $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
-        $test->get = array('list_path' => 'imap_serverA_INBOX');
+        $test->get = array('list_path' => 'imap_0_INBOX');
         $test->user_config = array(
             'imap_servers' => $this->imapServersConfig(),
             'enable_sieve_filter_setting' => true,
@@ -367,7 +367,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
     public function test_sieve_filters_enabled_message_content_outputs_client_when_configured() {
         $test = new Sieve_Handler_Test('sieve_filters_enabled_message_content', 'sievefilters');
         $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
-        $test->post = array('imap_server_id' => 'serverA');
+        $test->post = array('imap_server_id' => 0);
         $test->user_config = array(
             'imap_servers' => $this->imapServersConfig(),
             'enable_sieve_filter_setting' => true,
