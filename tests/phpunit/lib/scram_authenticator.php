@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for the ScramAuthenticator class
- * 
  */
 class Hm_Test_Scram_Authenticator extends TestCase {
 
@@ -17,7 +16,7 @@ class Hm_Test_Scram_Authenticator extends TestCase {
 
     public function setUp(): void {
         if (!defined('APP_PATH')) {
-            require_once __DIR__.'/../bootstrap.php';
+            require __DIR__.'/../bootstrap.php';
         }
         
         // Mock Hm_Debug if it doesn't exist
@@ -30,8 +29,6 @@ class Hm_Test_Scram_Authenticator extends TestCase {
 
     /**
      * Test getHashAlgorithm method with reflection (private method)
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
      */
     public function test_getHashAlgorithm() {
         $reflection = new ReflectionClass($this->scram);
@@ -54,8 +51,6 @@ class Hm_Test_Scram_Authenticator extends TestCase {
 
     /**
      * Test generateClientProof method
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
      */
     public function test_generateClientProof() {
         $username = 'testuser';
@@ -92,8 +87,6 @@ class Hm_Test_Scram_Authenticator extends TestCase {
 
     /**
      * Test generateClientProof with different algorithms
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
      */
     public function test_generateClientProof_different_algorithms() {
         $username = 'testuser';
@@ -126,8 +119,6 @@ class Hm_Test_Scram_Authenticator extends TestCase {
 
     /**
      * Test generateClientProof with different inputs
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
      */
     public function test_generateClientProof_different_inputs() {
         $baseParams = [
@@ -159,8 +150,6 @@ class Hm_Test_Scram_Authenticator extends TestCase {
 
     /**
      * Test authenticateScram with successful authentication
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
      */
     public function test_authenticateScram_success() {
         $scramAlgorithm = 'SCRAM-SHA-256';
@@ -200,8 +189,6 @@ class Hm_Test_Scram_Authenticator extends TestCase {
 
     /**
      * Test authenticateScram with invalid server challenge
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
      */
     public function test_authenticateScram_invalid_challenge() {
         $scramAlgorithm = 'SCRAM-SHA-256';
@@ -231,8 +218,6 @@ class Hm_Test_Scram_Authenticator extends TestCase {
 
     /**
      * Test authenticateScram with empty server response
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
      */
     public function test_authenticateScram_empty_response() {
         $scramAlgorithm = 'SCRAM-SHA-256';
@@ -262,8 +247,6 @@ class Hm_Test_Scram_Authenticator extends TestCase {
 
     /**
      * Test authenticateScram with different algorithms
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
      */
     public function test_authenticateScram_different_algorithms() {
         $algorithms = ['SCRAM-SHA-1', 'SCRAM-SHA-256', 'SCRAM-SHA-512'];
@@ -295,8 +278,6 @@ class Hm_Test_Scram_Authenticator extends TestCase {
 
     /**
      * Test authenticateScram with channel binding (PLUS variants)
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
      */
     public function test_authenticateScram_channel_binding() {
         $scramAlgorithm = 'SCRAM-SHA-256-PLUS';
@@ -327,8 +308,6 @@ class Hm_Test_Scram_Authenticator extends TestCase {
 
     /**
      * Test edge cases and boundary conditions
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
      */
     public function test_edge_cases() {
         $clientProof = $this->scram->generateClientProof('', 'password', 'salt', 'cnonce', 'snonce', 'sha256');
@@ -344,8 +323,6 @@ class Hm_Test_Scram_Authenticator extends TestCase {
 
     /**
      * Test that log method doesn't break the functionality
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
      */
     public function test_logging_functionality() {
         $reflection = new ReflectionClass($this->scram);
