@@ -175,7 +175,7 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_imap_authed_status() {
-        $this->assertSame(1, Hm_Mailbox::TYPE_IMAP);
+        $this->assertEquals('1', Hm_Mailbox::TYPE_IMAP);
         
         $mock_imap = $this->createMock(Hm_IMAP::class);
         $mock_imap->method('get_state')
@@ -203,7 +203,7 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_smtp_authed_status() {
-        $this->assertSame(4, Hm_Mailbox::TYPE_SMTP);
+        $this->assertEquals('4', Hm_Mailbox::TYPE_SMTP);
         
         $mock_smtp = $this->createMock(Hm_SMTP::class);
         
