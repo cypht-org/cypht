@@ -207,7 +207,6 @@ class Hm_Test_Scram_Authenticator extends TestCase {
             'SCRAM-SHA-256', $username, $password,
             $getServerResponse,
             function($cmd) {},
-            'imap',
             fn() => $clientNonce   // deterministic nonce so authMessage is predictable
         );
 
@@ -272,7 +271,6 @@ class Hm_Test_Scram_Authenticator extends TestCase {
             'SCRAM-SHA-1', $username, $password,
             function() use (&$responses, &$idx) { return $responses[$idx++] ?? ['']; },
             function($cmd) {},
-            'imap',
             fn() => $clientNonce
         );
 
