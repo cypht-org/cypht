@@ -40,6 +40,7 @@ function applySettingsPageHandlers(routeParams, hash) {
     $('.reset_default_value_input').on("click", reset_default_value_input);
     $('.reset_default_timezone').on("click", reset_default_timezone);
     if (window.smtpSettingsPageHandler) smtpSettingsPageHandler();
+    if (typeof autoSaveSettingsPageHandler === 'function') autoSaveSettingsPageHandler();
 
     $('#settingsSearch').on('input', function () {
         const query = $(this).val().trim().toLowerCase();

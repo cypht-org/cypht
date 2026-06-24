@@ -158,9 +158,9 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="hm_page_key" value="" />
-                        <p class="text-wrap">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
+                        <p class="text-wrap logout_warning_text">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
                         <input type="text" value="cypht_user" autocomplete="username" style="display: none;"/>
-                        <div class="my-3 form-floating">
+                        <div class="my-3 form-floating logout_password_row">
                             <input id="logout_password" autocomplete="current-password" name="password" class="form-control warn_on_paste" type="password" placeholder="Password">
                             <label for="logout_password" class="form-label screen-reader">Password</label>
                         </div>
@@ -168,7 +168,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     <div class="modal-footer">
                         <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
                         <input class="save_settings btn btn-primary" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
-                        <input class="save_settings btn btn-primary" type="submit" name="save_and_logout" value="Save and Logout" />
+                        <input class="save_settings btn btn-primary logout_save_and_exit" type="submit" name="save_and_logout" value="Save and Logout" />
                     </div>
                 </div>
                 </div>
@@ -208,9 +208,9 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="hm_page_key" value="" />
-                        <p class="text-wrap">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
+                        <p class="text-wrap logout_warning_text">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
                         <input type="text" value="cypht_user" autocomplete="username" style="display: none;"/>
-                        <div class="my-3 form-floating">
+                        <div class="my-3 form-floating logout_password_row">
                             <input id="logout_password" autocomplete="current-password" name="password" class="form-control warn_on_paste" type="password" placeholder="Password">
                             <label for="logout_password" class="form-label screen-reader">Password</label>
                         </div>
@@ -218,7 +218,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     <div class="modal-footer">
                         <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
                         <input class="save_settings btn btn-primary" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
-                        <input class="save_settings btn btn-primary" type="submit" name="save_and_logout" value="Save and Logout" />
+                        <input class="save_settings btn btn-primary logout_save_and_exit" type="submit" name="save_and_logout" value="Save and Logout" />
                     </div>
                 </div>
                 </div>
@@ -241,9 +241,9 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="hm_page_key" value="" />
-                        <p class="text-wrap">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
+                        <p class="text-wrap logout_warning_text">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
                         <input type="text" value="cypht_user" autocomplete="username" style="display: none;"/>
-                        <div class="my-3 form-floating">
+                        <div class="my-3 form-floating logout_password_row">
                             <input id="logout_password" autocomplete="current-password" name="password" class="form-control warn_on_paste" type="password" placeholder="Password">
                             <label for="logout_password" class="form-label screen-reader">Password</label>
                         </div>
@@ -251,7 +251,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     <div class="modal-footer">
                         <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
                         <input class="save_settings btn btn-primary" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
-                        <input class="save_settings btn btn-primary" type="submit" name="save_and_logout" value="Save and Logout" />
+                        <input class="save_settings btn btn-primary logout_save_and_exit" type="submit" name="save_and_logout" value="Save and Logout" />
                     </div>
                 </div>
                 </div>
@@ -273,9 +273,9 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="hm_page_key" value="" />
-                        <p class="text-wrap">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
+                        <p class="text-wrap logout_warning_text">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
                         <input type="text" value="cypht_user" autocomplete="username" style="display: none;"/>
-                        <div class="my-3 form-floating">
+                        <div class="my-3 form-floating logout_password_row">
                             <input id="logout_password" autocomplete="current-password" name="password" class="form-control warn_on_paste" type="password" placeholder="Password">
                             <label for="logout_password" class="form-label screen-reader">Password</label>
                         </div>
@@ -283,7 +283,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     <div class="modal-footer">
                         <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
                         <input class="save_settings btn btn-primary" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
-                        <input class="save_settings btn btn-primary" type="submit" name="save_and_logout" value="Save and Logout" />
+                        <input class="save_settings btn btn-primary logout_save_and_exit" type="submit" name="save_and_logout" value="Save and Logout" />
                     </div>
                 </div>
                 </div>
