@@ -13,7 +13,7 @@ class Hm_Test_Repository extends TestCase {
     private $session;
 
     public function setUp(): void {
-        require_once __DIR__.'/../bootstrap.php';
+        require __DIR__.'/../bootstrap.php';
 
         $this->user_config = new Hm_Mock_Config();
         $this->session     = new Hm_Mock_Session();
