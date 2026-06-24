@@ -249,12 +249,7 @@ class Hm_Carddav {
 
     private function url_concat($path) {
         $parsed = parse_url($this->url);
-        $host = $parsed['host'];
-        // If parsed URL contains a port, reappend it to host.
-        if (!empty($parsed['port'])) { 
-            $host .= ':' . $parsed['port']; 
-        }
-        return sprintf('%s://%s/%s', $parsed['scheme'], $host, preg_replace('#^/#', '', $path));
+        return sprintf('%s://%s/%s', $parsed['scheme'], $parsed['host'], preg_replace('#^/#', '', $path));
     }
 
     private function auth_headers() {
