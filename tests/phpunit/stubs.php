@@ -105,9 +105,3 @@ class Searchable_Wrapper {
         return self::$dataset;
     }
 }
-
-class TestableScramAuthenticator extends ScramAuthenticator {
-    public function hashAlgorithm(string $scramSpec): string {
-        return $this->getHashAlgorithm($scramSpec);
-    }
-}
