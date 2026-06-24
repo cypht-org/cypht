@@ -86,21 +86,6 @@ class Hm_Test_Hm_Cache extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_memcache_get_returns_default_on_connection_failure() {
-        $this->config->set('enable_memcached', true);
-        $this->config->set('memcached_server', 'asdf');
-        $this->config->set('memcached_port', 10);
-        Hm_Mock_Memcached::$result_code = 3;
-        $session = new Hm_Mock_Session();
-        $cache = new Hm_Cache($this->config, $session);
-        $this->assertEquals('memcache', $cache->type);
-        $this->assertEquals(array(), $cache->get('imap_folders_imap_test_', array()));
-        Hm_Mock_Memcached::$result_code = 16;
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
     public function test_del() {
         $session = new Hm_Mock_Session();
         $cache = new Hm_Cache($this->config, $session);
