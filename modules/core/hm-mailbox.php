@@ -46,14 +46,6 @@ class Hm_Mailbox {
         }
     }
 
-    /**
-     * Set connection
-     * @param object $connection The connection object to inject
-     */
-    public function set_connection($connection) {
-        $this->connection = $connection;
-    }
-
     public function connect() {
         if (! $this->connection) {
             return false;
@@ -579,14 +571,6 @@ class Hm_Mailbox {
         if (! $this->select_folder($folder)) {
             return [];
         }
-        
-        // Handle JMAP specifically since it's "IMAP-like" but has different method signatures
-        if ($this->type === self::TYPE_JMAP) {
-            // JMAP search uses IMAP-like parameters but handles sorting internally
-            $uids = $this->connection->search($target, false, $terms, [], $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
-            return $uids;
-        }
-        
         if ($this->is_imap()) {
             if ($sort) {
                 if ($this->connection->is_supported('SORT')) {

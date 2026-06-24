@@ -42,6 +42,7 @@ if (!defined('DEBUG_MODE')) {
 
 /* get mock objects */
 require APP_PATH.'tests/phpunit/mocks.php';
+
 /* get the stubs */
 require APP_PATH.'tests/phpunit/stubs.php';
 

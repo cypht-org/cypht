@@ -10,15 +10,14 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for the ini_set.php configuration file
  * These tests verify that the ini settings are properly configured
- * 
- * @preserveGlobalState disabled
- * @runInSeparateProcess
  */
 class Hm_Test_Ini_Set extends TestCase {
 
     private $originalIniValues = [];
 
     public function setUp(): void {
+        require __DIR__.'/../bootstrap.php';
+
         $this->storeOriginalIniValues();
     }
 
@@ -118,8 +117,7 @@ class Hm_Test_Ini_Set extends TestCase {
         ini_set('display_startup_errors', 0);
 
         if (!$config->get('disable_open_basedir', false)) {
-            $app_path = defined('APP_PATH') ? APP_PATH : dirname(dirname(dirname(__FILE__))).'/';
-            $script_dir = dirname(dirname($app_path.'/lib/ini_set.php'));
+            $script_dir = dirname(dirname(APP_PATH.'/lib/ini_set.php'));
             $dirs = [$script_dir, '/dev/urandom'];
             
             // Add PHPUnit and common system paths for CI/CD compatibility
@@ -156,6 +154,7 @@ class Hm_Test_Ini_Set extends TestCase {
                 $dirs[] = $attachment_dir;
             }
             
+            // Only set open_basedir in test environment, not in CI/CD
             if (!$this->isRunningInCI()) {
                 ini_set('open_basedir', implode(':', array_unique($dirs)));
             }
@@ -236,8 +235,11 @@ class Hm_Test_Ini_Set extends TestCase {
         $config = $this->createMockConfig();
         $this->simulateIniSetExecution($config);
         
+        // Some session settings may not be changeable in all environments
+        // so we test what we can change
         $this->assertEquals('0', ini_get('session.cookie_lifetime'));
         
+        // These might be read-only in some configurations, so we test if they're set or can be set
         $useStrictMode = ini_get('session.use_strict_mode');
         $this->assertTrue($useStrictMode === '1' || $useStrictMode === false, 'session.use_strict_mode should be 1 or false if read-only');
         
@@ -336,12 +338,7 @@ class Hm_Test_Ini_Set extends TestCase {
         $config = $this->createMockConfig();
         $this->simulateIniSetExecution($config);
         
-        $allowUrlInclude = ini_get('allow_url_include');
-        $this->assertTrue(
-            $allowUrlInclude === '0' || $allowUrlInclude === '' || $allowUrlInclude === false,
-            'allow_url_include should be disabled (0, empty string, or false)'
-        );
-        
+        $this->assertEquals('0', ini_get('allow_url_include'));
         $this->assertEquals('0', ini_get('display_errors'));
         $this->assertEquals('0', ini_get('display_startup_errors'));
     }
@@ -362,9 +359,8 @@ class Hm_Test_Ini_Set extends TestCase {
         $openBasedir = ini_get('open_basedir');
         $this->assertNotEmpty($openBasedir);
         
-        $app_path = defined('APP_PATH') ? APP_PATH : dirname(dirname(dirname(__FILE__))).'/';
         $expectedPaths = [
-            dirname(dirname($app_path.'/lib/ini_set.php')),
+            dirname(dirname(APP_PATH.'/lib/ini_set.php')),
             '/dev/urandom',
             sys_get_temp_dir()
         ];
