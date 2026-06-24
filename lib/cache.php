@@ -550,12 +550,12 @@ class Hm_Cache {
      */
     protected function memcache_get($key, $default) {
         $res = $this->backend->get($this->key_hash($key), $this->session->enc_key);
-        if ($this->backend->last_err() === Memcached::RES_SUCCESS) {
-            $this->log($key, 'hit');
-            return $res;
+        if (!$res && $this->backend->last_err() == Memcached::RES_NOTFOUND) {
+            $this->log($key, 'miss');
+            return $default;
         }
-        $this->log($key, 'miss');
-        return $default;
+        $this->log($key, 'hit');
+        return $res;
     }
 
     /*
