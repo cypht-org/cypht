@@ -164,6 +164,9 @@
     <testsuite name="modules_ldap_contacts">
       <file>./modules/ldap_contacts/ldap_contacts.php</file>
     </testsuite>
+    <!-- <testsuite name="modules_spam_reporting">
+      <file>./modules/spam_reporting/functions.php</file>
+    </testsuite> -->
   </testsuites>
   <source>
     <include>
