@@ -1496,9 +1496,6 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
                 continue;
             }
 
-            /**
-             * @var Hm_Mailbox $mailbox
-             */
             $mailbox = Hm_IMAP_List::get_connected_mailbox($id, $this->cache);
 
             if (!$mailbox || !$mailbox->authed()) {
@@ -1518,7 +1515,7 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
             foreach ($search_folders as $folder) {
                 if ($expand_search && $remaining <= 0) break;
 
-                $uids = $mailbox->search($folder, $filter, $terms, $sort, $reverse, true);
+                $uids = $mailbox->search($folder, $filter, $terms, $sort, $reverse, true, $enable_exclude_auto_bcc);
 
                 if ($expand_search) {
                     $uids = array_slice($uids, 0, $remaining);
@@ -1528,7 +1525,7 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
                     $uids = array_slice($uids, 0, $limit);
                 }
 
-                $headers = $mailbox->get_message_list($folder, $uids, $enable_exclude_auto_bcc);
+                $headers = $mailbox->get_message_list($folder, $uids);
                 foreach ($uids as $uid) {
                     if (isset($headers[$uid])) {
                         $msg = $headers[$uid];
