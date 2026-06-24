@@ -1434,7 +1434,7 @@ class Hm_Output_exclude_auto_bcc_setting extends Hm_Output_Module {
         if (array_key_exists('enable_exclude_auto_bcc', $settings)) {
             $auto = $settings['enable_exclude_auto_bcc'];
         }
-        $res = '<tr class="general_setting"><td><label class="form-check-label" for="enable_exclude_auto_bcc">'.$this->trans('Enable exclude auto BCC').'</label></td><td><input class="form-check-input" value="1" type="checkbox" name="enable_exclude_auto_bcc" id="enable_exclude_auto_bcc"  data-default-value="true"';
+        $res = '<tr class="general_setting"><td><label class="form-check-label" for="enable_exclude_auto_bcc">'.$this->trans('Enable exclude auto BCC').'</label></td><td><input class="form-check-input" value="0" type="checkbox" name="enable_exclude_auto_bcc" id="enable_exclude_auto_bcc"  data-default-value="true"';
         $reset = '';
         if ($auto) {
             $res .= ' checked="checked"';
