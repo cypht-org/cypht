@@ -399,7 +399,7 @@ class Hm_Test_Mailbox extends TestCase {
         $mock_imap->method('is_supported')->with('SORT')->willReturn(true);
         
         $mock_imap->method('get_message_sort_order')
-            ->with('date', true, 'ALL', [], true, false)
+            ->with('date', true, 'ALL', [], true, true, false)
             ->willReturn([1, 2, 3]);
         
         $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
@@ -427,9 +427,9 @@ class Hm_Test_Mailbox extends TestCase {
         $mock_imap->method('is_supported')->with('SORT')->willReturn(false);
         
         $mock_imap->method('search')
-            ->with('ALL', false, [], [], true, false)
+            ->with('ALL', false, [], [], true, true, false)
             ->willReturn([3, 1, 2]);
-
+        
         $mock_imap->method('sort_by_fetch')
             ->with('date', false, 'ALL', '3,1,2')
             ->willReturn([1, 2, 3]);
@@ -457,7 +457,7 @@ class Hm_Test_Mailbox extends TestCase {
         $mock_imap->method('select_mailbox')->willReturn(true);
         
         $mock_imap->method('search')
-            ->with('ALL', false, [], [], true, false)
+            ->with('ALL', false, [], [], true, true, false)
             ->willReturn([4, 5, 6]);
         
         $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
