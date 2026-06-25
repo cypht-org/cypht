@@ -366,8 +366,9 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                 if (feed_exists($form['new_feed_address'])) {
                     Hm_Msgs::add(sprintf('Feed url %s already exists', $form['new_feed_address']), 'warning');
                 } else {
-                    $connection_test = address_from_url($form['new_feed_address']);
-                    if ($con = @fsockopen($connection_test, 80, $errno, $errstr, 2)) {
+                    if (!feed_url_is_allowed($form['new_feed_address'])) {
+                        Hm_Msgs::add('Feed address is not allowed', 'danger');
+                    } else {
                         $feed = is_news_feed($form['new_feed_address']);
                         if (!$feed) {
                             $feed = new Hm_Feed();
@@ -375,8 +376,12 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                             if (trim($homepage)) {
                                 list($type, $href) = search_for_feeds($homepage);
                                 if ($type && $href) {
-                                    Hm_Msgs::add('Discovered a feed at that address');
-                                    $found = true;
+                                    if (!feed_url_is_allowed($href)) {
+                                        Hm_Msgs::add('Discovered feed address is not allowed', 'warning');
+                                    } else {
+                                        Hm_Msgs::add('Discovered a feed at that address');
+                                        $found = true;
+                                    }
                                 }
                                 else {
                                     Hm_Msgs::add('Could not find an RSS or ATOM feed at that address', 'warning');
@@ -397,9 +402,6 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                             }
                             $href = $form['new_feed_address'];
                         }
-                    }
-                    else {
-                        Hm_Msgs::add(sprintf('Could not add feed: %s', $errstr), 'danger');
                     }
                 }
             }
