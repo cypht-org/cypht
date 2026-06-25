@@ -7,6 +7,12 @@
 
 class OpmlTest extends PHPUnit\Framework\TestCase
 {
+    protected function setUp(): void
+    {
+        require_once APP_PATH.'modules/feeds/hm-feed.php';
+        require_once APP_PATH.'modules/feeds/hm-opml.php';
+    }
+
     /**
      * Test parsing valid OPML content
      */
@@ -18,12 +24,11 @@ class OpmlTest extends PHPUnit\Framework\TestCase
         <title>Test Feeds</title>
     </head>
     <body>
-        <outline text="Example Feed" xmlUrl="https://example.com/feed.xml" type="rss"/>
-        <outline text="Another Feed" title="Another Feed" xmlUrl="https://example.org/feed.xml" type="atom"/>
+        <outline text="Example Feed" xmlUrl="https://93.184.216.34/feed.xml" type="rss"/>
+        <outline text="Another Feed" title="Another Feed" xmlUrl="https://1.1.1.1/feed.xml" type="atom"/>
     </body>
 </opml>';
         
-        require_once APP_PATH.'modules/feeds/hm-opml.php';
         $parser = new Hm_Opml_Parser();
         $result = $parser->parse($opml);
         
@@ -42,16 +47,15 @@ class OpmlTest extends PHPUnit\Framework\TestCase
     <head><title>Nested Feeds</title></head>
     <body>
         <outline text="Tech" title="Tech">
-            <outline text="TechCrunch" xmlUrl="https://techcrunch.com/feed/" type="rss"/>
-            <outline text="Verge" xmlUrl="https://theverge.com/rss/index.xml" type="rss"/>
+            <outline text="TechCrunch" xmlUrl="https://93.184.216.34/feed1.xml" type="rss"/>
+            <outline text="Verge" xmlUrl="https://93.184.216.34/feed2.xml" type="rss"/>
         </outline>
         <outline text="News" title="News">
-            <outline text="BBC" xmlUrl="https://feeds.bbci.co.uk/news/rss.xml" type="rss"/>
+            <outline text="BBC" xmlUrl="https://1.1.1.1/feed.xml" type="rss"/>
         </outline>
     </body>
 </opml>';
         
-        require_once APP_PATH.'modules/feeds/hm-opml.php';
         $parser = new Hm_Opml_Parser();
         $result = $parser->parse($opml);
         
@@ -69,12 +73,11 @@ class OpmlTest extends PHPUnit\Framework\TestCase
 <opml version="1.0">
     <head><title>Test</title></head>
     <body>
-        <outline text="Valid Feed" xmlUrl="https://example.com/feed.xml"/>
+        <outline text="Valid Feed" xmlUrl="https://93.184.216.34/feed.xml"/>
         <outline text="Invalid Entry" title="No URL"/>
     </body>
 </opml>';
         
-        require_once APP_PATH.'modules/feeds/hm-opml.php';
         $parser = new Hm_Opml_Parser();
         $result = $parser->parse($opml);
         
@@ -93,7 +96,6 @@ class OpmlTest extends PHPUnit\Framework\TestCase
     <content>Invalid document</content>
 </not-opml>';
         
-        require_once APP_PATH.'modules/feeds/hm-opml.php';
         $parser = new Hm_Opml_Parser();
         $result = $parser->parse($opml);
         
@@ -106,7 +108,6 @@ class OpmlTest extends PHPUnit\Framework\TestCase
      */
     public function testEmptyContent()
     {
-        require_once APP_PATH.'modules/feeds/hm-opml.php';
         $parser = new Hm_Opml_Parser();
         $result = $parser->parse('');
         
@@ -119,17 +120,18 @@ class OpmlTest extends PHPUnit\Framework\TestCase
      */
     public function testUrlValidation()
     {
-        require_once APP_PATH.'modules/feeds/hm-opml.php';
         $parser = new Hm_Opml_Parser();
         
-        // Valid URLs
-        $this->assertTrue($parser->validateUrl('https://example.com/feed.xml'));
-        $this->assertTrue($parser->validateUrl('http://example.com/feed.xml'));
+        // Valid URLs (public IP avoids DNS dependency in CI/sandbox)
+        $this->assertTrue($parser->validateUrl('https://93.184.216.34/feed.xml'));
+        $this->assertTrue($parser->validateUrl('http://93.184.216.34/feed.xml'));
         
         // Invalid URLs
         $this->assertFalse($parser->validateUrl('ftp://example.com/feed.xml'));
         $this->assertFalse($parser->validateUrl('not-a-url'));
         $this->assertFalse($parser->validateUrl(''));
+        $this->assertFalse($parser->validateUrl('http://127.0.0.1/feed.xml'));
+        $this->assertFalse($parser->validateUrl('http://169.254.169.254/latest/meta-data/'));
     }
     
     /**
@@ -141,25 +143,24 @@ class OpmlTest extends PHPUnit\Framework\TestCase
 <opml version="1.0">
     <head><title>Test</title></head>
     <body>
-        <outline text="HTTPS Feed" xmlUrl="https://secure.example.com/feed.xml"/>
-        <outline text="HTTP Feed" xmlUrl="http://example.com/feed.xml"/>
+        <outline text="HTTPS Feed" xmlUrl="https://93.184.216.34/secure-feed.xml"/>
+        <outline text="HTTP Feed" xmlUrl="http://1.1.1.1/feed.xml"/>
     </body>
 </opml>';
         
-        require_once APP_PATH.'modules/feeds/hm-opml.php';
         $parser = new Hm_Opml_Parser();
         $parser->parse($opml);
         $feeds = $parser->getFeeds();
         
         // Check HTTPS feed
         $this->assertEquals('HTTPS Feed', $feeds[0]['name']);
-        $this->assertEquals('https://secure.example.com/feed.xml', $feeds[0]['server']);
+        $this->assertEquals('https://93.184.216.34/secure-feed.xml', $feeds[0]['server']);
         $this->assertTrue($feeds[0]['tls']);
         $this->assertEquals(443, $feeds[0]['port']);
         
         // Check HTTP feed
         $this->assertEquals('HTTP Feed', $feeds[1]['name']);
-        $this->assertEquals('http://example.com/feed.xml', $feeds[1]['server']);
+        $this->assertEquals('http://1.1.1.1/feed.xml', $feeds[1]['server']);
         $this->assertFalse($feeds[1]['tls']);
         $this->assertEquals(80, $feeds[1]['port']);
     }
@@ -173,11 +174,10 @@ class OpmlTest extends PHPUnit\Framework\TestCase
 <opml version="1.0">
     <head><title>Test</title></head>
     <body>
-        <outline title="Feed Title Only" xmlUrl="https://example.com/feed.xml"/>
+        <outline title="Feed Title Only" xmlUrl="https://93.184.216.34/feed.xml"/>
     </body>
 </opml>';
         
-        require_once APP_PATH.'modules/feeds/hm-opml.php';
         $parser = new Hm_Opml_Parser();
         $parser->parse($opml);
         $feeds = $parser->getFeeds();
@@ -194,15 +194,14 @@ class OpmlTest extends PHPUnit\Framework\TestCase
 <opml version="1.0">
     <head><title>Test</title></head>
     <body>
-        <outline xmlUrl="https://example.com/feed.xml"/>
+        <outline xmlUrl="https://93.184.216.34/feed.xml"/>
     </body>
 </opml>';
         
-        require_once APP_PATH.'modules/feeds/hm-opml.php';
         $parser = new Hm_Opml_Parser();
         $parser->parse($opml);
         $feeds = $parser->getFeeds();
         
-        $this->assertEquals('https://example.com/feed.xml', $feeds[0]['name']);
+        $this->assertEquals('https://93.184.216.34/feed.xml', $feeds[0]['name']);
     }
 }
