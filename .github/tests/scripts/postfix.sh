@@ -18,7 +18,6 @@ sudo -H postconf "smtpd_recipient_restrictions=permit_sasl_authenticated,permit_
 
 # Ensure Dovecot provides the Postfix auth socket with correct permissions.
 # Adding a separate conf.d file is more reliable than patching 10-master.conf
-# (which has this block commented-out by default on Ubuntu).
 sudo tee /etc/dovecot/conf.d/99-postfix-auth.conf > /dev/null << 'EOF'
 service auth {
   unix_listener /var/spool/postfix/private/auth {

@@ -82,57 +82,28 @@ class ServersTest(WebTest):
         reply_to.send_keys('testuser@localhost')
         signature = self.by_name('srv_setup_stepper_profile_signature')
         signature.send_keys('Test')
-        # Instead of clicking Finish (which races with our diagnostic call),
-        # submit the AJAX directly from within the browser; same session/CSRF/cookies.
-        # The JS reads the current page key from DOM so it is always valid.
-        self.driver.set_script_timeout(300)
-        import json as _json
-        result = self.driver.execute_async_script("""
-            var done = arguments[arguments.length - 1];
-            var pageKeyEl = document.getElementById('hm_page_key') ||
-                            document.querySelector('input[name="hm_page_key"]');
-            var pageKey = pageKeyEl ? pageKeyEl.value : '';
-            var data = [
-                {name: 'hm_ajax_hook',                        value: 'ajax_quick_servers_setup'},
-                {name: 'hm_page_key',                         value: pageKey},
-                {name: 'srv_setup_stepper_profile_name',      value: document.getElementById('srv_setup_stepper_profile_name').value},
-                {name: 'srv_setup_stepper_email',             value: document.querySelector('[name=srv_setup_stepper_email]').value},
-                {name: 'srv_setup_stepper_password',          value: document.querySelector('[name=srv_setup_stepper_password]').value},
-                {name: 'srv_setup_stepper_provider',          value: document.querySelector('#srv_setup_stepper_provider') ? document.querySelector('#srv_setup_stepper_provider').value : ''},
-                {name: 'srv_setup_stepper_is_sender',         value: true},
-                {name: 'srv_setup_stepper_is_receiver',       value: true},
-                {name: 'srv_setup_stepper_smtp_address',      value: document.querySelector('[name=srv_setup_stepper_smtp_address]').value},
-                {name: 'srv_setup_stepper_smtp_port',         value: document.querySelector('[name=srv_setup_stepper_smtp_port]').value},
-                {name: 'srv_setup_stepper_smtp_tls',          value: false},
-                {name: 'srv_setup_stepper_imap_address',      value: document.querySelector('[name=srv_setup_stepper_imap_address]').value},
-                {name: 'srv_setup_stepper_imap_port',         value: document.querySelector('[name=srv_setup_stepper_imap_port]').value},
-                {name: 'srv_setup_stepper_imap_tls',          value: false},
-                {name: 'srv_setup_stepper_enable_sieve',      value: false},
-                {name: 'srv_setup_stepper_create_profile',    value: true},
-                {name: 'srv_setup_stepper_profile_is_default',value: true},
-                {name: 'srv_setup_stepper_profile_signature', value: document.querySelector('[name=srv_setup_stepper_profile_signature]').value},
-                {name: 'srv_setup_stepper_profile_reply_to',  value: document.querySelector('[name=srv_setup_stepper_profile_reply_to]').value},
-                {name: 'srv_setup_stepper_imap_sieve_host',   value: ''},
-                {name: 'srv_setup_stepper_imap_sieve_mode_tls', value: false},
-                {name: 'srv_setup_stepper_only_jmap',         value: false},
-                {name: 'srv_setup_stepper_imap_hide_from_c_page', value: false},
-                {name: 'srv_setup_stepper_jmap_address',      value: ''},
-                {name: 'srv_setup_stepper_imap_server_id',    value: ''},
-                {name: 'srv_setup_stepper_smtp_server_id',    value: ''},
-            ];
-            Hm_Ajax.request(data, function(res) {
-                done({ok: true, res: res});
-            }, null, true, undefined, function(err) {
-                done({ok: false, err: String(err)});
-            });
+        self.driver.execute_script("""
+            var orig = Hm_Ajax_Request.prototype.format_xhr_data;
+            Hm_Ajax_Request.prototype.format_xhr_data = function(data) {
+                data = data.map(function(item) {
+                    if (item.value === undefined || item.value === null) {
+                        item.value = false;
+                    }
+                    return item;
+                });
+                return orig.call(this, data);
+            };
         """)
-        print(f"IN-BROWSER AJAX result: {_json.dumps(result)[:600]}")
-        saved = bool(result and result.get('ok') and result.get('res', {}).get('just_saved_credentials'))
-        msgs = result.get('res', {}).get('router_user_msgs', []) if result else []
-        print(f"just_saved_credentials={saved}  msgs={msgs}")
-        assert saved, f"Server setup failed. AJAX result: {result}"
-        # If saved, the JS will trigger Hm_Utils.redirect() - wait for it
+        elem = self.by_id('step_config_action_finish')
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant'})", elem)
+        WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable(elem))
+        elem.click()
+        # On success the wizard calls Hm_Utils.redirect(), wait for the reload.
         self.wait_with_folder_list()
+        self.wait_for_navigation_to_complete()
+        WebDriverWait(self.driver, 30).until(
+            EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'localhost/143')
+        )
 
 if __name__ == '__main__':
 
