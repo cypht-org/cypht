@@ -179,6 +179,18 @@ class Hm_Mock_Config {
             $this->data = $data;
         }
     }
+    public function reset_factory() {
+        $this->data = array(
+            'version' => $this->data['version'] ?? '',
+            'feeds' => $this->data['feeds'] ?? array(),
+            'imap_servers' => $this->data['imap_servers'] ?? array(),
+            'smtp_servers' => $this->data['smtp_servers'] ?? array(),
+        );
+    }
+    public function del($name) {
+        unset($this->data[$name]);
+        return true;
+    }
 }
 class Hm_Mock_Request {
     public $invalid_input_detected;

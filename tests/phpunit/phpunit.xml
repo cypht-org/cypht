@@ -134,11 +134,15 @@
       <file>./lib/api_curl.php</file>
       <file>./lib/js_libs.php</file>
       <file>./lib/repository.php</file>
+      <file>./lib/version.php</file>
+      <file>./lib/logging.php</file>
+      <file>./lib/output_debug.php</file>
     </testsuite>
     <!--<testsuite name="modules_imap">
             <file>./modules/imap/hm-imap.php</file>
         </testsuite>-->
     <testsuite name="modules_core">
+      <file>./modules/core/modules.php</file>
       <file>./modules/core/functions.php</file>
       <file>./modules/core/message_functions.php</file>
       <file>./modules/core/message_list_functions.php</file>
@@ -163,6 +167,9 @@
     </testsuite>
     <testsuite name="modules_ldap_contacts">
       <file>./modules/ldap_contacts/ldap_contacts.php</file>
+    </testsuite>
+    <testsuite name="mta_sts">
+      <file>./mta_sts.php</file>
     </testsuite>
   </testsuites>
   <source>
