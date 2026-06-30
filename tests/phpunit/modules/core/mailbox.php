@@ -29,6 +29,7 @@ class Hm_Test_Mailbox extends TestCase {
         require_once APP_PATH.'modules/imap/hm-ews.php';
         require_once APP_PATH.'modules/smtp/hm-smtp.php';
         require_once APP_PATH.'modules/core/hm-mailbox.php';
+        require_once APP_PATH.'modules/imap/functions.php';
         
         $this->mock_user_config = new Hm_Mock_Config();
         $this->mock_user_config->set('unsubscribed_folders', ['test_server_1' => ['Junk', 'Spam']]);
@@ -889,15 +890,421 @@ class Hm_Test_Mailbox extends TestCase {
     public function test_unsupported_send_message() {
         $mock_imap = $this->createMock(Hm_IMAP::class);
         $mock_imap->method('get_state')->willReturn('authenticated');
-        
+
         $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
-        
+
         $this->expectException(Error::class);
-        
+
         $mailbox->send_message(
             'test@example.com',
             ['recipient@example.com'],
             'Test message'
         );
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_state_returns_connection_state_for_imap() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertEquals('authenticated', $mailbox->state());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_state_returns_null_for_ews() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertNull($mailbox->state());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_folder_name_returns_folder_directly_for_imap() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertEquals('INBOX', $mailbox->get_folder_name('INBOX'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_folder_name_uses_quick_lookup_for_ews() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('get_folder_name_quick')->with('AQMs...')->willReturn('INBOX');
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertEquals('INBOX', $mailbox->get_folder_name('AQMs...'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_create_folder_returns_null_when_not_authed() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('disconnected');
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertNull($mailbox->create_folder('NewFolder'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_create_folder_delegates_to_connection_for_ews() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
+        $mock_ews->method('create_folder')->with('NewFolder', null)->willReturn('folder-id-123');
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertEquals('folder-id-123', $mailbox->create_folder('NewFolder'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_delete_folder_returns_null_when_not_authed() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('disconnected');
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertNull($mailbox->delete_folder('OldFolder'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_delete_folder_delegates_to_connection_for_ews() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
+        $mock_ews->method('delete_folder')->willReturn(true);
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertTrue($mailbox->delete_folder('OldFolder'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_rename_folder_returns_null_when_not_authed() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('disconnected');
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertNull($mailbox->rename_folder('OldFolder', 'NewName'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_rename_folder_delegates_to_ews_connection() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
+        $mock_ews->method('rename_folder')->willReturn(true);
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertTrue($mailbox->rename_folder('AQMs...encoded', 'NewName'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_folders_returns_null_when_not_authed() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('disconnected');
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertNull($mailbox->get_folders());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_folders_delegates_to_ews_connection() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
+        $mock_ews->method('get_folders')->willReturn(array('INBOX' => [], 'Sent' => []));
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $result = $mailbox->get_folders();
+        $this->assertArrayHasKey('INBOX', $result);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_subfolders_returns_null_when_not_authed() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('disconnected');
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertNull($mailbox->get_subfolders('INBOX'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_subfolders_delegates_to_ews_connection() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
+        $mock_ews->method('get_folders')->willReturn(array('INBOX.Sub' => []));
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $result = $mailbox->get_subfolders('INBOX');
+        $this->assertArrayHasKey('INBOX.Sub', $result);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_folder_state_returns_imap_connection_property() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->folder_state = 'selected';
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertEquals('selected', $mailbox->get_folder_state());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_selected_folder_returns_imap_connection_property() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->selected_mailbox = array('name' => 'INBOX');
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertEquals(array('name' => 'INBOX'), $mailbox->get_selected_folder());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_special_use_mailboxes_returns_null_when_not_authed() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('disconnected');
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertNull($mailbox->get_special_use_mailboxes());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_special_use_mailboxes_delegates_to_ews_connection() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
+        $mock_ews->method('get_special_use_folders')->willReturn(array('Trash' => 'Trash', 'Sent' => 'Sent'));
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertArrayHasKey('Trash', $mailbox->get_special_use_mailboxes());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_quota_root_delegates_to_imap_connection() {
+        $mock_imap = $this->getMockBuilder(Hm_IMAP::class)
+            ->addMethods(['get_quota_root', 'get_quota'])
+            ->getMock();
+        $mock_imap->method('get_quota_root')->with('INBOX')->willReturn(array('usage' => 100, 'limit' => 1000));
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $result = $mailbox->get_quota('INBOX', true);
+        $this->assertEquals(100, $result['usage']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_quota_returns_empty_for_ews() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertEquals(array(), $mailbox->get_quota('INBOX'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_debug_delegates_to_imap_connection() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('show_debug')->with(true, true, true)->willReturn(array('log entry'));
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertEquals(array('log entry'), $mailbox->get_debug());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_debug_returns_empty_for_ews() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertEquals(array(), $mailbox->get_debug());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_use_cache_returns_connection_property_for_imap() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->use_cache = true;
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertTrue($mailbox->use_cache());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_use_cache_returns_false_for_ews() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertFalse($mailbox->use_cache());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_dump_cache_delegates_to_imap_connection() {
+        $mock_imap = $this->getMockBuilder(Hm_IMAP::class)
+            ->addMethods(['dump_cache'])
+            ->getMock();
+        $mock_imap->method('dump_cache')->with('string')->willReturn('cache data');
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertEquals('cache data', $mailbox->dump_cache());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_dump_cache_returns_null_for_ews() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertNull($mailbox->dump_cache());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_state_delegates_to_imap_connection() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('selected');
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertEquals('selected', $mailbox->get_state());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_state_returns_authenticated_for_authed_ews() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertEquals('authenticated', $mailbox->get_state());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_capability_delegates_to_ews_connection() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('get_capability')->willReturn(array('EWS', 'IDLE'));
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertContains('IDLE', $mailbox->get_capability());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_set_read_only_sets_property_on_imap_connection() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->read_only = false;
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $mailbox->set_read_only(true);
+        $this->assertTrue($mock_imap->read_only);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_set_search_charset_sets_property_on_imap_connection() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->search_charset = '';
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $mailbox->set_search_charset('UTF-8');
+        $this->assertEquals('UTF-8', $mock_imap->search_charset);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_message_list_delegates_to_ews_connection() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
+        $mock_ews->method('get_folder_status')->willReturn(array('id' => 'inbox-id', 'name' => 'INBOX', 'messages' => 10));
+        $mock_ews->method('get_message_list')->willReturn(array(1 => array('subject' => 'Test')));
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $result = $mailbox->get_message_list('INBOX', array(1));
+        $this->assertArrayHasKey(1, $result);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_is_archive_folder_returns_false_for_ews() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertFalse($mailbox->is_archive_folder('archive', new Hm_Mock_Config(), 'INBOX'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_is_inplace_archive_enabled_delegates_to_ews_connection() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('is_inplace_archive_enabled')->willReturn(true);
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertTrue($mailbox->is_inplace_archive_enabled());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_is_inplace_archive_enabled_returns_null_for_imap() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        $this->assertNull($mailbox->is_inplace_archive_enabled());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_prep_folder_name_returns_folder_decoded_for_ews() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        $this->assertEquals('simpletestfolder', $mailbox->prep_folder_name('simpletestfolder'));
     }
 }
