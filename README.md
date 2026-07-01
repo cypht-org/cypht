@@ -26,6 +26,12 @@ customize the program without hacking the code.
 Installation instructions
 * All Cypht latest and master versions: [https://cypht.org/install](https://cypht.org/install)
 
+Troubleshooting
+* PHP version: Cypht requires PHP 8.1 or higher. Check your version with `php -v`. If needed, update PHP or use a different path to a newer PHP binary.
+* Missing PHP extensions: Common required extensions include curl, mbstring, xml, and sodium. If you see errors about missing extensions, install them via your system package manager (e.g., `apt-get install php-curl php-mbstring php-xml php-sodium`).
+* Database connection issues: Double-check your `.env` file settings for database host, port, username, and password. Ensure the database server is running and accessible.
+* Session/cookie problems in development: If you experience login issues or session errors, verify that PHP can write to the configured session save path. Also check that cookies are not being blocked by your browser.
+
 Monthly community meetings: [https://github.com/cypht-org/cypht/wiki/Monthly-Community-Meetings](https://github.com/cypht-org/cypht/wiki/Monthly-Community-Meetings)
 
 Security details: [https://cypht.org/security](https://cypht.org/security)
