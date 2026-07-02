@@ -8,6 +8,67 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+if (!hm_exists('feed_url_is_allowed')) {
+/**
+ * Reject feed URLs that resolve to private or reserved addresses (SSRF mitigation).
+ * @param string $url
+ * @return bool
+ */
+function feed_url_is_allowed($url) {
+    if (!is_string($url) || trim($url) === '') {
+        return false;
+    }
+    $url = trim($url);
+    if (!preg_match('/^https?:\/\//i', $url)) {
+        $url = 'http://'.$url;
+    }
+    if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+        return false;
+    }
+    $parts = parse_url($url);
+    if (empty($parts['scheme']) || empty($parts['host'])) {
+        return false;
+    }
+    $scheme = strtolower($parts['scheme']);
+    if ($scheme !== 'http' && $scheme !== 'https') {
+        return false;
+    }
+    $host = strtolower($parts['host']);
+    if (preg_match('/(^localhost|\.(local|localhost|internal)$)/', $host)) {
+        return false;
+    }
+    if (filter_var($host, FILTER_VALIDATE_IP)) {
+        return filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
+    }
+    $ips = array();
+    if (function_exists('dns_get_record')) {
+        $records = @dns_get_record($host, DNS_A + DNS_AAAA);
+        if (is_array($records)) {
+            foreach ($records as $record) {
+                if (!empty($record['ip'])) {
+                    $ips[] = $record['ip'];
+                }
+                if (!empty($record['ipv6'])) {
+                    $ips[] = $record['ipv6'];
+                }
+            }
+        }
+    }
+    if (empty($ips)) {
+        $resolved = gethostbyname($host);
+        if ($resolved === $host || filter_var($resolved, FILTER_VALIDATE_IP) === false) {
+            return false;
+        }
+        $ips[] = $resolved;
+    }
+    foreach (array_unique($ips) as $ip) {
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+            return false;
+        }
+    }
+    return true;
+}}
+
 /**
  * Manage a list of feeds
  * @subpackage feeds/lib
@@ -109,8 +170,12 @@ class Hm_Feed {
      */
     function get_feed_data($url) {
         $buffer = '';
-        if (!preg_match("?^http(|s)://?", ltrim($url))) {
+        if (!preg_match('/^https?:\/\//i', ltrim($url))) {
             $url = 'http://'.ltrim($url);
+        }
+        if (!feed_url_is_allowed($url)) {
+            $this->xml_data = $buffer;
+            return $buffer;
         }
         if (function_exists('curl_setopt')) {
             $type = 'curl';
@@ -125,7 +190,8 @@ class Hm_Feed {
                 curl_setopt($curl_handle, CURLOPT_URL, $url);
                 curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT,15);
                 curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER,1);
-                curl_setopt($curl_handle, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($curl_handle, CURLOPT_FOLLOWLOCATION, false);
+                curl_setopt($curl_handle, CURLOPT_ENCODING, '');
                 $buffer = trim(curl_exec($curl_handle));
                 $this->status_code = curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
                 if ($this->status_code !== false && $this->status_code !== 200) {
@@ -135,7 +201,8 @@ class Hm_Feed {
                 unset($curl_handle);
                 break;
             case 'file':
-                $buffer = file_get_contents($url);
+                $context = stream_context_create(array('http' => array('follow_location' => 0)));
+                $buffer = @file_get_contents($url, false, $context);
                 break;
         }
         $this->xml_data = $buffer;
