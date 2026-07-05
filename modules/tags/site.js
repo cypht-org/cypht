@@ -187,7 +187,7 @@ var show_tag_form_modal = function(tag) {
     modal.open();
 };
 
-var show_tag_delete_modal = function(tag) {
+var show_tag_delete_modal = function(tag, triggerLink) {
     var modal = new Hm_Modal({
         modalId: 'tagDeleteModal',
         title: tag_modal_icon('bi-trash', true) + hm_trans('Remove label')
@@ -200,7 +200,11 @@ var show_tag_delete_modal = function(tag) {
     modal.setContent(content);
     modal.addFooterBtn(hm_trans('Remove'), 'btn-danger custom-btn-danger', function() {
         var btn = $(this);
+        var originalLinkHtml = triggerLink ? triggerLink.html() : null;
         btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + hm_trans('Remove'));
+        if (triggerLink) {
+            triggerLink.html('<span class="spinner-border spinner-border-sm" role="status"></span>');
+        }
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_process_tag_delete'},
             {'name': 'tag_delete', 'value': 1},
@@ -211,6 +215,9 @@ var show_tag_delete_modal = function(tag) {
                     Hm_Folders.reload_folders(true);
                 } else {
                     btn.prop('disabled', false).html(hm_trans('Remove'));
+                    if (triggerLink) {
+                        triggerLink.html(originalLinkHtml);
+                    }
                 }
             }
         );
@@ -246,7 +253,7 @@ $(document).on('click', '.tag_action_delete', function(e) {
     e.preventDefault();
     e.stopPropagation();
     var li = $(this).closest('.tag_row');
-    show_tag_delete_modal({id: String(li.data('tag-id')), name: li.data('tag-name')});
+    show_tag_delete_modal({id: String(li.data('tag-id')), name: li.data('tag-name')}, $(this));
 });
 
 $(document).on('click', '.tag_expand_toggle', function(e) {
