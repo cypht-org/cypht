@@ -20,6 +20,21 @@ class Hm_Tags {
         self::initRepo('tags', $hmod->user_config, $hmod->session, self::$data);
     }
 
+    public static function colorPalette() {
+        return array(
+            '#d93025', '#e8710a', '#f9ab00', '#188038', '#12805c', '#039be5',
+            '#1a73e8', '#3949ab', '#8430ce', '#d01884', '#795548', '#5f6368',
+        );
+    }
+
+    public static function defaultColor() {
+        return '#5f6368';
+    }
+
+    public static function sanitizeColor($color) {
+        return in_array($color, self::colorPalette(), true) ? $color : self::defaultColor();
+    }
+
     public static function addMessage($tagId, $serverId, $folder, $messageId) {
         $folders = self::getFolders($tagId, $serverId);
         if (!in_array($folder, $folders)) {

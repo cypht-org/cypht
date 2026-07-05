@@ -10,6 +10,30 @@ var get_tags_json_data = function() {
     }
 };
 
+var get_tags_palette_data = function() {
+    var el = document.querySelector('.tags_palette_data');
+    if (!el) {
+        return [];
+    }
+    try {
+        return JSON.parse(el.textContent);
+    } catch (e) {
+        return [];
+    }
+};
+
+var build_tag_color_swatches = function(selected) {
+    var palette = get_tags_palette_data();
+    var html = '';
+    palette.forEach(function(color) {
+        var active = (color === selected) ? ' active' : '';
+        html += '<button type="button" class="tag_color_swatch' + active + '" data-color="' + esc_html(color) +
+            '" style="background-color: ' + esc_html(color) + ';" aria-label="' + esc_html(color) + '">' +
+            '<i class="bi bi-check-lg"></i></button>';
+    });
+    return html;
+};
+
 var render_tag_parent_results = function(container, query, excludeId) {
     var tags = get_tags_json_data();
     var q = (query || '').trim().toLowerCase();
@@ -88,6 +112,8 @@ var show_tag_form_modal = function(tag) {
     tag = tag || {};
     var isEdit = !!tag.id;
     var parentTag = tag.parent ? get_tags_json_data().find(function(t) { return t.id === tag.parent; }) : null;
+    var palette = get_tags_palette_data();
+    var currentColor = tag.color || palette[0];
     var modal = new Hm_Modal({
         modalId: 'tagFormModal',
         title: tag_modal_icon('bi-tag-fill') + (isEdit ? hm_trans('Edit label') : hm_trans('Create new label'))
@@ -97,6 +123,11 @@ var show_tag_form_modal = function(tag) {
     var content = '<div class="mb-3">';
     content += '<label for="modal_tag_name" class="form-label">' + hm_trans('Label name') + ' <span class="text-danger">*</span></label>';
     content += '<input required type="text" class="form-control custom-input" id="modal_tag_name" placeholder="' + hm_trans('e.g. Invoices') + '" value="' + esc_html(tag.name || '') + '">';
+    content += '</div>';
+    content += '<div class="mb-3">';
+    content += '<label class="form-label">' + hm_trans('Color') + '</label>';
+    content += '<div class="tag_color_swatches">' + build_tag_color_swatches(currentColor) + '</div>';
+    content += '<input type="hidden" id="modal_tag_color" value="' + esc_html(currentColor) + '">';
     content += '</div>';
     content += '<div class="form-check mb-3">';
     content += '<input class="form-check-input" type="checkbox" id="modal_tag_nest"' + (tag.parent ? ' checked' : '') + '>';
@@ -119,6 +150,11 @@ var show_tag_form_modal = function(tag) {
     modal.modal.on('change', '#modal_tag_nest', function() {
         $('#modal_tag_parent_wrapper').css('display', this.checked ? 'block' : 'none');
     });
+    modal.modal.on('click', '.tag_color_swatch', function() {
+        modal.modal.find('.tag_color_swatch').removeClass('active');
+        $(this).addClass('active');
+        modal.modal.find('#modal_tag_color').val($(this).data('color'));
+    });
     bind_tag_parent_picker(modal, tag.id);
 
     var submitLabel = isEdit ? hm_trans('Save') : hm_trans('Create');
@@ -129,11 +165,13 @@ var show_tag_form_modal = function(tag) {
             return;
         }
         var parent = $('#modal_tag_nest').is(':checked') ? $('#modal_tag_parent').val() : '';
+        var color = $('#modal_tag_color').val();
         var btn = $(this);
         btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + submitLabel);
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_process_tag_update'},
             {'name': 'tag_name', 'value': name},
+            {'name': 'tag_color', 'value': color},
             {'name': 'parent_tag', 'value': parent},
             {'name': 'tag_id', 'value': isEdit ? tag.id : ''}],
             function(res) {
@@ -199,7 +237,8 @@ $(document).on('click', '.tag_action_edit', function(e) {
     show_tag_form_modal({
         id: String(li.data('tag-id')),
         name: li.data('tag-name'),
-        parent: li.data('tag-parent') ? String(li.data('tag-parent')) : ''
+        parent: li.data('tag-parent') ? String(li.data('tag-parent')) : '',
+        color: li.data('tag-color') ? String(li.data('tag-color')) : ''
     });
 });
 

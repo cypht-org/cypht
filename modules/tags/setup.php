@@ -61,6 +61,7 @@ return array(
         'tag_name' => FILTER_UNSAFE_RAW,
         'tag_id' => FILTER_UNSAFE_RAW,
         'parent_tag' => FILTER_UNSAFE_RAW,
+        'tag_color' => FILTER_UNSAFE_RAW,
         'tag_delete' => FILTER_UNSAFE_RAW,
         'tag_per_source' => FILTER_VALIDATE_INT,
         'tag_since' => FILTER_UNSAFE_RAW,

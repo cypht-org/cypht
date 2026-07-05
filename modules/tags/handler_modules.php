@@ -97,13 +97,14 @@ class Hm_Handler_remove_tag_from_message extends Hm_Handler_Module {
  */
 class Hm_Handler_process_tag_update extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('tag_name','parent_tag','tag_id'));// 'tag_id', parent_tag
+        list($success, $form) = $this->process_form(array('tag_name','parent_tag','tag_id','tag_color'));
         if (!$success) {
             return;
         }
         $tag = array(
             'name' => html_entity_decode($form['tag_name'], ENT_QUOTES),
-            'parent' => $form['parent_tag'] ?? null
+            'parent' => $form['parent_tag'] ?? null,
+            'color' => Hm_Tags::sanitizeColor($form['tag_color'] ?? null)
         );
         if (!empty($form['tag_id']) && Hm_Tags::get($form['tag_id'])) {
             Hm_Tags::edit($form['tag_id'], $tag);

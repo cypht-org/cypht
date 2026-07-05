@@ -26,7 +26,7 @@
 .tag_row.tag_collapsed > .tag_row_main .tag_expand_toggle i { transform: rotate(-90deg); }
 .tag_row.tag_collapsed > .tag_children { display: none; }
 
-.tag_dot { font-size: 0.5rem; opacity: 0.6; margin-right: 0.6rem; }
+.tag_dot { font-size: 0.55rem; margin-right: 0.6rem; flex-shrink: 0; }
 .tag_dot_indent { margin-left: 1.25em; }
 
 .tag_children {
@@ -169,3 +169,25 @@
   font-size: 0.8125rem;
   color: rgba(var(--bs-body-color-rgb), 0.6);
 }
+
+.tag_color_swatches { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.tag_color_swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, border-color 0.15s ease;
+}
+.tag_color_swatch:hover { transform: scale(1.12); }
+.tag_color_swatch.active { border-color: var(--bs-body-color); }
+.tag_color_swatch i {
+  display: none;
+  color: #fff;
+  font-size: 13px;
+}
+.tag_color_swatch.active i { display: block; }

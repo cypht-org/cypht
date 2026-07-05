@@ -113,6 +113,8 @@ class Hm_Output_tags extends hm_output_module {
             $this->flatten_tags($folderTree, 0, $flat);
             $res .= '<script type="application/json" class="tags_json_data">'.
                 json_encode($flat, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP).'</script>';
+            $res .= '<script type="application/json" class="tags_palette_data">'.
+                json_encode(Hm_Tags::colorPalette(), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP).'</script>';
         }
         $res .= '<li class="tags_add_new"><a href="#" class="tag_add_new_btn">';
         if (!$this->get('hide_folder_icons')) {
@@ -130,16 +132,18 @@ class Hm_Output_tags extends hm_output_module {
         foreach ($folders as $id => $folder) {
             $hasChild = !empty($folder['children']);
             $parent = isset($folder['parent']) ? $folder['parent'] : '';
+            $color = Hm_Tags::sanitizeColor($folder['color'] ?? null);
             $res .= '<li class="tag_row'.($hasChild ? ' has_children' : '').' tags_'.$this->html_safe($id).
                 '" data-tag-id="'.$this->html_safe($id).
                 '" data-tag-name="'.$this->html_safe($folder['name']).
-                '" data-tag-parent="'.$this->html_safe($parent).'">';
+                '" data-tag-parent="'.$this->html_safe($parent).
+                '" data-tag-color="'.$this->html_safe($color).'">';
             $res .= '<div class="tag_row_main d-flex align-items-center">';
             if ($hasChild) {
                 $res .= '<a href="#" class="tag_expand_toggle"><i class="bi bi-chevron-down"></i></a>';
             }
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<i class="bi bi-tag-fill tag_dot'.($hasChild ? '' : ' tag_dot_indent').'"></i>';
+                $res .= '<i class="bi bi-circle-fill tag_dot'.($hasChild ? '' : ' tag_dot_indent').'" style="color: '.$color.';"></i>';
             }
             $res .= '<a class="tag_link flex-grow-1" data-id="tag_'.$this->html_safe($id).
                 '" href="'.$this->build_page_url('message_list', array('list_path' => 'tag', 'filter' => $this->html_safe($id))).'">';
@@ -166,7 +170,12 @@ class Hm_Output_tags extends hm_output_module {
      */
     private function flatten_tags($folders, $depth, &$out) {
         foreach ($folders as $id => $folder) {
-            $out[] = array('id' => $folder['id'], 'name' => $folder['name'], 'depth' => $depth);
+            $out[] = array(
+                'id' => $folder['id'],
+                'name' => $folder['name'],
+                'depth' => $depth,
+                'color' => Hm_Tags::sanitizeColor($folder['color'] ?? null)
+            );
             if (!empty($folder['children'])) {
                 $this->flatten_tags($folder['children'], $depth + 1, $out);
             }
