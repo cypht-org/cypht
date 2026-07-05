@@ -1,8 +1,3 @@
-/**
- * Gmail-style label management: create/edit/delete tags from modals
- * triggered directly from the folder menu, instead of a dedicated page.
- */
-
 var get_tags_json_data = function() {
     var el = document.querySelector('.tags_json_data');
     if (!el) {
@@ -29,26 +24,41 @@ var build_tag_parent_options = function(selectedParent, excludeId) {
     return html;
 };
 
+
+var apply_modern_modal_skin = function(modal) {
+    modal.modal.find('.modal-dialog').addClass('modal-dialog-centered');
+    modal.modal.find('.modal-content').addClass('custom-modal-content');
+    modal.modal.find('.modal-header').addClass('custom-modal-header');
+    modal.modal.find('.modal-title').addClass('d-flex align-items-center');
+    modal.modal.find('.modal-body').addClass('custom-modal-body');
+    modal.modal.find('.modal-footer').addClass('custom-modal-footer');
+    modal.modal.find('.modal-footer .btn-secondary').addClass('custom-btn-secondary');
+};
+
+var tag_modal_icon = function(icon, danger) {
+    return '<div class="modal-icon-wrapper' + (danger ? ' danger' : '') + ' me-2"><i class="bi ' + icon + '" style="font-size: 22px;"></i></div>';
+};
+
 var show_tag_form_modal = function(tag) {
     tag = tag || {};
     var isEdit = !!tag.id;
     var modal = new Hm_Modal({
         modalId: 'tagFormModal',
-        title: isEdit ? hm_trans('Edit label') : hm_trans('Create new label'),
-        btnSize: 'sm'
+        title: tag_modal_icon('bi-tag-fill') + (isEdit ? hm_trans('Edit label') : hm_trans('Create new label'))
     });
+    apply_modern_modal_skin(modal);
 
-    var content = '<div class="form-floating mb-3">';
-    content += '<input required type="text" class="form-control" id="modal_tag_name" placeholder="' + hm_trans('Label name') + '" value="' + esc_html(tag.name || '') + '">';
-    content += '<label for="modal_tag_name">' + hm_trans('Label name') + '</label>';
+    var content = '<div class="mb-3">';
+    content += '<label for="modal_tag_name" class="form-label">' + hm_trans('Label name') + ' <span class="text-danger">*</span></label>';
+    content += '<input required type="text" class="form-control custom-input" id="modal_tag_name" placeholder="' + hm_trans('e.g. Invoices') + '" value="' + esc_html(tag.name || '') + '">';
     content += '</div>';
     content += '<div class="form-check mb-3">';
     content += '<input class="form-check-input" type="checkbox" id="modal_tag_nest"' + (tag.parent ? ' checked' : '') + '>';
     content += '<label class="form-check-label" for="modal_tag_nest">' + hm_trans('Nest label under') + '</label>';
     content += '</div>';
-    content += '<div class="form-floating mb-3" id="modal_tag_parent_wrapper" style="display:' + (tag.parent ? 'block' : 'none') + '">';
-    content += '<select class="form-select" id="modal_tag_parent">' + build_tag_parent_options(tag.parent, tag.id) + '</select>';
-    content += '<label for="modal_tag_parent">' + hm_trans('Parent label') + '</label>';
+    content += '<div class="mb-1" id="modal_tag_parent_wrapper" style="display:' + (tag.parent ? 'block' : 'none') + '">';
+    content += '<label for="modal_tag_parent" class="form-label">' + hm_trans('Parent label') + '</label>';
+    content += '<select class="form-select custom-input" id="modal_tag_parent">' + build_tag_parent_options(tag.parent, tag.id) + '</select>';
     content += '</div>';
 
     modal.setContent(content);
@@ -61,7 +71,7 @@ var show_tag_form_modal = function(tag) {
     });
 
     var submitLabel = isEdit ? hm_trans('Save') : hm_trans('Create');
-    modal.addFooterBtn(submitLabel, 'btn-primary', function() {
+    modal.addFooterBtn(submitLabel, 'btn-primary custom-btn-primary', function() {
         var name = $('#modal_tag_name').val().trim();
         if (!name.length) {
             Hm_Notices.show('Please enter a label name', 'danger');
@@ -91,15 +101,15 @@ var show_tag_form_modal = function(tag) {
 var show_tag_delete_modal = function(tag) {
     var modal = new Hm_Modal({
         modalId: 'tagDeleteModal',
-        title: hm_trans('Remove label'),
-        btnSize: 'sm'
+        title: tag_modal_icon('bi-trash', true) + hm_trans('Remove label')
     });
+    apply_modern_modal_skin(modal);
 
     var content = '<p>' + hm_trans('Are you sure you want to remove this label? Messages will keep their content but lose this label.') + '</p>';
     content += '<p><strong>' + esc_html(tag.name) + '</strong></p>';
 
     modal.setContent(content);
-    modal.addFooterBtn(hm_trans('Remove'), 'btn-danger', function() {
+    modal.addFooterBtn(hm_trans('Remove'), 'btn-danger custom-btn-danger', function() {
         var btn = $(this);
         btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + hm_trans('Remove'));
         Hm_Ajax.request(
