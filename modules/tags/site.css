@@ -1,5 +1,55 @@
 .tag_icon { position: absolute; right: 50px; top: 15px; }
 .mobile .tag_icon { display: none; }
-.tags_action_btn { width: 30px !important; height: 30px !important; }
-.mr-4 { margin-right: 4px !important; }
 .tag_setting { display: none; }
+
+/* Gmail-style label tree in the folder menu */
+.tag_row { padding: 0 !important; }
+.tag_row_main {
+  padding: 0.3rem 0.3rem;
+  border-radius: var(--bs-border-radius);
+}
+.tag_row_main:hover { background-color: rgba(var(--bs-body-color-rgb), 0.06); }
+.tag_row .tag_link {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tag_expand_toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1em;
+  margin-right: 0.15rem;
+  color: rgba(var(--bs-body-color-rgb), 0.6);
+  text-decoration: none;
+}
+.tag_expand_toggle i { transition: transform 0.15s ease-in-out; display: inline-block; }
+.tag_row.tag_collapsed > .tag_row_main .tag_expand_toggle i { transform: rotate(-90deg); }
+.tag_row.tag_collapsed > .tag_children { display: none; }
+
+.tag_dot { font-size: 0.5rem; opacity: 0.6; margin-right: 0.6rem; }
+.tag_dot_indent { margin-left: 1.25em; }
+
+.tag_children {
+  list-style: none;
+  margin: 0;
+  padding-left: 1.4rem;
+}
+
+.tag_row_actions {
+  opacity: 0;
+  margin-left: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+.tag_row_main:hover .tag_row_actions,
+.tag_row_main:focus-within .tag_row_actions { opacity: 1; }
+.tag_row_actions a {
+  display: inline-block;
+  margin-left: 0.4rem;
+  color: rgba(var(--bs-body-color-rgb), 0.6);
+  text-decoration: none;
+}
+.tag_row_actions a:hover { color: var(--bs-link-hover-color); }
+.mobile .tag_row_actions { opacity: 1; }
