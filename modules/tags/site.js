@@ -10,20 +10,65 @@ var get_tags_json_data = function() {
     }
 };
 
-var build_tag_parent_options = function(selectedParent, excludeId) {
+var render_tag_parent_results = function(container, query, excludeId) {
     var tags = get_tags_json_data();
-    var html = '<option value="">' + hm_trans('No parent (top level)') + '</option>';
-    tags.forEach(function(t) {
+    var q = (query || '').trim().toLowerCase();
+    var html = '<div class="tag_parent_option" data-id="" data-name="">' + hm_trans('No parent (top level)') + '</div>';
+    var matches = tags.filter(function(t) {
         if (excludeId && t.id === excludeId) {
-            return;
+            return false;
         }
-        var indent = '&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(t.depth);
-        var selected = (selectedParent && t.id === selectedParent) ? ' selected' : '';
-        html += '<option value="' + esc_html(t.id) + '"' + selected + '>' + indent + esc_html(t.name) + '</option>';
+        return !q || t.name.toLowerCase().indexOf(q) !== -1;
     });
-    return html;
+    if (matches.length) {
+        matches.forEach(function(t) {
+            var indent = '&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(t.depth);
+            html += '<div class="tag_parent_option" data-id="' + esc_html(t.id) + '" data-name="' + esc_html(t.name) + '">' + indent + esc_html(t.name) + '</div>';
+        });
+    } else if (q) {
+        html += '<div class="tag_parent_empty">' + hm_trans('No matching labels') + '</div>';
+    }
+    container.html(html);
 };
 
+var bind_tag_parent_picker = function(modal, excludeId) {
+    var search = modal.modal.find('#modal_tag_parent_search');
+    var hidden = modal.modal.find('#modal_tag_parent');
+    var results = modal.modal.find('.tag_parent_results');
+
+    var open_results = function() {
+        render_tag_parent_results(results, search.val(), excludeId);
+        results.show();
+    };
+
+    search.on('focus', open_results);
+    search.on('input', function() {
+        hidden.val('');
+        open_results();
+    });
+    search.on('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            var only = results.find('.tag_parent_option');
+            if (only.length === 1) {
+                only.trigger('mousedown');
+            }
+        } else if (e.key === 'Escape') {
+            results.hide();
+        }
+    });
+    search.on('blur', function() {
+        setTimeout(function() { results.hide(); }, 150);
+    });
+    results.on('mousedown', '.tag_parent_option', function(e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var name = $(this).data('name') || '';
+        hidden.val(id ? String(id) : '');
+        search.val(name);
+        results.hide();
+    });
+};
 
 var apply_modern_modal_skin = function(modal) {
     modal.modal.find('.modal-dialog').addClass('modal-dialog-centered');
@@ -42,6 +87,7 @@ var tag_modal_icon = function(icon, danger) {
 var show_tag_form_modal = function(tag) {
     tag = tag || {};
     var isEdit = !!tag.id;
+    var parentTag = tag.parent ? get_tags_json_data().find(function(t) { return t.id === tag.parent; }) : null;
     var modal = new Hm_Modal({
         modalId: 'tagFormModal',
         title: tag_modal_icon('bi-tag-fill') + (isEdit ? hm_trans('Edit label') : hm_trans('Create new label'))
@@ -57,8 +103,12 @@ var show_tag_form_modal = function(tag) {
     content += '<label class="form-check-label" for="modal_tag_nest">' + hm_trans('Nest label under') + '</label>';
     content += '</div>';
     content += '<div class="mb-1" id="modal_tag_parent_wrapper" style="display:' + (tag.parent ? 'block' : 'none') + '">';
-    content += '<label for="modal_tag_parent" class="form-label">' + hm_trans('Parent label') + '</label>';
-    content += '<select class="form-select custom-input" id="modal_tag_parent">' + build_tag_parent_options(tag.parent, tag.id) + '</select>';
+    content += '<label for="modal_tag_parent_search" class="form-label">' + hm_trans('Parent label') + '</label>';
+    content += '<div class="tag_parent_picker">';
+    content += '<input type="text" class="form-control custom-input" id="modal_tag_parent_search" autocomplete="off" placeholder="' + hm_trans('Search labels...') + '" value="' + esc_html(parentTag ? parentTag.name : '') + '">';
+    content += '<input type="hidden" id="modal_tag_parent" value="' + esc_html(tag.parent || '') + '">';
+    content += '<div class="tag_parent_results"></div>';
+    content += '</div>';
     content += '</div>';
 
     modal.setContent(content);
@@ -69,6 +119,7 @@ var show_tag_form_modal = function(tag) {
     modal.modal.on('change', '#modal_tag_nest', function() {
         $('#modal_tag_parent_wrapper').css('display', this.checked ? 'block' : 'none');
     });
+    bind_tag_parent_picker(modal, tag.id);
 
     var submitLabel = isEdit ? hm_trans('Save') : hm_trans('Create');
     modal.addFooterBtn(submitLabel, 'btn-primary custom-btn-primary', function() {
