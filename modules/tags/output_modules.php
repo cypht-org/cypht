@@ -50,7 +50,6 @@ class Hm_Output_start_tag_settings extends Hm_Output_Module {
         $res = '<tr><td data-target=".tag_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-tags fs-5 me-2"></i>'.
             $this->trans('Tags').'</td></tr>';
-            print_r($res);
         return $res;
     }
 }

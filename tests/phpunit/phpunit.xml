@@ -165,6 +165,10 @@
     <testsuite name="modules_local_contacts">
       <file>./modules/local_contacts/local_contacts.php</file>
     </testsuite>
+    <testsuite name="modules_tags">
+      <file>./modules/tags/handler_modules.php</file>
+      <file>./modules/tags/output_modules.php</file>
+    </testsuite>
     <testsuite name="modules_ldap_contacts">
       <file>./modules/ldap_contacts/ldap_contacts.php</file>
     </testsuite>
