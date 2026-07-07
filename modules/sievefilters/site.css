@@ -3,7 +3,14 @@
     border: 2px dashed var(--bs-secondary);
     opacity: 0.6;
 }
+.sieve-filter-actions-block.table-responsive,
+.sieve-filter-conditions-block.table-responsive {
+    overflow: visible;
+}
 
+.folder-tree-dropdown .folder-tree-picker {
+    z-index: 1070;
+}
 .tingle-modal * {
     box-sizing: border-box
 }
