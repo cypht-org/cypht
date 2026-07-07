@@ -231,27 +231,38 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_load_custom_actions_returns_all_cypht_filters() {
-        Hm_Test_Sieve_Client::$scripts = array(
-            'from_list-10-cyphtfilter' => $this->sieveScriptWithSource('message_list'),
-            'from_message-20-cyphtfilter' => $this->sieveScriptWithSource('message'),
-            'manual_script-30-cypht' => "require [\"fileinto\"];",
-        );
-
+    public function test_load_custom_actions_returns_saved_custom_actions() {
         $test = new Sieve_Handler_Test('load_custom_actions', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
         $test->get = array('list_path' => 'imap_serverA_INBOX');
         $test->user_config = array(
             'imap_servers' => $this->imapServersConfig(),
             'enable_sieve_filter_setting' => true,
+            'custom_actions' => array(
+                'ca_move' => array(
+                    'id' => 'ca_move',
+                    'name' => 'Move Important',
+                    'actions' => array(
+                        array('action' => 'move', 'value' => 'Important'),
+                    ),
+                ),
+                'ca_flag' => array(
+                    'id' => 'ca_flag',
+                    'name' => 'Flag Message',
+                    'actions' => array(
+                        array('action' => 'flag', 'value' => 'flagged'),
+                    ),
+                ),
+            ),
         );
 
         $res = $test->run();
         $actions = $res->handler_response['custom_actions'];
 
         $this->assertCount(2, $actions);
-        $this->assertEquals('from_list-10-cyphtfilter', $actions[0]['id']);
-        $this->assertEquals('from message', $actions[1]['name']);
+        $this->assertEquals('ca_move', $actions[0]['id']);
+        $this->assertEquals('Move Important', $actions[0]['name']);
+        $this->assertEquals('ca_flag', $actions[1]['id']);
+        $this->assertEquals('Flag Message', $actions[1]['name']);
     }
 
     /**
