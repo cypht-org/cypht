@@ -80,7 +80,7 @@ function send_scheduled_message($handler, $imapMailbox, $folder, $msg_id, $send_
                 $profiles = Hm_Profiles::search('server', $mailbox_details['server']);
 
                 if (! empty($profiles)) {
-                    $smtpId = $profile = $profiles[0]['smtp_id'];
+                    $smtpId = $profiles[0]['smtp_id'];
                 } else {
                     if ($smtpServer = Hm_SMTP_List::fetch($mailbox_details['user'])) {
                         $smtpId = $smtpServer['id'];
@@ -90,6 +90,8 @@ function send_scheduled_message($handler, $imapMailbox, $folder, $msg_id, $send_
                     Hm_Debug::add(sprintf('ERRCannot find SMTP profile for mailbox server: %s', $mailbox_details['id']));
                     return false;
                 }
+            } else {
+                $smtpId = $profile['smtp_id'];
             }
             $smtpMailbox = Hm_SMTP_List::connect($smtpId, false);
             if (! $smtpMailbox || ! $smtpMailbox->authed()) {

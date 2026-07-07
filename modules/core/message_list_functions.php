@@ -542,9 +542,8 @@ function list_sources($sources, $output_mod) {
         else {
             $folder = $src['folder_name'];
         }
-        $res .= '<div class="list_src">'.$output_mod->html_safe($src['type']).' '.$output_mod->html_safe($src['name']);
-        $res .= ' '.$output_mod->html_safe($folder);
-        $res .= '</div>';
+        $label = trim($src['type'].' '.$src['name'].' '.$folder);
+        $res .= '<div class="list_src" title="'.$output_mod->html_safe($label).'">'.$output_mod->html_safe($label).'</div>';
     }
     $res .= '</div>';
     return $res;

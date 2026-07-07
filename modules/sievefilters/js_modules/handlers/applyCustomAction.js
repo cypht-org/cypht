@@ -4,7 +4,11 @@
  */
 function buildPossibleActionsHtml() {
     let html = '';
-    hm_sieve_possible_actions().forEach(function (value) {
+    const possibleActions = (typeof get_account_actions === 'function')
+        ? get_account_actions()
+        : hm_sieve_possible_actions();
+
+    possibleActions.forEach(function (value) {
         const selected = value.selected === true ? ' selected' : '';
         html += '<option' + selected + ' value="' + value.name + '">' + value.description + '</option>';
     });

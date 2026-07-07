@@ -86,6 +86,21 @@ class Hm_Test_Hm_Cache extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_memcache_get_returns_default_on_connection_failure() {
+        $this->config->set('enable_memcached', true);
+        $this->config->set('memcached_server', 'asdf');
+        $this->config->set('memcached_port', 10);
+        Hm_Mock_Memcached::$result_code = 3;
+        $session = new Hm_Mock_Session();
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertEquals('memcache', $cache->type);
+        $this->assertEquals(array(), $cache->get('imap_folders_imap_test_', array()));
+        Hm_Mock_Memcached::$result_code = 16;
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_del() {
         $session = new Hm_Mock_Session();
         $cache = new Hm_Cache($this->config, $session);
@@ -115,5 +130,53 @@ class Hm_Test_Hm_Cache extends TestCase {
         $this->assertEquals('bar', $cache->get('foo'));
         $cache->del('foo');
         $this->assertFalse($cache->get('foo', false));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_noop_cache_reconnect_returns_true() {
+        $noop = new Hm_Noop_Cache();
+        $this->assertTrue($noop->reconnect());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_noop_cache_set_returns_false() {
+        $noop = new Hm_Noop_Cache();
+        $this->assertFalse($noop->set('key', 'val', 600, ''));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_cache_reconnect_delegates_to_backend() {
+        $session = new Hm_Mock_Session();
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertTrue($cache->reconnect());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_cache_get_returns_default_for_noop_backend() {
+        $session = new Hm_Mock_Session();
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertEquals('my_default', $cache->get('nonexistent_key', 'my_default'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_cache_del_on_noop_backend_returns_true() {
+        $session = new Hm_Mock_Session();
+        $cache = new Hm_Cache($this->config, $session);
+        $this->assertTrue($cache->del('any_key'));
     }
 }

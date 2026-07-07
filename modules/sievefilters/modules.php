@@ -1380,7 +1380,7 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
         $res .= '<span class="filters_count"><span id="filter_num_' . $mailbox['id'] . '">' . $num_blocked . '</span> ' . $this->trans('blocked') . '</span></div>';
         $res .= '<div class="sievefilters_accounts filter_block py-3 d-none"><div class="filter_subblock">';
         $res .= $default_behaviour_html;
-        $res .= '<table class="filter_details table"><tbody>';
+        $res .= '<table class="filter_details blocked_senders_table table"><tbody>';
         $res .= '<tr><th class="col-sm-6">Sender</th><th class="col-sm-3">Behavior</th><th class="col-sm-3">Actions</th></tr>';
         $res .= get_blocked_senders($mailbox, $mailbox['id'], 'x-circle-fill', 'globe-europe-africa', $this->get('site_config'), $this->get('user_config'), $this);
         $res .= '</tbody></table>';

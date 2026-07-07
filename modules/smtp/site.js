@@ -264,6 +264,10 @@ var reset_smtp_form = function(save = true) {
     $('.compose_cc').val('');
     $('.compose_bcc').val('');
     $('.ke-content', $('iframe').contents()).html('');
+    if (window.mdEditor && window.mdEditor.codemirror) {
+        window.mdEditor.codemirror.getDoc().setValue('');
+        window.mdEditor.codemirror.save();
+    }
     $('.uploaded_files').html('');
     $('#compose_delivery_receipt').prop('checked', false);
     schedule_mta_sts_status_check();

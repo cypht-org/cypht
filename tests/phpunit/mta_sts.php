@@ -156,6 +156,121 @@ class Hm_Test_MTA_STS extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_parse_policy_id_extracts_id_from_valid_dns_record() {
+        $mta_sts = new Hm_MTA_STS();
+        $this->assertEquals('20190429T010101', $mta_sts->parse_policy_id('v=STSv1; id=20190429T010101;'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_parse_policy_id_returns_false_when_no_id_present() {
+        $mta_sts = new Hm_MTA_STS();
+        $this->assertFalse($mta_sts->parse_policy_id('v=STSv1; no-id-here'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_parse_policy_id_trims_whitespace_from_extracted_id() {
+        $mta_sts = new Hm_MTA_STS();
+        $this->assertEquals('abc123', $mta_sts->parse_policy_id('v=STSv1; id=  abc123  '));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_check_domain_returns_error_when_no_domain_set() {
+        $mta_sts = new Hm_MTA_STS();
+        $result = $mta_sts->check_domain();
+        $this->assertFalse($result['enabled']);
+        $this->assertNull($result['policy']);
+        $this->assertEquals('No domain specified', $result['error']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_check_tls_rpt_returns_error_when_no_domain_set() {
+        $mta_sts = new Hm_MTA_STS();
+        $result = $mta_sts->check_tls_rpt();
+        $this->assertFalse($result['enabled']);
+        $this->assertNull($result['rua']);
+        $this->assertEquals('No domain specified', $result['error']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_check_domain_caches_no_dns_record_result() {
+        $mta = new Hm_Testable_MTA_STS_No_DNS('nodomain.example');
+        $result = $mta->check_domain();
+        $this->assertFalse($result['enabled']);
+        $this->assertEquals('No MTA-STS DNS record found', $result['error']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_parse_policy_returns_false_for_missing_version() {
+        $mta_sts = new Hm_MTA_STS();
+        $this->assertFalse($mta_sts->parse_policy("version: STSv2\nmode: enforce\nmx: mx.example.com\nmax_age: 86400\n"));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_parse_policy_handles_comments_and_empty_lines() {
+        $mta_sts = new Hm_MTA_STS();
+        $content = "# comment\nversion: STSv1\n\nmode: testing\nmx: mx.example.com\nmax_age: 3600\n";
+        $result = $mta_sts->parse_policy($content);
+        $this->assertEquals('testing', $result['mode']);
+        $this->assertEquals(3600, $result['max_age']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_clear_cache_removes_cached_results() {
+        $mta = new Hm_Testable_MTA_STS('example.com');
+        $mta->check_domain();
+        $mta->clear_cache();
+        $mta->check_domain();
+        $this->assertEquals(2, Hm_Testable_MTA_STS::$dns_lookups);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_status_class_returns_disabled_for_unknown_mode() {
+        $mta_sts = new Hm_MTA_STS();
+        $result = array('enabled' => true, 'policy' => array('mode' => 'unknown_mode'));
+        $this->assertEquals('mta-sts-disabled', $mta_sts->get_status_class($result));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_status_message_returns_unknown_mode_message() {
+        $mta_sts = new Hm_MTA_STS();
+        $result = array('enabled' => true, 'policy' => array('mode' => 'unknown_xyz'));
+        $this->assertEquals('MTA-STS policy published (unknown mode)', $mta_sts->get_status_message($result));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_check_domain_uses_shared_cache() {
         $first = new Hm_Testable_MTA_STS('example.com');
         $second = new Hm_Testable_MTA_STS('example.com');
@@ -180,5 +295,25 @@ class Hm_Testable_MTA_STS extends Hm_MTA_STS {
 
     protected function fetch_policy() {
         return $this->parse_policy("version: STSv1\nmode: enforce\nmx: mail.example.com\nmax_age: 86400\n");
+    }
+}
+
+class Hm_Testable_MTA_STS_TLS extends Hm_MTA_STS {
+    public function check_tls_rpt() {
+        if (empty($this->domain)) {
+            return array('enabled' => false, 'rua' => null, 'error' => 'No domain specified');
+        }
+        return array(
+            'enabled' => true,
+            'rua' => 'mailto:reports@example.com',
+            'error' => null,
+            'dns_record' => 'v=TLSRPTv1; rua=mailto:reports@example.com'
+        );
+    }
+}
+
+class Hm_Testable_MTA_STS_No_DNS extends Hm_MTA_STS {
+    protected function get_mta_sts_dns_record() {
+        return false;
     }
 }

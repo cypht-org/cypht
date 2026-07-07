@@ -47,7 +47,6 @@ function handleSieveCustomAction() {
                 subject: $row.find('td.subject a').attr('title') || '',
             });
         });
-        console.log("selected from custom action:", selected);
 
         // Update apply button label with selected count
         const count = selected.length;

@@ -75,6 +75,7 @@ class Hm_Mock_Memcached_No {
 class Hm_Mock_Memcached {
     protected $data = array();
     public static $set_failure = false;
+    public static $result_code = 16;
     const RES_NOTFOUND = 1;
     const OPT_BINARY_PROTOCOL = false;
     function addServer($server, $port) {
@@ -88,9 +89,14 @@ class Hm_Mock_Memcached {
         return true;
     }
     function get($key) {
+        if (self::$result_code === 3) {
+            return false;
+        }
         if (array_key_exists($key, $this->data)) {
+            self::$result_code = 0;
             return $this->data[$key];
         }
+        self::$result_code = 16;
         return false;
     }
     function delete($key) {
@@ -110,7 +116,7 @@ class Hm_Mock_Memcached {
         return true;
     }
     function getResultCode() {
-        return 16;
+        return self::$result_code;
     }
 }
 
@@ -168,7 +174,22 @@ class Hm_Mock_Config {
     }
     public function load() {
     }
-    public function reload() {
+    public function reload($data = [], $user = null) {
+        if (!empty($data)) {
+            $this->data = $data;
+        }
+    }
+    public function reset_factory() {
+        $this->data = array(
+            'version' => $this->data['version'] ?? '',
+            'feeds' => $this->data['feeds'] ?? array(),
+            'imap_servers' => $this->data['imap_servers'] ?? array(),
+            'smtp_servers' => $this->data['smtp_servers'] ?? array(),
+        );
+    }
+    public function del($name) {
+        unset($this->data[$name]);
+        return true;
     }
 }
 class Hm_Mock_Request {
@@ -259,7 +280,8 @@ class Hm_Functions {
         'Jtoy6+MWo8dB+btO0PulIqXNz6WEBnuWa0/KHrelM2O/6N+9sdANg2CNUYo2ZsOtOZ4jEF9G27qZM2ILlnXwa1HCRDYByzmvk4Teg+PA=='; }
     public static function session_destroy() { return true; }
     public static function error_log($str=true) { return $str; }
-    public static function c_init() { return true; }
+    public static $curl_fail = false;
+    public static function c_init() { return self::$curl_fail ? false : true; }
     public static function c_setopt() { return true; }
     public static function c_status() { return 200; }
     public static function c_exec() { return self::$exec_res; }

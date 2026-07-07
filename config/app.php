@@ -129,8 +129,8 @@ return [
 
     /*
     |
-    | Enable TLS/SSL connections. Leave blank or set to false to disable. Set to
-    | true to enable TLS connections. If you want to use IMAP STARTTLS, do NOT
+    | Enable TLS/SSL connections. Set to false to disable. Leave blank (or set to
+    | true) to enable TLS connections by default. If you want to use IMAP STARTTLS, do NOT
     | enable this. This is only for TLS enabled sockets (typically on port 993).
     |
     */
@@ -567,7 +567,7 @@ return [
     | formatted message, you will now have a link before the message body called "Allow
     | Images" that will reload the message part with external images visible.
     */
-    'allow_external_image_sources' => env('ALLOW_EXTERNAL_IMAGE_SOURCES', true),
+    'allow_external_image_sources' => env('ALLOW_EXTERNAL_IMAGE_SOURCES', false),
 
     /*
     | ------------------
