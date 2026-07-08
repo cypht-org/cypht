@@ -689,6 +689,9 @@ class Hm_Mailbox {
                 $from_params = '';
                 $recipients_params = '';
             }
+            if ($message instanceof Hm_MIME_Msg) {
+                return $this->connection->send_mime_message($from, $recipients, $message, $from_params, $recipients_params);
+            }
             return $this->connection->send_message($from, $recipients, $message, $from_params, $recipients_params);
         } else {
             return $this->connection->send_message($from, $recipients, $message, $delivery_receipt);
