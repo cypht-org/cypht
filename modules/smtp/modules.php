@@ -77,8 +77,7 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                             $new_attachment['size'] = $sub['size'];
                             $new_attachment['type'] = $sub['type'];
                             $file_path = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$new_attachment['name'];
-                            $content = Hm_Crypt::ciphertext($mailbox->get_message_content(hex2bin($path[2]), $this->request->get['uid'], $ind), Hm_Request_Key::generate());
-                            file_put_contents($file_path, $content);
+                            $mailbox->stream_message_part_to_file(hex2bin($path[2]), $this->request->get['uid'], $ind, $file_path, Hm_Request_Key::generate());
                             $new_attachment['tmp_name'] = $file_path;
                             $new_attachment['filename'] = $file_path;
                             $attached_files[$this->request->get['uid']][] = $new_attachment;
@@ -135,8 +134,6 @@ class Hm_Handler_load_smtp_is_imap_forward_as_attachment extends Hm_Handler_Modu
                 if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
                     return;
                 }
-                $content = $mailbox->get_message_content(hex2bin($path[2]), $this->request->get['uid']);
-
                 # Attachment Download
                 $attached_files = [];
                 $this->session->set('uploaded_files', array());
@@ -148,16 +145,15 @@ class Hm_Handler_load_smtp_is_imap_forward_as_attachment extends Hm_Handler_Modu
                 $basename = str_replace(',', '', $msg_header['Subject']);
                 $name = $basename. '.eml';
                 $file_path = $file_dir . $name;
+                $size = $mailbox->stream_message_part_to_file(hex2bin($path[2]), $this->request->get['uid'], 0, $file_path, Hm_Request_Key::generate());
                 $attached_files[$this->request->get['uid']][] = array(
                     'name' => $name,
                     'type' => 'message/rfc822',
-                    'size' => strlen($content),
+                    'size' => $size,
                     'tmp_name' => $file_path,
                     'filename' => $file_path,
                     'basename' => $basename
                 );
-                $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
-                file_put_contents($file_path, $content);
                 $this->session->set('uploaded_files', $attached_files);
                 $this->out('as_attr', true);
             }
@@ -199,8 +195,7 @@ class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
                             $new_attachment['size'] = $sub['size'];
                             $new_attachment['type'] = $sub['type'] . "/" . $sub['subtype'];
                             $file_path = $file_dir . $new_attachment['name'];
-                            $content = Hm_Crypt::ciphertext($mailbox->get_message_content(hex2bin($path[2]), $this->request->get['uid'], $ind), Hm_Request_Key::generate());
-                            file_put_contents($file_path, $content);
+                            $mailbox->stream_message_part_to_file(hex2bin($path[2]), $this->request->get['uid'], $ind, $file_path, Hm_Request_Key::generate());
                             $new_attachment['tmp_name'] = $file_path;
                             $new_attachment['filename'] = $file_path;
                             $attached_files[$this->request->get['uid']][] = $new_attachment;
