@@ -753,7 +753,6 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* add attachments */
         $mime->add_attachments($uploaded_files);
-        $res = $mime->process_attachments();
 
         /* get smtp recipients */
         $recipients = $mime->get_recipient_addresses();
@@ -764,7 +763,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* send the message */
-        $err_msg = $mailbox->send_message($from, $recipients, $mime->get_mime_msg(), $this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt']));
+        $err_msg = $mailbox->send_message($from, $recipients, $mime, $this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt']));
         if ($err_msg) {
             Hm_Msgs::add(sprintf("%s", $err_msg), 'danger');
             repopulate_compose_form($draft, $this);
@@ -775,7 +774,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', DEFAULT_SMTP_AUTO_BCC);
         if ($auto_bcc) {
             $mime->set_auto_bcc($from);
-            $bcc_err_msg = $mailbox->send_message($from, array($from), $mime->get_mime_msg());
+            $bcc_err_msg = $mailbox->send_message($from, array($from), $mime);
         }
 
         /* check for associated IMAP server to save a copy */
@@ -1994,8 +1993,24 @@ if (!hm_exists('createFileFromChunks')) {
                     fwrite($fp, file_get_contents($temp_dir.'/'.$fileName.'.part'.$i));
                 }
                 fclose($fp);
-                $hashed_content = Hm_Crypt::ciphertext(file_get_contents($temp_dir.'/../'.$fileName), Hm_Request_Key::generate());
-                file_put_contents($temp_dir.'/../'.$fileName, $hashed_content);
+
+                // re-encrypt the reassembled file in place, streaming it
+                // through fixed-size chunks so large uploads don't need to
+                // be fully buffered in memory
+                $plain_path = $temp_dir.'/../'.$fileName;
+                $encrypted_path = $plain_path.'.enc';
+                $writer = new Hm_Crypt_Stream_Writer($encrypted_path, Hm_Request_Key::generate());
+                $src = fopen($plain_path, 'rb');
+                while (! feof($src)) {
+                    $chunk = fread($src, 1048576);
+                    if ($chunk === false || $chunk === '') {
+                        break;
+                    }
+                    $writer->write($chunk);
+                }
+                fclose($src);
+                $writer->close();
+                rename($encrypted_path, $plain_path);
             } else {
                 return false;
             }
@@ -2128,7 +2143,6 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     }
 
     $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name, $profile['id'], $body_type_for_mime);
-    $res = $mime->process_attachments();
 
     if (! empty($atts['schedule']) && empty($mime->get_recipient_addresses())) {
         Hm_Msgs::add("ERRNo valid recipients found");
