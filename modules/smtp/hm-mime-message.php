@@ -20,6 +20,7 @@ class Hm_MIME_Msg {
     private $html = false;
     private $final_msg = '';
     private $body_msg = '';
+    private $body_prepared = false;
 
     /* build mime message data */
     function __construct($to, $subject, $body, $from, $html=false, $cc='', $bcc='', $in_reply_to_id='', $from_name='', $reply_to='', $delivery_receipt='', $schedule='', $profile_id = '') {
@@ -126,8 +127,9 @@ class Hm_MIME_Msg {
 
     /* output mime message */
     function get_mime_msg() {
-        if (!empty($this->body)) {
+        if (!empty($this->body) && !$this->body_prepared) {
             $this->prep_message_body();
+            $this->body_prepared = true;
         }
         $res = '';
         $headers = '';
@@ -161,8 +163,9 @@ class Hm_MIME_Msg {
      */
     function get_headers_and_body() {
         if (! $this->body_msg) {
-            if (!empty($this->body)) {
+            if (!empty($this->body) && !$this->body_prepared) {
                 $this->prep_message_body();
+                $this->body_prepared = true;
             }
             $res = '';
             if ($this->html) {
