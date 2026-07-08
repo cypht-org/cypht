@@ -65,7 +65,36 @@ class Hm_Handler_sieve_filters_enabled extends Hm_Handler_Module {
  */
 class Hm_Handler_load_custom_actions extends Hm_Handler_Module {
     public function process() {
-        $this->out('custom_actions', $this->user_config->get('custom_actions', []));
+        $imap_account = '';
+        if (!empty($this->request->post['imap_account'])) {
+            $imap_account = trim($this->request->post['imap_account']);
+        } elseif (!empty($this->request->get['imap_account'])) {
+            $imap_account = trim($this->request->get['imap_account']);
+        } elseif (!empty($this->get('mailbox_name'))) {
+            $imap_account = trim($this->get('mailbox_name'));
+        } elseif (!empty($this->request->get['list_path'])) {
+            $path = $this->request->get['list_path'];
+            if (preg_match('/^imap_(\w+)_(.+)$/', $path, $matches)) {
+                $imap_server_id = $matches[1];
+                $imap_servers = $this->user_config->get('imap_servers');
+                if (!empty($imap_servers[$imap_server_id]['name'])) {
+                    $imap_account = trim($imap_servers[$imap_server_id]['name']);
+                }
+            }
+        }
+
+        if ($imap_account === '') {
+            $this->out('custom_action_error', 'Missing account');
+            return;
+        }
+
+        $custom_actions = $this->user_config->get('custom_actions', []);
+        $account_actions = [];
+        if (!empty($custom_actions['by_account'][$imap_account])) {
+            $account_actions = $custom_actions['by_account'][$imap_account];
+        }
+
+        $this->out('custom_actions', $account_actions);
     }
 }
 
@@ -1794,20 +1823,34 @@ class Hm_Handler_save_custom_action extends Hm_Handler_Module {
             return;
         }
 
+        $imap_account = isset($this->request->post['imap_account']) ? trim($this->request->post['imap_account']) : '';
+        if ($imap_account === '') {
+            $this->out('custom_action_error', 'Missing account');
+            return;
+        }
+
         $custom_actions = $this->user_config->get('custom_actions', []);
+
+        if (!isset($custom_actions['by_account']) || !is_array($custom_actions['by_account'])) {
+            $custom_actions['by_account'] = [];
+        }
+
+        $account_actions = $custom_actions['by_account'][$imap_account] ?? [];
+
         $posted_id = isset($this->request->post['action_id']) ? trim($this->request->post['action_id']) : '';
-        if ($posted_id && array_key_exists($posted_id, $custom_actions)) {
+        if ($posted_id && array_key_exists($posted_id, $account_actions)) {
             $id = $posted_id;
             $message = 'Custom action updated';
         } else {
             $id = uniqid('ca_', true);
             $message = 'Custom action created';
         }
-        $custom_actions[$id] = [
+        $account_actions[$id] = [
             'id' => $id,
             'name' => $form['custom_action_name'],
             'actions' => $actions,
         ];
+        $custom_actions['by_account'][$imap_account] = $account_actions;
         $this->user_config->set('custom_actions', $custom_actions);
         $this->session->record_unsaved($message);
         $this->session->set('user_data', $this->user_config->dump());
