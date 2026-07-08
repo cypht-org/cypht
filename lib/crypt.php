@@ -325,20 +325,68 @@ class Hm_Crypt_Stream_Writer {
     private $chunk_index = 0;
     private $buffer = '';
     private $closed = false;
+    private $salt;
 
     /**
      * @param string $path destination file path
      * @param string $key encryption key
+     * @param string|null $salt reuse a previously generated salt (see
+     *                           get_salt()) instead of generating a new one -
+     *                           needed to resume writing the same encrypted
+     *                           stream from a later, separate process/request
+     * @param int $start_index chunk index to continue counting from, when
+     *                         resuming a stream started by an earlier writer
+     * @param bool $append open the destination file for appending instead of
+     *                     truncating it, and skip writing the salt header
+     *                     again - set this together with $salt/$start_index
+     *                     when resuming
      */
-    public function __construct($path, $key) {
-        $this->fp = fopen($path, 'wb');
+    public function __construct($path, $key, $salt = null, $start_index = 0, $append = false) {
+        $this->fp = fopen($path, $append ? 'ab' : 'wb');
         if (!$this->fp) {
             throw new Exception(sprintf('Unable to open %s for writing', $path));
         }
-        $salt = Hm_Crypt_Base::random(16);
-        $this->crypt_key = Hm_Crypt_Base::pbkdf2($key, $salt.'enc', 32, self::PBKDF2_ROUNDS, self::PBKDF2_ALGO);
-        $this->hmac_key = Hm_Crypt_Base::pbkdf2($key, $salt.'mac', 32, self::PBKDF2_ROUNDS, self::PBKDF2_ALGO);
-        fwrite($this->fp, $salt);
+        $this->salt = $salt !== null ? $salt : Hm_Crypt_Base::random(16);
+        $this->crypt_key = Hm_Crypt_Base::pbkdf2($key, $this->salt.'enc', 32, self::PBKDF2_ROUNDS, self::PBKDF2_ALGO);
+        $this->hmac_key = Hm_Crypt_Base::pbkdf2($key, $this->salt.'mac', 32, self::PBKDF2_ROUNDS, self::PBKDF2_ALGO);
+        $this->chunk_index = $start_index;
+        if (! $append) {
+            fwrite($this->fp, $this->salt);
+        }
+    }
+
+    /**
+     * The salt this writer generated (or was given), needed by a later
+     * writer to resume this same stream
+     * @return string
+     */
+    public function get_salt() {
+        return $this->salt;
+    }
+
+    /**
+     * The chunk index the next write will use, needed by a later writer to
+     * resume this same stream
+     * @return int
+     */
+    public function get_next_chunk_index() {
+        return $this->chunk_index;
+    }
+
+    /**
+     * Encrypt and write exactly one chunk immediately (no buffering), then
+     * release the file handle. For a writer used once per incoming piece of
+     * data across separate requests/processes (e.g. one HTTP request per
+     * upload chunk), where each caller must flush and hand off rather than
+     * hold the handle open.
+     * @param string $data plaintext chunk
+     * @param bool $final whether this is the last chunk of the stream
+     * @return void
+     */
+    public function write_chunk_now($data, $final) {
+        $this->write_chunk($data, $final);
+        fclose($this->fp);
+        $this->closed = true;
     }
 
     /**

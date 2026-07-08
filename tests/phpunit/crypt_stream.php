@@ -96,6 +96,35 @@ class Hm_Test_Crypt_Stream extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_resumable_writer_across_separate_instances() {
+        $data1 = random_bytes(1000);
+        $data2 = random_bytes(1500);
+        $data3 = random_bytes(37);
+
+        // simulate one HTTP request per chunk: each chunk gets its own
+        // Hm_Crypt_Stream_Writer instance, resuming from where the last
+        // one left off
+        $writer1 = new Hm_Crypt_Stream_Writer($this->path, 'testkey');
+        $salt = $writer1->get_salt();
+        $writer1->write_chunk_now($data1, false);
+        $next = $writer1->get_next_chunk_index();
+
+        $writer2 = new Hm_Crypt_Stream_Writer($this->path, 'testkey', $salt, $next, true);
+        $writer2->write_chunk_now($data2, false);
+        $next = $writer2->get_next_chunk_index();
+
+        $writer3 = new Hm_Crypt_Stream_Writer($this->path, 'testkey', $salt, $next, true);
+        $writer3->write_chunk_now($data3, true);
+
+        $reader = new Hm_Crypt_Stream_Reader($this->path, 'testkey');
+        $this->assertEquals($data1.$data2.$data3, $this->read_all($reader));
+        $reader->close();
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_wrong_key_fails() {
         $writer = new Hm_Crypt_Stream_Writer($this->path, 'testkey');
         $writer->write('secret data');
