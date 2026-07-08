@@ -83,6 +83,7 @@ function collectActionsFromModal(modal) {
  */
 function applyToSelected(modal, imapAccount, actions) {
     const selectedUids = [];
+    const resolvedImapAccount = (imapAccount || current_account || '').toString();
     $('.message_table input[type=checkbox]:checked').each(function () {
         // Use the full checkbox id (imap_{server_id}_{uid}_{hex_folder}) so the
         // server can extract server, UID and folder without extra lookups.
@@ -101,7 +102,7 @@ function applyToSelected(modal, imapAccount, actions) {
     Hm_Ajax.request(
         [
             { name: 'hm_ajax_hook', value: 'ajax_apply_custom_action' },
-            { name: 'imap_account', value: imapAccount },
+            { name: 'imap_account', value: resolvedImapAccount },
             { name: 'uids',         value: JSON.stringify(selectedUids) },
             { name: 'actions_json', value: JSON.stringify(actions_parsed) },
         ],
@@ -151,6 +152,7 @@ function handleApplyCustomAction() {
         Hm_Ajax.request(
             [
                 { name: 'hm_ajax_hook',      value: 'ajax_save_custom_action' },
+                { name: 'imap_account',      value: (currentImapAccount || current_account || '').toString() },
                 { name: 'custom_action_name', value: actionName },
                 { name: 'actions_json',       value: JSON.stringify(actions_parsed) },
                 { name: 'action_id',          value: currentActionId },
@@ -191,6 +193,7 @@ function handleApplyCustomAction() {
         Hm_Ajax.request(
             [
                 { name: 'hm_ajax_hook',       value: 'ajax_save_custom_action' },
+                { name: 'imap_account',       value: (currentImapAccount || current_account || '').toString() },
                 { name: 'custom_action_name',  value: actionName },
                 { name: 'actions_json',        value: JSON.stringify(actions_parsed) },
                 { name: 'action_id',           value: currentActionId },

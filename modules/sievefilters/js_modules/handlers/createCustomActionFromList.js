@@ -91,6 +91,7 @@ function createCustomActionFromList(custom_action_modal, options) {
     Hm_Ajax.request(
         [
             { name: 'hm_ajax_hook', value: 'ajax_save_custom_action' },
+            { name: 'imap_account', value: imapAccount },
             { name: 'custom_action_name', value: actionName },
             { name: 'actions_json', value: JSON.stringify(actions_parsed) },
         ],
