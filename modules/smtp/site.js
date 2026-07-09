@@ -287,6 +287,13 @@ var init_resumable_upload = function () {
         target:'?page=compose&hm_ajax_hook=ajax_upload_chunk&draft_smtp=' + $(".compose_server").val(),
         testTarget:'?page=compose&hm_ajax_hook=ajax_get_test_chunk&draft_smtp=' + $(".compose_server").val(),
         testMethod: 'POST',
+        // PHP's default session handler locks the session file for the
+        // duration of each request; several chunk-upload requests in
+        // flight at once queue up behind that lock (and behind each
+        // other) rather than actually running in parallel, which can be
+        // slow enough to make a request time out and look like a lost
+        // session. Uploading one chunk at a time avoids that contention.
+        simultaneousUploads: 1,
         headers: {
             'X-Requested-with': 'xmlhttprequest'
         }

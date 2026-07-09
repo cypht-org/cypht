@@ -303,10 +303,16 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
                 Hm_Msgs::add('Error saving (move_uploaded_file) chunk '.$this->request->get['resumableChunkNumber'].' for file '.$this->request->get['resumableFilename'], 'danger');
             } else {
                 // check if all the parts present, and create the final destination file
-                $result = createFileFromChunks($temp_dir, $this->request->get['resumableFilename'],
-                                $this->request->get['resumableChunkSize'],
-                                $this->request->get['resumableTotalSize'],
-                                $this->request->get['resumableTotalChunks']);
+                try {
+                    $result = createFileFromChunks($temp_dir, $this->request->get['resumableFilename'],
+                                    $this->request->get['resumableChunkSize'],
+                                    $this->request->get['resumableTotalSize'],
+                                    $this->request->get['resumableTotalChunks']);
+                }
+                catch (Exception $e) {
+                    Hm_Debug::add(sprintf('Error finalizing uploaded file %s: %s', $this->request->get['resumableFilename'], $e->getMessage()));
+                    Hm_Msgs::add('Error processing uploaded file '.$this->request->get['resumableFilename'], 'danger');
+                }
             }
         }
     }
@@ -819,10 +825,21 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             $specials = get_special_folders($this, $imap_server);
             delete_draft($form['draft_id'], $this->cache, $imap_server, $specials['draft']);
         }
-        
-        delete_uploaded_files($this->session, $form['draft_id']);
-        if ($form['draft_id'] > 0) {
-            delete_uploaded_files($this->session, 0);
+
+        /* Attachment files on disk are only cleaned up once nothing else
+         * needs to read them. When a sent-folder copy is being saved,
+         * Hm_Handler_imap_save_sent (modules/imap/handler_modules.php),
+         * which runs later, still needs to re-read attachment content via
+         * $mime->get_mime_msg() - it performs the cleanup itself in that
+         * case instead of here. */
+        if ($imap_server === false) {
+            delete_uploaded_files($this->session, $form['draft_id']);
+            if ($form['draft_id'] > 0) {
+                delete_uploaded_files($this->session, 0);
+            }
+        }
+        else {
+            $this->out('compose_draft_id', $form['draft_id'], false);
         }
     }
 }
@@ -1975,55 +1992,85 @@ if (!hm_exists('rrmdir')) {
  */
 if (!hm_exists('createFileFromChunks')) {
     function createFileFromChunks($temp_dir, $fileName, $chunkSize, $totalSize,$total_files) {
-        // count all the parts of this file
-        // $fileName = Hm_Crypt::ciphertext($fileName, Hm_Request_Key::generate());
-        $total_files_on_server_size = 0;
-        $temp_total = 0;
-        foreach(scandir($temp_dir) as $file) {
-            $temp_total = $total_files_on_server_size;
-            $tempfilesize = filesize($temp_dir.'/'.$file);
-            $total_files_on_server_size = $temp_total + $tempfilesize;
+        if (! is_dir($temp_dir)) {
+            // already finalized by a concurrent request for another chunk
+            // of the same upload (resumable.js uploads several chunks in
+            // parallel)
+            return true;
         }
-        // check that all the parts are present
-        // If the Size of all the chunks on the server is equal to the size of the file uploaded.
-        if ($total_files_on_server_size >= $totalSize) {
-        // create the final destination file
-            if (($fp = fopen($temp_dir.'/../'.$fileName, 'w')) !== false) {
-                for ($i=1; $i<=$total_files; $i++) {
-                    fwrite($fp, file_get_contents($temp_dir.'/'.$fileName.'.part'.$i));
-                }
-                fclose($fp);
 
-                // re-encrypt the reassembled file in place, streaming it
-                // through fixed-size chunks so large uploads don't need to
-                // be fully buffered in memory
-                $plain_path = $temp_dir.'/../'.$fileName;
-                $encrypted_path = $plain_path.'.enc';
-                $writer = new Hm_Crypt_Stream_Writer($encrypted_path, Hm_Request_Key::generate());
-                $src = fopen($plain_path, 'rb');
-                while (! feof($src)) {
-                    $chunk = fread($src, 1048576);
-                    if ($chunk === false || $chunk === '') {
-                        break;
+        // serialize finalization across those concurrent requests, so only
+        // one of them reassembles/encrypts the file - without this, two
+        // requests could both see "all chunks present" and race on writing/
+        // renaming the same files, at best wasting work and at worst
+        // hitting a mid-write file-not-found error
+        $lock_path = rtrim($temp_dir, '/\\').'.lock';
+        $lock_fp = @fopen($lock_path, 'c');
+        if (! $lock_fp || ! flock($lock_fp, LOCK_EX)) {
+            if ($lock_fp) {
+                fclose($lock_fp);
+            }
+            return true;
+        }
+
+        $result = true;
+        if (is_dir($temp_dir)) {
+            // count all the parts of this file
+            $total_files_on_server_size = 0;
+            foreach (scandir($temp_dir) as $file) {
+                if ($file === '.' || $file === '..') {
+                    continue;
+                }
+                $total_files_on_server_size += filesize($temp_dir.'/'.$file);
+            }
+            // check that all the parts are present
+            // If the Size of all the chunks on the server is equal to the size of the file uploaded.
+            if ($total_files_on_server_size >= $totalSize) {
+                // create the final destination file
+                if (($fp = fopen($temp_dir.'/../'.$fileName, 'w')) !== false) {
+                    for ($i=1; $i<=$total_files; $i++) {
+                        fwrite($fp, file_get_contents($temp_dir.'/'.$fileName.'.part'.$i));
                     }
-                    $writer->write($chunk);
-                }
-                fclose($src);
-                $writer->close();
-                rename($encrypted_path, $plain_path);
-            } else {
-                return false;
-            }
+                    fclose($fp);
 
-            // rename the temporary directory (to avoid access from other
-            // concurrent chunks uploads) and than delete it
-            if (rename($temp_dir, $temp_dir.'_UNUSED')) {
-                rrmdir($temp_dir.'_UNUSED');
-            } else {
-                rrmdir($temp_dir);
+                    // re-encrypt the reassembled file in place, streaming it
+                    // through fixed-size chunks so large uploads don't need to
+                    // be fully buffered in memory
+                    $plain_path = $temp_dir.'/../'.$fileName;
+                    $encrypted_path = $plain_path.'.enc';
+                    $writer = new Hm_Crypt_Stream_Writer($encrypted_path, Hm_Request_Key::generate());
+                    $src = fopen($plain_path, 'rb');
+                    while (! feof($src)) {
+                        $chunk = fread($src, 1048576);
+                        if ($chunk === false || $chunk === '') {
+                            break;
+                        }
+                        $writer->write($chunk);
+                    }
+                    fclose($src);
+                    $writer->close();
+                    rename($encrypted_path, $plain_path);
+                } else {
+                    $result = false;
+                }
+
+                if ($result) {
+                    // rename the temporary directory (to avoid access from other
+                    // concurrent chunks uploads) and than delete it
+                    if (rename($temp_dir, $temp_dir.'_UNUSED')) {
+                        rrmdir($temp_dir.'_UNUSED');
+                    } else {
+                        rrmdir($temp_dir);
+                    }
+                }
             }
         }
-        return true;
+
+        flock($lock_fp, LOCK_UN);
+        fclose($lock_fp);
+        @unlink($lock_path);
+
+        return $result;
     }
 }
 
