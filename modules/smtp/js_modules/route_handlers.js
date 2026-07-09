@@ -153,10 +153,6 @@ function applySmtpComposePageHandlers(routeParams) {
                         }
                     });
                 } else {
-                    // sending large attachments can take a while (the
-                    // browser does a real full-page form submit here, not
-                    // an AJAX call) - show visible feedback so it doesn't
-                    // look like the click did nothing
                     const sendBtn = document.querySelector('.smtp_send_placeholder');
                     if (sendBtn) {
                         sendBtn.disabled = true;

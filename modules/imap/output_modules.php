@@ -210,7 +210,12 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
             $showMsgArgs = $this->get('msg_show_args', '');
             $res .=  format_msg_part_section($this->get('msg_struct'), $this, $part, $args, $att_args);
             $res .= '</table>';
-            $res .= format_attached_image_section($this->get('msg_struct'), $this, $showMsgArgs);
+            $res = '<div class="msg_parts_toggle">'.
+                '<button type="button" class="btn btn-link p-0" data-bs-toggle="collapse" data-bs-target="#msg_parts_details" aria-expanded="false" aria-controls="msg_parts_details">'.
+                    '<i class="bi bi-chevron-down"></i> '.$this->trans('View technical details').
+                '</button></div>'.
+                '<div class="collapse" id="msg_parts_details">'.$res.'</div>';
+            $res = format_attached_files_section($this->get('msg_struct'), $this, $args, $showMsgArgs).$res;
             $this->out('msg_parts', $res);
         }
     }

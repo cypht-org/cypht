@@ -826,12 +826,6 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             delete_draft($form['draft_id'], $this->cache, $imap_server, $specials['draft']);
         }
 
-        /* Attachment files on disk are only cleaned up once nothing else
-         * needs to read them. When a sent-folder copy is being saved,
-         * Hm_Handler_imap_save_sent (modules/imap/handler_modules.php),
-         * which runs later, still needs to re-read attachment content via
-         * $mime->get_mime_msg() - it performs the cleanup itself in that
-         * case instead of here. */
         if ($imap_server === false) {
             delete_uploaded_files($this->session, $form['draft_id']);
             if ($form['draft_id'] > 0) {
@@ -1993,17 +1987,9 @@ if (!hm_exists('rrmdir')) {
 if (!hm_exists('createFileFromChunks')) {
     function createFileFromChunks($temp_dir, $fileName, $chunkSize, $totalSize,$total_files) {
         if (! is_dir($temp_dir)) {
-            // already finalized by a concurrent request for another chunk
-            // of the same upload (resumable.js uploads several chunks in
-            // parallel)
             return true;
         }
 
-        // serialize finalization across those concurrent requests, so only
-        // one of them reassembles/encrypts the file - without this, two
-        // requests could both see "all chunks present" and race on writing/
-        // renaming the same files, at best wasting work and at worst
-        // hitting a mid-write file-not-found error
         $lock_path = rtrim($temp_dir, '/\\').'.lock';
         $lock_fp = @fopen($lock_path, 'c');
         if (! $lock_fp || ! flock($lock_fp, LOCK_EX)) {
@@ -2033,9 +2019,6 @@ if (!hm_exists('createFileFromChunks')) {
                     }
                     fclose($fp);
 
-                    // re-encrypt the reassembled file in place, streaming it
-                    // through fixed-size chunks so large uploads don't need to
-                    // be fully buffered in memory
                     $plain_path = $temp_dir.'/../'.$fileName;
                     $encrypted_path = $plain_path.'.enc';
                     $writer = new Hm_Crypt_Stream_Writer($encrypted_path, Hm_Request_Key::generate());

@@ -359,9 +359,6 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
             }
         }
 
-        /* attachment files on disk are kept around until this point so
-         * $mime->get_mime_msg() above can still re-read their content for
-         * the sent-folder copy; safe to clean them up now */
         $draft_id = $this->get('compose_draft_id', 0);
         delete_uploaded_files($this->session, $draft_id);
         if ($draft_id > 0) {

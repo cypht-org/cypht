@@ -739,8 +739,6 @@ class Hm_SMTP {
             while ($chunk !== false) {
                 if ($part['base64']) {
                     $buffer .= $chunk;
-                    /* flush in multiples of 57 raw bytes, so output lines
-                     * land on clean 76-char base64 boundaries */
                     $usable = strlen($buffer) - (strlen($buffer) % 57);
                     if ($usable > 0) {
                         $this->write_raw(chunk_split(base64_encode(substr($buffer, 0, $usable))));
@@ -757,8 +755,6 @@ class Hm_SMTP {
             }
         }
         catch (Exception $e) {
-            /* tampered/truncated mid-stream: nothing more can safely be
-             * sent for this attachment */
             $reader->close();
             return true;
         }
