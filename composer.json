@@ -82,7 +82,6 @@
     },
     "scripts": {
         "post-update-cmd": "composer suggest",
-        "post-package-install": "composer suggest",
         "post-install-cmd": "composer suggest"
     }
 }
