@@ -491,8 +491,8 @@ class Hm_Mailbox {
                     if ($this->connection->append_start($folder, mb_strlen($msg))) {
                         $this->connection->append_feed($msg."\r\n");
                         if ($this->connection->append_end()) {
-                            if ($this->connection->message_action('DELETE', array($uid))['status']) {
-                                $this->connection->message_action('EXPUNGE', array($uid));
+                            if ($this->connection->message_action('DELETE', array($msg_id))['status']) {
+                                $this->connection->message_action('EXPUNGE', array($msg_id));
                                 return true;
                             }
                         }
