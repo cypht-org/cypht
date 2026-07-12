@@ -93,6 +93,11 @@ jobs:
       - name: "Script: test.sh"
         run: bash tests/phpunit/run.sh
 
+      - name: "Real mail server integration tests"
+        env:
+          CYPHT_REAL_MAIL_SERVER: 'true'
+        run: vendor/bin/phpunit --configuration tests/phpunit/phpunit.xml --testsuite integration_mail_server
+
 
   Test-selenium:
     name: SELENIUM (PHP-${{ matrix.php-versions }} && DB-${{ matrix.database }})
