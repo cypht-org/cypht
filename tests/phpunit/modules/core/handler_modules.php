@@ -485,7 +485,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
         $test->prep();
         $test->ses_obj->auth_state = true;
         $test->run_only();
-        $this->assertEquals(array('Saved user data on logout, Session destroyed on logout'), Hm_Msgs::get());
+        $this->assertEquals(array('Saved user data on logout', 'Session destroyed on logout'), Hm_Msgs::get());
         Hm_Msgs::flush();
 
         $test->post = array('save_and_logout' => true);

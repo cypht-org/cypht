@@ -166,7 +166,7 @@ class Hm_Test_Core_Functions extends TestCase {
         $res2 = Hm_Output_Modules::dump();
         $len2 = count($res2['foo']);
         $this->assertEquals(13, $len);
-        $this->assertEquals(20, $len2);
+        $this->assertEquals(21, $len2);
     }
     /**
      * @preserveGlobalState disabled

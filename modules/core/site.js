@@ -1606,7 +1606,8 @@ var Hm_Utils = {
     },
 
     confirm_logout: function() {
-        if ((! $('#unsaved_changes').length || $('#unsaved_changes').val() == 0) && !$('.save_reminder').length) {
+        if ((typeof hm_auto_save_ready === 'function' && hm_auto_save_ready()) ||
+            ((! $('#unsaved_changes').length || $('#unsaved_changes').val() == 0) && !$('.save_reminder').length)) {
             document.getElementById('logout_without_saving').click();
         }
         else {

@@ -761,6 +761,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         if ($this->session->is_active()) {
             if ($success) {
                 $this->user_config->load(rtrim($form['username']), $form['password']);
+                maybe_store_settings_save_key_from_login($this->session, $this->user_config, $this->config, $form['password']);
             }
             else {
                 $user_data = $this->session->get('user_data', array());
@@ -782,6 +783,8 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         }
         $this->out('mailto_handler', $this->user_config->get('mailto_handler_setting', false));
         $this->out('warn_for_unsaved_changes', $this->user_config->get('warn_for_unsaved_changes_setting', false));
+        $this->out('auto_save_setting', $this->user_config->get('auto_save_setting', DEFAULT_AUTO_SAVE));
+        $this->out('auto_save_key_ready', settings_save_key_ready($this->session, $this->user_config, $this->config));
         $this->out('no_password_save', $this->user_config->get('no_password_save_setting', DEFAULT_NO_PASSWORD_SAVE));
         $this->out('user_settings', $this->user_config->dump(), false);
         if (!mb_strstr($this->request->server['REQUEST_URI'], 'page=') && $this->page == 'home') {
@@ -806,6 +809,9 @@ class Hm_Handler_save_user_data extends Hm_Handler_Module {
         if (!empty($user_data)) {
             $this->session->set('user_data', $user_data);
         }
+        if (try_auto_save_settings($this)) {
+            $this->out('auto_save_key_ready', settings_save_key_ready($this->session, $this->user_config, $this->config));
+        }
     }
 }
 
@@ -827,6 +833,8 @@ class Hm_Handler_logout extends Hm_Handler_Module {
         }
 
         if (array_key_exists('logout', $this->request->post) && !$this->session->loaded) {
+            try_auto_save_settings($this);
+            clear_settings_save_key($this->session);
             $this->session->destroy($this->request);
             Hm_Msgs::add('Session destroyed on logout', 'info');
             $this->out('redirect_url', '?home');
@@ -834,28 +842,8 @@ class Hm_Handler_logout extends Hm_Handler_Module {
         elseif (array_key_exists('save_and_logout', $this->request->post)) {
             list($success, $form) = $this->process_form(array('password'));
             if ($success) {
-                $user = $this->session->get('username', false);
-                $path = $this->config->get('user_settings_dir', false);
-                $pages = $this->session->get('saved_pages', array());
-                if (!empty($pages)) {
-                    $this->user_config->set('saved_pages', $pages);
-                }
-                if ($this->session->auth($user, $form['password'])) {
-                    $pass = $form['password'];
-                }
-                else {
-                    Hm_Msgs::add('Incorrect password, could not save settings to the server', 'warning');
-                    $pass = false;
-                }
-                if ($user && $path && $pass) {
-                    try {
-                        $this->user_config->save($user, $pass);
-                        $this->session->destroy($this->request);
-                        Hm_Msgs::add('Saved user data on logout, Session destroyed on logout', 'info');
-                        $this->out('redirect_url', '?home');
-                    } catch (Exception $e) {
-                        Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
-                    }
+                if (persist_user_settings($this, $form['password'], true, false)) {
+                    $this->out('redirect_url', '?home');
                 }
             }
             else {
@@ -1077,6 +1065,89 @@ class Hm_Handler_process_warn_for_unsaved_changes_setting extends Hm_Handler_Mod
             return $val;
         }
         process_site_setting('warn_for_unsaved_changes', $this, 'warn_for_unsaved_changes_callback', false, true);
+    }
+}
+
+/**
+ * AJAX handler to enable or disable auto-save
+ * @subpackage core/handler
+ */
+class Hm_Handler_ajax_auto_save_settings extends Hm_Handler_Module {
+    public function process() {
+        if (!auto_save_is_available($this->config)) {
+            return;
+        }
+        $this->out('no_redirect', true);
+        $enabled = filter_var($this->request->post['auto_save'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        if ($enabled) {
+            list($success, $form) = $this->process_form(array('password'));
+            if (!$success) {
+                Hm_Msgs::add('Password is required to enable auto-save', 'warning');
+                $this->out('auto_save_error', true);
+                return;
+            }
+            $user = $this->session->get('username', false);
+            if (!$this->session->auth($user, $form['password'])) {
+                Hm_Msgs::add('Incorrect password, could not enable auto-save', 'warning');
+                $this->out('auto_save_error', true);
+                return;
+            }
+            set_settings_save_key($this->session, $form['password']);
+            $this->user_config->set('auto_save_setting', true);
+            if (!persist_user_settings($this, $form['password'], false, false)) {
+                clear_settings_save_key($this->session);
+                $this->user_config->set('auto_save_setting', false);
+                $this->out('auto_save_error', true);
+                return;
+            }
+            Hm_Msgs::add('Auto-save enabled', 'info');
+            $this->out('auto_save_enabled', true);
+        }
+        else {
+            $password = get_settings_save_key($this->session);
+            $this->user_config->set('auto_save_setting', false);
+            if ($password && persist_user_settings($this, $password, false, true)) {
+                clear_settings_save_key($this->session);
+            }
+            else {
+                clear_settings_save_key($this->session);
+                $this->session->record_unsaved('Auto-save disabled');
+            }
+            Hm_Msgs::add('Auto-save disabled', 'info');
+            $this->out('auto_save_enabled', false);
+        }
+        $this->out('auto_save_key_ready', settings_save_key_ready($this->session, $this->user_config, $this->config));
+    }
+}
+
+/**
+ * AJAX handler to resume auto-save with a password when the session key is missing
+ * @subpackage core/handler
+ */
+class Hm_Handler_ajax_resume_auto_save extends Hm_Handler_Module {
+    public function process() {
+        if (!auto_save_is_available($this->config)) {
+            return;
+        }
+        if (!$this->user_config->get('auto_save_setting', DEFAULT_AUTO_SAVE)) {
+            return;
+        }
+        $this->out('no_redirect', true);
+        list($success, $form) = $this->process_form(array('password'));
+        if (!$success) {
+            Hm_Msgs::add('Password is required to resume auto-save', 'warning');
+            $this->out('auto_save_error', true);
+            return;
+        }
+        if (!$this->session->auth($this->session->get('username', false), $form['password'])) {
+            Hm_Msgs::add('Incorrect password, could not resume auto-save', 'warning');
+            $this->out('auto_save_error', true);
+            return;
+        }
+        set_settings_save_key($this->session, $form['password']);
+        try_auto_save_settings($this, false);
+        $this->out('auto_save_key_ready', settings_save_key_ready($this->session, $this->user_config, $this->config));
+        Hm_Msgs::add('Auto-save resumed', 'info');
     }
 }
 

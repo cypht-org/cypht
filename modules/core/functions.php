@@ -477,6 +477,161 @@ function max_source_setting_callback($val) {
 }}
 
 /**
+ * Session key used to store the account password for auto-save
+ */
+if (!defined('SETTINGS_SAVE_KEY')) {
+    define('SETTINGS_SAVE_KEY', 'settings_save_key');
+}
+
+/**
+ * @return bool true when encrypted settings require explicit save credentials
+ */
+if (!hm_exists('auto_save_is_available')) {
+function auto_save_is_available($config) {
+    return crypt_state($config);
+}}
+
+/**
+ * @return void
+ */
+if (!hm_exists('set_settings_save_key')) {
+function set_settings_save_key($session, $password) {
+    $session->set(SETTINGS_SAVE_KEY, $password);
+}}
+
+/**
+ * @return string|false
+ */
+if (!hm_exists('get_settings_save_key')) {
+function get_settings_save_key($session) {
+    return $session->get(SETTINGS_SAVE_KEY, false);
+}}
+
+/**
+ * @return void
+ */
+if (!hm_exists('clear_settings_save_key')) {
+function clear_settings_save_key($session) {
+    $session->del(SETTINGS_SAVE_KEY);
+}}
+
+/**
+ * @return bool
+ */
+if (!hm_exists('settings_save_key_ready')) {
+function settings_save_key_ready($session, $user_config, $config) {
+    if (!auto_save_is_available($config)) {
+        return false;
+    }
+    if (!$user_config->get('auto_save_setting', DEFAULT_AUTO_SAVE)) {
+        return false;
+    }
+    return (bool) get_settings_save_key($session);
+}}
+
+/**
+ * Store login password for auto-save when the user preference is enabled
+ * @return void
+ */
+if (!hm_exists('maybe_store_settings_save_key_from_login')) {
+function maybe_store_settings_save_key_from_login($session, $user_config, $config, $password) {
+    if (!$password || !auto_save_is_available($config)) {
+        return;
+    }
+    if (!$user_config->get('auto_save_setting', DEFAULT_AUTO_SAVE)) {
+        return;
+    }
+    set_settings_save_key($session, $password);
+}}
+
+/**
+ * Merge session-only combined page state before persisting settings
+ * @return void
+ */
+if (!hm_exists('merge_saved_pages_before_persist')) {
+function merge_saved_pages_before_persist($handler) {
+    $pages = $handler->session->get('saved_pages', array());
+    if (!empty($pages)) {
+        $handler->user_config->set('saved_pages', $pages);
+    }
+}}
+
+/**
+ * Save user settings from the session to permanent storage
+ * @subpackage core/functions
+ * @param object $handler hm handler module object
+ * @param string $password account password used for auth and encryption
+ * @param bool $logout true if this is a save + logout request
+ * @param bool $quiet true to suppress success messages (auto-save)
+ * @return bool true if settings were saved
+ */
+if (!hm_exists('persist_user_settings')) {
+function persist_user_settings($handler, $password, $logout = false, $quiet = false) {
+    $user = $handler->session->get('username', false);
+    $path = $handler->config->get('user_settings_dir', false);
+
+    if (!$handler->session->auth($user, $password)) {
+        if (!$quiet) {
+            Hm_Msgs::add('Incorrect password, could not save settings to the server', 'warning');
+        }
+        return false;
+    }
+    if (!$user || !$path) {
+        return false;
+    }
+    try {
+        merge_saved_pages_before_persist($handler);
+        $handler->user_config->save($user, $password);
+        $handler->session->set('changed_settings', array());
+        if ($logout) {
+            clear_settings_save_key($handler->session);
+            $handler->session->destroy($handler->request);
+            Hm_Msgs::add('Saved user data on logout', 'info');
+            Hm_Msgs::add('Session destroyed on logout', 'info');
+        }
+        elseif (!$quiet) {
+            Hm_Msgs::add('Settings saved', 'info');
+        }
+        return true;
+    } catch (Exception $e) {
+        if (!$quiet) {
+            Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
+        }
+        return false;
+    }
+}}
+
+/**
+ * Attempt to permanently save staged settings using the session save key
+ * @return bool
+ */
+if (!hm_exists('try_auto_save_settings')) {
+function try_auto_save_settings($handler, $quiet = true) {
+    if (!auto_save_is_available($handler->config)) {
+        return false;
+    }
+    $changed = $handler->session->get('changed_settings', array());
+    if (empty($changed)) {
+        return false;
+    }
+    if (!$handler->user_config->get('auto_save_setting', DEFAULT_AUTO_SAVE)) {
+        return false;
+    }
+    $password = get_settings_save_key($handler->session);
+    if (!$password) {
+        return false;
+    }
+    if (persist_user_settings($handler, $password, false, $quiet)) {
+        return true;
+    }
+    clear_settings_save_key($handler->session);
+    if (!$quiet) {
+        Hm_Msgs::add('Auto-save paused. Re-enter your password to resume.', 'warning');
+    }
+    return false;
+}}
+
+/**
  * Save user settings from the session to permanent storage
  * @subpackage core/functions
  * @param object $handler hm handler module object
@@ -486,33 +641,7 @@ function max_source_setting_callback($val) {
  */
 if (!hm_exists('save_user_settings')) {
 function save_user_settings($handler, $form, $logout) {
-    $user = $handler->session->get('username', false);
-    $path = $handler->config->get('user_settings_dir', false);
-
-    if ($handler->session->auth($user, $form['password'])) {
-        $pass = $form['password'];
-    }
-    else {
-        Hm_Msgs::add('Incorrect password, could not save settings to the server', 'warning');
-        $pass = false;
-    }
-    if ($user && $path && $pass) {
-        try {
-            $handler->user_config->save($user, $pass);
-            $handler->session->set('changed_settings', array());
-            if ($logout) {
-                $handler->session->destroy($handler->request);
-                Hm_Msgs::add('Saved user data on logout', 'info');
-                Hm_Msgs::add('Session destroyed on logout', 'info');
-            }
-            else {
-                Hm_Msgs::add('Settings saved', 'info');
-            }
-        } catch (Exception $e) {
-            Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
-        }
-    }
-
+    persist_user_settings($handler, $form['password'], $logout, false);
 }}
 
 /**
@@ -563,6 +692,7 @@ function setup_base_page($name, $source=false, $use_layout=true) {
     add_output($name, 'js_search_data', true, $source);
     add_output($name, 'header_end', false, $source);
     add_output($name, 'msgs', false, $source);
+    add_output($name, 'auto_save_resume_notice', true, $source, 'msgs', 'after');
     add_output($name, 'content_start', false, $source);
     if($use_layout) {
         add_output($name, 'login_start', false, $source);
