@@ -133,46 +133,19 @@ function handleApplyCustomAction() {
     const edit_modal = new Hm_Modal({ size: 'xl', modalId: 'editCustomActionModal' });
     edit_modal.setTitle(hm_trans('Edit Custom Action'));
 
-    // Cancel
-    edit_modal.addFooterBtn(hm_trans('Cancel'), 'btn-secondary', function () {
-        edit_modal.hide();
-    });
-
     // Save (disabled until something is edited)
     edit_modal.addFooterBtn(hm_trans('Save'), 'btn-secondary ms-auto edit_ca_save_btn', function () {
         if (!isDirty) { return; }
-
-        const actionName = edit_modal.modal.find('.custom_action_name_input').val().trim();
-        if (!actionName) {
-            showErrorMsg(hm_trans('Action name is required'), '.sieve-filter-name-group', 6000);
-            return;
-        }
-        const actions_parsed = collectActionsFromModal(edit_modal);
-        if (!actions_parsed.length) {
-            showErrorMsg(hm_trans('You must provide at least one action'), '.sieve-filter-actions-block', 6000);
-            return;
-        }
-
-        Hm_Ajax.request(
-            [
-                { name: 'hm_ajax_hook',      value: 'ajax_save_custom_action' },
-                { name: 'imap_account',      value: (currentImapAccount || current_account || '').toString() },
-                { name: 'custom_action_name', value: actionName },
-                { name: 'actions_json',       value: JSON.stringify(actions_parsed) },
-                { name: 'action_id',          value: currentActionId },
-            ],
-            function (res) {
-                if (res.custom_action_error) {
-                    Hm_Notices.show(res.custom_action_error, 'danger');
-                    return;
-                }
-                if (res.custom_action_saved) {
-                    isDirty = false;
-                    edit_modal.modalFooter.find('.edit_ca_save_btn').prop('disabled', true);
-                    Hm_Notices.show(hm_trans('Custom action "' + actionName + '" updated'), 'info');
-                }
+        saveCustomAction(edit_modal, {
+            imapAccount: (currentImapAccount || current_account ).toString(),
+            actionId: currentActionId,
+            applyAfterSave: false,
+            saveCallback: function (res) {
+                isDirty = false;
+                edit_modal.modalFooter.find('.edit_ca_save_btn').prop('disabled', true);
+                Hm_Notices.show(hm_trans('Custom action updated'), 'info');
             }
-        );
+        });
     });
 
     // Apply to Selected (always visible)
@@ -183,35 +156,15 @@ function handleApplyCustomAction() {
     // Update & Apply (hidden until dirty)
     edit_modal.addFooterBtn(hm_trans('Update & Apply'), 'btn-success edit_ca_update_apply_btn', function () {
         if (!isDirty) { return; }
-        const actionName = edit_modal.modal.find('.custom_action_name_input').val().trim();
-        if (!actionName) {
-            showErrorMsg(hm_trans('Action name is required'), '.sieve-filter-name-group', 6000);
-            return;
-        }
-        const actions_parsed = collectActionsFromModal(edit_modal);
-        if (!actions_parsed.length) {
-            showErrorMsg(hm_trans('You must provide at least one action'), '.sieve-filter-actions-block', 6000);
-            return;
-        }
-        // Save first, then apply
-        Hm_Ajax.request(
-            [
-                { name: 'hm_ajax_hook',       value: 'ajax_save_custom_action' },
-                { name: 'imap_account',       value: (currentImapAccount || current_account || '').toString() },
-                { name: 'custom_action_name',  value: actionName },
-                { name: 'actions_json',        value: JSON.stringify(actions_parsed) },
-                { name: 'action_id',           value: currentActionId },
-            ],
-            function (res) {
-                if (res.custom_action_error) {
-                    Hm_Notices.show(res.custom_action_error, 'danger');
-                    return;
-                }
-                if (res.custom_action_saved) {
-                    applyToSelected(edit_modal, currentImapAccount, actions_parsed);
-                }
+        saveCustomAction(edit_modal, {
+            imapAccount: (currentImapAccount || current_account || '').toString(),
+            actionId: currentActionId,
+            applyAfterSave: true,
+            applyCallback: function (applyRes) {
+                isDirty = false;
+                window.location = window.location;
             }
-        );
+        });
     });
 
     // ---- Click handler on saved action buttons ----
@@ -222,9 +175,10 @@ function handleApplyCustomAction() {
         const actionName  = $(this).attr('data-action-name') || '';
         currentImapAccount = $(this).attr('data-imap-account') || '';
         currentActionId    = $(this).attr('data-action-id')   || '';
+        localStorage.setItem('last_custom_action', JSON.stringify({actions: actions}));
 
         // Set global account so get_account_actions() works for mailbox AJAX
-        current_account         = currentImapAccount;
+        current_account = currentImapAccount;
         current_account_element = null;
 
         // Load fresh template into modal
@@ -237,30 +191,46 @@ function handleApplyCustomAction() {
         // Pre-fill action rows (scoped; avoids polluting any other open modal)
         const $table = edit_modal.modal.find('.filter_actions_modal_table');
         $table.empty();
-        populateActionRows($table, actions);
 
-        // Update Apply button label/state
-        const count = $('.message_table input[type=checkbox]:checked').length;
-        edit_modal.modalFooter.find('.edit_ca_apply_btn')
-            .text(count > 0
-                ? hm_trans('Apply to') + ' ' + count + ' ' + hm_trans('Selected')
-                : hm_trans('Apply to Selected'))
-            .prop('disabled', count === 0);
+        Hm_Ajax.request(
+            [   {'name': 'hm_ajax_hook', 'value': 'ajax_load_custom_action_by_id'},
+                {'name': 'imap_account', 'value': currentImapAccount},
+                {'name': 'custom_action_id', 'value': currentActionId}
+            ],
+            function(res) {
+                if (res.custom_action_error) {
+                    Hm_Notices.show(res.custom_action_error, 'danger');
+                    return;
+                }
 
-        // Reset dirty state — Save is disabled, Update & Apply is hidden
-        isDirty = false;
-        edit_modal.modalFooter.find('.edit_ca_save_btn').prop('disabled', true);
-        edit_modal.modalFooter.find('.edit_ca_update_apply_btn').addClass('d-none');
+                const action = res.custom_action;
+                localStorage.setItem('actions', JSON.stringify(action));
 
-        edit_modal.open();
+                if (action.actions && typeof action.actions === 'object') {
+                    populateActionRows($table, Object.values(action.actions));
+                }
 
-        // Dirty tracking: first change enables Save and reveals Update & Apply
-        edit_modal.modal.off('.dirty').on('change.dirty input.dirty', 'select, input:not([type=hidden]), textarea', function () {
-            if (!isDirty) {
-                isDirty = true;
-                edit_modal.modalFooter.find('.edit_ca_save_btn').prop('disabled', false);
-                edit_modal.modalFooter.find('.edit_ca_update_apply_btn').removeClass('d-none');
+                const count = $('.message_table input[type=checkbox]:checked').length;
+                edit_modal.modalFooter.find('.edit_ca_apply_btn')
+                    .text(count > 0
+                        ? hm_trans('Apply to') + ' ' + count + ' ' + hm_trans('Selected')
+                        : hm_trans('Apply to Selected')).prop('disabled', count === 0);
+
+                // Reset dirty state — Save is disabled, Update & Apply is hidden
+                isDirty = false;
+                edit_modal.modalFooter.find('.edit_ca_save_btn').prop('disabled', true);
+                edit_modal.modalFooter.find('.edit_ca_update_apply_btn').addClass('d-none');
+
+                edit_modal.open();
+                // Dirty tracking: first change enables Save and reveals Update & Apply
+                edit_modal.modal.off('.dirty').on('change.dirty input.dirty', 'select, input:not([type=hidden]), textarea', function () {
+                if (!isDirty) {
+                    isDirty = true;
+                    edit_modal.modalFooter.find('.edit_ca_save_btn').prop('disabled', false);
+                    edit_modal.modalFooter.find('.edit_ca_update_apply_btn').removeClass('d-none');
+                }
+            });
             }
-        });
+        );
     });
 }
