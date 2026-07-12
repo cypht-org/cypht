@@ -908,7 +908,7 @@ const registerSieveModalEvents = () => {
  * These require modal instances or operate on elements that only exist
  * on the sieve filters settings page.
  */
-const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
+const registerSievePageEvents = (edit_filter_modal, edit_script_modal, custom_action_modal) => {
     $(document).off('click', '.sievefilters_accounts_title').on('click', '.sievefilters_accounts_title', function() {
         $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
     });
@@ -1085,6 +1085,107 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
     });
 
     /**
+     * Create custom action
+     */
+    $(document).off('click', '.create_custom_action').on('click', '.create_custom_action', function() {
+
+        const account = $(this).attr('account');
+
+        // Clear previous buttons from modal footer
+        custom_action_modal.customButtons = [];
+        custom_action_modal.modalFooter.children().not('.btn-secondary').remove();
+        custom_action_modal.setTitle('Create Custom Action');
+
+
+        $('.custom_action_name_input').val('');
+        const $table = custom_action_modal.modal.find('.filter_actions_modal_table');
+        $table.empty();
+
+        custom_action_modal.addFooterBtn(
+            hm_trans('Save Custom Action'),
+            'btn-primary ms-auto',
+            function () {
+                createCustomActionFromList(custom_action_modal, { applyAfterSave: false, imapAccount: account });
+            },
+        );
+        
+        custom_action_modal.open();
+    });
+
+    /**
+     * Edit custom action
+     */
+    $(document).off('click', '.edit_custom_action').on('click', '.edit_custom_action', function(e) {
+        e.preventDefault();
+        const account = $(this).attr('data-imap-account');
+        const actionId = $(this).attr('data-action-id');
+        const actionName = $(this).attr('data-action-name');
+
+        current_account = account;
+        $('.custom_action_name_input').val(actionName);
+        const $table = custom_action_modal.modal.find('.filter_actions_modal_table');
+        $table.empty();
+
+        Hm_Ajax.request(
+            [   {'name': 'hm_ajax_hook', 'value': 'ajax_load_custom_action_by_id'},
+                {'name': 'imap_account', 'value': account},
+                {'name': 'custom_action_id', 'value': actionId}
+            ],
+            function(res) {
+                if (res.custom_action_error) {
+                    Hm_Notices.show(res.custom_action_error, 'danger');
+                    return;
+                }
+
+                const action = res.custom_action;
+                localStorage.setItem('actions', JSON.stringify(action));
+
+                if (action.actions && typeof action.actions === 'object') {
+                    populateActionRows($table, Object.values(action.actions));
+                }
+
+                // Clear previous buttons from modal footer
+                custom_action_modal.customButtons = [];
+                custom_action_modal.modalFooter.children().not('.btn-secondary').remove();
+                
+                custom_action_modal.setTitle('Edit Custom Action - ' + action.name);
+                custom_action_modal.addFooterBtn(
+                    hm_trans('Edit'),
+                    'btn-primary ms-auto',
+                    function () {
+                        createCustomActionFromList(custom_action_modal, { applyAfterSave: false, imapAccount: account, actionId: actionId });
+                    },
+                );
+                custom_action_modal.open();
+            }
+        );
+    });
+
+    /**
+     * Delete custom action
+     */
+    $(document).off('click', '.delete_custom_action').on('click', '.delete_custom_action', function(e) {
+        e.preventDefault();
+        if (!confirm('Do you want to delete this custom action?')) {
+            return;
+        }
+        let obj = $(this);
+        let actionId = $(this).attr('data-action-id');
+        let account = $(this).attr('data-imap-account');
+        
+        Hm_Ajax.request(
+            [   {'name': 'hm_ajax_hook', 'value': 'ajax_delete_custom_action'},
+                {'name': 'custom_action_id', 'value': actionId},
+                {'name': 'imap_account', 'value': account}],
+            function(res) {
+                if (res.custom_action_deleted == '1') {
+                    obj.closest('tr').remove();
+                }
+            }
+        );
+    });
+
+    /**
      * Actions Drag and Drop
      */
     const actionsTbody = document.querySelector(".filter_actions_modal_table");
@@ -1096,7 +1197,25 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
             ghostClass: "sortable-ghost",
         });
     }
-};
+};/**
+ * Register tab switching for Filters / Custom actions
+ */
+function registerSieveTabSwitching() {
+    $(document).off('click', '.sieve-tab-btn').on('click', '.sieve-tab-btn', function (e) {
+        e.preventDefault();
+        const tabName = $(this).data('tab');
+        const $container = $(this).closest('.filter_subblock');
+        
+        // Update tab button states
+        $container.find('.sieve-tab-btn').removeClass('active').attr('aria-selected', 'false');
+        $(this).addClass('active').attr('aria-selected', 'true');
+        
+        // Update content visibility
+        $container.find('.sieve-tab-content').addClass('d-none');
+        $container.find('.sieve-tab-content[data-tab-id="' + tabName + '"]').removeClass('d-none');
+    });
+}
+
 
 function blockListPageHandlers() {
     $(document).on('change', '.select_default_behaviour', function(e) {
@@ -1312,12 +1431,14 @@ function sieveFiltersPageHandler() {
         isFilterFromCustomActions: false,
     });
 
-    const edit_filter_modal = createEditFilterModal(
+    //-------------------------------------------------------------------- Filter modal for creating/editing filters
+    edit_filter_modal = createEditFilterModal(
         save_filter_inner,
         getCurrentAccount,
     );
 
-    var edit_script_modal = new Hm_Modal({
+    //-------------------------------------------------------------------- Script modal for creating/editing scripts
+    edit_script_modal = new Hm_Modal({
         size: 'xl',
         modalId: 'myEditScript'
     });
@@ -1331,10 +1452,23 @@ function sieveFiltersPageHandler() {
         save_script(current_account);
     });
 
+    //-------------------------------------------------------------------- Custom action modal for creating/editing custom actions 
+    custom_action_modal = new Hm_Modal({
+        size: 'xl',
+        modalId: 'myCustomActionModalFromSieve',
+    });
+
+    custom_action_modal.setTitle(hm_trans('Setup a new Custom Action'));
+    const templateEl = document.querySelector('#custom_action_template');
+    if (templateEl) {
+        custom_action_modal.setContent(templateEl.innerHTML);
+    }
+
     /**************************************************************************************
      * Initialize sieve button events
      **************************************************************************************/
-    registerSievePageEvents(edit_filter_modal, edit_script_modal);
+    registerSievePageEvents(edit_filter_modal, edit_script_modal, custom_action_modal);
+    registerSieveTabSwitching();
 
     const save_script = Hm_Filters.save_script;
     // const save_filter = Hm_Filters.save_filter;
@@ -1418,6 +1552,9 @@ function collectChips(container) {
 let current_mailbox_for_filter;
 let edit_filter_modal_for_automatic_actions;
 let edit_filter_template_content;
+let custom_action_modal;
+let edit_filter_modal;
+let edit_script_modal;
 
 function createFilterFromList(launcherModal) {
     const froms = collectChips('#filter-from-list');
