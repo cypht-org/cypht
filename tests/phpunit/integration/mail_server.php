@@ -54,6 +54,28 @@ class Hm_Test_Integration_Mail_Server extends TestCase {
     }
 
     /**
+     * Dump the raw protocol exchange for diagnostics. Hm_Mailbox::get_debug()
+     * only supports IMAP; for SMTP we reach into Hm_SMTP's private debug/command/
+     * response logs via reflection since it has no public accessor.
+     */
+    private function protocol_log($mailbox) {
+        if ($mailbox->is_imap()) {
+            return print_r($mailbox->get_debug(), true);
+        }
+        $connection = $mailbox->get_connection();
+        $ref = new ReflectionClass($connection);
+        $dump = [];
+        foreach (['debug', 'commands', 'responses'] as $prop) {
+            if ($ref->hasProperty($prop)) {
+                $p = $ref->getProperty($prop);
+                $p->setAccessible(true);
+                $dump[$prop] = $p->getValue($connection);
+            }
+        }
+        return print_r($dump, true);
+    }
+
+    /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
@@ -62,8 +84,8 @@ class Hm_Test_Integration_Mail_Server extends TestCase {
 
         $connected = $mailbox->connect();
 
-        $this->assertTrue($connected, 'Hm_Mailbox::connect() should return true for a successful IMAP login');
-        $this->assertTrue($mailbox->authed());
+        $this->assertTrue($connected, 'Hm_Mailbox::connect() should return true for a successful IMAP login. Protocol log: '.$this->protocol_log($mailbox));
+        $this->assertTrue($mailbox->authed(), 'Protocol log: '.$this->protocol_log($mailbox));
     }
 
     /**
@@ -76,8 +98,8 @@ class Hm_Test_Integration_Mail_Server extends TestCase {
 
         $folders = $mailbox->get_folders();
 
-        $this->assertIsArray($folders);
-        $this->assertTrue($mailbox->select_folder('INBOX'));
+        $this->assertIsArray($folders, 'Protocol log: '.$this->protocol_log($mailbox));
+        $this->assertTrue($mailbox->select_folder('INBOX'), 'Protocol log: '.$this->protocol_log($mailbox));
     }
 
     /**
@@ -89,7 +111,7 @@ class Hm_Test_Integration_Mail_Server extends TestCase {
 
         $mailbox->connect();
 
-        $this->assertTrue($mailbox->authed(), 'Hm_Mailbox::authed() should be true after a successful SMTP AUTH');
+        $this->assertTrue($mailbox->authed(), 'Hm_Mailbox::authed() should be true after a successful SMTP AUTH. Protocol log: '.$this->protocol_log($mailbox));
     }
 
     /**
@@ -101,7 +123,7 @@ class Hm_Test_Integration_Mail_Server extends TestCase {
 
         $smtp_mailbox = $this->make_mailbox('smtp');
         $smtp_mailbox->connect();
-        $this->assertTrue($smtp_mailbox->authed(), 'SMTP auth must succeed before sending the test message');
+        $this->assertTrue($smtp_mailbox->authed(), 'SMTP auth must succeed before sending the test message. Protocol log: '.$this->protocol_log($smtp_mailbox));
 
         $raw_message = "From: ".self::RECIPIENT."\r\n"
             ."To: ".self::RECIPIENT."\r\n"
@@ -111,7 +133,7 @@ class Hm_Test_Integration_Mail_Server extends TestCase {
             ."Cypht integration test body.\r\n";
 
         $sent = $smtp_mailbox->send_message(self::RECIPIENT, [self::RECIPIENT], $raw_message);
-        $this->assertTrue($sent, 'send_message() should report success');
+        $this->assertTrue($sent, 'send_message() should report success. Protocol log: '.$this->protocol_log($smtp_mailbox));
 
         // local delivery via Postfix -> Dovecot is not instant; poll briefly.
         $found = false;
@@ -130,6 +152,6 @@ class Hm_Test_Integration_Mail_Server extends TestCase {
             }
         }
 
-        $this->assertTrue($found, "Message with subject marker '$marker' was not found in INBOX via IMAP after sending over SMTP.");
+        $this->assertTrue($found, "Message with subject marker '$marker' was not found in INBOX via IMAP after sending over SMTP. Protocol log: ".$this->protocol_log($imap_mailbox));
     }
 }

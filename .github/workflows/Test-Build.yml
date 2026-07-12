@@ -90,6 +90,7 @@ jobs:
       - name: "Script: setup.sh"
         run: bash .github/tests/setup.sh
 
+
       - name: "Script: test.sh"
         run: bash tests/phpunit/run.sh
 
