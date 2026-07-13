@@ -168,7 +168,9 @@ function applyMessageListPageHandlers(routeParams) {
 
 function applyMessagePageHandlers(routeParams) {
     const path = routeParams.list_path.substr(0, 4);
-    
+  
+    if (window.handleApplyCustomAction) handleApplyCustomAction();
+
     switch (path) {
         case 'imap':
         case 'trac':
