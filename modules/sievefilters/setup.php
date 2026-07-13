@@ -22,6 +22,17 @@ add_handler('message_list', 'load_mailbox_name', true, 'sievefilters', 'load_use
 add_handler('message_list', 'load_automatic_actions', true, 'sievefilters', 'load_mailbox_name', 'after');
 add_handler('message_list', 'load_custom_actions', true, 'sievefilters', 'load_mailbox_name', 'after');
 
+/* message-page custom actions — a standalone endpoint, deliberately NOT part of
+ * ajax_imap_message_content. That response is cached client-side per message to
+ * avoid refetching message content, but the account's custom actions list can
+ * change independently of any given message, so it's fetched fresh every time
+ * instead of being frozen inside a cached message snapshot. */
+setup_base_ajax_page('ajax_message_custom_actions', 'core');
+add_handler('ajax_message_custom_actions', 'load_message_custom_actions_context', true, 'sievefilters');
+add_handler('ajax_message_custom_actions', 'load_custom_actions', true, 'sievefilters', 'load_message_custom_actions_context', 'after');
+add_output('ajax_message_custom_actions', 'message_page_custom_actions', true, 'sievefilters');
+
+
 /* custom actions */
 setup_base_ajax_page('ajax_save_custom_action', 'core');
 add_handler('ajax_save_custom_action', 'save_custom_action', true, 'sievefilters');
@@ -56,6 +67,9 @@ add_output('sieve_filters', 'sievefilters_title_start', true, 'sievefilters', 'c
 add_output('ajax_hm_folders', 'sievefilters_settings_link', true, 'sievefilters', 'settings_menu_end', 'before');
 add_output('message', 'sievefilters_modal_content_start', true, 'sievefilters', 'content_section_start', 'after');
 add_output('message', 'sievefilters_settings_link', true, 'sievefilters', 'settings_menu_end', 'before');
+add_output('message', 'custom_action_modal_content', true, 'sievefilters', 'content_section_start', 'after');
+add_output('ajax_imap_message_content', 'new_sieve_filter_for_message_like_this', true, 'sievefilters', 'filter_message_headers', 'after');
+
 
 setup_base_ajax_page('ajax_account_sieve_filters', 'core');
 add_handler('ajax_account_sieve_filters', 'settings_load_imap', true, 'sievefilters', 'load_user_data', 'after');
@@ -153,7 +167,6 @@ add_output('ajax_sieve_block_change_behaviour', 'sieve_block_change_behaviour_ou
 
 add_handler('settings', 'process_enable_sieve_filter_setting', true, 'sievefilters', 'save_user_settings', 'before');
 add_output('settings', 'enable_sieve_filter_setting', true, 'sievefilters', 'start_general_settings', 'after');
-add_output('ajax_imap_message_content', 'new_sieve_filter_for_message_like_this', true, 'sievefilters', 'filter_message_headers', 'after');
 
 add_handler('home', 'check_sieve_configuration', true, 'nux','load_imap_servers_from_config', 'after');
 add_output('home', 'display_sieve_misconfig_alert', true, 'nux', 'start_welcome_dialog', 'after');
@@ -188,6 +201,7 @@ return array(
         'ajax_account_sieve_filters',
         'ajax_block_account_sieve_filters',
         'ajax_imap_message_content',
+        'ajax_message_custom_actions',
         'ajax_save_custom_action',
         'ajax_apply_custom_action',
         'ajax_load_custom_action_by_id',
@@ -209,6 +223,7 @@ return array(
         'mailbox' => array(FILTER_UNSAFE_RAW, false),
         'reload_page' => array(FILTER_VALIDATE_BOOL, false),
         'new_filter' => array(FILTER_UNSAFE_RAW, false),
+        'message_custom_actions' => array(FILTER_UNSAFE_RAW, false),
         'mailbox_name' => array(FILTER_UNSAFE_RAW, false),
         'custom_action_saved' => array(FILTER_VALIDATE_BOOL, false),
         'custom_action_id' => array(FILTER_UNSAFE_RAW, false),
