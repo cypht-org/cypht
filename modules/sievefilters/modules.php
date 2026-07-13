@@ -1202,7 +1202,7 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-journal-bookmark-fill me-2"></i>';
         }
-        $res .= $this->trans('Filters').'</a></li>';
+        $res .= $this->trans('Filters & Actions').'</a></li>';
         $res .= '<li class="menu_block_list"><a class="unread_link" href="'.$this->build_page_url('block_list').'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-x-circle-fill me-2"></i>';
@@ -1221,7 +1221,7 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
 class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
     protected function output() {
         $socked_connected = $this->get('socket_connected', false);
-        $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters').'</div>';
+        $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters & Actions').'</div>';
         $res .= '<div class="p-3">';
         $res .= '<div id="sieve_accounts"></div>';
         $res .= get_classic_filter_modal_content();
@@ -1236,7 +1236,7 @@ class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
 class Hm_Output_sievefilters_title_start extends Hm_Output_Module {
     protected function output() {
         $socked_connected = $this->get('socket_connected', false);
-        $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters').'</div>';
+        $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters & Actions').'</div>';
         $res .= '<div class="p-3">';
         $res .= '<div id="sieve_accounts"></div>';
         return $res;
@@ -1453,6 +1453,11 @@ class Hm_Output_account_sieve_filters extends Hm_Output_Module {
 
         // Filters tab content
         $res .= '<div class="sieve-tab-content" data-tab-id="filters">';
+        $res .= '<div class="sieve-info-bubble alert alert-info alert-dismissible fade show py-2" data-info-key="sieve_filters_info_dismissed" role="alert">';
+        $res .= '<i class="bi bi-info-circle me-2"></i>';
+        $res .= $this->trans('Filters run automatically: they check every incoming message against the conditions you set (sender, subject, etc.) and apply their actions without you doing anything.');
+        $res .= '<button type="button" class="btn-close sieve-info-bubble-close" aria-label="' . $this->trans('Close') . '"></button>';
+        $res .= '</div>';
         $res .= '<div class="mb-3">';
         $res .= '<button class="add_filter btn btn-primary me-2" account="'.$mailbox['name'].'"  sieve_extensions=\'' . json_encode($mailbox['sieve_extensions']) . '\'>Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script btn btn-light border">Add Script</button>';
         $res .= '</div>';
@@ -1466,6 +1471,11 @@ class Hm_Output_account_sieve_filters extends Hm_Output_Module {
 
         // Custom actions tab content
         $res .= '<div class="sieve-tab-content d-none" data-tab-id="custom-actions">';
+        $res .= '<div class="sieve-info-bubble alert alert-info alert-dismissible fade show py-2" data-info-key="custom_actions_info_dismissed" role="alert">';
+        $res .= '<i class="bi bi-info-circle me-2"></i>';
+        $res .= $this->trans('Custom action buttons are manual: unlike filters, they never run on their own. You apply by selecting messages and clicking the custom action button.');
+        $res .= '<button type="button" class="btn-close sieve-info-bubble-close" aria-label="' . $this->trans('Close') . '"></button>';
+        $res .= '</div>';
         $res .= '<div class="mb-3">';
         $res .= '<button class="create_custom_action btn btn-primary" account="'.$mailbox['name'].'">Create Custom Action</button>';
         $res .= '</div>';
@@ -2275,6 +2285,11 @@ class Hm_Output_message_list_automatic_actions extends Hm_Output_Module
     }
 }
 
+/**
+ * @subpackage sievefilters/output
+ * Custom actions dropdown for the message-list toolbar. Applies to whatever
+ * rows are checked in the message table.
+ */
 class Hm_Output_message_list_custom_actions extends Hm_Output_Module
 {
     protected function output()
@@ -2282,44 +2297,71 @@ class Hm_Output_message_list_custom_actions extends Hm_Output_Module
         if (!$this->get('sieve_filters_enabled')) {
             return '';
         }
+
         $custom_actions = $this->get('custom_actions', []);
         $mailbox_name = $this->get('mailbox_name', '');
 
-        $res = '<div class="dropdown">'
-            .   '<a class="msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle" '
-            .   'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
-            .   $this->trans('Custom actions')
-            .   '</a>'
-            .   '<div class="dropdown-menu custom-actions p-2" aria-labelledby="filter_message">';
+        $res = render_custom_actions_dropdown($this, $custom_actions, $mailbox_name);
+        $this->concat('msg_controls_custom_actions', $res);
+    }
+}
 
-        $res .= '<small class="dropdown-header text-muted px-2 py-1">'
-            .  '<i class="bi bi-info-circle me-1"></i>'.$this->trans('Customised actions you can apply to selected emails')
-            .  '</small>';
+/**
+ * @subpackage sievefilters/output
+ * Custom actions dropdown for the opened message page.
+ */
+class Hm_Output_message_page_custom_actions extends Hm_Output_Module
+{
+    protected function output()
+    {
+        if (!$this->get('sieve_filters_enabled')) {
+            return '';
+        }
+        $custom_actions = $this->get('custom_actions', []);
 
-        if (!empty($custom_actions)) {
-            $res .= '<div class="d-flex flex-column gap-1 mb-2">';
-            foreach ($custom_actions as $filter) {
-                $res .= sprintf(
-                    '<button class="custom_action_btn btn btn-sm btn-outline-secondary text-start" data-action-id="%s" data-imap-account="%s" data-action-name="%s" data-actions="%s">'
-                    .'<i class="bi bi-play-circle me-2 text-success"></i>%s</button>',
-                    htmlspecialchars($filter['id']),
-                    htmlspecialchars($mailbox_name),
-                    htmlspecialchars($filter['name']),
-                    htmlspecialchars(json_encode($filter['actions'])),
-                    htmlspecialchars($filter['name'])
-                );
-            }
-            $res .= '</div><hr class="dropdown-divider">';
+        $mailbox_name = $this->get('mailbox_name', '');
+
+        $res = render_custom_actions_dropdown($this, $custom_actions, $mailbox_name, [
+            'server_id' => $this->get('msg_server_id'),
+            'uid'       => $this->get('msg_text_uid'),
+            'folder'    => $this->get('msg_folder'),
+        ]);
+
+        $this->out('message_custom_actions', $res, false);
+    }
+}
+
+/**
+ * @subpackage sievefilters/handler
+ * Lightweight context for the standalone message-list page custom actions endpoint.
+ */
+class Hm_Handler_load_message_custom_actions_context extends Hm_Handler_Module {
+    public function process() {
+        $server_id = '';
+        $uid = '';
+        $folder = '';
+        if (!empty($this->request->post['imap_server_id'])) {
+            $server_id = trim($this->request->post['imap_server_id']);
+        }
+        if (!empty($this->request->post['imap_msg_uid'])) {
+            $uid = trim($this->request->post['imap_msg_uid']);
+        }
+        if (!empty($this->request->post['folder'])) {
+            $folder = trim($this->request->post['folder']);
         }
 
-        $res .= '<button class="dropdown-item add_custom_action text-primary btn btn-secondary py-2" '
-                    .'id="add_custom_action_button" account="'.$mailbox_name.'" '
-                .'>'
-                .   '<i class="bi bi-plus-circle me-2"></i>'.$this->trans('Create from Selected')
-                . '</button>';
-        $res .= '</div></div>';
+        $this->out('msg_server_id', $server_id !== '' ? $server_id : null);
+        $this->out('msg_text_uid', $uid !== '' ? $uid : null);
+        $this->out('msg_folder', $folder !== '' ? $folder : null);
 
-        $this->concat('msg_controls_custom_actions', $res);
+        $this->out('sieve_filters_enabled', $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER));
+
+        if ($server_id !== '') {
+            $imap_servers = $this->user_config->get('imap_servers', []);
+            if (!empty($imap_servers[$server_id]['name'])) {
+                $this->out('mailbox_name', $imap_servers[$server_id]['name']);
+            }
+        }
     }
 }
 
