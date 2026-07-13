@@ -1,4 +1,12 @@
 /**
+ * When set, custom action buttons target this single message (imap_{server_id}_{uid}_{folder})
+ * instead of the checked rows in the message list. Set by the click handler in
+ * handleApplyCustomAction() when a .custom_action_btn_message button is clicked, read by
+ * applyToSelected(). Null means "use checkbox selection" (message-list context).
+ */
+let currentSingleTarget = null;
+
+/**
  * Builds the <option> HTML for all possible sieve actions.
  * @returns {string}
  */
@@ -86,15 +94,21 @@ function collectActionsFromModal(modal) {
  * @param {Array}    [actions]  optional override (used by Update & Apply after save)
  */
 function applyToSelected(modal, imapAccount, actions) {
-    const selectedUids = [];
+    let selectedUids = [];
     const resolvedImapAccount = (imapAccount || current_account || '').toString();
-    $('.message_table input[type=checkbox]:checked').each(function () {
-        // Use the full checkbox id (imap_{server_id}_{uid}_{hex_folder}) so the
-        // server can extract server, UID and folder without extra lookups.
-        if (this.id && this.id.indexOf('imap') === 0) {
-            selectedUids.push(this.id);
-        }
-    });
+
+    if (currentSingleTarget) {
+        // Message-page context: apply directly to the open message, no checkboxes involved.
+        selectedUids = [currentSingleTarget];
+    } else {
+        $('.message_table input[type=checkbox]:checked').each(function () {
+            // Use the full checkbox id (imap_{server_id}_{uid}_{hex_folder}) so the
+            // server can extract server, UID and folder without extra lookups.
+            if (this.id && this.id.indexOf('imap') === 0) {
+                selectedUids.push(this.id);
+            }
+        });
+    }
 
     if (!selectedUids.length) {
         Hm_Notices.show(hm_trans('Please select at least one message'), 'warning');
@@ -167,8 +181,7 @@ function handleApplyCustomAction() {
         });
     });
 
-    // ---- Click handler on saved action buttons ----
-    $(document).on('click', '.custom_action_btn', function (e) {
+    $(document).off('click', '.custom_action_btn').on('click', '.custom_action_btn', function (e) {
         e.preventDefault();
 
         const actions     = JSON.parse($(this).attr('data-actions') || '[]');
@@ -176,6 +189,11 @@ function handleApplyCustomAction() {
         currentImapAccount = $(this).attr('data-imap-account') || '';
         currentActionId    = $(this).attr('data-action-id')   || '';
         localStorage.setItem('last_custom_action', JSON.stringify({actions: actions}));
+
+        // Message-page button: target the open message directly, not a checkbox selection.
+        currentSingleTarget = $(this).hasClass('custom_action_btn_message')
+            ? 'imap_' + $(this).attr('data-msg-server-id') + '_' + $(this).attr('data-msg-uid') + '_' + $(this).attr('data-msg-folder')
+            : null;
 
         // Set global account so get_account_actions() works for mailbox AJAX
         current_account = currentImapAccount;
@@ -210,11 +228,16 @@ function handleApplyCustomAction() {
                     populateActionRows($table, Object.values(action.actions));
                 }
 
-                const count = $('.message_table input[type=checkbox]:checked').length;
+                const count = currentSingleTarget
+                    ? 1
+                    : $('.message_table input[type=checkbox]:checked').length;
                 edit_modal.modalFooter.find('.edit_ca_apply_btn')
-                    .text(count > 0
-                        ? hm_trans('Apply to') + ' ' + count + ' ' + hm_trans('Selected')
-                        : hm_trans('Apply to Selected')).prop('disabled', count === 0);
+                    .text(currentSingleTarget
+                        ? hm_trans('Apply to this message')
+                        : (count > 0
+                            ? hm_trans('Apply to') + ' ' + count + ' ' + hm_trans('Selected')
+                            : hm_trans('Apply to Selected')))
+                    .prop('disabled', count === 0);
 
                 // Reset dirty state — Save is disabled, Update & Apply is hidden
                 isDirty = false;
