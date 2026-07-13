@@ -654,3 +654,78 @@ if (!hm_exists('is_mailbox_linked_with_filters')) {
         return false;
     }
 }
+
+
+if (!hm_exists('render_custom_actions_dropdown')) {
+    /**
+     * Render the "Custom actions" dropdown markup. Shared between the message-list
+     * toolbar (checkbox-driven, $msg_context null) and the single-message page
+     * (fixed target message, $msg_context set) so the two stay visually and
+     * structurally consistent without duplicating the button-building logic.
+     *
+     * @param Hm_Output_Module $output_mod current output module (for trans())
+     * @param array $custom_actions saved custom actions for the account
+     * @param string $mailbox_name account the actions belong to
+     * @param array|null $msg_context ['server_id', 'uid', 'folder'] of the open
+     *        message when rendering the message-page variant, null otherwise
+     * @return string
+    */
+    function render_custom_actions_dropdown($output_mod, $custom_actions, $mailbox_name, $msg_context = null) {
+        $is_message_page = $msg_context !== null;
+
+        $toggle_id = $is_message_page ? 'message_custom_actions_toggle' : 'filter_message';
+        $toggle_class = $is_message_page
+            ? 'hLink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle me-2'
+            : 'msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle';
+
+        $res = '<div class="dropdown' . ($is_message_page ? ' d-inline-block' : '') . '">'
+            .   '<a class="' . $toggle_class . '" '
+            .   'id="' . $toggle_id . '" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
+            .   $output_mod->trans('Custom actions')
+            .   '</a>'
+            .   '<div class="dropdown-menu custom-actions p-2" aria-labelledby="' . $toggle_id . '">';
+
+        $res .= '<small class="dropdown-header text-muted px-2 py-1">'
+            .  '<i class="bi bi-info-circle me-1"></i>'.$output_mod->trans('Customised actions you can apply to selected emails')
+            .  '</small>';
+
+        if (!empty($custom_actions)) {
+            $res .= '<div class="d-flex flex-column gap-1 mb-2">';
+            foreach ($custom_actions as $filter) {
+                $extra_class = $is_message_page ? ' custom_action_btn_message' : '';
+                $extra_attrs = $is_message_page
+                    ? sprintf(
+                        ' data-msg-server-id="%s" data-msg-uid="%s" data-msg-folder="%s"',
+                        htmlspecialchars($msg_context['server_id']),
+                        htmlspecialchars($msg_context['uid']),
+                        htmlspecialchars($msg_context['folder'])
+                    )
+                    : '';
+                $res .= sprintf(
+                    '<button class="custom_action_btn%s btn btn-sm btn-outline-secondary text-start" data-action-id="%s" data-imap-account="%s" data-action-name="%s" %s>'
+                    .'<i class="bi bi-play-circle me-2 text-success"></i>%s</button>',
+                    $extra_class,
+                    htmlspecialchars($filter['id']),
+                    htmlspecialchars($mailbox_name),
+                    htmlspecialchars($filter['name']),
+                    $extra_attrs,
+                    htmlspecialchars($filter['name'])
+                );
+            }
+            $res .= '</div><hr class="dropdown-divider">';
+        }
+
+        if (!$is_message_page) {
+            // "Create from Selected" relies on message-list checkbox selection; not applicable
+            // when this dropdown is rendered for a single open message.
+            $res .= '<button class="dropdown-item add_custom_action text-primary btn btn-secondary py-2" '
+                    .'id="add_custom_action_button" account="'.$mailbox_name.'" '
+                    .'>'
+                    .   '<i class="bi bi-plus-circle me-2"></i>'.$output_mod->trans('Create from Selected')
+                    . '</button>';
+        }
+        $res .= '</div></div>';
+
+        return $res;
+    }
+}
