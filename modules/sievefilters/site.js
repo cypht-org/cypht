@@ -102,7 +102,7 @@ var load_sieve_filters = function(pageName) {
                     (res) => {
                         $(`#${spinnerId}`).remove();
                         $('#sieve_accounts').append(res.sieve_detail_display);
-                    
+                        hideDismissedSieveInfoBubbles();
                     }
                 );
             }
@@ -1090,6 +1090,7 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal, custom_ac
     $(document).off('click', '.create_custom_action').on('click', '.create_custom_action', function() {
 
         const account = $(this).attr('account');
+        current_account = account;
 
         // Clear previous buttons from modal footer
         custom_action_modal.customButtons = [];
@@ -1108,7 +1109,7 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal, custom_ac
                 createCustomActionFromList(custom_action_modal, { applyAfterSave: false, imapAccount: account });
             },
         );
-        
+
         custom_action_modal.open();
     });
 
@@ -1197,7 +1198,33 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal, custom_ac
             ghostClass: "sortable-ghost",
         });
     }
-};/**
+};
+/**
+ * Info bubbles explaining Filters (automatic) vs Custom actions (manual).
+ * Dismissal is remembered per browser session, keyed by data-info-key.
+ */
+function hideDismissedSieveInfoBubbles() {
+    $('#sieve_accounts').find('.sieve-info-bubble').each(function () {
+        const key = $(this).data('info-key');
+        if (key && Hm_Utils.get_from_local_storage(key) === '1') {
+            $(this).remove();
+        }
+    });
+}
+
+function registerSieveInfoBubbles() {
+    $(document).off('click', '.sieve-info-bubble-close').on('click', '.sieve-info-bubble-close', function (e) {
+        e.preventDefault();
+        const $bubble = $(this).closest('.sieve-info-bubble');
+        const key = $bubble.data('info-key');
+        if (key) {
+            Hm_Utils.save_to_local_storage(key, '1');
+        }
+        $bubble.remove();
+    });
+}
+
+/**
  * Register tab switching for Filters / Custom actions
  */
 function registerSieveTabSwitching() {
@@ -1469,6 +1496,7 @@ function sieveFiltersPageHandler() {
      **************************************************************************************/
     registerSievePageEvents(edit_filter_modal, edit_script_modal, custom_action_modal);
     registerSieveTabSwitching();
+    registerSieveInfoBubbles();
 
     const save_script = Hm_Filters.save_script;
     // const save_filter = Hm_Filters.save_filter;
