@@ -483,6 +483,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     if(!in_array($sender, $existing_emails)){
                         $txt .= '<div class="dropdown d-inline-block"><a class="block_sender_link hlink dropdown-toggle text-decoration-none btn btn-sm btn-outline-danger '.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : '"').' href="#" aria-labelledby="dropdownMenuBlockSender" data-bs-toggle="dropdown"><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a>';
                         $txt .= block_filter_dropdown($this);
+                        $txt .= '</div>';
                     }
                 } else {
                     $txt .= '<span class="text-decoration-none btn btn-sm btn-outline-danger" data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
@@ -490,7 +491,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
             $txt .= '<a class="hlink text-decoration-none btn btn-sm btn-outline-secondary" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
-            $txt .= '<span id="extra-header-buttons" class="d-flex gap-2">'. $this->get('extra_header_buttons', '') . '</span></div>';
+            $txt .= '<span id="extra-header-buttons" class="d-flex gap-2">'. $this->get('extra_header_buttons', '') . '</span>';
             $txt .= '<input type="hidden" class="move_to_type" value="" />';
             $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
