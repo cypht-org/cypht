@@ -8,7 +8,9 @@ function handleSieveCustomAction() {
         hm_trans('Save Custom Action'),
         'btn-secondary ms-auto',
         function () {
-            createCustomActionFromList(custom_action_modal, { applyAfterSave: false });
+            const $btn = $(this);
+            setButtonLoading($btn, hm_trans('Saving...'));
+            createCustomActionFromList(custom_action_modal, { applyAfterSave: false, triggerBtn: $btn });
         },
     );
 
@@ -16,10 +18,13 @@ function handleSieveCustomAction() {
         hm_trans('Save & Apply to Selected'),
         'btn-primary save_and_apply_btn',
         function () {
+            const $btn = $(this);
+            setButtonLoading($btn, hm_trans('Applying...'));
             createCustomActionFromList(custom_action_modal, {
                 applyAfterSave: true,
                 imapAccount: custom_action_modal._imapAccount || '',
                 singleTarget: custom_action_modal._singleTarget || null,
+                triggerBtn: $btn,
             });
         },
     );
