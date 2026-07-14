@@ -1546,7 +1546,7 @@ nav.collapsed .src_name_initial {
   background-color: var(--bs-link-hover-color);
   color: var(--bs-body-bg);
   margin: 5px 10px;
-  width: 100%;
+  width: 90%;
   text-align: center;
   border-radius: var(--bs-border-radius);
 }
@@ -1728,6 +1728,12 @@ pre.msg_source {
 .advanced_search_form #term_and_or1 { width: 100%; }
 .advanced_search_form .source_section .inner_list .form-check { margin: 0 0 0 30px !important; }
 .advanced_search_form .source_section .unread_count { padding-top: 4px; }
+#opml_import_form .form-control { width: 50%; }
+.add_tag .subtitle { margin-top: 0 !important; }
+.add_server .txt_fld { width: 100%; }
+.configured_server .server_subtitle { padding-bottom: 5px; }
+.msg_actions a.disabled_link { padding: 0.25rem 0.5rem; border-radius: var(--bs-border-radius-sm); border-color: 1px solid var(--bs-primary); }
+.msg_actions .btn.disabled { opacity: 0.5; }
 
 
 /* some theming changes */
@@ -1782,6 +1788,7 @@ pre.msg_source {
 .mobile .folders { margin-top: 1rem; margin-left: 1rem !important; }
 .mobile .folders_page.row { margin-left: 0; margin-right: 0; }
 .mobile .folders_page { margin-bottom: 50px; }
+.mobile .folder_list li { padding-top: 4px; padding-bottom: 4px; }
 .mobile .server_section { overflow: hidden; }
 .mobile .add_server .txt_fld { width: 100%; }
 .mobile .reset_factory_button { margin-right: 1rem; }
@@ -1799,6 +1806,8 @@ pre.msg_source {
 }
 .mobile .content_title .path_delim + a { display: contents; }
 .mobile .calendar > .m-4 { margin: 1rem !important; }
+.mobile .calendar .px-4 > form { display: block; margin: -30px 0 30px; }
+.mobile .calendar .px-4 > form button { margin-bottom: 25px; }
 .mobile .quick_add_multiple_server_form { padding-left: 1.5rem; padding-right: 1.5rem; }
 .mobile .advanced_search_form [id^="adv_target"],
 .mobile .advanced_search_form .other_section > div { width: 100%; }
@@ -1815,7 +1824,14 @@ pre.msg_source {
 .mobile .user_settings input[type='number'] { max-width: 150px; }
 .mobile .user_settings textarea { max-width: 150px; }
 .mobile .save_settings_page { margin-bottom: 40px; }
-
+.mobile .compose_form { margin-top: 25px; padding: 0 !important; width: 100% !important; }
+.mobile .compose_attach_form { padding-bottom: 25px; }
+.mobile .compose_sign { margin-right: 0px !important; }
+.mobile .list_actions { font-size: 90%; }
+.mobile .list_controls { color: var(--bs-body-color); }
+.mobile .edit_profile, .mobile .change_pass { margin-left: 0; margin-right: 0; }
+.mobile .submit_row { padding-bottom: 25px; }
+.mobile .tags_tree + .tags_tree { margin-bottom: 25px; }
 
 
 /* Mobile responsive overrides for Bootstrap classes */
@@ -1852,7 +1868,7 @@ pre.msg_source {
   .mobile .content_title > .flex-wrap {
     flex-wrap: nowrap !important; margin-bottom: 0px !important;
   }
-  .mobile .content_title .list_meta { margin-top: 3px; margin-bottom: 0px !important; }
+  .mobile .content_title .list_meta { margin-top: 5px; margin-bottom: 0px !important; }
   .mobile .msg_text .small_header .col-md-2 { width: 16.667%; }
   .mobile .msg_text .small_header > div + div { width: 83.333%; }
   .mobile #list_controls_menu.show { left: auto; right: -15px; }
@@ -1884,7 +1900,7 @@ pre.msg_source {
   .mobile .login_form .vh-100 > .card { margin-top: -10px; }
   .mobile .time_section .adv_times { width: 100%; }
   .mobile .time_section .adv_times input { width: 100% !important; }
-  .notices .definitive_actions {
-    margin-left: 0 !important;
-  }
+  .mobile .category-tabs { padding: 0; }
+  .mobile .category-tabs-container { margin-top: 0.5rem; }
+  .notices .definitive_actions { margin-left: 0 !important; }
 }
