@@ -678,12 +678,14 @@ if (!hm_exists('render_custom_actions_dropdown')) {
             ? 'hLink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle me-2'
             : 'msg_custom core_msg_control btn btn-sm btn-light no_mobile border text-black-50 dropdown-toggle';
 
+        $menu_class = 'dropdown-menu custom-actions p-2' . ($is_message_page ? ' custom-actions-message' : '');
+
         $res = '<div class="dropdown' . ($is_message_page ? ' d-inline-block' : '') . '">'
             .   '<a class="' . $toggle_class . '" '
             .   'id="' . $toggle_id . '" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
             .   $output_mod->trans('Custom actions')
             .   '</a>'
-            .   '<div class="dropdown-menu custom-actions p-2" aria-labelledby="' . $toggle_id . '">';
+            .   '<div class="' . $menu_class . '" aria-labelledby="' . $toggle_id . '">';
 
         $res .= '<small class="dropdown-header text-muted px-2 py-1">'
             .  '<i class="bi bi-info-circle me-1"></i>'.$output_mod->trans('Customised actions you can apply to selected emails')
@@ -715,15 +717,27 @@ if (!hm_exists('render_custom_actions_dropdown')) {
             $res .= '</div><hr class="dropdown-divider">';
         }
 
-        if (!$is_message_page) {
-            // "Create from Selected" relies on message-list checkbox selection; not applicable
-            // when this dropdown is rendered for a single open message.
-            $res .= '<button class="dropdown-item add_custom_action text-primary btn btn-secondary py-2" '
-                    .'id="add_custom_action_button" account="'.$mailbox_name.'" '
-                    .'>'
-                    .   '<i class="bi bi-plus-circle me-2"></i>'.$output_mod->trans('Create from Selected')
-                    . '</button>';
-        }
+        // On the message page there's no checkbox selection to build from, so this button
+        // creates a new custom action scoped to the single open message instead (mirrors
+        // "Filter similar messages" / new_sieve_filter_for_message_like_this naming).
+        $create_label = $is_message_page
+            ? $output_mod->trans('Create for message like this')
+            : $output_mod->trans('Create from Selected');
+        $create_extra_class = $is_message_page ? ' add_custom_action_message' : '';
+        $create_extra_attrs = $is_message_page
+            ? sprintf(
+                ' data-msg-server-id="%s" data-msg-uid="%s" data-msg-folder="%s"',
+                htmlspecialchars($msg_context['server_id']),
+                htmlspecialchars($msg_context['uid']),
+                htmlspecialchars($msg_context['folder'])
+            )
+            : '';
+
+        $res .= '<button class="dropdown-item add_custom_action'.$create_extra_class.' text-primary btn btn-secondary py-2" '
+                .'id="add_custom_action_button" account="'.$mailbox_name.'"'.$create_extra_attrs
+                .'>'
+                .   '<i class="bi bi-plus-circle me-2"></i>'.$create_label
+                . '</button>';
         $res .= '</div></div>';
 
         return $res;
