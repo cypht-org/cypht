@@ -13,11 +13,6 @@ function setButtonLoading($btn, loadingText) {
         '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>' + loadingText
     );
 
-    // Lock every other footer button too, so a second action can't fire while this one
-    // is in flight — they just go inert, no spinner/text change. Only siblings that were
-    // actually enabled get marked/locked; a button already disabled for its own reason
-    // (e.g. Save before anything is dirty) must stay disabled either way, and must NOT
-    // get re-enabled by restoreButtonState() below if this request fails.
     $btn.closest('.modal-footer').find('button').not($btn).not(':disabled')
         .addClass('sibling-locked').prop('disabled', true);
 }

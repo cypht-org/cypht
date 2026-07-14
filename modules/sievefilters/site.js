@@ -421,9 +421,6 @@ const Hm_Filters = (function (hm) {
         let actions_value = $('[name^=sieve_selected_action_value]').map(function(idx, elem) {
             return $(elem).val();
         }).get();
-        let actions_field_type = $('[name^=sieve_selected_action_value]').map(function(idx, elem) {
-            return $(elem).attr('type');
-        }).get();
         let actions_extra_value = $('input[name^=sieve_selected_extra_action_value]').map(function(idx, elem) {
             return $(elem).val();
         }).get();
@@ -433,18 +430,23 @@ const Hm_Filters = (function (hm) {
             return false;
         }
 
+        // Checking the field's own type=hidden isn't enough to know a value can be skipped —
+        // "keep" is legitimately hidden/empty on purpose, but "move"/"copy to folder" also
+        // use a hidden input (populated by the folder-tree picker) and DO require a value.
+        // Look up the action's own definition instead so an unselected folder gets caught
+        // here too, same as every other action needing a value.
+        const possible_actions = (typeof get_account_actions === 'function') ? get_account_actions() : hm_sieve_possible_actions();
         idx = 0;
         actions_type.forEach(function (elem, key) {
-            console.log(actions_field_type[idx])
-            if (actions_value[idx] === "" && actions_field_type[idx] !== 'hidden') {
+            const actionDef = possible_actions.find(function (a) { return a.name === elem; });
+            const requiresValue = !actionDef || actionDef.type !== 'none';
+            if (requiresValue && actions_value[idx] === "") {
                 let order = ordinal_number(key + 1);
-                let previous_messages = $('.sys_messages').html();
-                previous_messages += previous_messages ? '<br>': '';
-                showErrorMsg(
-                  "The " + order + " action (" + elem + ") must be provided",
-                  ".sieve-filter-actions-block",
-                  10000
-                );
+                const actionLabel = actionDef ? actionDef.description : elem;
+                const message = (actionDef && actionDef.type === 'mailbox')
+                    ? "The " + order + " action (" + actionLabel + ") requires a folder to be selected"
+                    : "The " + order + " action (" + actionLabel + ") must be provided";
+                showErrorMsg(message, ".sieve-filter-actions-block", 10000);
                 validation_failed = true;
             }
             actions_parsed.push(
