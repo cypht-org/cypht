@@ -183,7 +183,7 @@ if (!class_exists('Hm_IMAP')) {
         );
 
         /* holds the current IMAP connection state */
-        private $state = 'disconnected';
+        public $state = 'disconnected';
 
         /* used for message part content streaming */
         private $stream_size = 0;
@@ -341,6 +341,9 @@ if (!class_exists('Hm_IMAP')) {
                 $this->debug[] = 'Logged in successfully as ' . $username;
                 $this->get_capability();
                 $this->enable();
+                if ($this->is_supported('X-CM-EXT-1')) {
+                    $this->id();
+                }
             } else {
                 $this->debug[] = 'Log in for ' . $username . ' FAILED';
             }
@@ -2332,7 +2335,7 @@ if (!class_exists('Hm_IMAP')) {
          */
         public function id() {
             $server_id = array();
-            if ($this->is_supported('ID')) {
+            if ($this->is_supported('ID') || $this->is_supported('X-CM-EXT-1')) {
                 $params = array(
                     'name' => $this->app_name,
                     'version' => $this->app_version,

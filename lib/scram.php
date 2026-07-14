@@ -21,9 +21,14 @@ private $hashes = array(
     'sha512'  => 'sha512'
 );
 
-private function getHashAlgorithm($scramAlgorithm) {
+protected function getHashAlgorithm($scramAlgorithm) {
     $parts = explode('-', mb_strtolower($scramAlgorithm));
-    return $this->hashes[$parts[1]] ?? 'sha1'; // Default to sha1 if the algorithm is not found
+    if (count($parts) > 2) {
+        $hashAlgorithm = implode('-', array_slice($parts, 1));
+    } else {
+        $hashAlgorithm = $parts[1] ?? '';
+    }
+    return $this->hashes[$hashAlgorithm] ?? 'sha1'; // Default to sha1 if the algorithm is not found
 }
 private function log($message) {
     // Use Hm_Debug to add the debug message
@@ -44,8 +49,9 @@ public function generateClientProof($username, $password, $salt, $clientNonce, $
     return $clientProof;
 }
 
-public function authenticateScram($scramAlgorithm, $username, $password, $getServerResponse, $sendCommand, $protocol = 'imap') {
+public function authenticateScram($scramAlgorithm, $username, $password, $getServerResponse, $sendCommand, $protocol = 'imap', ?callable $nonce_generator = null) {
     $algorithm = $this->getHashAlgorithm($scramAlgorithm);
+    $nonce_generator = $nonce_generator ?? static fn() => base64_encode(random_bytes(32));
 
     // SMTP uses "AUTH <mech>"; IMAP uses "AUTHENTICATE <mech>".
     // SMTP's send_command() appends \r\n internally, so we must not include it here.
@@ -67,7 +73,7 @@ public function authenticateScram($scramAlgorithm, $username, $password, $getSer
         $salt = base64_decode(substr($parts[1], strpos($parts[1], "=") + 1));
 
         // Generate client nonce
-        $clientNonce = base64_encode(random_bytes(32));
+        $clientNonce = $nonce_generator();
         $this->log("Generated client nonce: " . $clientNonce);
 
         // Calculate client proof

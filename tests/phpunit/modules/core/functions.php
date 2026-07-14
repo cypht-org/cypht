@@ -209,4 +209,157 @@ class Hm_Test_Core_Functions extends TestCase {
     public function test_profiles_by_server_id() {
         $this->assertEquals(array(), profiles_by_smtp_id(array('smtp_id' => 0), 0));
     }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_validate_domain_full_accepts_valid_domains() {
+        $this->assertTrue(validate_domain_full('example.com'));
+        $this->assertTrue(validate_domain_full('sub.example.co.uk'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_validate_domain_full_accepts_ipv4_literal() {
+        $this->assertTrue(validate_domain_full('[192.168.1.1]'));
+        $this->assertFalse(validate_domain_full('[256.0.0.1]'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_validate_domain_full_accepts_ipv6_literal() {
+        $this->assertTrue(validate_domain_full('[IPv6:2001:db8::1]'));
+        $this->assertFalse(validate_domain_full('[IPv6:invalid::addr::]'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_validate_domain_full_rejects_hyphen_at_start_or_end_of_label() {
+        $this->assertFalse(validate_domain_full('-bad.example.com'));
+        $this->assertFalse(validate_domain_full('bad-.example.com'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_validate_domain_full_rejects_empty_and_too_long() {
+        $this->assertFalse(validate_domain_full(''));
+        $this->assertFalse(validate_domain_full(str_repeat('a', 256)));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_validate_local_full_accepts_valid_local_parts() {
+        $this->assertTrue(validate_local_full('user.name+tag'));
+        $this->assertTrue(validate_local_full('user123'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_validate_local_full_accepts_quoted_strings() {
+        $this->assertTrue(validate_local_full('"quoted string"'));
+        $this->assertFalse(validate_local_full('"bad"quote"'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_validate_local_full_rejects_dots_at_start_end_and_consecutive() {
+        $this->assertFalse(validate_local_full('.starts.with.dot'));
+        $this->assertFalse(validate_local_full('ends.with.dot.'));
+        $this->assertFalse(validate_local_full('double..dot'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_validate_local_full_rejects_empty_and_too_long() {
+        $this->assertFalse(validate_local_full(''));
+        $this->assertFalse(validate_local_full(str_repeat('a', 65)));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_check_file_upload_returns_false_when_key_missing() {
+        $request = new stdClass();
+        $request->files = array();
+        $this->assertFalse(check_file_upload($request, 'myfile'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_check_file_upload_returns_false_for_non_array_files() {
+        $request = new stdClass();
+        $request->files = 'not_an_array';
+        $this->assertFalse(check_file_upload($request, 'myfile'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_check_file_upload_returns_true_when_valid() {
+        $request = new stdClass();
+        $request->files = array('myfile' => array('tmp_name' => '/tmp/upload'));
+        $this->assertTrue(check_file_upload($request, 'myfile'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_default_sort_order_opts_returns_expected_keys() {
+        $opts = default_sort_order_opts();
+        $this->assertArrayHasKey('arrival', $opts);
+        $this->assertArrayHasKey('date', $opts);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_can_save_last_added_server_returns_true_when_no_duplicate() {
+        Hm_Server_Wrapper::add(array('user' => 'u1', 'pass' => 'p1', 'name' => 'srv1', 'server' => 'host1', 'port' => 993, 'tls' => 1, 'id' => 'x1'));
+        $this->assertTrue(can_save_last_added_server('Hm_Server_Wrapper', 'u1'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_can_save_last_added_server_returns_false_and_deletes_on_duplicate() {
+        Hm_Server_Wrapper::add(array('user' => 'dup', 'pass' => 'p', 'name' => 'same', 'server' => 'host.example.com', 'port' => 993, 'tls' => 1, 'id' => 's1'));
+        Hm_Server_Wrapper::add(array('user' => 'dup', 'pass' => 'p', 'name' => 'same', 'server' => 'host.example.com', 'port' => 993, 'tls' => 1, 'id' => 's2'));
+        $result = can_save_last_added_server('Hm_Server_Wrapper', 'dup');
+        $this->assertFalse($result);
+        $this->assertFalse(Hm_Server_Wrapper::dump('s2'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_nexter_formats_returns_array_of_format_options() {
+        $formats = nexter_formats();
+        $this->assertIsArray($formats);
+        $this->assertNotEmpty($formats);
+    }
 }

@@ -1733,16 +1733,32 @@ if (!hm_exists('parse_mstnef')) {
             return '<div class="alert alert-danger" rol="alert">Unable to parse TNEF message. Please ensure that "attachment_dir" is configured in your environmment and is writable!</div>';
         }
 
-        $unpackDir = $attachmentDir . DIRECTORY_SEPARATOR . 'message_' . $msgId . '_' . rand(1000, 9999);
+        // Create a private, hard-to-predict unpack directory to reduce race/symlink abuse risk.
+        $unpackDir = false;
+        for ($i = 0; $i < 5; $i++) {
+            try {
+                $suffix = bin2hex(random_bytes(8));
+            } catch (Exception $e) {
+                $suffix = uniqid('', true);
+            }
+            $candidateDir = $attachmentDir . DIRECTORY_SEPARATOR . 'message_' . $msgId . '_' . $suffix;
+            if (@mkdir($candidateDir, 0700)) {
+                $unpackDir = $candidateDir;
+                break;
+            }
+        }
 
-        if (! file_exists($unpackDir)) {
-            mkdir($unpackDir);
+        if (! $unpackDir) {
+            return '<div class="alert alert-danger" rol="alert">Unable to parse TNEF message. Failed to create a secure temporary directory.</div>';
         }
         
         $filename = $unpackDir . DIRECTORY_SEPARATOR . 'message' . '.dat';
         file_put_contents($filename, $tnefBinary);
 
-        $tnefParserOutput = shell_exec("tnef -f $filename -C $unpackDir --save-body");
+        // Escape shell args because attachment content and derived file paths are untrusted.
+        $tnefParserOutput = shell_exec(
+            'tnef -f '.escapeshellarg($filename).' -C '.escapeshellarg($unpackDir).' --save-body'
+        );
         if ($tnefParserOutput) {
             Hm_Debug::add("Failed to parse TNEF message. Details: " . $tnefParserOutput);
             return '<div class="alert alert-danger" rol="alert">Unable to parse TNEF message. Please check the log output for more details.</div>';
@@ -1751,19 +1767,30 @@ if (!hm_exists('parse_mstnef')) {
         unlink($filename);
 
         if ($returnFile) {
+            // download_attachment is request data; enforce basename-only to block traversal input.
+            $safeReturnFile = basename($returnFile);
+            if ($safeReturnFile !== $returnFile || $safeReturnFile === '' || $safeReturnFile === '.' || $safeReturnFile === '..') {
+                Hm_Debug::add('Rejected invalid MSTNEF attachment filename requested for download');
+                return '<div class="alert alert-danger" rol="alert">Unable to download the requested attachment.</div>';
+            }
+
             // remove the files not requested
             foreach (glob($unpackDir . DIRECTORY_SEPARATOR . '*') as $file) {
                 if (is_file($file)) {
                     $fileInfo = pathinfo($file);
-                    if ($fileInfo['basename'] !== $returnFile) {
+                    if ($fileInfo['basename'] !== $safeReturnFile) {
                         unlink($file);
                     }
                 }
             }
             
-            $filePath = $unpackDir . DIRECTORY_SEPARATOR . $returnFile;
-            if (file_exists($filePath)) {
-                return $filePath;
+            $filePath = $unpackDir . DIRECTORY_SEPARATOR . $safeReturnFile;
+            $realUnpackDir = realpath($unpackDir);
+            $realFilePath = realpath($filePath);
+            // Resolve and verify containment to prevent symlink/path bypass outside unpackDir.
+            if ($realUnpackDir && $realFilePath && is_file($realFilePath) &&
+                strpos($realFilePath, $realUnpackDir . DIRECTORY_SEPARATOR) === 0) {
+                return $realFilePath;
             }
         }
 
@@ -1775,7 +1802,8 @@ if (!hm_exists('parse_mstnef')) {
                 $mimeType = mime_content_type($file);
 
                 if (strtolower($fileInfo['extension']) === 'rtf') {
-                    $bodyOutput = shell_exec("unrtf --html $file");
+                    // Escape path before shell execution to avoid command injection via crafted filenames.
+                    $bodyOutput = shell_exec('unrtf --html '.escapeshellarg($file));
                     if (! $bodyOutput) {
                         Hm_Debug::add("Failed to parse RTF body from TNEF message. Details: " . $bodyOutput);
                         $bodyOutput = '<div class="alert alert-danger" rol="alert">Unable to parse RTF body from TNEF message. Please check the log output for more details.</div>';

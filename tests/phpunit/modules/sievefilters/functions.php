@@ -2,6 +2,35 @@
 
 use PHPUnit\Framework\TestCase;
 
+class Hm_Test_Sieve_Failing_Factory {
+    public function init($user_config = null, $imap_account = null, $is_nux_supported = false) {
+        throw new Exception('Connection refused');
+    }
+}
+
+class Hm_Test_Failing_Sieve_Site_Config {
+    public function get($name) {
+        return 'Hm_Test_Sieve_Failing_Factory';
+    }
+    public function get_modules($include_setup = false) {
+        return array();
+    }
+}
+
+class Hm_Test_Mock_Sieve_Module {
+    public $config;
+    public $user_config;
+
+    public function __construct($site_config, $user_config) {
+        $this->config = $site_config;
+        $this->user_config = $user_config;
+    }
+
+    public function module_is_supported($name) {
+        return false;
+    }
+}
+
 /**
  * Helper class to manage mock scripts
  */
@@ -308,6 +337,289 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
         $this->assertStringContainsString('keep;', $mockScripts['main_script']);
         $this->assertStringContainsString('discard;', $mockScripts['main_script']);
         $this->assertStringNotContainsString('# CYPHT CONFIG HEADER', $mockScripts['main_script']);
+    }
+
+    private function makeMockSieveClient(array $extraMethods = []) {
+        $client = $this->createMock(PhpSieveManager\ManageSieve\Client::class);
+        $client->method('connect')->willReturn(true);
+        $client->method('listScripts')->willReturnCallback(function () {
+            return array_keys(MockSieveClientStorage::getScripts());
+        });
+        $client->method('getScript')->willReturnCallback(function ($name) {
+            return MockSieveClientStorage::getScripts()[$name] ?? '';
+        });
+        $client->method('close')->willReturn(true);
+        return $client;
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_split_script_lines_handles_crlf_line_endings() {
+        $script = "first line\r\nsecond line\r\nthird line";
+        $result = split_script_lines($script);
+        $this->assertCount(3, $result);
+        $this->assertEquals('first line', $result[0]);
+        $this->assertEquals('second line', $result[1]);
+        $this->assertEquals('third line', $result[2]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_sieve_client_factory_uses_class_from_site_config() {
+        $factory = get_sieve_client_factory(new Hm_Test_Mock_Sieve_Site_Config());
+        $this->assertInstanceOf('Hm_Test_Mock_Sieve_Client_Factory', $factory);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_initialize_sieve_client_factory_returns_null_and_adds_message_on_exception() {
+        require_once APP_PATH.'modules/sievefilters/hm-sieve.php';
+        $result = initialize_sieve_client_factory(
+            new Hm_Test_Failing_Sieve_Site_Config(),
+            new Hm_Mock_Config(),
+            array('sieve_config_host' => 'sieve.example.com')
+        );
+        $this->assertNull($result);
+        $messages = Hm_Msgs::get();
+        $this->assertNotEmpty($messages);
+        $this->assertStringContainsString('Connection refused', $messages[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_blocked_senders_array_returns_empty_when_no_blocked_senders_script() {
+        MockSieveClientStorage::setScripts(array('other_script' => 'discard;'));
+        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+            return $this->makeMockSieveClient();
+        });
+        $result = get_blocked_senders_array(
+            array('name' => 'Test', 'sieve_config_host' => 'tls://sieve.example.com:4190'),
+            new Hm_Test_Mock_Sieve_Site_Config(),
+            new Hm_Mock_Config()
+        );
+        $this->assertEquals(array(), $result);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_blocked_senders_array_returns_senders_and_prepends_wildcard_for_domain_entries() {
+        $senders = array('spam@example.com', '@baddomain.com');
+        MockSieveClientStorage::setScripts(array(
+            'blocked_senders' => implode("\n", array(
+                "# CYPHT CONFIG HEADER - DON'T REMOVE",
+                '# ' . base64_encode(json_encode($senders)),
+                '',
+                'discard; stop;',
+            )),
+        ));
+        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+            return $this->makeMockSieveClient();
+        });
+        $result = get_blocked_senders_array(
+            array('name' => 'Test', 'sieve_config_host' => 'tls://sieve.example.com:4190'),
+            new Hm_Test_Mock_Sieve_Site_Config(),
+            new Hm_Mock_Config()
+        );
+        $this->assertCount(2, $result);
+        $this->assertContains('spam@example.com', $result);
+        $this->assertContains('*@baddomain.com', $result);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_blocked_senders_array_returns_empty_and_adds_message_on_exception() {
+        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+            throw new Exception('Client connection failed');
+        });
+        $result = get_blocked_senders_array(
+            array('name' => 'Test', 'sieve_config_host' => 'tls://sieve.example.com:4190'),
+            new Hm_Test_Mock_Sieve_Site_Config(),
+            new Hm_Mock_Config()
+        );
+        $this->assertEquals(array(), $result);
+        $this->assertStringContainsString('Client connection failed', Hm_Msgs::get()[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_blocked_senders_returns_empty_string_when_script_not_present() {
+        MockSieveClientStorage::setScripts(array());
+        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+            return $this->makeMockSieveClient();
+        });
+        $mod = new Hm_Output_Test(array(), array());
+        $result = get_blocked_senders(
+            array('name' => 'Test', 'sieve_config_host' => 'tls://sieve.example.com:4190', 'sieve_extensions' => array()),
+            'serverA', 'x-circle', 'globe',
+            new Hm_Test_Mock_Sieve_Site_Config(), new Hm_Mock_Config(), $mod
+        );
+        $this->assertEquals('', $result);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_blocked_senders_returns_html_rows_with_sender_and_unblock_button() {
+        $senders = array('spam@example.com');
+        $actions = array('spam@example.com' => array('action' => 'discard', 'reject_message' => ''));
+        MockSieveClientStorage::setScripts(array(
+            'blocked_senders' => implode("\n", array(
+                "# CYPHT CONFIG HEADER - DON'T REMOVE",
+                '# ' . base64_encode(json_encode($senders)),
+                '# ' . base64_encode(json_encode($actions)),
+                '',
+                'discard; stop;',
+            )),
+        ));
+        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+            return $this->makeMockSieveClient();
+        });
+        $mod = new Hm_Output_Test(array(), array());
+        $result = get_blocked_senders(
+            array('name' => 'Test', 'sieve_config_host' => 'tls://sieve.example.com:4190', 'sieve_extensions' => array()),
+            'serverA', 'x-circle', 'globe',
+            new Hm_Test_Mock_Sieve_Site_Config(), new Hm_Mock_Config(), $mod
+        );
+        $this->assertStringContainsString('spam@example.com', $result);
+        $this->assertStringContainsString('unblock_button', $result);
+        $this->assertStringContainsString('block_domain_button', $result);
+        $this->assertStringContainsString('Discard', $result);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_sieve_linked_mailbox_returns_folder_map_for_move_action_scripts() {
+        $actions = array(array('action' => 'move', 'value' => 'Archive'));
+        MockSieveClientStorage::setScripts(array(
+            'archive_filter-10-cyphtfilter' => implode("\n", array(
+                "# CYPHT CONFIG HEADER - DON'T REMOVE",
+                '# ' . base64_encode(json_encode(array(array('condition' => 'from', 'value' => 'test@example.com')))),
+                '# ' . base64_encode(json_encode($actions)),
+                '# ' . base64_encode('message_list'),
+                '',
+                'if anyof (header :contains "From" ["test@example.com"]) {',
+                '    # CYPHT GENERATED CONDITION',
+                '    fileinto "Archive";',
+                '}',
+            )),
+        ));
+        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+            return $this->makeMockSieveClient();
+        });
+        $user_config = new Hm_Mock_Config();
+        $module = new Hm_Test_Mock_Sieve_Module(new Hm_Test_Mock_Sieve_Site_Config(), $user_config);
+        $result = get_sieve_linked_mailbox(
+            array('name' => 'Primary Account', 'sieve_config_host' => 'tls://sieve.example.com:4190'),
+            $module
+        );
+        $this->assertArrayHasKey('archive_filter-10-cyphtfilter', $result);
+        $this->assertEquals('Archive', $result['archive_filter-10-cyphtfilter']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_is_mailbox_linked_with_filters_returns_false_when_no_sieve_config_on_account() {
+        $user_config = new Hm_Mock_Config();
+        $user_config->set('imap_servers', array(
+            'serverA' => array('name' => 'Test', 'server' => 'imap.example.com'),
+        ));
+        $module = new Hm_Test_Mock_Sieve_Module(new Hm_Test_Mock_Sieve_Site_Config(), $user_config);
+        $this->assertFalse(is_mailbox_linked_with_filters('Archive', 'serverA', $module));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_is_mailbox_linked_with_filters_returns_true_when_folder_is_linked() {
+        $actions = array(array('action' => 'move', 'value' => 'Archive'));
+        MockSieveClientStorage::setScripts(array(
+            'arch-10-cyphtfilter' => implode("\n", array(
+                "# CYPHT CONFIG HEADER - DON'T REMOVE",
+                '# ' . base64_encode(json_encode(array(array('condition' => 'from', 'value' => 'x@x.com')))),
+                '# ' . base64_encode(json_encode($actions)),
+                '# ' . base64_encode('message_list'),
+                '',
+                '# CYPHT GENERATED CONDITION',
+                'fileinto "Archive";',
+            )),
+        ));
+        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+            return $this->makeMockSieveClient();
+        });
+        $user_config = new Hm_Mock_Config();
+        $user_config->set('imap_servers', array(
+            'serverA' => array('name' => 'Test', 'sieve_config_host' => 'tls://sieve.example.com:4190'),
+        ));
+        $module = new Hm_Test_Mock_Sieve_Module(new Hm_Test_Mock_Sieve_Site_Config(), $user_config);
+        $this->assertTrue(is_mailbox_linked_with_filters('Archive', 'serverA', $module));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_block_filter_discard_action_generates_discard_script() {
+        $filter = \PhpSieveManager\Filters\FilterFactory::create('blocked_senders');
+        $result = block_filter($filter, new Hm_Mock_Config(), 'discard', 0, 'discard@example.com');
+        $this->assertEquals('discard', $result['action']);
+        $this->assertStringContainsString('discard@example.com', $filter->toScript());
+        $this->assertStringContainsString('discard;', $filter->toScript());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_block_filter_reject_default_uses_configured_message() {
+        $user_config = new Hm_Mock_Config();
+        $user_config->set('sieve_block_default_reject_message', array(0 => 'No thanks'));
+        $filter = \PhpSieveManager\Filters\FilterFactory::create('blocked_senders');
+        $result = block_filter($filter, $user_config, 'reject_default', 0, 'reject@example.com');
+        $this->assertEquals('reject_default', $result['action']);
+        $this->assertEquals('No thanks', $result['reject_message']);
+        $this->assertStringContainsString('reject', $filter->toScript());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_block_filter_blocked_action_moves_to_blocked_folder() {
+        $filter = \PhpSieveManager\Filters\FilterFactory::create('blocked_senders');
+        $result = block_filter($filter, new Hm_Mock_Config(), 'blocked', 0, 'junk@example.com');
+        $this->assertEquals('blocked', $result['action']);
+        $this->assertStringContainsString('fileinto "Blocked"', $filter->toScript());
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_format_main_script_handles_script_with_no_require_statements() {
+        $result = format_main_script("keep;\ndiscard;");
+        $this->assertStringContainsString('keep;', $result);
+        $this->assertStringContainsString('discard;', $result);
+        $this->assertStringNotContainsString('require', $result);
     }
 
     /**

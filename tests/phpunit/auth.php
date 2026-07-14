@@ -128,6 +128,29 @@ class Hm_Test_Auth extends TestCase {
         $auth = new Hm_Auth_DB($this->config);
         $this->assertEquals(2, $auth->create('unittestuser', 'unittestpass'));
     }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_auth_dynamic_check_credentials_always_returns_false() {
+        $config = new Hm_Mock_Config();
+        $auth = new Hm_Auth_Dynamic($config);
+        $this->assertFalse($auth->check_credentials('any_user', 'any_pass'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_auth_save_auth_detail_is_callable_with_no_effect() {
+        $config = new Hm_Mock_Config();
+        $auth = new Hm_Auth_Dynamic($config);
+        $session = new Hm_Mock_Session();
+        $this->expectNotToPerformAssertions();
+        $auth->save_auth_detail($session);
+    }
+
     public function tearDown(): void {
         unset($this->config);
     }

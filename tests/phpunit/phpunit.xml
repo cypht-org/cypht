@@ -132,13 +132,29 @@
       <file>./modules/imap/is_imap_junk_folder.php</file>
       <file>./modules/imap/imap_message_action_not_junk.php</file>
     </testsuite>
+    <testsuite name="lib">
+      <file>./lib/searchable.php</file>
+      <file>./lib/scram_authenticator.php</file>
+      <file>./lib/ini_set.php</file>
+      <file>./lib/api_curl.php</file>
+      <file>./lib/js_libs.php</file>
+      <file>./lib/repository.php</file>
+      <file>./lib/version.php</file>
+      <file>./lib/logging.php</file>
+      <file>./lib/output_debug.php</file>
+    </testsuite>
+    <!--<testsuite name="modules_imap">
+            <file>./modules/imap/hm-imap.php</file>
+        </testsuite>-->
     <testsuite name="modules_core">
+      <file>./modules/core/modules.php</file>
       <file>./modules/core/functions.php</file>
       <file>./modules/core/message_functions.php</file>
       <file>./modules/core/message_list_functions.php</file>
       <file>./modules/core/handler_modules.php</file>
       <file>./modules/core/output_modules.php</file>
       <file>./modules/core/output_modules_debug.php</file>
+      <file>./modules/core/mailbox.php</file>
     </testsuite>
     <testsuite name="modules_saved_searches">
       <file>./modules/saved_searches/functions.php</file>
@@ -154,8 +170,15 @@
     <testsuite name="modules_local_contacts">
       <file>./modules/local_contacts/local_contacts.php</file>
     </testsuite>
+    <testsuite name="modules_tags">
+      <file>./modules/tags/handler_modules.php</file>
+      <file>./modules/tags/output_modules.php</file>
+    </testsuite>
     <testsuite name="modules_ldap_contacts">
       <file>./modules/ldap_contacts/ldap_contacts.php</file>
+    </testsuite>
+    <testsuite name="mta_sts">
+      <file>./mta_sts.php</file>
     </testsuite>
   </testsuites>
   <source>

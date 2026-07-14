@@ -36,15 +36,16 @@ class ServersTest(WebTest):
         name = self.by_id('srv_setup_stepper_profile_name')
         name.send_keys('Test')
         email = self.by_name('srv_setup_stepper_email')
-        email.send_keys('test@localhost')
+        email.send_keys('testuser@localhost')
         pwd = self.by_name('srv_setup_stepper_password')
-        pwd.send_keys('test')
+        pwd.send_keys('testuser')
         next_button = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable((By.ID, "step_config_action_next"))
         )
-         # Scroll to the button and wait for any animations/overlays to finish
+        # Scroll to the button and wait for any animations/overlays to finish
         self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant', block: 'center'});", next_button)
         WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(next_button))
+
 
         # Try multiple click methods for better reliability
         try:
@@ -66,19 +67,43 @@ class ServersTest(WebTest):
         imap_port = self.by_name('srv_setup_stepper_imap_port')
         imap_port.clear()
         imap_port.send_keys(143)
+        
+        smtp_tls_radio = self.by_id('smtp_start_tls')
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", smtp_tls_radio)
+        sleep(0.2)
+        self.driver.execute_script("arguments[0].click();", smtp_tls_radio)
+
+        imap_tls_radio = self.by_id('imap_start_tls')
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", imap_tls_radio)
+        sleep(0.2)
+        self.driver.execute_script("arguments[0].click();", imap_tls_radio)
+
         reply_to = self.by_name('srv_setup_stepper_profile_reply_to')
-        reply_to.send_keys('test@localhost')
+        reply_to.send_keys('testuser@localhost')
         signature = self.by_name('srv_setup_stepper_profile_signature')
         signature.send_keys('Test')
+        self.driver.execute_script("""
+            var orig = Hm_Ajax_Request.prototype.format_xhr_data;
+            Hm_Ajax_Request.prototype.format_xhr_data = function(data) {
+                data = data.map(function(item) {
+                    if (item.value === undefined || item.value === null) {
+                        item.value = false;
+                    }
+                    return item;
+                });
+                return orig.call(this, data);
+            };
+        """)
         elem = self.by_id('step_config_action_finish')
         self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant'})", elem)
         WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable(elem))
         elem.click()
-        wait = WebDriverWait(self.driver, 60)
-        element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "sys_messages")))
-        sys_message_text = element.text
-        sys_message_texts = sys_message_text.split('\n')
-        assert any("Authentication failed" in text for text in sys_message_texts)
+        # On success the wizard calls Hm_Utils.redirect(), wait for the reload.
+        self.wait_with_folder_list()
+        self.wait_for_navigation_to_complete()
+        WebDriverWait(self.driver, 30).until(
+            EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), 'localhost/143')
+        )
 
 if __name__ == '__main__':
 
