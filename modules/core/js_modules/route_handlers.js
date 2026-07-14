@@ -171,6 +171,10 @@ function applyMessagePageHandlers(routeParams) {
   
     if (window.handleApplyCustomAction) handleApplyCustomAction();
 
+    // Wires up #add_custom_action_button ("Create for message like this"), same as
+    // applyMessageListPageHandlers does for the list's "Create from Selected" button.
+    if (window.handleSieveCustomAction) handleSieveCustomAction();
+
     switch (path) {
         case 'imap':
         case 'trac':
