@@ -598,9 +598,6 @@ function preFetchMessageContent(msgPart, uid, path) {
     }, null, true)
 }
 
-// HM_BUILD_VERSION changes on every rebuild, so keys built with it go stale
-// automatically. MSG_CACHE_PREFIX marks them so purgeStaleMessageCache() can find
-// and remove the old ones without touching unrelated sessionStorage keys.
 const MSG_CACHE_PREFIX = 'msg_cache_';
 
 function getMessageStorageKey(uid, listPath = getListPathParam()) {
