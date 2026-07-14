@@ -7,6 +7,8 @@
  *   - applyAfterSave: (optional, default false) whether to apply after saving
  *   - applyCallback: (optional) callback after apply succeeds
  *   - saveCallback: (optional) callback after save succeeds
+ *   - triggerBtn: (optional) jQuery button element to disable/spin for the duration,
+ *     and re-enable if validation fails or the request errors (see applyCustomAction.js)
  */
 function saveCustomAction(modal, options) {
     options = options || {};
@@ -15,6 +17,7 @@ function saveCustomAction(modal, options) {
     const applyAfterSave = !!options.applyAfterSave;
     const applyCallback = options.applyCallback || null;
     const saveCallback = options.saveCallback || null;
+    const triggerBtn = options.triggerBtn || null;
 
     // --- Validate name ---
     const actionName = modal.modal.find('.custom_action_name_input').val().trim();
@@ -24,70 +27,39 @@ function saveCustomAction(modal, options) {
             '.sieve-filter-name-group',
             6000
         );
+        restoreButtonState(triggerBtn);
         return false;
     }
 
     // --- Collect and validate actions ---
-    const actions_type = modal.modal.find('select[name^=sieve_selected_actions]').map(function (idx, elem) {
-        return $(elem).val();
-    }).get();
-
-    const actions_value = modal.modal.find('[name^=sieve_selected_action_value]').map(function (idx, elem) {
-        return $(elem).val();
-    }).get();
-
-    const actions_field_type = modal.modal.find('[name^=sieve_selected_action_value]').map(function (idx, elem) {
-        return $(elem).attr('type');
-    }).get();
-
-    const actions_extra_value = modal.modal.find('input[name^=sieve_selected_extra_action_value]').map(function (idx, elem) {
-        return $(elem).val();
-    }).get();
-
-    if (actions_type.length === 0) {
-        showErrorMsg(
-            hm_trans('You must provide at least one action'),
-            '.sieve-filter-actions-block',
-            6000
-        );
-        return false;
-    }
-
-    let validation_failed = false;
-    const actions_parsed = [];
-
-    actions_type.forEach(function (action, idx) {
-        if (actions_value[idx] === '' && actions_field_type[idx] !== 'hidden') {
-            showErrorMsg(
-                hm_trans('The ' + ordinal_number(idx + 1) + ' action (' + action + ') value must be provided'),
-                '.sieve-filter-actions-block',
-                6000
-            );
-            validation_failed = true;
-        }
-        actions_parsed.push({
-            action: action,
-            value: actions_value[idx],
-            extra_option: '',
-            extra_option_value: actions_extra_value[idx] || '',
-        });
-    });
-
-    if (validation_failed) {
+    // Shared with applyToSelected() (applyCustomAction.js) so every custom-action modal
+    // button — Save, Update & Apply, Save & Apply, Apply to Selected — validates the same
+    // way (at least one action; a value for anything but "keep"; a dedicated message when
+    // a "move"/"copy to folder" action has no folder selected).
+    const actions_parsed = collectActionsFromModal(modal);
+    if (!actions_parsed) {
+        restoreButtonState(triggerBtn);
         return false;
     }
 
     // --- Collect selected UIDs if applying ---
+    // singleTarget (message-page context, e.g. "Create for message like this") applies
+    // directly to the open message; otherwise fall back to the message-list checkbox selection.
     const selectedUids = [];
     if (applyAfterSave) {
-        $('.message_table input[type=checkbox]:checked').each(function () {
-            if (this.id && this.id.indexOf('imap') === 0) {
-                selectedUids.push(this.id);
+        if (options.singleTarget) {
+            selectedUids.push(options.singleTarget);
+        } else {
+            $('.message_table input[type=checkbox]:checked').each(function () {
+                if (this.id && this.id.indexOf('imap') === 0) {
+                    selectedUids.push(this.id);
+                }
+            });
+            if (!selectedUids.length) {
+                Hm_Notices.show(hm_trans('Please select at least one message to apply'), 'warning');
+                restoreButtonState(triggerBtn);
+                return false;
             }
-        });
-        if (!selectedUids.length) {
-            Hm_Notices.show(hm_trans('Please select at least one message to apply'), 'warning');
-            return false;
         }
     }
 
@@ -103,12 +75,16 @@ function saveCustomAction(modal, options) {
         function (res) {
             if (res.custom_action_error) {
                 Hm_Notices.show(res.custom_action_error, 'danger');
+                restoreButtonState(triggerBtn);
                 return;
             }
-            if (!res.custom_action_saved) { return; }
+            if (!res.custom_action_saved) {
+                restoreButtonState(triggerBtn);
+                return;
+            }
 
             const message = actionId ? 'updated' : 'saved';
-            
+
             // Execute save callback if provided
             if (saveCallback) {
                 saveCallback(res, actions_parsed);
@@ -132,6 +108,7 @@ function saveCustomAction(modal, options) {
                 ],
                 function (applyRes) {
                     modal.hide();
+                    restoreButtonState(triggerBtn);
                     if (applyRes.custom_action_error) {
                         Hm_Notices.show(applyRes.custom_action_error, 'danger');
                     } else {
