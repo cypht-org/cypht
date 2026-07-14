@@ -4,8 +4,6 @@ function handleSieveCustomAction() {
         modalId: 'myCustomActionModal',
     });
 
-    custom_action_modal.setTitle(hm_trans('Setup Custom Action from selected messages'));
-
     custom_action_modal.addFooterBtn(
         hm_trans('Save Custom Action'),
         'btn-secondary ms-auto',
@@ -21,11 +19,12 @@ function handleSieveCustomAction() {
             createCustomActionFromList(custom_action_modal, {
                 applyAfterSave: true,
                 imapAccount: custom_action_modal._imapAccount || '',
+                singleTarget: custom_action_modal._singleTarget || null,
             });
         },
     );
 
-    $('#add_custom_action_button').on('click', function (e) {
+    $(document).off('click', '#add_custom_action_button').on('click', '#add_custom_action_button', function (e) {
         e.preventDefault();
 
         const mailbox = $(this).attr('account');
@@ -34,28 +33,43 @@ function handleSieveCustomAction() {
         current_account = mailbox;
         current_account_element = find_account_element(mailbox);
 
-        const selected = [];
+        const singleTarget = $(this).hasClass('add_custom_action_message')
+            ? 'imap_' + $(this).attr('data-msg-server-id') + '_' + $(this).attr('data-msg-uid') + '_' + $(this).attr('data-msg-folder')
+            : null;
+        custom_action_modal._singleTarget = singleTarget;
 
-        $('.message_table input[type=checkbox]:checked').each(function () {
-            const $row = $(this).closest('tr');
+        custom_action_modal.setTitle(singleTarget
+            ? hm_trans('Setup Custom Action for message like this')
+            : hm_trans('Setup Custom Action from selected messages'));
 
-            selected.push({
-                // imap_id: this.value,
-                uid: $row.data('uid'),
-                message_id: $row.data('msg-id'),
-                from_email: ($row.find('td.from').data('title') || '').trim(),
-                subject: $row.find('td.subject a').attr('title') || '',
-            });
-        });
-
-        // Update apply button label with selected count
-        const count = selected.length;
         const $applyBtn = custom_action_modal.modalFooter.find('.save_and_apply_btn');
-        $applyBtn.text(count > 0
-            ? hm_trans('Save & Apply to') + ' ' + count + ' ' + hm_trans('Selected')
-            : hm_trans('Save & Apply to Selected')
-        );
-        $applyBtn.prop('disabled', count === 0);
+
+        if (singleTarget) {
+            $applyBtn.text(hm_trans('Save & Apply to this message'));
+            $applyBtn.prop('disabled', false);
+        } else {
+            const selected = [];
+
+            $('.message_table input[type=checkbox]:checked').each(function () {
+                const $row = $(this).closest('tr');
+
+                selected.push({
+                    // imap_id: this.value,
+                    uid: $row.data('uid'),
+                    message_id: $row.data('msg-id'),
+                    from_email: ($row.find('td.from').data('title') || '').trim(),
+                    subject: $row.find('td.subject a').attr('title') || '',
+                });
+            });
+
+            // Update apply button label with selected count
+            const count = selected.length;
+            $applyBtn.text(count > 0
+                ? hm_trans('Save & Apply to') + ' ' + count + ' ' + hm_trans('Selected')
+                : hm_trans('Save & Apply to Selected')
+            );
+            $applyBtn.prop('disabled', count === 0);
+        }
 
         const templateEl = document.querySelector('#custom_action_template');
         if (templateEl) {
