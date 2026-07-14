@@ -1,3 +1,6 @@
+.custom-actions-message {
+    min-width: 300px;
+}
 .sortable-ghost {
     background-color: var(--bs-secondary-bg-subtle);
     border: 2px dashed var(--bs-secondary);
