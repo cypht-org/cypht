@@ -1050,7 +1050,8 @@ function blockListPageHandlers() {
         if (!confirm(hm_trans('Do you want to unblock sender?'))) {
             return;
         }
-        let sender = $(this).parent().parent().children().html();
+        let row = $(this).closest('tr');
+        let sender = row.find('.blocked_sender_fld').first().text().trim();
         let elem = $(this);
         Hm_Ajax.request(
             [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_unblock_sender'},
@@ -1058,7 +1059,7 @@ function blockListPageHandlers() {
                 {'name': 'sender', 'value': sender}
             ],
             function(res) {
-                elem.parent().parent().remove();
+                row.remove();
                 var num_filters = $("#filter_num_" + elem.attr('mailbox_id')).html();
                 num_filters = parseInt(num_filters) - 1;
                 $("#filter_num_" + elem.attr('mailbox_id')).html(num_filters);
@@ -1070,7 +1071,7 @@ function blockListPageHandlers() {
         e.preventDefault();
         let parent = $(this).closest('tr');
         let elem = parent.find('.block_action');
-        let sender = $(this).closest('tr').children().first().html();
+        let sender = $(this).closest('tr').find('.blocked_sender_fld').first().text().trim();
         let scope = sender.startsWith('*@') ? 'domain': 'sender';
 
         Hm_Ajax.request(
@@ -1093,8 +1094,7 @@ function blockListPageHandlers() {
 
     $(document).on('click', '.block_domain_button', function(e) {
         e.preventDefault();
-        let sender = $(this).parent().parent().children().html();
-        let elem = $(this);
+        let sender = $(this).closest('tr').find('.blocked_sender_fld').first().text().trim();
         Hm_Ajax.request(
             [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_domain'},
                 {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},

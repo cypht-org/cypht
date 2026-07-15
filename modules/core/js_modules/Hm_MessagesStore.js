@@ -15,9 +15,10 @@ class Hm_MessagesStore {
      * @property {RowObject} 1 - An object containing the row message and the IMAP key
      */
 
-    constructor(path, page = 1, filter = '', sortFld = 'arrival', rows = []) {
+    constructor(path, page = 1, filter = '', sortFld = 'arrival', rows = [], expandSearch = false) {
         this.path = path;
-        this.list = path + '_' + (filter ? filter.replace(/\s+/g, '_') + '_' + sortFld + '_': '') + page;
+        this.expandSearch = expandSearch;
+        this.list = path + '_' + (filter ? filter.replace(/\s+/g, '_') + '_' + sortFld + '_': '') + page + (expandSearch ? '_expanded' : '');
         this.sortFld = sortFld;
         this.rows = rows;
         this.sources = {};
@@ -26,6 +27,18 @@ class Hm_MessagesStore {
         this.pages = 0;
         this.page = page;
         this.newMessages = [];
+        this.forceGithubRefresh = false;
+        // Resolvers for in-flight load() outer promises; abort() drains these so Promise.all settles.
+        this._cancelResolvers = new Set();
+    }
+
+    /**
+     * Cancel all in-flight load() calls by settling their pending promises immediately.
+     * Call this on page teardown to prevent stale DOM writes and unblock the event loop.
+     */
+    abort() {
+        this._cancelResolvers.forEach(resolve => resolve());
+        this._cancelResolvers.clear();
     }
 
     /**
@@ -87,7 +100,7 @@ class Hm_MessagesStore {
                 this.pages = parseInt(pages);
                 this.newMessages = this.getNewMessages(updatedMessages);
 
-                if (typeof do_not_flag_as_read_on_open == 'booelan') {
+                if (typeof do_not_flag_as_read_on_open == 'boolean') {
                     this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
                 }
 
@@ -124,7 +137,9 @@ class Hm_MessagesStore {
 
         await Promise.all(this.fetch(hideLoadingState).map((req) => {
             return new Promise((resolve) => {
+                this._cancelResolvers.add(resolve);
                 req.then((response) => {
+                    this._cancelResolvers.delete(resolve);
                     response.resolvePromise = resolve;
                     pendingResponses.set(response.sourceId, response);
 
@@ -135,10 +150,16 @@ class Hm_MessagesStore {
                     // Process after a short delay to allow batching
                     processingTimeout = setTimeout(processPendingResponses, 10);
                 }, (error) => {
+                    // A source failed (network error, server error, rate-limit, etc.).
+                    // Resolve with no data so Promise.all can settle and other sources
+                    // that did succeed are still rendered.
+                    this._cancelResolvers.delete(resolve);
                     console.error('Error loading messages from source:', error);
+                    resolve();
                 });
             });
         }));
+        this._cancelResolvers.clear();
 
         return this;
     }
@@ -273,6 +294,11 @@ class Hm_MessagesStore {
                         if (response) {
                             response.sourceId = store.hashObject(initialConfig); // Do not use this config object because the request appends a "hm_page_key" entry, which would change the hash
                             resolve(response);
+                        } else {
+                            // Hm_Ajax calls back with false on any failure (network error,
+                            // non-JSON response, server error, etc.). Reject so the load()
+                            // error handler can resolve the outer Promise and unblock Promise.all.
+                            reject(new Error('AJAX request returned empty response'));
                         }
                     },
                     [],
@@ -291,6 +317,9 @@ class Hm_MessagesStore {
 
     getRequestConfigs() {
         const config = [{ name: "list_page", value: this.page }, { name: "sort", value: this.sortFld }];
+        if (this.expandSearch) {
+            config.push({ name: "expand_search", value: 1 });
+        }
         const configs = [];
         if (this.path.startsWith('imap')) {
             const detail = Hm_Utils.parse_folder_path(this.path, 'imap');
@@ -305,9 +334,14 @@ class Hm_MessagesStore {
             }
             config.push({ name: "hm_ajax_hook", value: 'ajax_feed_combined' });
             configs.push(config);
-        } else if (this.path.startsWith('github')) {
+        } else if (this.path.startsWith('github') && this.path !== 'github_all') {
             config.push({ name: "hm_ajax_hook", value: 'ajax_github_data' });
-            config.push({ name: "github_repo", value: this.path.split('_')[1] });
+            // Use slice instead of split('_')[1] so repo names/owners with underscores
+            // (e.g. "my_org/my_repo") are passed through intact.
+            config.push({ name: "github_repo", value: this.path.slice('github_'.length) });
+            if (this.forceGithubRefresh) {
+                config.push({ name: "github_force_refresh", value: 1 });
+            }
             configs.push(config);
         } else {
             if (this.path == 'tag') {
@@ -319,6 +353,9 @@ class Hm_MessagesStore {
                 if (this.path != 'combined_inbox' && this.path != 'search') {
                     sources = sources.filter(s => s.type != 'feeds');
                 }
+                if (this.path === 'github_all') {
+                    sources = sources.filter(s => s.type === 'github');
+                }
                 sources.forEach((ds) => {
                     const cfg = config.slice();
                     if (ds.type == 'feeds') {
@@ -328,6 +365,15 @@ class Hm_MessagesStore {
                         cfg.push({ name: "hm_ajax_hook", value: ds.hook });
                         for (const param in ds.params) {
                             cfg.push({ name: param, value: ds.params[param] });
+                        }
+                    } else if (ds.type === 'github') {
+                        cfg.push({ name: "hm_ajax_hook", value: 'ajax_github_data' });
+                        cfg.push({ name: "github_repo", value: ds.id });
+                        if (this.path === 'unread') {
+                            cfg.push({ name: "github_unread", value: 1 });
+                        }
+                        if (this.forceGithubRefresh) {
+                            cfg.push({ name: "github_force_refresh", value: 1 });
                         }
                     } else {
                         cfg.push({ name: "hm_ajax_hook", value: this.path == 'search' ? 'ajax_imap_search' : 'ajax_imap_message_list' });

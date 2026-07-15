@@ -122,4 +122,57 @@ class Hm_Test_Servers extends TestCase {
         Hm_Server_Wrapper::clean_up($this->id);
         Hm_Server_Wrapper::clean_up();
     }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_for_mailbox_returns_server_with_password_and_username_fields() {
+        $result = Hm_Server_Wrapper::getForMailbox($this->id);
+        $this->assertIsArray($result);
+        $this->assertEquals('testpass', $result['password']);
+        $this->assertEquals('testuser', $result['username']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_for_mailbox_returns_false_for_unknown_id() {
+        $this->assertFalse(Hm_Server_Wrapper::getForMailbox('nonexistent'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_dump_for_mailbox_single_server_includes_password_and_username() {
+        $result = Hm_Server_Wrapper::dumpForMailbox($this->id);
+        $this->assertIsArray($result);
+        $this->assertEquals('testpass', $result['password']);
+        $this->assertEquals('testuser', $result['username']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_dump_for_mailbox_all_servers_includes_password_and_username_in_each() {
+        $result = Hm_Server_Wrapper::dumpForMailbox();
+        $this->assertIsArray($result);
+        foreach ($result as $server) {
+            $this->assertArrayHasKey('password', $server);
+            $this->assertArrayHasKey('username', $server);
+        }
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_fetch_with_empty_server_name_matches_by_username_only() {
+        $result = Hm_Server_Wrapper::fetch('testuser', '');
+        $this->assertIsArray($result);
+        $this->assertGreaterThan(0, count($result));
+    }
 }

@@ -762,8 +762,8 @@ function privacy_setting_callback($val, $key, $mod) {
     $setting = Hm_Output_privacy_settings::$settings[$key];
     $key .= '_setting';
     $user_setting = $mod->user_config->get($key);
-    $update = $mod->request->post['update'];
-    $pop = $mod->request->post['pop'];
+    $update = $mod->request->post['update'] ?? false;
+    $pop = $mod->request->post['pop'] ?? false;
 
     if ($update) {
         if ($pop) {
@@ -810,7 +810,9 @@ if (!hm_exists('get_scheduled_date')) {
                 $label = 'Next month';
                 break;
             default:
-                $date_string = $format;
+                // Strip sub-second precision (e.g. .000Z) from ISO 8601 strings;
+                // PHP's strtotime() does not support milliseconds.
+                $date_string = preg_replace('/\.\d+(?=Z|[+\-]\d{2}:?\d{2}|$)/', '', $format);
                 $label = 'Certain date';
                 break;
         }
@@ -844,13 +846,13 @@ function nexter_formats() {
 }}
 
 if (!hm_exists('schedule_dropdown')) {
-function schedule_dropdown($output, $send_now = false) {
+function schedule_dropdown($output, $send_now = false, $list_control = false) {
     $values = nexter_formats();
 
     $txt = '';
     if ($send_now) {
         $txt .= '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none dropdown-toggle" id="dropdownMenuNexterDate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Reschedule').'</a>';
+                <a class="hlink text-decoration-none dropdown-toggle' . ($list_control ? ' border btn btn-sm btn-light': ''). '" id="dropdownMenuNexterDate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Reschedule').'</a>';
     }
     $txt .= '<ul class="dropdown-menu nexter_dropdown schedule_dropdown" aria-labelledby="dropdownMenuNexterDate">';
     foreach ($values as $format) {

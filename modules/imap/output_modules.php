@@ -112,6 +112,8 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
      */
 
     protected function output() {
+        $auto_allow_images = false;
+        $blocked_remote_resources = 0;
         $txt = '<div class="msg_text_inner">';
         if ($this->get('msg_text')) {
             $struct = $this->get('msg_struct_current', array());
@@ -121,20 +123,25 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
             if (isset($struct['subtype']) && mb_strtolower($struct['subtype']) == 'html') {
                 $allowed = $this->get('header_allow_images');
                 $msgText = $this->get('msg_text');
+                $blocked_remote_resources = count_blocked_remote_email_css_resources($msgText);
                 // Everything in the message starting with src="http:// or src="https:// or src='http:// or src='https://
                 $externalResRegexp = '/src="(https?:\/\/[^"]*)"|src=\'(https?:\/\/[^\']*)\'/i';
 
                 if ($allowed) {
                     $images_whitelist = $this->get('images_whitelist');
                     $sender_email = $this->get('sender_email');
-                    if (! in_array($sender_email, $images_whitelist)) {
+                    $images_blacklist = $this->get('images_blacklist');
+                    $auto_allow_images = in_array($sender_email, $images_whitelist)
+                        && ! in_array($sender_email, $images_blacklist);
+
+                    if (! in_array($sender_email, $images_blacklist)) {
                         $msgText = preg_replace_callback($externalResRegexp, function ($matches) {
                             return 'data-src="' . $matches[1] . '" ' . 'src="" ' . 'data-message-part="' . $this->html_safe($this->get('imap_msg_part')) . '"';
                         }, $msgText);
                     }
 
-                    $images_blacklist = $this->get('images_blacklist');
                     if (in_array($sender_email, $images_blacklist)) {
+                        $blocked_remote_resources = 0;
                         $msgText = preg_replace_callback('/\<[^>]*(src="(https?:\/\/[^"]*)"|src=\'(https?:\/\/[^\']*)\')[^>]*\>/i', function ($matches) {
                             return '';
                         }, $msgText);
@@ -159,6 +166,22 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                 }
                 $txt .= '<div class="msg_plain_part">' . $plainContent . '</div>';
             }
+        }
+        if ($auto_allow_images) {
+            $txt = preg_replace(
+                '/^<div class="msg_text_inner">/',
+                '<div class="msg_text_inner" data-auto-allow-images="1">',
+                $txt,
+                1
+            );
+        }
+        elseif ($blocked_remote_resources > 0) {
+            $txt = preg_replace(
+                '/^<div class="msg_text_inner">/',
+                '<div class="msg_text_inner" data-blocked-remote-resources="' . (int) $blocked_remote_resources . '">',
+                $txt,
+                1
+            );
         }
         $txt .= '</div>';
         $this->out('msg_text', $txt);
@@ -367,7 +390,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
 
             $lc_headers = lc_headers($headers);
-            // Collect all recipients from To, Cc, and From (sender)
             $all_recipients = array();
             if (array_key_exists('to', $lc_headers)) {
                 $all_recipients = array_merge($all_recipients, process_address_fld($lc_headers['to']));
@@ -375,27 +397,31 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if (array_key_exists('cc', $lc_headers)) {
                 $all_recipients = array_merge($all_recipients, process_address_fld($lc_headers['cc']));
             }
-            // Add sender (from) as a possible recipient
-            if (array_key_exists('from', $lc_headers)) {
-                $from_addrs = process_address_fld($lc_headers['from']);
-                $all_recipients = array_merge($all_recipients, $from_addrs);
-            }
-            // Get current user email
+            // Get current user email and sender email
             $imap_server_id = null;
             $server_user = null;
+            $sender_email = null;
             if (array_key_exists('from', $lc_headers)) {
                 $imap_server_id = explode('_', $this->get('msg_list_path'))[1];
                 $server = Hm_IMAP_List::get($imap_server_id, false);
                 if ($server) {
                     $server_user = $server['user'];
                 }
+                $from_addrs = process_address_fld($lc_headers['from']);
+                if (!empty($from_addrs)) {
+                    $sender_email = $from_addrs[0]['email'];
+                }
             }
-            // Remove current user from recipients
+            // Remove current user and the sender from recipients
             $other_recipients = array();
             foreach ($all_recipients as $addr) {
-                if (!$server_user || mb_strtolower($addr['email']) != mb_strtolower($server_user)) {
-                    $other_recipients[] = $addr['email'];
+                if ($server_user && mb_strtolower($addr['email']) == mb_strtolower($server_user)) {
+                    continue;
                 }
+                if ($sender_email && mb_strtolower($addr['email']) == mb_strtolower($sender_email)) {
+                    continue;
+                }
+                $other_recipients[] = mb_strtolower($addr['email']);
             }
             // Unique recipients
             $other_recipients = array_unique($other_recipients);
@@ -437,7 +463,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<div class="position-relative"><a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="copy_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Copy').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
             $txt .= '<div class="position-relative"><a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="move_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Move').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
             if (!$this->get('is_archive_folder')) {
-                $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+                if ($this->get('ews_inplace_archive_enabled') === false) {
+                    $txt .= '<span class="d-inline-block" tabindex="0" title="'.$this->trans('In-Place Archive is not enabled for this Exchange account. Please contact your administrator.').'"><span class="btn btn-sm btn-outline-secondary disabled">'.$this->trans('Archive').'</span></span>';
+                } else {
+                    $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+                }
             }
 
             if ($this->get('is_trash_folder')) {
@@ -477,7 +507,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
             $txt .= '<a class="hlink text-decoration-none btn btn-sm btn-outline-secondary" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
-            $txt .= '</div><span id="extra-header-buttons"></span>';
+            $txt .= '<span id="extra-header-buttons" class="d-flex gap-2">'. $this->get('extra_header_buttons', '') . '</span></div>';
             $txt .= '<input type="hidden" class="move_to_type" value="" />';
             $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';

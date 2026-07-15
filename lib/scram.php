@@ -21,9 +21,14 @@ private $hashes = array(
     'sha512'  => 'sha512'
 );
 
-private function getHashAlgorithm($scramAlgorithm) {
+protected function getHashAlgorithm($scramAlgorithm) {
     $parts = explode('-', mb_strtolower($scramAlgorithm));
-    return $this->hashes[$parts[1]] ?? 'sha1'; // Default to sha1 if the algorithm is not found
+    if (count($parts) > 2) {
+        $hashAlgorithm = implode('-', array_slice($parts, 1));
+    } else {
+        $hashAlgorithm = $parts[1] ?? '';
+    }
+    return $this->hashes[$hashAlgorithm] ?? 'sha1'; // Default to sha1 if the algorithm is not found
 }
 private function log($message) {
     // Use Hm_Debug to add the debug message
@@ -44,23 +49,31 @@ public function generateClientProof($username, $password, $salt, $clientNonce, $
     return $clientProof;
 }
 
-public function authenticateScram($scramAlgorithm, $username, $password, $getServerResponse, $sendCommand) {
+public function authenticateScram($scramAlgorithm, $username, $password, $getServerResponse, $sendCommand, $protocol = 'imap', ?callable $nonce_generator = null) {
     $algorithm = $this->getHashAlgorithm($scramAlgorithm);
+    $nonce_generator = $nonce_generator ?? static fn() => base64_encode(random_bytes(32));
 
-    // Send initial SCRAM command
-    $scramCommand = 'AUTHENTICATE ' . $scramAlgorithm . "\r\n";
-    $sendCommand($scramCommand);
+    // SMTP uses "AUTH <mech>"; IMAP uses "AUTHENTICATE <mech>".
+    // SMTP's send_command() appends \r\n internally, so we must not include it here.
+    // IMAP's send_command() sends exactly what it receives, so \r\n must be included.
+    if ($protocol === 'smtp') {
+        $sendCommand('AUTH ' . $scramAlgorithm);
+    } else {
+        $sendCommand('AUTHENTICATE ' . $scramAlgorithm . "\r\n");
+    }
     $response = $getServerResponse();
-    if (!empty($response) && mb_substr($response[0], 0, 2) == '+ ') {
-        $this->log("Received server challenge: " . $response[0]);
+
+    $challenge = $this->extractChallenge($response, $protocol);
+    if ($challenge !== null) {
+        $this->log("Received server challenge: " . $challenge);
         // Extract salt and server nonce from the server's challenge
-        $serverChallenge = base64_decode(mb_substr($response[0], 2));
+        $serverChallenge = base64_decode($challenge);
         $parts = explode(',', $serverChallenge);
         $serverNonce = base64_decode(substr($parts[0], strpos($parts[0], "=") + 1));
         $salt = base64_decode(substr($parts[1], strpos($parts[1], "=") + 1));
 
         // Generate client nonce
-        $clientNonce = base64_encode(random_bytes(32));
+        $clientNonce = $nonce_generator();
         $this->log("Generated client nonce: " . $clientNonce);
 
         // Calculate client proof
@@ -71,13 +84,19 @@ public function authenticateScram($scramAlgorithm, $username, $password, $getSer
         $clientFinalMessage = $channelBindingData . 'r=' . $serverNonce . $clientNonce . ',p=' . $clientProof;
         $clientFinalMessageEncoded = base64_encode($clientFinalMessage);
         $this->log("Sending client final message: " . $clientFinalMessageEncoded);
-        // Send client final message to server
-        $sendCommand($clientFinalMessageEncoded . "\r\n");
+
+        // Send client final message to server (same \r\n handling as the initial command)
+        if ($protocol === 'smtp') {
+            $sendCommand($clientFinalMessageEncoded);
+        } else {
+            $sendCommand($clientFinalMessageEncoded . "\r\n");
+        }
 
         // Verify server's response
         $response = $getServerResponse();
-        if (!empty($response) && mb_substr($response[0], 0, 2) == '+ ') {
-            $serverFinalMessage = base64_decode(mb_substr($response[0], 2));
+        $challenge2 = $this->extractChallenge($response, $protocol);
+        if ($challenge2 !== null) {
+            $serverFinalMessage = base64_decode($challenge2);
             $parts = explode(',', $serverFinalMessage);
             $serverProof = substr($parts[0], strpos($parts[0], "=") + 1);
 
@@ -104,5 +123,20 @@ public function authenticateScram($scramAlgorithm, $username, $password, $getSer
         $this->log("SCRAM authentication failed: Invalid server challenge");
     }
     return false; // Authentication failed
+}
+
+private function extractChallenge($response, $protocol) {
+    if ($protocol === 'smtp') {
+        // SMTP get_response() returns a chunked array: [['334', ['base64data']], ...]
+        if (!empty($response) && isset($response[0][0]) && $response[0][0] === '334') {
+            return $response[0][1][0] ?? '';
+        }
+        return null;
+    }
+    // IMAP get_response() returns raw strings; continuation lines start with '+ '
+    if (!empty($response) && mb_substr($response[0], 0, 2) === '+ ') {
+        return mb_substr($response[0], 2);
+    }
+    return null;
 }
 }

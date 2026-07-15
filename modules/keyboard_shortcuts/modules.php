@@ -139,11 +139,13 @@ class Hm_Output_shortcut_edit_form extends Hm_Output_Module {
         $res .= '<div class="edit_shortcut_form px-5"><form method="POST" action="'.$this->build_page_url('shortcuts', array('edit_id' => $this->html_safe($details['id']))).'">';
         $res .= '<input type="hidden" name="shortcut_id" value="'.$this->html_safe($details['id']).'" />';
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
-        $res .= '<table>';
-        $res .= '<tr><th colspan="2">'.$this->trans(ucfirst($details['group'])).' : '.
-            $this->trans($details['label']).'</th></tr>';
-        $res .= '<tr><td>'.$this->trans('Modifier Key(s)').'</td>';
-        $res .= '<td><select class="form-select form-select-sm" required multiple size="5" name="shortcut_meta[]">';
+        $shortcut_title = $this->trans(ucfirst($details['group'])).' : '.$this->trans($details['label']);
+        $safe_shortcut_title = $this->html_safe($shortcut_title);
+        $res .= '<div class="shortcut_edit_fields">';
+        $res .= '<h5 class="shortcut_edit_title mb-3" title="'.$safe_shortcut_title.'">'.$safe_shortcut_title.'</h5>';
+        $res .= '<div class="edit_shortcut_field mb-3">';
+        $res .= '<label class="form-label">'.$this->trans('Modifier Key(s)').'</label>';
+        $res .= '<select class="form-select form-select-sm w-100" required multiple size="5" name="shortcut_meta[]">';
         foreach ($meta as $v) {
             $res .= '<option ';
             if (in_array($v, $details['control_chars'], true)) {
@@ -154,9 +156,10 @@ class Hm_Output_shortcut_edit_form extends Hm_Output_Module {
             }
             $res .= 'value="'.$v.'">'.ucfirst($v).'</option>';
         }
-        $res .= '</select></td></tr>';
-        $res .= '<tr><td>'.$this->trans('Character').'</td>';
-        $res .= '<td><select class="form-select form-select-sm" required " name="shortcut_key">';
+        $res .= '</select></div>';
+        $res .= '<div class="edit_shortcut_field mb-3">';
+        $res .= '<label class="form-label">'.$this->trans('Character').'</label>';
+        $res .= '<select class="form-select form-select-sm w-100" required name="shortcut_key">';
         foreach ($codes as $name => $val) {
             $res .= '<option ';
             if ($val == $details['char']) {
@@ -164,13 +167,11 @@ class Hm_Output_shortcut_edit_form extends Hm_Output_Module {
             }
             $res .= 'value="'.$this->html_safe($val).'">'.$this->html_safe($name).'</option>';
         }
-        $res .= '</select></td></tr>';
-        $res .= '<tr><td colspan="2">
-                        <input type="submit" class="btn btn-primary" value="'.$this->trans('Update').'" />
-                        <input type="button" class="btn btn-light border reset_shortcut" value="'.$this->trans('Cancel').'" />
-                </td></tr>';
-
-        $res .= '</table></form></div>';
+        $res .= '</select></div>';
+        $res .= '<div class="d-flex gap-2 flex-wrap mt-2">';
+        $res .= '<input type="submit" class="btn btn-primary" value="'.$this->trans('Update').'" />';
+        $res .= '<input type="button" class="btn btn-light border reset_shortcut" value="'.$this->trans('Cancel').'" />';
+        $res .= '</div></div></form></div>';
         return $res;
     }
 }

@@ -184,6 +184,23 @@ trait Hm_Server_List {
         self::initRepo($name, $user_config, $session, self::$server_list);
     }
 
+
+    /**
+     * Assign a server type to servers that do not have one.
+     * Servers added after the introduction of the type field already include it,
+     * so this only applies to migrating older server lists.
+     * The type field is required because Hm_Mailbox relies on it to construct the connection object.
+     * @param string $type
+     * @return void
+     */
+    protected static function bindServerTypes($type) {
+        foreach (self::$entities as $id => $server) {
+            if (! array_key_exists('type', $server)) {
+                self::edit($id, ['type' => $type]);
+            }
+        }
+    }
+
     /**
      * Add a server definition
      * @param array $atts server details
@@ -250,12 +267,12 @@ trait Hm_Server_List {
     }
 
     /**
-     * Fetch a server by the username and servername
+     * Fetch a server by the username and/or servername
      * @param string $username the user associated with the server
      * @param string $servername the host associated with the server
      * @return array|false
      */
-    public static function fetch($username, $servername) {
+    public static function fetch($username, $servername = '') {
         foreach (self::$server_list as $id => $server) {
             if (self::match($server, $username, $servername)) {
                 if (array_key_exists('pass', $server)) {
@@ -274,9 +291,12 @@ trait Hm_Server_List {
      * @param string $name server name
      * @return boolean
      */
-    private static function match($server, $user, $name) {
+    private static function match($server, $user, $name ='') {
         if (array_key_exists('user', $server) && array_key_exists('server', $server)) {
-            if ($user == $server['user'] && $name == $server['server']) {
+            if ($user == $server['user']) {
+                if ($name) {
+                    return $name == $server['server'];
+                }
                 return true;
             }
         }

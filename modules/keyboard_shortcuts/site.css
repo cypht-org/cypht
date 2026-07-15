@@ -1,8 +1,26 @@
 /* .shortcut_content { width: 100%; padding-bottom: 30px; }
 .shortcut_content .edit_shortcut_form { width: 1%; margin: 20px; margin-left: 40px; } */
-.edit_shortcut_form table th, .edit_shortcut_form table td { padding-bottom: 10px; padding-right: 20px; text-align: left; font-weight: normal; white-space: nowrap; }
-/* .edit_shortcut_form select { overflow-y: auto; } */
-.edit_shortcut_form table th { font-size: 115%; padding-bottom: 20px; }
+.edit_shortcut_form {
+  max-width: 100%;
+}
+.edit_shortcut_form .shortcut_edit_fields {
+  display: flex;
+  flex-direction: column;
+  max-width: 32rem;
+}
+.edit_shortcut_form .shortcut_edit_title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+.edit_shortcut_form .edit_shortcut_field .form-label {
+  font-weight: normal;
+  margin-bottom: 0.35rem;
+}
 .shortcut_table { width: 50%; }
 /* .kbd_config { cursor: pointer; opacity: .4; } */
 .shortcut_table th { padding-left: 40px; font-weight: normal; padding-top: 6px; padding-bottom: 3px; text-align: left; }
@@ -14,3 +32,10 @@
 .mobile .shortcut_table img { width: 20px; height: 20px; }
 .mobile .shortcut_table th { padding-left: 10px; }
 .mobile .shortcut_table { padding-right: 10px; }
+.mobile .edit_shortcut_form {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+.mobile .edit_shortcut_form .shortcut_edit_fields {
+  max-width: 100%;
+}

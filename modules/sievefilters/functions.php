@@ -334,7 +334,11 @@ if (!hm_exists('prepare_sieve_script')) {
 if (!hm_exists('get_domain')) {
     function get_domain($email)
     {
-        $domain = explode('@', $email)[1];
+        $parts = explode('@', $email, 2);
+        if (count($parts) < 2 || $parts[1] === '') {
+            return false;
+        }
+        $domain = $parts[1];
         if (preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain, $regs)) {
             return $regs['domain'];
         }
@@ -403,13 +407,13 @@ if (!hm_exists('block_filter')) {
         elseif ($default_behaviour == 'Reject') {
             $filter->addRequirement('reject');
             $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\RejectFilterAction([$reject_message])
+                new \PhpSieveManager\Filters\Actions\RejectFilterAction(['reason' => $reject_message])
             );
         }
         elseif ($default_behaviour == 'Move') {
             $filter->addRequirement('fileinto');
             $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['Blocked'])
+                new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => 'Blocked'])
             );
         }
 
@@ -535,29 +539,34 @@ if (!hm_exists('get_blocked_senders')){
             ];
             $ret = '';
             foreach ($blocked_senders as $k => $sender) {
-                $reject_message = $blocked_list_actions[$sender]['reject_message'];
-                $ret .= '<tr><td>'.$sender.'</td><td>';
+                $reject_message = ($blocked_list_actions[$sender] ?? [])['reject_message'] ?? '';
+                $sender_esc = $module->html_safe($sender);
+                $behavior_text = '';
                 if (is_array($blocked_list_actions) && array_key_exists($sender, $blocked_list_actions)) {
                     $action = $blocked_list_actions[$sender]['action'] ?: 'default';
-                    $ret .= $actions_map[$action];
+                    $behavior_text = $actions_map[$action];
                     if ($action == 'reject_with_message') {
-                        $ret .= ' - '.$reject_message;
+                        $behavior_text .= ' - '.$reject_message;
                     }
                 } else {
                     $action = 'default';
-                    $ret .= 'Default';
+                    $behavior_text = 'Default';
                 }
-                $ret .= '<a href="#" mailbox_id="'.$mailbox_id.'" data-action="'.$action.'" data-reject-message="'.$reject_message.'" title="'.$module->trans('Change Behavior').'" class="block_sender_link toggle-behavior-dropdown" aria-labelledby="dropdownMenuBlockSender'.$k.'" data-bs-toggle="dropdown" aria-expanded="false"> <i class="bi bi-pencil-fill ms-3"></i></a>';
-                $ret .= block_filter_dropdown($module, $mailbox_id, false, 'edit_blocked_behavior', 'Edit', $k);
+                $behavior_esc = $module->html_safe($behavior_text);
+                $reject_message_esc = $module->html_safe($reject_message);
 
-                $ret .= '</td><td><i class="bi bi-'.$icon_svg.' unblock_button" mailbox_id="'.$mailbox_id.'" data-title="unblock Sender '.$sender.'"></i>';
+                $ret .= '<tr>';
+                $ret .= '<td class="blocked_sender_fld" data-title="'.$sender_esc.'">'.$sender_esc.'</td>';
+                $ret .= '<td><span class="blocked_behavior_fld" data-title="'.$behavior_esc.'">'.$behavior_esc.'</span>';
+                $ret .= '<a href="#" mailbox_id="'.$mailbox_id.'" data-action="'.$action.'" data-reject-message="'.$reject_message_esc.'" title="'.$module->trans('Change Behavior').'" class="block_sender_link toggle-behavior-dropdown" aria-labelledby="dropdownMenuBlockSender'.$k.'" data-bs-toggle="dropdown" aria-expanded="false"> <i class="bi bi-pencil-fill ms-3"></i></a>';
+                $ret .= block_filter_dropdown($module, $mailbox_id, false, 'edit_blocked_behavior', 'Edit', $k);
+                $ret .= '</td>';
+                $ret .= '<td class="text-end blocked_sender_actions" style="width: 100px">';
+                $ret .= '<a href="#" class="unblock_button cursor-pointer" mailbox_id="'.$mailbox_id.'" data-title="'.$module->html_safe('unblock Sender '.$sender).'"><i class="bi bi-'.$icon_svg.' ms-2"></i></a>';
                 if (!mb_strstr($sender, '*')) {
                     $sender_party = explode('@', $sender);
-                    $domain_name = "";
-                    if(isset($sender_party[1])) {
-                        $domain_name = $sender_party[1];
-                    }
-                    $ret .= ' <i class="bi bi-'.$icon_block_domain_svg.' block_domain_button" mailbox_id="'.$mailbox_id.'" data-title="block domain '.$domain_name.'"></i>';
+                    $domain_name = isset($sender_party[1]) ? $sender_party[1] : '';
+                    $ret .= '<a href="#" class="block_domain_button cursor-pointer ms-3" mailbox_id="'.$mailbox_id.'" data-title="'.$module->html_safe('block domain '.$domain_name).'"><i class="bi bi-'.$icon_block_domain_svg.'"></i></a>';
                 }
                 $ret .= '</td></tr>';
             }
@@ -600,13 +609,18 @@ if (!hm_exists('get_sieve_host_from_services')) {
 
 if (!hm_exists('get_sieve_linked_mailbox')) {
     function get_sieve_linked_mailbox ($imap_account, $module) {
-        $factory = get_sieve_client_factory($site_config);
+        $factory = get_sieve_client_factory($module->config);
         try {
             $client = $factory->init($module->user_config, $imap_account, $module->module_is_supported('nux'));
             $scripts = $client->listScripts();
             $folders = [];
             foreach ($scripts as $s) {
                 $script = $client->getScript($s);
+
+                if (! mb_strstr($script, 'CYPHT GENERATED CONDITION')) {
+                    continue;
+                }
+
                 $base64_obj = str_replace("# ", "", split_script_lines($script)[2]);
                 $obj = json_decode(base64_decode($base64_obj))[0];
                 if ($obj && in_array($obj->action, ['copy', 'move'])) {

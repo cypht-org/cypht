@@ -1,6 +1,6 @@
-function applyContactsPageHandlers() {
+function applyContactsPageHandlers(routeParams) {
     // Validate contact form on submit
-    $('.add_contact_form').on('submit', function(e) {
+    $('.add_contact_form').off('submit').on('submit', function(e) {
         var emailField = $('#contact_email');
         var email = emailField.val();
 
@@ -15,7 +15,7 @@ function applyContactsPageHandlers() {
     });
 
     // Real-time validation feedback on email field
-    $('#contact_email').on('blur', function() {
+    $('#contact_email').off('blur').on('blur', function() {
         var email = $(this).val();
         // Always remove existing error messages first
         $(this).siblings('.invalid-feedback').remove();
@@ -29,28 +29,28 @@ function applyContactsPageHandlers() {
     });
 
     // Remove invalid feedback on input
-    $('#contact_email').on('input', function() {
+    $('#contact_email').off('input').on('input', function() {
         if ($(this).hasClass('is-invalid')) {
             $(this).removeClass('is-invalid');
             $(this).siblings('.invalid-feedback').remove();
         }
     });
 
-    $('.delete_contact:not([data-ldap-dn])').on("click", function() {
-        delete_contact($(this).data('id'), $(this).data('source'), $(this).data('type'));
+    $('.delete_contact:not([data-ldap-dn])').off("click").on("click", function() {
+        delete_contact($(this).data('id'), $(this).data('source'), $(this).data('type'), $(this));
         return false;
     });
-    $('.show_contact').on("click", function() {
+    $('.show_contact').off("click").on("click", function() {
         $('#'+$(this).data('id')).toggle();
         return false;
     });
-    $('.reset_contact').on("click", function() {
+    $('.reset_contact').off("click").on("click", function() {
         Hm_Utils.redirect('?page=contacts');
     });
-    $('.server_title').on("click", function() {
+    $('.server_title').off("click").on("click", function() {
         $(this).next().toggle();
     });
-    $('#contact_phone').on("keyup", function() {
+    $('#contact_phone').off("keyup").on("keyup", function() {
         let contact_phone = $('#contact_phone').val();
         const regex_number = new RegExp('^\\d+$');
         const allowed_characters = ['+','-','(',')'];
@@ -62,15 +62,61 @@ function applyContactsPageHandlers() {
         }
 
     });
-    $('.source_link').on("click", function () {
+    $('.source_link').off("click").on("click", function () {
         $('.list_actions').toggle(); $('#list_controls_menu').hide();
         return false;
     });
     contact_import_pagination();
+
+    initContactTabs();
+    initPagination();
+    
+    const activeTab = routeParams?.active_tab;
+    if (activeTab) {
+        $('.category-tab').removeClass('active');
+        $('.category-tab[data-target="' + activeTab + '"]').addClass('active');
+        $('.tab-content-section').removeClass('active');
+        $('#' + activeTab).addClass('active');
+        
+        if (typeof updateEditLinksWithActiveTab === 'function') {
+            updateEditLinksWithActiveTab(activeTab);
+        }
+    } else {
+        var defaultActiveTab = $('.category-tab.active').data('target');
+        if (defaultActiveTab && typeof updateEditLinksWithActiveTab === 'function') {
+            updateEditLinksWithActiveTab(defaultActiveTab);
+        }
+    }
+    
+    // Initialize local contact modal handlers if available
+    if (typeof initLocalContactModal === 'function') {
+        initLocalContactModal();
+    }
+
+    // Initialize LDAP contact modal handlers if available
+    if (typeof initLdapContactModal === 'function') {
+        initLdapContactModal();
+    }
+
+    // Auto-open modal if open_modal parameter is in URL
+    const modalType = routeParams?.open_modal;
+    
+    if (modalType) {
+        const modalId = modalType === 'ldap' ? 'ldapContactModal' : 'localContactModal';
+        
+        requestAnimationFrame(function() {
+            const modalElement = document.getElementById(modalId);
+            
+            if (modalElement && typeof bootstrap !== 'undefined' && !modalElement.classList.contains('show')) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            }
+        });
+    }
 }
 
 function applyContactsAutocompleteComposePageHandlers() {
-    $('.compose_to').on('keyup', function(e) { autocomplete_contact(e, '.compose_to', '#to_contacts'); });
-    $('.compose_cc').on('keyup', function(e) { autocomplete_contact(e, '.compose_cc', '#cc_contacts'); });
-    $('.compose_bcc').on('keyup', function(e) { autocomplete_contact(e, '.compose_bcc', '#bcc_contacts'); });
+    $('.compose_to').off('keyup').on('keyup', function(e) { autocomplete_contact(e, '.compose_to', '#to_contacts'); });
+    $('.compose_cc').off('keyup').on('keyup', function(e) { autocomplete_contact(e, '.compose_cc', '#cc_contacts'); });
+    $('.compose_bcc').off('keyup').on('keyup', function(e) { autocomplete_contact(e, '.compose_bcc', '#bcc_contacts'); });
 }

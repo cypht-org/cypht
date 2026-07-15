@@ -81,13 +81,58 @@ class Hm_Tags_Wrapper {
     }
 }
 
+class Hm_Repository_Wrapper {
+    use Hm_Repository;
+
+    private static $data = array();
+
+    public static function init($user_config, $session) {
+        self::initRepo('test_entities', $user_config, $session, self::$data);
+    }
+}
+
 if (!defined("IMAP_TEST")) {
     class Hm_IMAP {
         static public $allow_connection = true;
         static public $allow_auth = true;
         private $connected = false;
+        public $read_only = false;
+        public $search_charset = '';
+        public $use_cache = true;
+        public $selected_mailbox = false;
+        public $folder_state = false;
         public function get_state() { if (self::$allow_auth) { return $this->connected ? 'authenticated' : false; } return 'connected'; }
         public function connect() { if (self::$allow_connection) { $this->connected = true; return true; } return false; }
         public function show_debug() {}
+        public function get_mailbox_status() { return null; }
+        public function get_mailbox_list() { return null; }
+        public function select_mailbox() { return null; }
+        public function get_mailbox_page() { return null; }
+        public function mailbox_subscription() { return null; }
+        public function is_supported() { return null; }
+        public function get_message_sort_order() { return null; }
+        public function search() { return null; }
+        public function sort_by_fetch() { return null; }
+        public function message_action() { return null; }
+    }
+}
+
+class Searchable_Wrapper {
+    use Searchable;
+
+    private static $dataset = [];
+
+    public static function load(array $data): void {
+        self::$dataset = $data;
+    }
+
+    protected static function getDataset(): array {
+        return self::$dataset;
+    }
+}
+
+class TestableScramAuthenticator extends ScramAuthenticator {
+    public function hashAlgorithm(string $scramSpec): string {
+        return $this->getHashAlgorithm($scramSpec);
     }
 }

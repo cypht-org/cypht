@@ -46,6 +46,14 @@ class Hm_Mailbox {
         }
     }
 
+    /**
+     * Set connection
+     * @param object $connection The connection object to inject
+     */
+    public function set_connection($connection) {
+        $this->connection = $connection;
+    }
+
     public function connect() {
         if (! $this->connection) {
             return false;
@@ -118,20 +126,23 @@ class Hm_Mailbox {
         }
     }
 
-    public function get_folder_name($folder) {
+    public function get_folder_name($folder, $quick = false) {
         if ($this->is_imap()) {
             return $folder;
         } else {
             $result = $this->connection->get_folder_name_quick($folder);
             if ($result) {
                 return $result;
-            } else {
-                if (! $this->connection->authed()) {
-                    $this->connect();
-                }
-                $result = $this->connection->get_folder_status($folder);
-                return $result['name'];
             }
+
+            if ($quick) {
+                return null;
+            }
+            if (!$this->connection->authed()) {
+                $this->connect();
+            }
+            $result = $this->connection->get_folder_status($folder);
+            return $result['name'];
         }
     }
 
@@ -568,6 +579,14 @@ class Hm_Mailbox {
         if (! $this->select_folder($folder)) {
             return [];
         }
+        
+        // Handle JMAP specifically since it's "IMAP-like" but has different method signatures
+        if ($this->type === self::TYPE_JMAP) {
+            // JMAP search uses IMAP-like parameters but handles sorting internally
+            $uids = $this->connection->search($target, false, $terms, [], $exclude_deleted, true, $only_auto_bcc);
+            return $uids;
+        }
+        
         if ($this->is_imap()) {
             if ($sort) {
                 if ($this->connection->is_supported('SORT')) {
@@ -641,6 +660,13 @@ class Hm_Mailbox {
             return is_imap_archive_folder($id, $user_config, $current_folder);
         }
         return false;
+    }
+
+    public function is_inplace_archive_enabled() {
+        if ($this->type === self::TYPE_EWS && $this->connection) {
+            return $this->connection->is_inplace_archive_enabled();
+        }
+        return null;
     }
 
     public function get_config() {

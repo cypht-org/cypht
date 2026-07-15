@@ -15,7 +15,6 @@ jobs:
   main:
     name: Validate PR title
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - uses: amannn/action-semantic-pull-request@v5
         env:
@@ -39,6 +38,7 @@ jobs:
             module/[a-z0-9_-]+
             unit
             e2e
+            deps
             other
           # Configure that a scope must always be provided.
           requireScope: true

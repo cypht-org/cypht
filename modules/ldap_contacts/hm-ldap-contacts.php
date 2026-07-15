@@ -34,6 +34,10 @@ class Hm_LDAP_Contacts extends Hm_Auth_LDAP {
         return @ldap_add($this->fh, $dn, $entry);
     }
 
+    public function error() {
+        return @ldap_error($this->fh);
+    }
+
     public function delete($dn) {
         return @ldap_delete($this->fh, $dn);
     }
@@ -80,6 +84,7 @@ class Hm_LDAP_Contacts extends Hm_Auth_LDAP {
                 array_key_exists('display_name', $res) && $res['display_name']) {
                 $res['source'] = $this->source;
                 $res['type'] = 'ldap';
+                $res['group'] = 'Personal Addresses';
                 $res['all_fields'] = $all;
                 $result[] = $res;
             }

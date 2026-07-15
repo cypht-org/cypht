@@ -339,17 +339,23 @@ function subject_callback($vals, $style, $output_mod) {
     }
     
     $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);
+
+    $safe_url = $output_mod->html_safe($vals[1]);
+    $inline_active = $output_mod->get('inline_message_setting') && !$output_mod->get('is_mobile');
+    $link_href = $inline_active ? '#' : $safe_url;
+    $data_src_attr = $inline_active ? ' data-src="' . $safe_url . '"' : '';
+
     if ($style == 'news') {
         if ($output_mod->get('is_mobile')) {
-            return sprintf('<div class="subject"><div class="%s" title="%s">%s %s <a href="%s">%s</a></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $img, $icon_type_msg, $output_mod->html_safe($vals[1]), $hl_subject);
+            return sprintf('<div class="subject"><div class="%s" title="%s">%s %s <a href="%s">%s</a></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $img, $icon_type_msg, $safe_url, $hl_subject);
         }
-        return sprintf('<div class="subject"><div class="%s" title="%s">%s %s <a href="%s">%s</a><p class="fw-light">%s</p></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $icon_type_msg, $img, $output_mod->html_safe($vals[1]), $hl_subject, $preview_msg);
+        return sprintf('<div class="subject"><div class="%s" title="%s">%s %s <a%s href="%s">%s</a><p class="fw-light">%s</p></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $icon_type_msg, $img, $data_src_attr, $link_href, $hl_subject, $preview_msg);
     }
 
     if ($output_mod->get('is_mobile')) {
-        return sprintf('<td class="subject"><div class="%s"> %s <a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $icon_type_msg, $subject, $output_mod->html_safe($vals[1]), $hl_subject);
+        return sprintf('<td class="subject"><div class="%s"> %s <a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $icon_type_msg, $subject, $safe_url, $hl_subject);
     }
-    return sprintf('<td class="subject"><div class="%s"> %s <a title="%s" href="%s">%s</a><p class="fw-light">%s</p></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $icon_type_msg, $subject, $output_mod->html_safe($vals[1]), $hl_subject, $preview_msg);
+    return sprintf('<td class="subject"><div class="%s"> %s <a title="%s"%s href="%s">%s</a><p class="fw-light">%s</p></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $icon_type_msg, $subject, $data_src_attr, $link_href, $hl_subject, $preview_msg);
 }}
 
 /**
@@ -366,7 +372,7 @@ function date_callback($vals, $style, $output_mod) {
     if ($style == 'news') {
         return sprintf('<div class="msg_date%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></div>', $delayed_class, $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
     }
-    return sprintf('<td class="msg_date%s" title="%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $delayed_class, $output_mod->html_safe(date('r', $vals[1])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
+    return sprintf('<td class="msg_date%s" title="%s">%s%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $delayed_class, $output_mod->html_safe(date('r', $vals[1])), ($delayed_class ? '<span class="badge bg-secondary-subtle text-body"><i class="bi bi-alarm"></i></span>': ''), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
 }}
 
 function dates_holders_callback($vals) {
@@ -532,9 +538,8 @@ function list_sources($sources, $output_mod) {
         else {
             $folder = $src['folder_name'];
         }
-        $res .= '<div class="list_src">'.$output_mod->html_safe($src['type']).' '.$output_mod->html_safe($src['name']);
-        $res .= ' '.$output_mod->html_safe($folder);
-        $res .= '</div>';
+        $label = trim($src['type'].' '.$src['name'].' '.$folder);
+        $res .= '<div class="list_src" title="'.$output_mod->html_safe($label).'">'.$output_mod->html_safe($label).'</div>';
     }
     $res .= '</div>';
     return $res;

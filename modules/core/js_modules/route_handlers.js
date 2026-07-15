@@ -212,7 +212,7 @@ function applyCommonWrappedPageHandlers() {
         updateNavbarDynamicContent();
     }
 
-    if ($('.cypht-layout nav').hasClass('collapsed')) {
+    if ($('.cypht-layout nav').hasClass('collapsed') || Hm_Utils.get_from_local_storage('navbar_collapsed') === '1') {
         document.documentElement.style.setProperty('--nav-size', 'var(--nav-collapsed-size)');
     } else {
         document.documentElement.style.setProperty('--nav-size', 'var(--nav-expanded-size)');

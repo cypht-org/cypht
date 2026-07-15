@@ -249,6 +249,16 @@ class Hm_Handler_process_auto_bcc extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_process_enable_exclude_auto_bcc extends Hm_Handler_Module {
+    public function process() {
+        function enable_exclude_auto_bcc_callback($val) { return $val; }
+        process_site_setting('enable_exclude_auto_bcc', $this, 'enable_exclude_auto_bcc_callback', DEFAULT_SETTING_ENABLE_EXCLUDE_AUTO_BCC, true);
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_get_test_chunk extends Hm_Handler_Module {
     public function process() {
         $filepath = $this->config->get('attachment_dir');
@@ -324,6 +334,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         $uploaded_files = array_key_exists('uploaded_files', $this->request->post) ? $this->request->post['uploaded_files'] : false;
         $delivery_receipt = array_key_exists('compose_delivery_receipt', $this->request->post) ? $this->request->post['compose_delivery_receipt'] : false;
         $schedule = array_key_exists('schedule', $this->request->post) ? $this->request->post['schedule'] : '';
+        $body_type = $this->get('smtp_compose_type', DEFAULT_SMTP_COMPOSE_TYPE);
 
         if (array_key_exists('delete_uploaded_files', $this->request->post) && $this->request->post['delete_uploaded_files']) {
             delete_uploaded_files($this->session, $draft_id);
@@ -352,7 +363,8 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
             }
             $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
                     'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
-                    'draft_in_reply_to' => $inreplyto, 'delivery_receipt' => $delivery_receipt, 'schedule' => $schedule), $draft_id, $this->session,
+                    'draft_in_reply_to' => $inreplyto, 'delivery_receipt' => $delivery_receipt, 'schedule' => $schedule,
+                    'body_type' => $body_type), $draft_id, $this->session,
                     $this, $this->cache, $uploaded_files, $profile);
             if ($new_draft_id >= 0) {
                 if ($draft_notice) {
@@ -1014,7 +1026,7 @@ class Hm_Output_compose_form_start extends Hm_Output_Module {
         $res = '<div class="container">';
         $res .= '<div class="row justify-content-md-center">';
         $res .= '<div class="col col-lg-10 col-xl-8">';
-        $res .= '<form class="compose_form p-4" method="post" action="'.$this->build_page_url('compose').'" data-reminder="' . $this->get('enable_attachment_reminder', 0) . '">';
+        $res .= '<form class="compose_form p-4" method="post" action="'.$this->build_page_url('compose').'" data-reminder="' . $this->get('enable_attachment_reminder', 0) . '" data-compose-type="'.$this->get('smtp_compose_type', DEFAULT_SMTP_COMPOSE_TYPE).'">';
         return $res;
     }
 }
@@ -1173,13 +1185,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         if (count($this->get('smtp_servers', array())) == 0) {
             $send_disabled = 'disabled="disabled" ';
         }
-        $res = '';
-        if ($html == 1) {
-            // TODO: The client should be provided all relevant configs so it can tell what appropriate js code to execute. This should not be handled by backend modules.
-            $res .= '<script type="text/javascript">window.HTMLEditor = true</script>';
-        }
-
-        $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+        $res = '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<input type="hidden" name="compose_msg_path" value="'.$this->html_safe($msg_path).'" />'.
                 '<input type="hidden" name="post_archive" class="compose_post_archive" value="0" />'.
                 '<input type="hidden" name="next_email_post" class="compose_next_email_data" value="" />'.
@@ -1220,12 +1226,6 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 if($this->get('enable_compose_delivery_receipt_setting')) {
                     $res .= '<div class="form-check mb-3"><input value="1" name="compose_delivery_receipt" disabled id="compose_delivery_receipt" type="checkbox" class="form-check-input" checked/><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
                 }
-        if ($html == 2) {
-            $res .= '<link href="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
-                '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.js"></script>'.
-                '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/markdown/marked.js"></script>'.
-                '<script type="text/javascript">window.mdEditor = new Editor(); mdEditor.render();</script>';
-        }
         $res .= '<table class="uploaded_files">';
 
         foreach ($files as $file) {
@@ -1420,6 +1420,27 @@ class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res .= '>'.$reset.'</div></td></tr>';
+        return $res;
+    }
+}
+
+/**
+ * @subpackage smtp/output
+ */
+class Hm_Output_exclude_auto_bcc_setting extends Hm_Output_Module {
+    protected function output() {
+        $auto = DEFAULT_SETTING_ENABLE_EXCLUDE_AUTO_BCC;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('enable_exclude_auto_bcc', $settings)) {
+            $auto = $settings['enable_exclude_auto_bcc'];
+        }
+        $res = '<tr class="general_setting"><td><label class="form-check-label" for="enable_exclude_auto_bcc">'.$this->trans('Enable exclude auto BCC').'</label></td><td><input class="form-check-input" value="1" type="checkbox" name="enable_exclude_auto_bcc" id="enable_exclude_auto_bcc"  data-default-value="true"';
+        $reset = '';
+        if ($auto) {
+            $res .= ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
+        }
+        $res .= '>'.$reset.'</td></tr>';
         return $res;
     }
 }
@@ -1640,10 +1661,8 @@ class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
             return;
         }
         $scheduled_msg_count = 0;
+        // Pass the raw value; reschedule_message_sending() calls get_scheduled_date() internally.
         $new_schedule_date = $form['schedule_date'];
-        if ($form['schedule_date'] != 'now') {
-            $new_schedule_date = get_scheduled_date($form['schedule_date']);
-        }
         $ids = explode(',', $form['scheduled_msg_ids']);
         foreach ($ids as $msg_part) {
             list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
@@ -1666,7 +1685,6 @@ class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
             $msg = 'ERRFailed to schedule sending for messages';
         }
         Hm_Msgs::add($msg);
-        $this->save_hm_msgs();
     }
 }
 
@@ -2021,14 +2039,14 @@ function get_uploaded_files_from_array($uploaded_files) {
 }
 }
 
-function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '', $profile_id = null) {
+function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '', $profile_id = null, $body_type = false) {
     $uploaded_files = get_uploaded_files_from_array($uploaded_files);
     $mime = new Hm_MIME_Msg(
         $atts['draft_to'],
         $atts['draft_subject'],
         $atts['draft_body'],
         $from,
-        false,
+        $body_type,
         $atts['draft_cc'],
         $atts['draft_bcc'],
         '',
@@ -2096,8 +2114,25 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     } else {
         $folder = $specials['draft'];
     }
-    
-    $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name, $profile['id']);
+
+    // For scheduled messages, use the real outbound format so the message is stored
+    // with proper MIME structure (multipart/alternative for HTML/markdown).
+    // Regular drafts stay as plain text so they re-open correctly in the compose form.
+    $body_type_for_mime = false;
+    if (!empty($atts['schedule'])) {
+        $body_type_for_mime = isset($atts['body_type']) ? (int) $atts['body_type'] : false;
+        // Markdown (type 2) must be pre-converted to HTML; Hm_MIME_Msg then wraps
+        // it in a multipart/alternative part, matching what direct send does.
+        if ($body_type_for_mime === 2 && !empty($atts['draft_body'])) {
+            $converter = new GithubFlavoredMarkdownConverter([
+                'html_input' => 'strip',
+                'allow_unsafe_links' => false,
+            ]);
+            $atts['draft_body'] = $converter->convert($atts['draft_body']);
+        }
+    }
+
+    $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name, $profile['id'], $body_type_for_mime);
     $res = $mime->process_attachments();
 
     if (! empty($atts['schedule']) && empty($mime->get_recipient_addresses())) {

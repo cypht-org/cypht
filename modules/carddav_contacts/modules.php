@@ -193,7 +193,7 @@ class Hm_Handler_load_carddav_contacts extends Hm_Handler_Module {
             $this->append('contact_sources', 'carddav');
         }
         $this->out('contact_store', $contacts, false);
-        $this->out('carddav_sources', $details);
+        $this->out('carddav_sources', config('carddav'));
     }
 }
 

@@ -38,57 +38,65 @@ class Hm_Environment {
     }
 
     public function define_default_constants($config) {
-        define('DEFAULT_SEARCH_SINCE', $config->get('default_setting_search_since', '-1 week'));
-        define('DEFAULT_UNREAD_SINCE', $config->get('default_setting_unread_since', '-1 week'));
-        define('DEFAULT_UNREAD_PER_SOURCE', $config->get('default_setting_unread_per_source', 20));
-        define('DEFAULT_FLAGGED_SINCE', $config->get('default_setting_flagged_since', '-1 week'));
-        define('DEFAULT_FLAGGED_PER_SOURCE', $config->get('default_setting_flagged_per_source', 20));
-        define('DEFAULT_ALL_SINCE', $config->get('default_setting_all_since', '-1 week'));
-        define('DEFAULT_ALL_PER_SOURCE', $config->get('default_setting_all_per_source', 20));
-        define('DEFAULT_ALL_EMAIL_SINCE', $config->get('default_setting_all_email_since', '-1 week'));
-        define('DEFAULT_ALL_EMAIL_PER_SOURCE', $config->get('default_setting_all_email_per_source', 20));
-        define('DEFAULT_FEED_SINCE', $config->get('default_setting_feed_since', '-1 week'));
-        define('DEFAULT_FEED_LIMIT', $config->get('default_setting_feed_limit', 20));
-        define('DEFAULT_SENT_SINCE', $config->get('default_setting_sent_since', '-1 week'));
-        define('DEFAULT_SENT_PER_SOURCE', $config->get('default_setting_sent_per_source', 20));
-        define('DEFAULT_UNREAD_EXCLUDE_FEEDS', $config->get('default_setting_unread_exclude_feeds', false));
-        define('DEFAULT_LIST_STYLE', $config->get('default_setting_list_style', 'email_style'));
-        define('DEFAULT_IMAP_PER_PAGE', $config->get('default_setting_imap_per_page', 20));
-        define('DEFAULT_JUNK_SINCE', $config->get('default_setting_junk_since', '-1 week'));
-        define('DEFAULT_JUNK_PER_SOURCE', $config->get('default_setting_junk_per_source', 20));
-        define('DEFAULT_SNOOZED_SINCE', $config->get('default_setting_snoozed_since', '-1 week'));
-        define('DEFAULT_SNOOZED_PER_SOURCE', $config->get('default_setting_snoozed_per_source', 20));
-        define('DEFAULT_ENABLE_SNOOZE', $config->get('default_setting_enable_snooze', true));
-        define('DEFAULT_TAGS_SINCE', $config->get('default_setting_tags_since', '-1 week'));
-        define('DEFAULT_TAGS_PER_SOURCE', $config->get('default_setting_tags_per_source', 20));
-        define('DEFAULT_TRASH_SINCE', $config->get('default_setting_trash_since', '-1 week'));
-        define('DEFAULT_TRASH_PER_SOURCE', $config->get('default_setting_trash_per_source', 20));
-        define('DEFAULT_DRAFT_SINCE', $config->get('default_setting_draft_since', '-1 week'));
-        define('DEFAULT_DRAFT_PER_SOURCE', $config->get('default_setting_draft_per_source', 20));
-        define('DEFAULT_SIMPLE_MSG_PARTS', $config->get('default_setting_simple_msg_parts', false));
-        define('DEFAULT_MSG_PART_ICONS', $config->get('default_setting_msg_part_icons', true));
-        define('DEFAULT_PAGINATION_LINKS', $config->get('default_setting_pagination_links', true));
-        define('DEFAULT_REVIEW_SENT_EMAIL', $config->get('default_setting_review_sent_email', true));
-        define('DEFAULT_TEXT_ONLY', $config->get('default_setting_text_only', false));
-        define('DEFAULT_NO_PASSWORD_SAVE', $config->get('default_setting_no_password_save', false));
-        define('DEFAULT_SHOW_LIST_ICONS', $config->get('default_setting_show_list_icons', true));
-        define('DEFAULT_START_PAGE', $config->get('default_setting_start_page', "none"));
-        define('DEFAULT_DISABLE_DELETE_PROMPT', $config->get('default_setting_disable_delete_prompt', false));
-        define('DEFAULT_NO_FOLDER_ICONS', $config->get('default_setting_no_folder_icons', false));
-        define('DEFAULT_SETTING_LANGUAGE', $config->get('default_setting_language', 'en'));
-        define('DEFAULT_SMTP_COMPOSE_TYPE', $config->get('default_setting_smtp_compose_type', 0));
-        define('DEFAULT_SMTP_AUTO_BCC', $config->get('default_setting_smtp_auto_bcc', false));
-        define('DEFAULT_THEME', $config->get('default_setting_theme', 'default'));
-        define('DEFAULT_UNREAD_EXCLUDE_WORDPRESS', $config->get('default_setting_unread_exclude_wordpress', false));
-        define('DEFAULT_WORDPRESS_SINCE', $config->get('default_setting_wordpress_since', '-1 week'));
-        define('DEFAULT_UNREAD_EXCLUDE_GITHUB', $config->get('default_setting_unread_exclude_github', false));
-        define('DEFAULT_GITHUB_PER_SOURCE', $config->get('default_setting_github_limit', 20));
-        define('DEFAULT_GITHUB_SINCE', $config->get('default_setting_github_since', '-1 week'));
-        define('DEFAULT_INLINE_MESSAGE', $config->get('default_setting_inline_message', false));
-        define('DEFAULT_INLINE_MESSAGE_STYLE', $config->get('default_setting_inline_message_style', 'right'));
-        define('DEFAULT_ENABLE_KEYBOARD_SHORTCUTS', $config->get('default_setting_enable_keyboard_shortcuts', false));
-        define('DEFAULT_ENABLE_SIEVE_FILTER', $config->get('default_setting_enable_sieve_filter', false));
-        define('DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND', $config->get('default_setting_enable_collect_address_on_send', false));
+        $this->define_constant('DEFAULT_SEARCH_SINCE', $config->get('default_setting_search_since', '-1 week'));
+        $this->define_constant('DEFAULT_UNREAD_SINCE', $config->get('default_setting_unread_since', '-1 week'));
+        $this->define_constant('DEFAULT_UNREAD_PER_SOURCE', $config->get('default_setting_unread_per_source', 20));
+        $this->define_constant('DEFAULT_FLAGGED_SINCE', $config->get('default_setting_flagged_since', '-1 week'));
+        $this->define_constant('DEFAULT_FLAGGED_PER_SOURCE', $config->get('default_setting_flagged_per_source', 20));
+        $this->define_constant('DEFAULT_SEARCH_ALL_FOLDERS', $config->get('default_setting_search_all_folders', false));
+        $this->define_constant('DEFAULT_ALL_SINCE', $config->get('default_setting_all_since', '-1 week'));
+        $this->define_constant('DEFAULT_ALL_PER_SOURCE', $config->get('default_setting_all_per_source', 20));
+        $this->define_constant('DEFAULT_ALL_EMAIL_SINCE', $config->get('default_setting_all_email_since', '-1 week'));
+        $this->define_constant('DEFAULT_ALL_EMAIL_PER_SOURCE', $config->get('default_setting_all_email_per_source', 20));
+        $this->define_constant('DEFAULT_FEED_SINCE', $config->get('default_setting_feed_since', '-1 week'));
+        $this->define_constant('DEFAULT_FEED_LIMIT', $config->get('default_setting_feed_limit', 20));
+        $this->define_constant('DEFAULT_SENT_SINCE', $config->get('default_setting_sent_since', '-1 week'));
+        $this->define_constant('DEFAULT_SENT_PER_SOURCE', $config->get('default_setting_sent_per_source', 20));
+        $this->define_constant('DEFAULT_UNREAD_EXCLUDE_FEEDS', $config->get('default_setting_unread_exclude_feeds', false));
+        $this->define_constant('DEFAULT_LIST_STYLE', $config->get('default_setting_list_style', 'email_style'));
+        $this->define_constant('DEFAULT_IMAP_PER_PAGE', $config->get('default_setting_imap_per_page', 20));
+        $this->define_constant('DEFAULT_JUNK_SINCE', $config->get('default_setting_junk_since', '-1 week'));
+        $this->define_constant('DEFAULT_JUNK_PER_SOURCE', $config->get('default_setting_junk_per_source', 20));
+        $this->define_constant('DEFAULT_SNOOZED_SINCE', $config->get('default_setting_snoozed_since', '-1 week'));
+        $this->define_constant('DEFAULT_SNOOZED_PER_SOURCE', $config->get('default_setting_snoozed_per_source', 20));
+        $this->define_constant('DEFAULT_ENABLE_SNOOZE', $config->get('default_setting_enable_snooze', true));
+        $this->define_constant('DEFAULT_TAGS_SINCE', $config->get('default_setting_tags_since', '-1 week'));
+        $this->define_constant('DEFAULT_TAGS_PER_SOURCE', $config->get('default_setting_tags_per_source', 20));
+        $this->define_constant('DEFAULT_TRASH_SINCE', $config->get('default_setting_trash_since', '-1 week'));
+        $this->define_constant('DEFAULT_TRASH_PER_SOURCE', $config->get('default_setting_trash_per_source', 20));
+        $this->define_constant('DEFAULT_DRAFT_SINCE', $config->get('default_setting_draft_since', '-1 week'));
+        $this->define_constant('DEFAULT_DRAFT_PER_SOURCE', $config->get('default_setting_draft_per_source', 20));
+        $this->define_constant('DEFAULT_SIMPLE_MSG_PARTS', $config->get('default_setting_simple_msg_parts', false));
+        $this->define_constant('DEFAULT_MSG_PART_ICONS', $config->get('default_setting_msg_part_icons', true));
+        $this->define_constant('DEFAULT_PAGINATION_LINKS', $config->get('default_setting_pagination_links', true));
+        $this->define_constant('DEFAULT_REVIEW_SENT_EMAIL', $config->get('default_setting_review_sent_email', true));
+        $this->define_constant('DEFAULT_TEXT_ONLY', $config->get('default_setting_text_only', false));
+        $this->define_constant('DEFAULT_NO_PASSWORD_SAVE', $config->get('default_setting_no_password_save', false));
+        $this->define_constant('DEFAULT_SHOW_LIST_ICONS', $config->get('default_setting_show_list_icons', true));
+        $this->define_constant('DEFAULT_START_PAGE', $config->get('default_setting_start_page', "none"));
+        $this->define_constant('DEFAULT_DISABLE_DELETE_PROMPT', $config->get('default_setting_disable_delete_prompt', false));
+        $this->define_constant('DEFAULT_NO_FOLDER_ICONS', $config->get('default_setting_no_folder_icons', false));
+        $this->define_constant('DEFAULT_SETTING_LANGUAGE', $config->get('default_setting_language', 'en'));
+        $this->define_constant('DEFAULT_SMTP_COMPOSE_TYPE', $config->get('default_setting_smtp_compose_type', 0));
+        $this->define_constant('DEFAULT_SMTP_AUTO_BCC', $config->get('default_setting_smtp_auto_bcc', false));
+        $this->define_constant('DEFAULT_THEME', $config->get('default_setting_theme', 'default'));
+        $this->define_constant('DEFAULT_UNREAD_EXCLUDE_WORDPRESS', $config->get('default_setting_unread_exclude_wordpress', false));
+        $this->define_constant('DEFAULT_WORDPRESS_SINCE', $config->get('default_setting_wordpress_since', '-1 week'));
+        $this->define_constant('DEFAULT_UNREAD_EXCLUDE_GITHUB', $config->get('default_setting_unread_exclude_github', false));
+        $this->define_constant('DEFAULT_GITHUB_PER_SOURCE', $config->get('default_setting_github_limit', 20));
+        $this->define_constant('DEFAULT_GITHUB_SINCE', $config->get('default_setting_github_since', '-1 week'));
+        $this->define_constant('DEFAULT_INLINE_MESSAGE', $config->get('default_setting_inline_message', false));
+        $this->define_constant('DEFAULT_INLINE_MESSAGE_STYLE', $config->get('default_setting_inline_message_style', 'right'));
+        $this->define_constant('DEFAULT_ENABLE_KEYBOARD_SHORTCUTS', $config->get('default_setting_enable_keyboard_shortcuts', false));
+        $this->define_constant('DEFAULT_ENABLE_SIEVE_FILTER', $config->get('default_setting_enable_sieve_filter', false));
+        $this->define_constant('DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND', $config->get('default_setting_enable_collect_address_on_send', false));
+        $this->define_constant('DEFAULT_SETTING_ENABLE_EXCLUDE_AUTO_BCC', $config->get('default_setting_enable_exclude_auto_bcc', true));
+    }
+
+    private function define_constant($name, $value) {
+        if (!defined($name)) {
+            define($name, $value);
+        }
     }
 
     /**

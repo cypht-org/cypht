@@ -24,6 +24,7 @@ setup_cypht() {
     if [ "$DB" = "sqlite" ]; then
         # .env
         sed -i 's/DB_DRIVER=mysql/DB_DRIVER=sqlite/' .env
+        sed -i 's|DB_NAME=.*|DB_NAME=/tmp/test.db|' .env
         # mocks.php
         sed -i 's/mysql/sqlite/' tests/phpunit/mocks.php
         sed -i "s/'host'/'socket'/" tests/phpunit/mocks.php
@@ -54,6 +55,7 @@ setup_db() {
     fi
     if [ "$DB" = "sqlite" ]; then
         touch /tmp/test.db
+        chmod 666 /tmp/test.db
         sqlite3 /tmp/test.db 'create table hm_user (username varchar(255), hash varchar(255), primary key (username));'
         sqlite3 /tmp/test.db 'create table hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));'
         sqlite3 /tmp/test.db 'create table hm_user_settings(username varchar(255), settings longblob, primary key (username));'
@@ -82,9 +84,36 @@ setup_user() {
 	sudo useradd -m -p '$1$BMvnSsOY$DXbm292ZTfTwuEwUpu/Lo/' testuser
 	sudo mkdir -p /home/testuser/mail/.imap/INBOX
 	sudo chown -R testuser:testuser /home/testuser
+    sudo chmod 700 /home/testuser/mail/.imap
 	sudo usermod -aG mail testuser
 	sudo usermod -aG postdrop testuser
+
+    sudo systemctl restart dovecot
+
 	STATUS_DONE
+}
+# test dovecot user authentication
+test_user_setup() {
+    STATUS_TITLE "Test MailUser After Setup"
+
+    # Test authentication with doveadm
+    echo "Testing Dovecot authentication for 'testuser@localhost'..."
+    sudo doveadm auth test testuser testuser
+
+    # Try SMTP login manually via STARTTLS
+    echo -e "EHLO localhost\r\nAUTH PLAIN $(printf '\0testuser@localhost\0testuser' | base64)\r\nQUIT\r\n" | \
+      openssl s_client -connect localhost:25 -starttls smtp -crlf
+
+    # Try IMAP login manually (plaintext)
+    echo -e "a login testuser@localhost testuser\r\na logout\r\n" | \
+      openssl s_client -connect localhost:143 -crlf
+
+    # Check if Postfix auth socket exists
+    echo "Checking Postfix auth socket..."
+    sudo ls -l /var/spool/postfix/private/auth
+    sudo test -S /var/spool/postfix/private/auth && echo "Socket exists"
+
+    STATUS_DONE
 }
 
 # config Dovecot
@@ -108,6 +137,18 @@ setup_postfix() {
 	else
 		STATUS_ERROR
 		exit 1
+	fi
+}
+
+# setup OpenLDAP test data
+setup_ldap() {
+	STATUS_TITLE "Setup OpenLDAP"
+	bash .github/tests/scripts/ldap.sh
+	if [ $? -eq 0 ]; then
+		STATUS_DONE
+	else
+		STATUS_ERROR
+		echo "Warning: LDAP setup failed - LDAP tests may be skipped"
 	fi
 }
 
@@ -144,6 +185,7 @@ setup_site() {
 	sudo -u www-data cp .github/tests/.env .
 	if [ "$DB" = "sqlite" ]; then
 		sudo -u www-data sed -i 's/DB_DRIVER=mysql/DB_DRIVER=sqlite/' .env
+		sudo -u www-data sed -i 's|DB_NAME=.*|DB_NAME=/tmp/test.db|' .env
 	fi
 	sudo -u www-data sed -i "s|ATTACHMENT_DIR=.*|ATTACHMENT_DIR=/var/www/cypht/hm3/attachments|" .env
 	sudo -u www-data php scripts/config_gen.php
@@ -181,6 +223,7 @@ setup_site() {
 setup_unit_tests() {
     setup_cypht
     bootstrap_unit_tests
+    setup_ldap
 }
 
 setup_ui_tests() {
@@ -189,6 +232,8 @@ setup_ui_tests() {
     setup_user
     setup_dovecot
     setup_postfix
+    setup_ldap
+    test_user_setup
     setup_site
 }
 

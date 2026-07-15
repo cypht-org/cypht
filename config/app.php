@@ -1,5 +1,4 @@
 <?php
-
 return [
     /*
     |
@@ -130,8 +129,8 @@ return [
 
     /*
     |
-    | Enable TLS/SSL connections. Leave blank or set to false to disable. Set to
-    | true to enable TLS connections. If you want to use IMAP STARTTLS, do NOT
+    | Enable TLS/SSL connections. Set to false to disable. Leave blank (or set to
+    | true) to enable TLS connections by default. If you want to use IMAP STARTTLS, do NOT
     | enable this. This is only for TLS enabled sockets (typically on port 993).
     |
     */
@@ -568,7 +567,7 @@ return [
     | formatted message, you will now have a link before the message body called "Allow
     | Images" that will reload the message part with external images visible.
     */
-    'allow_external_image_sources' => env('ALLOW_EXTERNAL_IMAGE_SOURCES', true),
+    'allow_external_image_sources' => env('ALLOW_EXTERNAL_IMAGE_SOURCES', false),
 
     /*
     | ------------------
@@ -651,7 +650,7 @@ return [
     | Handles page layout, login/logout, and the default settings pages. This set
     | is required.
     */
-    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags')),
+    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags,brute_force')),
     // 'modules' => [
     //     /*
     //     |  ----
@@ -972,6 +971,16 @@ return [
     //     |
     //     */
     //     // 'hello_world',
+
+    //     /*
+    //     | -------------------------
+    //     | Brute Force Protection
+    //     | -------------------------
+    //     |
+    //     | Tracks failed login attempts per IP and per username. Locks out the
+    //     | source IP and targeted account after too many failures.
+    //     */
+    //     'brute_force',
     // ],
 
     /*
@@ -980,6 +989,22 @@ return [
     | ----------
     */
     // 'api_login_key' => env('API_LOGIN_KEY'),
+
+    /*
+    | -----------------------------------------------------------------------------
+    | Brute Force Login Protection
+    | -----------------------------------------------------------------------------
+    |
+    | These settings control the brute_force module set. The module tracks failed
+    | login attempts by IP address and username. After brute_force_max_attempts
+    | consecutive failures the source IP and/or the targeted account are locked
+    | out for brute_force_lockout_duration seconds.
+    |
+    | brute_force_max_attempts     – failures before lockout (default: 5)
+    | brute_force_lockout_duration – lockout length in seconds (default: 900 = 15 min)
+    */
+    'brute_force_max_attempts'     => env('BRUTE_FORCE_MAX_ATTEMPTS', 5),
+    'brute_force_lockout_duration' => env('BRUTE_FORCE_LOCKOUT_DURATION', 900),
 
     /*
     | -----------------------------------------------------------------------------
@@ -1212,6 +1237,12 @@ return [
     'default_setting_flagged_per_source' => env('DEFAULT_SETTING_FLAGGED_PER_SOURCE', 20),
 
     /*
+    | Search all folders in combined views (flagged, unread, etc.)
+    | Defaults to false
+    */
+    'default_setting_search_all_folders' => env('DEFAULT_SETTING_SEARCH_ALL_FOLDERS', false),
+
+    /*
     |
     | Per source time limit for the flagged combined view
     | Defaults to 1 week
@@ -1239,6 +1270,12 @@ return [
     | Defaults to false
     */
     'default_setting_enable_collect_address_on_send' => env('DEFAULT_SETTING_ENABLE_COLLECT_ADDRESS_ON_SEND', false),
+
+    /*
+    | This will not include auto-bcc'ed messages
+    | Defaults to true
+    */
+    'default_setting_enable_exclude_auto_bcc' => env('DEFAULT_SETTING_ENABLE_EXCLUDE_AUTO_BCC', true),
 
     /*
     |
@@ -1375,6 +1412,6 @@ return [
     'js_exclude_deps' => env('JS_EXCLUDE_DEPS', ''),
 
     'page_param_name' => env('PAGE_PARAM_NAME', 'page'),
-  
+
     'enable_mstnef_viewer' => env('ENABLE_MSTNEF_VIEWER', false),
 ];

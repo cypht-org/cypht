@@ -19,6 +19,7 @@ class Hm_SMTP_List {
 
     public static function init($user_config, $session) {
         self::initRepo('smtp_servers', $user_config, $session, self::$server_list);
+        self::bindServerTypes('smtp');
         self::$user_config = $user_config;
         self::$session = $session;
     }
@@ -141,16 +142,16 @@ class Hm_SMTP {
             $this->starttls = true;
         }
         $this->request_auths = array(
-            'scram-sha-1',
-            'scram-sha-1-plus',
-            'scram-sha-256',
-            'scram-sha-256-plus',
-            'scram-sha-224',
-            'scram-sha-224-plus',
-            'scram-sha-384',
-            'scram-sha-384-plus',
-            'scram-sha-512',
             'scram-sha-512-plus',
+            'scram-sha-512',
+            'scram-sha-384-plus',
+            'scram-sha-384',
+            'scram-sha-256-plus',
+            'scram-sha-256',
+            'scram-sha-224-plus',
+            'scram-sha-224',
+            'scram-sha-1-plus',
+            'scram-sha-1',
             'cram-md5',
             'login',
             'plain');
@@ -377,7 +378,8 @@ class Hm_SMTP {
                 $username,
                 $password,
                 [$this, 'get_response'],
-                [$this, 'send_command']
+                [$this, 'send_command'],
+                'smtp'
             );
             if ($result) {
                 return 'Authentication successful';
@@ -567,26 +569,19 @@ class Hm_SMTP {
 
     /* NTLM compatible DES encryption */
     function des_encrypt($string, $challenge='KGS!@#$%') {
-        $key = array();
         $tmp = array();
         $len = strlen($string);
         for ($i=0; $i<7; ++$i)
             $tmp[] = $i < $len ? ord($string[$i]) : 0;
-        $key[] = $tmp[0] & 254;
-        $key[] = ($tmp[0] << 7) | ($tmp[1] >> 1);
-        $key[] = ($tmp[1] << 6) | ($tmp[2] >> 2);
-        $key[] = ($tmp[2] << 5) | ($tmp[3] >> 3);
-        $key[] = ($tmp[3] << 4) | ($tmp[4] >> 4);
-        $key[] = ($tmp[4] << 3) | ($tmp[5] >> 5);
-        $key[] = ($tmp[5] << 2) | ($tmp[6] >> 6);
-        $key[] = $tmp[6] << 1;
-        $is = mcrypt_get_iv_size(MCRYPT_DES, MCRYPT_MODE_ECB);
-        $iv = mcrypt_create_iv($is, MCRYPT_RAND);
-        $key0 = "";
-        foreach ($key as $k)
-            $key0 .= chr($k);
-        $crypt = mcrypt_encrypt(MCRYPT_DES, $key0, $challenge, MCRYPT_MODE_ECB, $iv);
-        return $crypt;
+        $key  = chr($tmp[0] & 254);
+        $key .= chr(($tmp[0] << 7) | ($tmp[1] >> 1));
+        $key .= chr(($tmp[1] << 6) | ($tmp[2] >> 2));
+        $key .= chr(($tmp[2] << 5) | ($tmp[3] >> 3));
+        $key .= chr(($tmp[3] << 4) | ($tmp[4] >> 4));
+        $key .= chr(($tmp[4] << 3) | ($tmp[5] >> 5));
+        $key .= chr(($tmp[5] << 2) | ($tmp[6] >> 6));
+        $key .= chr($tmp[6] << 1);
+        return openssl_encrypt($challenge, 'DES-ECB', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
     }
 
     /* Send a message */

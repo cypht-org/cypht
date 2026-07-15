@@ -68,6 +68,7 @@ add_handler('settings', 'reset_factory', true, 'core', 'save_user_data', 'before
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
 add_handler('settings', 'privacy_settings', true, 'core', 'date', 'after');
+add_handler('settings', 'process_search_all_folders_setting', true, 'core', 'save_user_settings', 'before');
 
 add_output('settings', 'start_settings_form', true, 'core', 'version_upgrade_checker', 'after');
 add_output('settings', 'start_search_settings', true, 'core', 'start_settings_form', 'after');
@@ -83,7 +84,8 @@ add_output('settings', 'delete_prompt_setting', true, 'core', 'list_style_settin
 add_output('settings', 'no_password_setting', true, 'core', 'delete_prompt_setting', 'after');
 add_output('settings', 'start_page_setting', true, 'core', 'no_password_setting', 'after');
 add_output('settings', 'default_sort_order_setting', true, 'core', 'start_page_setting', 'after');
-add_output('settings', 'start_unread_settings', true, 'core', 'default_sort_order_setting', 'after');
+add_output('settings', 'search_all_folders_setting', true, 'core', 'default_sort_order_setting', 'after');
+add_output('settings', 'start_unread_settings', true, 'core', 'search_all_folders_setting', 'after');
 add_output('settings', 'unread_since_setting', true, 'core', 'start_unread_settings', 'after');
 add_output('settings', 'unread_source_max_setting', true, 'core', 'unread_since_setting', 'after');
 add_output('settings', 'start_flagged_settings', true, 'core', 'unread_source_max_setting', 'after');
@@ -113,9 +115,11 @@ add_output('settings', 'privacy_settings', 'true', 'core', 'start_unread_setting
 /* message list page */
 setup_base_page('message_list');
 add_handler('message_list', 'default_sort_order_setting', true, 'core', 'load_user_data', 'after');
+add_handler('message_list', 'load_search_all_folders_setting', true, 'core', 'load_user_data', 'after');
 add_output('message_list', 'message_list_heading', true, 'core', 'version_upgrade_checker', 'after');
 add_output('message_list', 'message_list_start', true, 'core', 'message_list_heading', 'after');
 add_output('message_list', 'message_list_end', true, 'core', 'message_list_start', 'after');
+add_output('message_list', 'expand_search_banner', true, 'core', 'message_list_end', 'after');
 
 /* search page */
 setup_base_page('search');
@@ -153,6 +157,11 @@ add_output('logout', 'logout', true, 'core', 'content_section_start', 'after');
 
 /* message action ajax request */
 setup_base_ajax_page('ajax_message_action', 'core');
+
+/* save search_all_folders setting (value 0=off, 1=button, 2=always-on) */
+setup_base_ajax_page('ajax_save_search_all_folders', 'core');
+add_handler('ajax_save_search_all_folders', 'ajax_save_search_all_folders', true, 'core', 'load_user_data', 'after');
+add_handler('ajax_save_search_all_folders', 'save_user_data', true, 'core', 'ajax_save_search_all_folders', 'after');
 
 /* password udpates when not saving between logins */
 setup_base_ajax_page('ajax_update_server_pw', 'core');
@@ -217,6 +226,7 @@ return array(
         'ajax_hm_folders',
         'ajax_message_action',
         'ajax_reset_search',
+        'ajax_save_search_all_folders',
         'ajax_update_server_pw',
         'ajax_no_op',
         'notfound',
@@ -312,6 +322,8 @@ return array(
         'language' => FILTER_UNSAFE_RAW,
         'flagged_per_source' => FILTER_VALIDATE_INT,
         'flagged_since' => FILTER_UNSAFE_RAW,
+        'search_all_folders' => FILTER_VALIDATE_INT,
+        'expand_search' => FILTER_VALIDATE_INT,
         'unread_per_source' => FILTER_VALIDATE_INT,
         'unread_since' => FILTER_UNSAFE_RAW,
         'all_email_per_source' => FILTER_VALIDATE_INT,

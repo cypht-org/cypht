@@ -344,6 +344,45 @@ class Hm_Handler_process_delete_prompt_setting extends Hm_Handler_Module {
 }
 
 /**
+ * AJAX handler: directly save search_all_folders as integer (0=off, 1=button, 2=always-on).
+ * Cannot use process_site_setting (requires save_settings key not present in AJAX calls).
+ * @subpackage core/handler
+ */
+class Hm_Handler_ajax_save_search_all_folders extends Hm_Handler_Module {
+    public function process() {
+        $val = isset($this->request->post['search_all_folders']) ? (int)$this->request->post['search_all_folders'] : -1;
+        if (in_array($val, [0, 1, 2], true)) {
+            $this->user_config->set('search_all_folders_setting', $val);
+            $this->out('search_all_folders_saved', true);
+        }
+    }
+}
+
+/**
+ * Expose the search_all_folders setting to output modules (message_list page)
+ * @subpackage core/handler
+ */
+class Hm_Handler_load_search_all_folders_setting extends Hm_Handler_Module {
+    public function process() {
+        // Only expose as "enabled" when setting=1 (button mode). Setting=2 is always-on and needs no button.
+        $this->out('search_all_folders_enabled', (int)$this->user_config->get('search_all_folders_setting', 0) === 1);
+    }
+}
+
+/**
+ * Process input from the search all folders in combined views setting
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_search_all_folders_setting extends Hm_Handler_Module {
+    public function process() {
+        function search_all_folders_callback($val) {
+            return $val;
+        }
+        process_site_setting('search_all_folders', $this, 'search_all_folders_callback', DEFAULT_SEARCH_ALL_FOLDERS, true);
+    }
+}
+
+/**
  * Process input from the disable delete attachment setting
  * @subpackage core/handler
  */

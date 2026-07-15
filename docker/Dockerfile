@@ -40,6 +40,7 @@ RUN set -eux \
     && curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o - | sh -s \
         xdebug redis gnupg memcached ldap \
     && rm -rf /var/lib/apt/lists/* \
+    && rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default \
     && mkdir -p /var/log/php /var/log/supervisord \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \

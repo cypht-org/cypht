@@ -6,8 +6,13 @@ function applySmtpComposePageHandlers(routeParams) {
         $('.smtp_send_placeholder').trigger('click');
     });
 
-    if (window.HTMLEditor) {
+    const composeType = Number($('.compose_form').data('compose-type'));
+
+    if (composeType === 1) {
         useKindEditor();
+    }
+    else if (composeType === 2) {
+        useMarkdownEditor();
     }
 
     var interval = Hm_Utils.get_from_global('compose_save_interval', 30);
@@ -220,6 +225,7 @@ function applySmtpComposePageHandlers(routeParams) {
 
     const getSmtpProfileCallback = (res) => {
         const deliveryReceiptCheckBox = $('#compose_delivery_receipt');
+        deliveryReceiptCheckBox.next('label').next('span.badge').remove();
         if (! res.dsn_supported) {
             deliveryReceiptCheckBox.prop('checked', false);
             deliveryReceiptCheckBox.prop('disabled', true);
@@ -227,7 +233,6 @@ function applySmtpComposePageHandlers(routeParams) {
         } else {
             deliveryReceiptCheckBox.prop('disabled', false);
             deliveryReceiptCheckBox.prop('checked', true);
-            deliveryReceiptCheckBox.next('label').next('span.badge').remove();
         }
     };
 
@@ -262,6 +267,7 @@ function applySmtpComposePageHandlers(routeParams) {
                     $(".bubble_dropdown-content").remove();
                     remove_recipient_from_list($selectedBubble.data('id'));
                     $selectedBubble.remove();
+                    schedule_mta_sts_status_check();
                 } else {
                     $bubbles.last().addClass('bubble_selected');
                 }
@@ -297,7 +303,10 @@ function applySmtpComposePageHandlers(routeParams) {
         $(".bubble_dropdown-content").remove();
         remove_recipient_from_list($(this).parent().data('id'));
         $(this).parent().remove();
+        schedule_mta_sts_status_check();
     });
+
+    init_mta_sts_status_check();
 
     var selectedOption = $('#compose_smtp_id option[selected]');
     var selectedEmail = selectedOption.data('email');
@@ -315,6 +324,7 @@ function applySmtpComposePageHandlers(routeParams) {
             return true;
         }).join(', ');
         recipientsInput.val(newRecipients);
+        schedule_mta_sts_status_check();
     };
 
     if (recipientsInput.val().includes(selectedEmail)) {
@@ -323,6 +333,7 @@ function applySmtpComposePageHandlers(routeParams) {
             if ($(this).val() !== selectedVal) {
                 if (!recipientsInput.val().includes(selectedEmail)) {
                     recipientsInput.val(recipientsInput.val() + ', ' + excludedEmail);
+                    schedule_mta_sts_status_check();
                 }
             } else {
                 excludeEmail();

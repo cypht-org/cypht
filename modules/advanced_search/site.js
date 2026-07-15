@@ -71,6 +71,15 @@ var add_remove_targets = function(el) {
     });
 };
 
+var set_adv_folder_link_titles = function(container) {
+    $(container).find('.adv_folder_link').each(function() {
+        const label = $(this).text().trim();
+        if (label) {
+            $(this).attr('title', label);
+        }
+    });
+};
+
 var expand_adv_folder = function(res) {
     if (res.imap_expanded_folder_path) {
         var list_container = $('.adv_folder_list');
@@ -84,6 +93,7 @@ var expand_adv_folder = function(res) {
         $('a', list_container).not('.adv_folder_link').off('click');
         $('a', list_container).not('.adv_folder_link').on("click", function() { adv_folder_select($(this).data('id')); return false; });
         modifyInnerLists(foldersWrapper);
+        set_adv_folder_link_titles(list_container);
     }
 };
 
@@ -131,6 +141,7 @@ var adv_select_imap_folder = function(el) {
 
     $('.imap_folder_link', folders).addClass('adv_folder_link').removeClass('imap_folder_link');
     $('.adv_folder_list').html(folders.html());
+    set_adv_folder_link_titles(list_container);
 
     $('.adv_folder_link', list_container).on("click", function() { return expand_adv_folder_list($(this).data('target')); });
     $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').not('.pick_special_folders').off('click');

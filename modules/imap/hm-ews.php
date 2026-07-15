@@ -160,6 +160,10 @@ class Hm_EWS {
         }
     }
 
+    public function is_inplace_archive_enabled() {
+        return count($this->get_folder_status(Enumeration\DistinguishedFolderIdNameType::ARCHIVE_ROOT, false)) > 0;
+    }
+
     public function get_folder_status($folder, $report_error = true) {
         try {
             if ($this->is_distinguished_folder($folder)) {
@@ -215,7 +219,7 @@ class Hm_EWS {
         if ($this->is_distinguished_folder($folder)) {
             $folderObj = new Type\DistinguishedFolderIdType($folder);
         } else {
-            $folderObj = new Type\FolderIdType(hex2bin($folder));
+            $folderObj = new Type\FolderIdType($folder);
         }
         $new_folder = new Type\FolderType();
         $new_folder->displayName = $new_name;
@@ -245,8 +249,7 @@ class Hm_EWS {
             if ($this->is_distinguished_folder($parent)) {
                 $parentObj = new Type\DistinguishedFolderIdType($parent);
             } else {
-                // Convert hex ID to binary for EWS
-                $parentObj = new Type\FolderIdType(hex2bin($parent));
+                $parentObj = new Type\FolderIdType($parent);
             }
             $request = [
                 'FolderIds' => Utilities\getFolderIds([$folderObj]),
@@ -265,7 +268,7 @@ class Hm_EWS {
 
     public function delete_folder($folder) {
         try {
-            return $this->api->deleteFolder(new Type\FolderIdType(hex2bin($folder)));
+            return $this->api->deleteFolder(new Type\FolderIdType($folder));
         } catch(\Exception $e) {
             Hm_Msgs::add($e->getMessage(), 'danger');
             return false;
@@ -358,7 +361,10 @@ class Hm_EWS {
         $request = array(
             'Traversal' => 'Shallow',
             'ItemShape' => array(
-                'BaseShape' => 'IdOnly'
+                'BaseShape' => 'IdOnly',
+                'AdditionalProperties' => [
+                    'FieldURI' => ['FieldURI' => 'item:ItemClass'],
+                ],
             ),
             'IndexedPageItemView' => [
                 'MaxEntriesReturned' => $limit,
@@ -533,6 +539,13 @@ class Hm_EWS {
 
         $itemIds = [];
         foreach ($items as $item) {
+            // Skip contacts — they cannot be rendered as mail messages and requesting
+            // their full properties via GetItem crashes the EWS library when a contact
+            // has a single email address (SOAP returns stdClass instead of array).
+            $itemClass = method_exists($item, 'getItemClass') ? (string) $item->getItemClass() : '';
+            if (stripos($itemClass, 'IPM.Contact') === 0 || stripos($itemClass, 'IPM.DistList') === 0) {
+                continue;
+            }
             $itemIds[] = bin2hex($item->getItemId()->getId());
         }
         return [$result->getTotalItemsInView(), $itemIds];
@@ -1125,7 +1138,7 @@ class Hm_EWS {
                 $result[] = $this->extract_mailbox($mailbox);
             }
             return $result;
-        } elseif (is_object($data) && $data->Mailbox) {
+        } elseif (is_object($data) && isset($data->Mailbox)) {
             if(is_array($data->Mailbox)) {
                 $result = [];
                 foreach ($data->Mailbox as $mailbox) {

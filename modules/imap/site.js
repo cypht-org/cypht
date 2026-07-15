@@ -424,8 +424,9 @@ var remove_from_cached_imap_pages = function(msg_cache_key) {
     });
 }
 
-async function select_imap_folder(path, page = 1, reload, processInTheBackground = false) {
-    const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), []);
+async function select_imap_folder(path, page = 1, reload, processInTheBackground = false, expandSearch = false, forceGithubRefresh = false) {
+    const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), [], expandSearch);
+    messages.forceGithubRefresh = forceGithubRefresh;
     await messages.load(reload, processInTheBackground, false, () => {
         if (processInTheBackground || Hm_Utils.rows().length) {
             for (let row of messages.rows) {
@@ -466,6 +467,8 @@ async function select_imap_folder(path, page = 1, reload, processInTheBackground
         });
     });
 
+    messages.forceGithubRefresh = false;
+
     Hm_Message_List.check_empty_list();
 
     if (path === 'unread') {
@@ -486,7 +489,7 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
             $('#imap_filter_form').trigger('submit');
         }
         else {
-            select_imap_folder(listPath, listPage, true);
+            select_imap_folder(listPath, listPage, true, false, false, true);
         }
     });
     $('.imap_filter').on("change", function(e) {
@@ -504,6 +507,46 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
 
     // try to fetch from cache but also reload messages, so user don't wait 60 seconds to see the new list (useful for read/unread UI and other updates)
     await select_imap_folder(listPath, listPage, true);
+
+    const isCombinedView = !listPath.startsWith('imap_') && !listPath.startsWith('feeds') && !listPath.startsWith('github');
+    const banner = $('.expand-search-banner');
+    if (isCombinedView && banner.length) {
+        const $main = $('#cypht-main');
+        $main.append(banner);
+
+        const positionBanner = () => {
+            const left = $main.offset().left;
+            banner.css({ position: 'fixed', bottom: 0, left: left, right: 0, 'z-index': 1030 });
+        };
+        positionBanner();
+        $(window).off('resize.expandBanner').on('resize.expandBanner', positionBanner);
+
+        banner.addClass('d-flex').removeClass('d-none');
+
+        const hideBanner = () => {
+            banner.addClass('d-none').removeClass('d-flex');
+            $(window).off('resize.expandBanner');
+        };
+
+        banner.find('.expand-search-btn').off('click').on('click', async function() {
+            hideBanner();
+            await select_imap_folder(listPath, listPage, true, false, true);
+        });
+
+        banner.find('.expand-search-always').off('click').on('click', function(e) {
+            e.preventDefault();
+            const msg = $(this).data('confirm');
+            if (!window.confirm(msg)) return;
+            hideBanner();
+            Hm_Ajax.request(
+                [{ name: 'hm_ajax_hook', value: 'ajax_save_search_all_folders' },
+                 { name: 'search_all_folders', value: 2 }],
+                () => { location.reload(); },
+                null, true
+            );
+        });
+    }
+
     handleMessagesDragAndDrop();
 
     // Refresh in the background each 60 seconds
@@ -555,9 +598,32 @@ function preFetchMessageContent(msgPart, uid, path) {
     }, null, true)
 }
 
+const MSG_CACHE_PREFIX = 'msg_cache_';
+
 function getMessageStorageKey(uid, listPath = getListPathParam()) {
-    return uid + '_' + listPath;
+    const version = (typeof HM_BUILD_VERSION !== 'undefined' && HM_BUILD_VERSION) ? HM_BUILD_VERSION : 'dev';
+    return MSG_CACHE_PREFIX + version + '_' + uid + '_' + listPath;
 }
+
+/**
+ * Deletes any cached message entry written under an older HM_BUILD_VERSION.
+ * Runs once per page load.
+ */
+function purgeStaleMessageCache() {
+    const version = (typeof HM_BUILD_VERSION !== 'undefined' && HM_BUILD_VERSION) ? HM_BUILD_VERSION : 'dev';
+    const currentPrefix = MSG_CACHE_PREFIX + version + '_';
+    const staleKeys = [];
+    for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key && key.indexOf(MSG_CACHE_PREFIX) === 0 && key.indexOf(currentPrefix) !== 0) {
+            staleKeys.push(key);
+        }
+    }
+    staleKeys.forEach(function (key) {
+        Hm_Utils.remove_from_local_storage(key);
+    });
+}
+purgeStaleMessageCache();
 
 async function markPrefetchedMessagesAsRead(uid) {
     const listPath = getListPathParam();
@@ -1251,8 +1317,6 @@ $(function() {
         }
     }
     setTimeout(prefetch_imap_folders, 2);
-
-    processNextActionDate();
 });
 
 

@@ -291,11 +291,20 @@ td {
   font-size: 100%;
 }
 .server_content,
-.profile_content,
 .user_settings {
   position: relative;
   display: table;
   table-layout: fixed;
+  width: 100%;
+  min-height: 500px;
+  background: #fff;
+  height: 100%;
+  margin-right: 20px;
+  padding-bottom: 20px;
+}
+.profile_content {
+  position: relative;
+  display: block;
   width: 100%;
   min-height: 500px;
   background: #fff;
@@ -401,6 +410,7 @@ button {
   padding-top: 20px;
   position: fixed;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .folders,
@@ -445,8 +455,8 @@ button {
   padding-right: 11px;
 }
 .account_icon {
-  opacity: 0.5;
-  vertical-align: -2px;
+  opacity: 1;
+  vertical-align: 0;
   padding-right: 6px;
 }
 .small_account_icon {
@@ -852,7 +862,7 @@ div.unseen,
   display: none;
 }
 .debug_title {
-  color: var(--bs-primary);
+  color: var(--bs-link-color);
   position: fixed;
   background-color: var(--bs-secondary-bg);
   bottom: 0px;
@@ -1036,7 +1046,6 @@ div.unseen,
 .mobile .account_icon {
   width: 16px;
   height: 16px;
-  vertical-align: -5px;
 }
 .mobile .folder_toggle {
   display: block;
@@ -1340,6 +1349,16 @@ div.unseen,
   font-size: 85%;
   padding: 15px 20px;
   display: none;
+  box-sizing: border-box;
+  max-width: min(320px, calc(100vw - 2rem));
+}
+.list_sources .list_src {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .step_config-title {
@@ -1515,9 +1534,21 @@ nav.collapsed .app-logo, nav.collapsed .menu_search, nav.collapsed .nav-label, n
 }
 
 nav.collapsed .menu-toggle {
-  right: 35%;
+  right: 33%;
   margin: auto;
   /* margin-left: 32px; */
+}
+
+nav.collapsed .src_name_initial {
+  padding: 10px;
+  font-weight: bold;
+  font-size: 80%;
+  background-color: var(--bs-link-hover-color);
+  color: var(--bs-body-bg);
+  margin: 5px 10px;
+  width: 90%;
+  text-align: center;
+  border-radius: var(--bs-border-radius);
 }
 
 nav.collapsed .folders {
@@ -1549,6 +1580,12 @@ nav.collapsed .sidebar-footer a {
   text-align: center;
 }
 
+.navbar-popover { max-width: unset; }
+.navbar-popover .email_folders .imap_folder_link { max-width: unset; }
+.navbar-popover .popover-body .folders { margin: 0 !important; }
+
+
+
 /* End collapsed navbar state */
 
 .sidebar-footer {
@@ -1556,7 +1593,7 @@ nav.collapsed .sidebar-footer a {
   display: flex;
   justify-content: space-between;
   padding: 0 15px 0 25px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 
 .logout_link {
@@ -1678,9 +1715,26 @@ pre.msg_source {
 .menu_search.selected_menu { background-color: transparent; }
 #dropdownMenuForward + ul .forward_link span,
 #contact_info + #contact_popup span { white-space: nowrap; }
-#extra-header-buttons { display: inline-block; margin-top: 0; }
+#extra-header-buttons { margin-top: 0; }
 .sievefilters_settings > .p-3 { padding: 0 !important; }
 #sieve_accounts > .p-2 { padding: 0.5rem 1rem; }
+.server_content .quick_add_multiple_server_form { padding-left: 1.5rem; padding-right: 1.5rem; }
+
+.advanced_search_form [id^="adv_target"],
+.advanced_search_form .other_section > div { width: 75%; }
+.advanced_search_form .terms_section .d-flex { flex-wrap: wrap; }
+.advanced_search_form .terms_section .adv_terms { width: 75% !important; }
+.advanced_search_form .table > :not(caption) > * > * { box-shadow: none; }
+.advanced_search_form #term_and_or1 { width: 100%; }
+.advanced_search_form .source_section .inner_list .form-check { margin: 0 0 0 30px !important; }
+.advanced_search_form .source_section .unread_count { padding-top: 4px; }
+#opml_import_form .form-control { width: 50%; }
+.add_tag .subtitle { margin-top: 0 !important; }
+.add_server .txt_fld { width: 100%; }
+.configured_server .server_subtitle { padding-bottom: 5px; }
+.msg_actions a.disabled_link { padding: 0.25rem 0.5rem; border-radius: var(--bs-border-radius-sm); border-color: 1px solid var(--bs-primary); }
+.msg_actions .btn.disabled { opacity: 0.5; }
+
 
 /* some theming changes */
 .allow_image_link .btn-light, .definitive_actions .btn-light,
@@ -1697,10 +1751,18 @@ pre.msg_source {
   color: var(--bs-body-bg) !important;
   background: var(--bs-link-color);
 }
-.content_title .list_sources.w-100 { width: auto !important; }
+.content_title .list_sources.w-100 {
+  width: auto !important;
+  max-width: min(320px, calc(100vw - 2rem));
+  min-width: 0;
+}
 .content_title .list_sources .src_title { font-weight: bold; }
-.total_unread_count, .total_unread_count.badge, .unread_count { color: var(--bs-body-bg) !important; background-color: var(--bs-link-hover-color) !important; }
-.folders a, .unread_link, .logout_link { color: rgba(var(--bs-body-color-rgb), 0.85); }
+.total_unread_count, .total_unread_count.badge, .unread_count {
+  color: var(--bs-body-bg) !important; background-color: var(--bs-link-hover-color) !important;
+  border-radius: 4px !important;
+}
+.folders a, .logout_link { color: rgba(var(--bs-body-color-rgb), 1); }
+.unread_link { color: rgba(var(--bs-body-color-rgb), 0.85); }
 .msg_text .js-header_subject { color: var(--bs-body-color) !important; font-size: 1.4rem !important; }
 .plink, .nlink { color: var(--bs-link-color); }
 .plink:hover, .nlink:hover { color: var(--bs-link-hover-color); text-decoration: none; }
@@ -1714,6 +1776,7 @@ pre.msg_source {
 }
 .input-group-text { border: var(--bs-border-width) solid var(--bs-border-color); }
 .compose_to { color: inherit; }
+.add_contact_row { background-color: var(--bs-body-bg); }
 
 /* some mobile changes */
 .mobile .no_mobile { display: none !important; }
@@ -1724,9 +1787,10 @@ pre.msg_source {
 .mobile .search_form { padding-left: 0; }
 .mobile .folders { margin-top: 1rem; margin-left: 1rem !important; }
 .mobile .folders_page.row { margin-left: 0; margin-right: 0; }
+.mobile .folders_page { margin-bottom: 50px; }
+.mobile .folder_list li { padding-top: 4px; padding-bottom: 4px; }
 .mobile .server_section { overflow: hidden; }
 .mobile .add_server .txt_fld { width: 100%; }
-.mobile .user_settings table td { padding: 5px 10px; }
 .mobile .reset_factory_button { margin-right: 1rem; }
 .mobile .message_list .list_controls.on_mobile form { display: inline-block; }
 .mobile .message_list > .p-3 { padding-top: 10px !important; }
@@ -1735,7 +1799,39 @@ pre.msg_source {
 .mobile .msg_text_inner { font-size: 120%; padding: 0px !important; }
 .mobile .save_perm_form { margin-bottom: 1.5rem; }
 .mobile .save_perm_form .save_settings { margin-bottom: 0.5rem; }
-.mobile .content_title .list_sources { top: 40px; border: 1px solid var(--bs-border-color); }
+.mobile .content_title .list_sources {
+  top: 40px;
+  border: 1px solid var(--bs-border-color);
+  max-width: min(300px, calc(100vw - 1.5rem));
+}
+.mobile .content_title .path_delim + a { display: contents; }
+.mobile .calendar > .m-4 { margin: 1rem !important; }
+.mobile .calendar .px-4 > form { display: block; margin: -30px 0 30px; }
+.mobile .calendar .px-4 > form button { margin-bottom: 25px; }
+.mobile .quick_add_multiple_server_form { padding-left: 1.5rem; padding-right: 1.5rem; }
+.mobile .advanced_search_form [id^="adv_target"],
+.mobile .advanced_search_form .other_section > div { width: 100%; }
+.mobile .advanced_search_form .terms_section,
+.mobile .advanced_search_form .source_section,
+.mobile .advanced_search_form .targets_section,
+.mobile .advanced_search_form .time_section,
+.mobile .advanced_search_form .other_section { margin-left: 2rem !important; margin-right: 2rem !important; }
+.mobile .general_setting .d-block { display: table-cell !important; }
+.mobile .user_settings table td { padding: 5px 10px; }
+.mobile .user_settings > form > .px-3 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+.mobile .user_settings select { max-width: 150px; }
+.mobile .user_settings input[type='text'],
+.mobile .user_settings input[type='number'] { max-width: 150px; }
+.mobile .user_settings textarea { max-width: 150px; }
+.mobile .save_settings_page { margin-bottom: 40px; }
+.mobile .compose_form { margin-top: 25px; padding: 0 !important; width: 100% !important; }
+.mobile .compose_attach_form { padding-bottom: 25px; }
+.mobile .compose_sign { margin-right: 0px !important; }
+.mobile .list_actions { font-size: 90%; }
+.mobile .list_controls { color: var(--bs-body-color); }
+.mobile .edit_profile, .mobile .change_pass { margin-left: 0; margin-right: 0; }
+.mobile .submit_row { padding-bottom: 25px; }
+.mobile .tags_tree + .tags_tree { margin-bottom: 25px; }
 
 
 /* Mobile responsive overrides for Bootstrap classes */
@@ -1772,10 +1868,23 @@ pre.msg_source {
   .mobile .content_title > .flex-wrap {
     flex-wrap: nowrap !important; margin-bottom: 0px !important;
   }
-  .mobile .content_title .list_meta { margin-top: 3px; margin-bottom: 0px !important; }
+  .mobile .content_title .list_meta { margin-top: 5px; margin-bottom: 0px !important; }
   .mobile .msg_text .small_header .col-md-2 { width: 16.667%; }
   .mobile .msg_text .small_header > div + div { width: 83.333%; }
   .mobile #list_controls_menu.show { left: auto; right: -15px; }
+
+  .mobile .adv_folder_list .folders { margin-left: 0px !important; }
+  .mobile .terms_section .d-flex { display: inline-block !important; }
+  .mobile .terms_section .adv_terms { display: inline-block; }
+  .mobile .terms_section .adv_term_nots input { margin-top: 10px; }
+  .mobile .source_section .adv_folder_list .folders > li > .wrapper {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .mobile .targets_section .adv_targets .form-check-label { display: inline; }
+  .mobile .time_section .adv_times { display: inline-block !important; }
+  .mobile .time_section .new_time { display: block; }
 }
 
 @media (max-width: 575.98px) {
@@ -1788,7 +1897,10 @@ pre.msg_source {
   .mobile .msg_text .small_header > div + div { width: 80%; }
   .mobile .msg_text .small_header > div.d-none + div { width: 100%; }
   .mobile .msg_controls .move_to_location { right: -90px; }
-  .notices .definitive_actions {
-    margin-left: 0 !important;
-  }
+  .mobile .login_form .vh-100 > .card { margin-top: -10px; }
+  .mobile .time_section .adv_times { width: 100%; }
+  .mobile .time_section .adv_times input { width: 100% !important; }
+  .mobile .category-tabs { padding: 0; }
+  .mobile .category-tabs-container { margin-top: 0.5rem; }
+  .notices .definitive_actions { margin-left: 0 !important; }
 }

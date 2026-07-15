@@ -1109,6 +1109,64 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
 }
 
 /**
+ * Expand-search banner shown in combined views when search_all_folders setting is enabled.
+ * Hidden by default (d-none); JS shows it for combined views only.
+ * @subpackage core/output
+ */
+class Hm_Output_expand_search_banner extends Hm_Output_Module {
+    protected function output() {
+        if (!$this->get('search_all_folders_enabled', false)) {
+            return '';
+        }
+        return '<div class="expand-search-banner d-none align-items-center gap-3 py-2 px-4 border-top border-secondary-subtle bg-body-secondary text-muted shadow-sm">'
+            .'<i class="bi bi-folder2-open fs-5 text-secondary"></i>'
+            .'<span class="small">'.$this->trans('Showing results from the primary folder only.').'</span>'
+            .'<div class="btn-group ms-auto">'
+            .'<button type="button" class="btn btn-sm btn-outline-secondary expand-search-btn d-flex align-items-center gap-1">'
+            .'<i class="bi bi-search"></i>'
+            .'<span>'.$this->trans('Search all folders').'</span>'
+            .'</button>'
+            .'<button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">'
+            .'<span class="visually-hidden">'.$this->trans('More options').'</span>'
+            .'</button>'
+            .'<ul class="dropdown-menu dropdown-menu-end">'
+            .'<li><a class="dropdown-item expand-search-always" href="#" data-confirm="'
+            .$this->trans('This will make searches on this page more resource-intensive. Are you sure?').'">'
+            .'<i class="bi bi-floppy me-2"></i>'.$this->trans('Always search all folders')
+            .'</a></li>'
+            .'</ul>'
+            .'</div>'
+            .'</div>';
+    }
+}
+
+/**
+ * Option to search all folders in combined views (flagged, unread, etc.)
+ * @subpackage core/output
+ */
+class Hm_Output_search_all_folders_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $checked = '';
+        $reset = '';
+        if (!empty($settings['search_all_folders'])) {
+            $checked = ' checked="checked"';
+            if ($settings['search_all_folders'] !== DEFAULT_SEARCH_ALL_FOLDERS) {
+                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise fs-6 cursor-pointer refresh_list reset_default_value_checkbox"></i></span>';
+            }
+        }
+        $badge = '<span class="badge bg-warning text-dark ms-2">'.$this->trans('Experimental').'</span>';
+        $warning = '<tr class="general_setting"><td colspan="2" class="d-block d-md-table-cell"><small class="text-muted">'.
+            $this->trans('When enabled, combined views (Flagged, Unread, etc.) will search across all folders on the server instead of just the primary folder. This provides more complete results but is significantly more resource-intensive.').
+            '</small></td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label class="form-check-label" for="search_all_folders">'.
+            $this->trans('Search all folders in combined views').$badge.'</label></td>'.
+            '<td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.
+            ' value="1" id="search_all_folders" name="search_all_folders" data-default-value="'.(DEFAULT_SEARCH_ALL_FOLDERS ? 'true' : 'false').'"/>'.$reset.'</div></td></tr>'.$warning;
+    }
+}
+
+/**
  * Option for the "received since" date range for the Flagged page
  * @subpackage core/output
  */

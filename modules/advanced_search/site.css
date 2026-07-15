@@ -9,4 +9,64 @@
 .adv_search_link { margin-left: 20px; }
 .adv_terms { margin-left: 10px; }
 
+.advanced_search_form .adv_folder_list .wrapper {
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.advanced_search_form .adv_folder_list .adv_folder_link {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: min(240px, 40vw);
+}
+.advanced_search_form .adv_folder_list .wrapper > .unread_count {
+  flex-shrink: 0;
+}
+.advanced_search_form .adv_folder_list .wrapper > .d-flex.gap-3 {
+  flex-shrink: 0;
+}
+.advanced_search_form .adv_folder_list .inner_list .wrapper > a {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: min(220px, 38vw);
+}
+
 .mobile .search_result_title { position: relative !important; z-index: 99 !important;}
+.mobile .advanced_search_form .adv_folder_list .adv_folder_link {
+  max-width: min(180px, 50vw);
+}
+.mobile .advanced_search_form .adv_folder_list .inner_list .wrapper > a {
+  max-width: min(160px, 45vw);
+}
+
+/* Search results: from + subject only on mobile */
+.mobile .adv_controls + .message_list .message_table td.source,
+.mobile .adv_controls + .message_list .message_table td.msg_date,
+.mobile .adv_controls + .message_list .message_table td.icon,
+.mobile .adv_controls + .message_list .message_table td.dates {
+  display: none !important;
+}
+.mobile .adv_controls + .message_list .message_table {
+  table-layout: auto;
+}
+.mobile .adv_controls + .message_list .message_table td.checkbox_cell {
+  width: 28px;
+}
+.mobile .adv_controls + .message_list .message_table td.from {
+  width: 35%;
+  max-width: 35%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mobile .adv_controls + .message_list .message_table td.subject {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
