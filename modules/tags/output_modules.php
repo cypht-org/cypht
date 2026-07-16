@@ -50,7 +50,6 @@ class Hm_Output_start_tag_settings extends Hm_Output_Module {
         $res = '<tr><td data-target=".tag_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-tags fs-5 me-2"></i>'.
             $this->trans('Tags').'</td></tr>';
-            print_r($res);
         return $res;
     }
 }
@@ -88,102 +87,10 @@ class Hm_Output_tag_since_setting extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_tags_heading extends Hm_Output_Module {
-    /**
-     */
-    protected function output() {
-        return '<div class="content_title">'.$this->trans('Tags').'</div>';
-    }
-}
-class Hm_Output_tags_tree extends Hm_Output_Module {
-    /**
-     */
-    protected function output() {
-        if ($this->format == 'HTML5') {
-            $folders = $this->get('tags', array());
-            $tag = $this->get('edit_tag');
-            $id = $this->get('edit_tag_id');
-            
-            // Organize folders into a tree structure
-            $folderTree = [];
-            foreach ($folders as $folderId => $folder) {
-                if (isset($folder['parent']) && $folder['parent']) {
-                    $folders[$folder['parent']]['children'][$folderId] = &$folders[$folderId];
-                } else {
-                    $folderTree[$folderId] = &$folders[$folderId];
-                }
-            }               
-        
-            // Generate the tree view HTML
-            $treeViewHtml = generate_tree_view($folderTree, $this->html_safe(Hm_Request_Key::generate()), $this);
-            $treeContent = count($folderTree) > 0 ? $treeViewHtml : '<p>'. $this->trans('No tags available yet.') .'</p>';
-            $out = '<div class="tags_tree mt-3 col-lg-8 col-md-12 col-sm-12">
-                    <div class="card m-3 mr-0">
-                        <div class="card-body">
-                            <div class="tree-view">
-                                ' . $treeContent . '
-                            </div>
-                        </div>
-                    </div>
-                </div>';
-
-            if ($this->get('tags_updated')) {
-                $out .= '<script>window.tagsUpdated = true;</script>';
-            }
-            return $out;
-        }
-    }
-}
-
-class Hm_Output_tags_form extends Hm_Output_Module {
-    /**
-     */
-    protected function output() {
-        if ($this->format == 'HTML5') {
-        $count = count($this->get('tags', array()));
-        $count = sprintf($this->trans('%d configured'), $count);
-        $tag = $this->get('edit_tag', null);
-        $id = $this->get('edit_tag_id', null);
-        $parent_tag = !empty($tag) ? $tag['parent'] : null;
-        $options = '';
-        
-        foreach ($this->get('tags', array()) as $index => $folder) {
-            $option_selected = !is_null($id) && $folder['id'] === $parent_tag ? 'selected' : '';
-            $options .= '<option '. $option_selected.' value="'.$this->html_safe($folder['id']).'">'.$this->html_safe($folder['name']).'</option>';
-        }
-        $form_title = !is_null($id) ? $this->trans('Edit tag/label').': '.$tag['name'] : $this->trans('Add a tag/label');
-        return '<div class="tags_tree mt-3 col-lg-4 col-md-8 col-sm-12">
-                    <div class="card m-3">
-                        <div class="card-body">
-                            <form class="add_tag me-0" method="POST" action="'.$this->build_page_url('tags').'">
-                                <input type="hidden" name="hm_page_key" id="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
-
-                                <div class="subtitle mt-4">'.$form_title.'</div>
-
-                                <div class="form-floating mb-3">
-                                    <input type="hidden" id="hm_ajax_hook" name="hm_ajax_hook" class="txt_fld form-control" value="ajax_process_tag_update">
-                                    <input type="hidden" id="tag_id" name="tag_id" class="txt_fld form-control" value="'.$this->html_safe($id).'" placeholder="'.$this->trans('Tag id').'">
-                                    <input required type="text" id="tag_name" name="tag_name" class="txt_fld form-control" value="'.$this->html_safe($tag['name']).'" placeholder="'.$this->trans('Tag name').'">
-                                    <label class="" for="tag_name">'.$this->trans('Tag name').'</label>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <select id="parent_tag" name="parent_tag" class="form-select form-select-lg mb-3" aria-label="">
-                                        <option value="" selected>None</option>
-                                        '.$options.'
-                                    </select>
-                                    <label class="" for="parent_tag">'.$this->trans('Parent Tag name').'</label>
-                                </div>
-
-                                <input type="submit" class="btn btn-primary px-5" value="'.$this->trans('Add').'" name="submit_tag" />
-                            </form>
-                        </div>
-                    </div>
-                </div>';
-        }
-    }
-}
-
 /**
+ * Renders the tag/label list in the folder menu, and a hidden
+ * JSON blob used by site.js to build the "parent label" picker in the
+ * create/edit modal, without a server round trip.
  * @subpackage tags/output
  */
 class Hm_Output_tags extends hm_output_module {
@@ -191,14 +98,6 @@ class Hm_Output_tags extends hm_output_module {
         $res = '';
         $folders = $this->get('tags', array());
         if (is_array($folders) && !empty($folders)) {
-            if(count($this->get('tags', array()))  > 1) {
-                $res .= '<li class="menu_tags"><a class="all_tags" href="'.$this->build_page_url('tags').'">';
-                if (!$this->get('hide_folder_icons')) {
-                    $res .= '<i class="bi bi-tags fs-5 me-2"></i>';
-                }
-                $res .= $this->trans('All');
-                $res .= '<span class="tags_count">('.count($folders).')</span></a></li>';
-            }
             $folderTree = [];
             foreach ($folders as $folderId => $folder) {
                 if (isset($folder['parent']) && $folder['parent']) {
@@ -207,33 +106,79 @@ class Hm_Output_tags extends hm_output_module {
                     $folderTree[$folderId] = &$folders[$folderId];
                 }
             }
-            foreach ($folderTree as $id => $folder) {
-                $hasChild = isset($folder['children']) && !empty($folder['children']);
-                $res .= '<li class="tags_'.$this->html_safe($id).'">';
-                if (!$this->get('hide_folder_icons')) {
-                    $res .= $hasChild ? '<i class="bi bi-caret-down"></i>' : '<i class="bi bi-tags fs-5 me-2"></i>';
-                }
-                $res .= '<a data-id="tag_'.$this->html_safe($id).'" href="'.$this->build_page_url('message_list', array('list_path' => 'tag', 'filter' => $this->html_safe($id))).'">';
-                $res .= $this->html_safe($folder['name']).'</a>';
-                if($hasChild) {
-                    $res .= '<ul>';
-                    foreach ($folder['children'] as $key => $child) {
-                        $res .= '<li class="tag_'.$this->html_safe($child['id']).'">';
-                        $res .= '<a data-id="tag_'.$this->html_safe($child['id']).'" href="'.$this->build_page_url('message_list', array('list_path' => 'tag', 'filter' => $this->html_safe($child['id']))).'">';
-                        $res .= $this->html_safe($folder['name']).'</a>';
-                        $res .= '</li>';
-                    }
-                    $res .= '</ul>';
-                }
-                $res .= '</li>';
-            }
+            $res .= $this->render_tag_branch($folderTree);
+
+            $flat = [];
+            $this->flatten_tags($folderTree, 0, $flat);
+            $res .= '<script type="application/json" class="tags_json_data">'.
+                json_encode($flat, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP).'</script>';
+            $res .= '<script type="application/json" class="tags_palette_data">'.
+                json_encode(Hm_Tags::colorPalette(), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP).'</script>';
         }
-        $res .= '<li class="tags_add_new"><a href="'.$this->build_page_url('tags').'">';
+        $res .= '<li class="tags_add_new"><a href="#" class="tag_add_new_btn">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-plus-square menu-icon"></i>';
         }
         $res .= $this->trans('Add label').'</a></li>';
         $this->append('folder_sources', array('tags_folders', $res));
+    }
+
+    /**
+     * Recursively render a branch of the tag tree as nested <li> menu items
+     */
+    private function render_tag_branch($folders) {
+        $res = '';
+        foreach ($folders as $id => $folder) {
+            $hasChild = !empty($folder['children']);
+            $parent = isset($folder['parent']) ? $folder['parent'] : '';
+            $color = Hm_Tags::sanitizeColor($folder['color'] ?? null);
+            $res .= '<li class="tag_row'.($hasChild ? ' has_children' : '').' tags_'.$this->html_safe($id).
+                '" data-tag-id="'.$this->html_safe($id).
+                '" data-tag-name="'.$this->html_safe($folder['name']).
+                '" data-tag-parent="'.$this->html_safe($parent).
+                '" data-tag-color="'.$this->html_safe($color).'">';
+            $res .= '<div class="tag_row_main d-flex align-items-center">';
+            if ($hasChild) {
+                $res .= '<a href="#" class="tag_expand_toggle"><i class="bi bi-chevron-down"></i></a>';
+            }
+            if (!$this->get('hide_folder_icons')) {
+                $res .= '<i class="bi bi-circle-fill tag_dot'.($hasChild ? '' : ' tag_dot_indent').'" style="color: '.$color.';"></i>';
+            }
+            $res .= '<a class="tag_link flex-grow-1" data-id="tag_'.$this->html_safe($id).
+                '" href="'.$this->build_page_url('message_list', array('list_path' => 'tag', 'filter' => $this->html_safe($id))).'">';
+            $res .= $this->html_safe($folder['name']).'</a>';
+            $res .= '<span class="tag_row_actions">';
+            $res .= '<a href="#" class="tag_action_add_child" title="'.$this->trans('Add sub-label').'"><i class="bi bi-plus-lg"></i></a>';
+            $res .= '<a href="#" class="tag_action_edit" title="'.$this->trans('Edit').'"><i class="bi bi-pencil"></i></a>';
+            $res .= '<a href="#" class="tag_action_delete" title="'.$this->trans('Remove').'"><i class="bi bi-trash"></i></a>';
+            $res .= '</span>';
+            $res .= '</div>';
+            if ($hasChild) {
+                $res .= '<ul class="tag_children">';
+                $res .= $this->render_tag_branch($folder['children']);
+                $res .= '</ul>';
+            }
+            $res .= '</li>';
+        }
+        return $res;
+    }
+
+    /**
+     * Flatten the tree into an ordered, indented list for the parent
+     * label <select> built client side
+     */
+    private function flatten_tags($folders, $depth, &$out) {
+        foreach ($folders as $id => $folder) {
+            $out[] = array(
+                'id' => $folder['id'],
+                'name' => $folder['name'],
+                'depth' => $depth,
+                'color' => Hm_Tags::sanitizeColor($folder['color'] ?? null)
+            );
+            if (!empty($folder['children'])) {
+                $this->flatten_tags($folder['children'], $depth + 1, $out);
+            }
+        }
     }
 }
 

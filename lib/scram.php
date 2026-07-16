@@ -49,7 +49,7 @@ public function generateClientProof($username, $password, $salt, $clientNonce, $
     return $clientProof;
 }
 
-public function authenticateScram($scramAlgorithm, $username, $password, $getServerResponse, $sendCommand, $protocol = 'imap', callable $nonce_generator = null) {
+public function authenticateScram($scramAlgorithm, $username, $password, $getServerResponse, $sendCommand, $protocol = 'imap', ?callable $nonce_generator = null) {
     $algorithm = $this->getHashAlgorithm($scramAlgorithm);
     $nonce_generator = $nonce_generator ?? static fn() => base64_encode(random_bytes(32));
 
