@@ -769,7 +769,7 @@ function Message_List() {
         if (action_type == 'unsnooze' && getListPathParam() == 'snoozed') {
             remove = true;
         }
-        else if (action_type == 'delete' || ['archive', 'junk'].includes(action_type)) {
+        else if (action_type == 'delete' || ['archive', 'junk', 'not_junk'].includes(action_type)) {
             remove = true;
         }
         if (remove) {
@@ -1266,6 +1266,45 @@ var Hm_Folders = {
         }
     },
 
+    update_junk_nav_unread_badge: function() {
+        if (typeof hm_special_folders !== 'function' || !$('.junk_unread_count').length) {
+            return;
+        }
+        var sf = hm_special_folders();
+        if (!sf || typeof sf !== 'object') {
+            $('.junk_unread_count').html('');
+            return;
+        }
+        var junkTotal = 0;
+        var prefixes = ['imap_', 'jmap_', 'ews_'];
+        for (var sid in sf) {
+            if (!Object.prototype.hasOwnProperty.call(sf, sid)) {
+                continue;
+            }
+            var folders = sf[sid];
+            if (!folders || !folders.length) {
+                continue;
+            }
+            for (var i = 0; i < folders.length; i++) {
+                if (folders[i].type !== 'junk' || !folders[i].id) {
+                    continue;
+                }
+                for (var p = 0; p < prefixes.length; p++) {
+                    var k = prefixes[p] + sid + '_' + folders[i].id;
+                    if (Object.prototype.hasOwnProperty.call(Hm_Folders.unread_counts, k)) {
+                        junkTotal += parseInt(Hm_Folders.unread_counts[k], 10) || 0;
+                        break;
+                    }
+                }
+            }
+        }
+        if (junkTotal > 0) {
+            $('.junk_unread_count').html('&#160;'+junkTotal+'&#160;');
+        } else {
+            $('.junk_unread_count').html('');
+        }
+    },
+
     update_unread_counts: function(folder) {
         if (folder) {
             $('.unread_'+folder).html('&#160;'+Hm_Folders.unread_counts[folder]+'&#160;');
@@ -1351,6 +1390,7 @@ var Hm_Folders = {
                 }
             }
         }
+        Hm_Folders.update_junk_nav_unread_badge();
         Hm_Utils.save_to_local_storage('unread_counts', Hm_Utils.json_encode(Hm_Folders.unread_counts));
     },
 
@@ -1435,6 +1475,9 @@ var Hm_Folders = {
         Hm_Folders.expand_after_update = false;
         Hm_Folders.listen_for_new_messages();
         hl_save_link();
+        if (typeof refresh_junk_folder_status_from_special_folders === 'function') {
+            refresh_junk_folder_status_from_special_folders();
+        }
     },
 
     update_folder_list: function(reset_cache = false) {
@@ -1534,6 +1577,9 @@ var Hm_Folders = {
             Hm_Folders.load_unread_counts();
             Hm_Folders.update_unread_counts();
             Hm_Folders.listen_for_new_messages();
+            if (typeof refresh_junk_folder_status_from_special_folders === 'function') {
+                refresh_junk_folder_status_from_special_folders();
+            }
             return true;
         }
         return false;

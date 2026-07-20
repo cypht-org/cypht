@@ -1469,11 +1469,11 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
             $res .= '<i class="bi bi-flag-fill menu-icon"></i>';
         }
         $res .= '<span class="nav-label">'.$this->trans('Flagged').'</span></a> <span class="flagged_count"></span></li>';
-        $res .= '<li class="menu_junk"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'junk'], true) .'">';
+        $res .= '<li class="menu_junk d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="'. $this->build_page_url('message_list', ['list_path' => 'junk'], true) .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-envelope-x-fill menu-icon"></i>';
         }
-        $res .= '<span class="nav-label">'.$this->trans('Junk').'</span></a></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Junk').'</span></a><span class="junk_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li>';
         $res .= '<li class="menu_trash"><a class="unread_link" href="'. $this->build_page_url('message_list', ['list_path' => 'trash'], true) .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-trash3-fill menu-icon"></i>';

@@ -1212,6 +1212,40 @@ var imap_folder_status = function() {
     }
 };
 
+/**
+ * Request STATUS (unseen) for each configured junk mailbox via ajax_imap_folder_status,
+ */
+var refresh_junk_folder_status_from_special_folders = function() {
+    if (typeof hm_is_logged === 'function' && !hm_is_logged()) {
+        return;
+    }
+    if (typeof get_imap_folder_status !== 'function' || typeof hm_special_folders !== 'function') {
+        return;
+    }
+    var sf = hm_special_folders();
+    if (!sf || typeof sf !== 'object') {
+        return;
+    }
+    for (var sid in sf) {
+        if (!Object.prototype.hasOwnProperty.call(sf, sid)) {
+            continue;
+        }
+        var folders = sf[sid];
+        if (!folders || !folders.length) {
+            continue;
+        }
+        for (var i = 0; i < folders.length; i++) {
+            if (folders[i].type !== 'junk' || !folders[i].id) {
+                continue;
+            }
+            if (!folders[i].label) {
+                continue;
+            }
+            get_imap_folder_status(sid, folders[i].id);
+        }
+    }
+};
+
 function imap_setup_tags() {
     $('.label-checkbox').on('click', function() {
         var folder_id = $(this).data('id');

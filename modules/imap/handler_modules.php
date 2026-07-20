@@ -606,6 +606,7 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                 }
 
                 $this->out('is_trash_folder', is_imap_trash_folder($this, $parts[1], $folder));
+                $this->out('is_junk_folder', is_imap_junk_folder($this, $parts[1], $folder));
 
                 if (!empty($details)) {
                     if (array_key_exists('folder_label', $this->request->get)) {
@@ -1241,12 +1242,12 @@ class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
  */
 class Hm_Handler_imap_message_action extends Hm_Handler_Module {
     /**
-     * Read, unread, delete, flag, unflag, archive, or mark as junk a set of message uids
+     * Read, unread, delete, flag, unflag, archive, mark as junk, restore, or not junk a set of message uids
      */
     public function process() {
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
-            if (in_array($form['action_type'], array('delete', 'read', 'unread', 'flag', 'unflag', 'archive', 'junk', 'restore'))) {
+            if (in_array($form['action_type'], array('delete', 'read', 'unread', 'flag', 'unflag', 'archive', 'junk', 'restore', 'not_junk'))) {
                 $ids = process_imap_message_ids($form['message_ids']);
                 $errs = 0;
                 $msgs = 0;
@@ -1303,6 +1304,14 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
         $error = false;
         $moved = array();
         $folder_name = hex2bin($folder);
+
+        if ($action_type === 'not_junk') {
+            if ($mailbox->is_imap()) {
+                $mailbox->message_action($folder_name, 'NOT_JUNK', $uids);
+            }
+            $action_type = 'restore';
+        }
+
         $special_folder = $this->get_special_folder($action_type, $specials, $server_details);
 
         if ($action_type == "restore" && !$special_folder) {
@@ -1367,7 +1376,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
         } elseif ($action_type == 'junk' && array_key_exists('junk', $specials)) {
             $folder = $specials['junk'];
         } elseif ($action_type == 'restore') {
-            $folder = $specials['inbox'];
+            $folder = is_array($specials) ? ($specials['inbox'] ?? false) : false;
         }
         return $folder;
     }
