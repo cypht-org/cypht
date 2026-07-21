@@ -520,6 +520,8 @@ function message_since_dropdown($since, $name, $output_mod, $original_default_va
  */
 if (!hm_exists('list_sources')) {
 function list_sources($sources, $output_mod) {
+    $list_path = $output_mod->get('list_path', '');
+    $is_multi_source = $list_path && !preg_match('/^(?:imap|feeds|github|wp_|tag$)/', $list_path);
     $res = '<div class="list_sources w-100 mt-2">';
     $res .= '<div class="src_title fs-5 mb-2">'.$output_mod->html_safe('Sources').'</div>';
     foreach ($sources as $src) {
@@ -538,8 +540,17 @@ function list_sources($sources, $output_mod) {
         else {
             $folder = $src['folder_name'];
         }
-        $label = trim($src['type'].' '.$src['name'].' '.$folder);
-        $res .= '<div class="list_src" title="'.$output_mod->html_safe($label).'">'.$output_mod->html_safe($label).'</div>';
+        $label = $output_mod->html_safe($src['type']).' '.$output_mod->html_safe($src['name']).' '.$output_mod->html_safe($folder);
+        if ($is_multi_source) {
+            $source_json = rawurlencode(json_encode($src));
+            $res .= '<label class="list_src d-flex align-items-center gap-2">'.
+                '<input class="form-check-input combined_source_toggle" type="checkbox" data-list-path="'.$output_mod->html_safe($list_path).'" data-source="'.$source_json.'" checked="checked" />'.
+                '<span>'.$label.'</span>'.
+                '</label>';
+        }
+        else {
+            $res .= '<div class="list_src" title="'.$label.'">'.$label.'</div>';
+        }
     }
     $res .= '</div>';
     return $res;
