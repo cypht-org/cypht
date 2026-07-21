@@ -22,7 +22,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.1']
+        php-versions: ['8.1', '8.3']
         database: ['mysql', 'postgres', 'sqlite']
 
     env:
@@ -101,7 +101,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.1']
+        php-versions: ['8.1', '8.3']
         database: ['sqlite']
 
     env:
