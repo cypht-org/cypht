@@ -43,6 +43,12 @@ if (!defined('DEBUG_MODE')) {
     define('DEBUG_MODE', $debug_mode);
 }
 
+/* real-server integration tests opt out of the lightweight Hm_IMAP stub so the
+   real class (modules/imap/hm-imap.php) loads instead when they require it */
+if (!defined('IMAP_TEST') && getenv('CYPHT_REAL_MAIL_SERVER') === 'true') {
+    define('IMAP_TEST', true);
+}
+
 /* get the stubs */
 require APP_PATH.'tests/phpunit/stubs.php';
 
