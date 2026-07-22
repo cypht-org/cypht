@@ -138,16 +138,7 @@ class Hm_Opml_Parser {
      * @return bool True if valid HTTP/HTTPS URL
      */
     function validateUrl($url) {
-        if (empty($url)) {
-            return false;
-        }
-
-        $url = trim($url);
-        if (!preg_match('/^https?:\/\//i', $url)) {
-            return false;
-        }
-
-        return filter_var($url, FILTER_VALIDATE_URL) !== false;
+        return feed_url_is_allowed($url);
     }
 
     /**
