@@ -674,4 +674,51 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
         $this->assertStringContainsString('project archive', $result['list']);
         $this->assertStringNotContainsString('external-script', $result['list']);
     }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_client_factory_returns_cached_client_for_same_account() {
+        require_once APP_PATH.'modules/sievefilters/hm-sieve.php';
+
+        $imap_account = array(
+            'sieve_config_host' => 'tls://sieve.example.com:4190',
+            'user' => 'alice@example.com',
+        );
+        $cache_key = md5($imap_account['sieve_config_host'].'|'.$imap_account['user']);
+        $cached_client = $this->createMock(PhpSieveManager\ManageSieve\Client::class);
+
+        $instances = (new ReflectionClass(Hm_Sieve_Client_Factory::class))->getProperty('instances');
+        $instances->setAccessible(true);
+        $instances->setValue(null, array($cache_key => $cached_client));
+
+        $client = (new Hm_Sieve_Client_Factory())->init(null, $imap_account, false);
+
+        $this->assertSame($cached_client, $client);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_client_factory_cache_is_keyed_per_account() {
+        require_once APP_PATH.'modules/sievefilters/hm-sieve.php';
+
+        $alice_account = array('sieve_config_host' => 'tls://sieve.example.com:4190', 'user' => 'alice@example.com');
+        $bob_account = array('sieve_config_host' => 'tls://sieve.example.com:4190', 'user' => 'bob@example.com');
+        $alice_key = md5($alice_account['sieve_config_host'].'|'.$alice_account['user']);
+        $bob_key = md5($bob_account['sieve_config_host'].'|'.$bob_account['user']);
+        $alice_client = $this->createMock(PhpSieveManager\ManageSieve\Client::class);
+        $bob_client = $this->createMock(PhpSieveManager\ManageSieve\Client::class);
+
+        $instances = (new ReflectionClass(Hm_Sieve_Client_Factory::class))->getProperty('instances');
+        $instances->setAccessible(true);
+        $instances->setValue(null, array($alice_key => $alice_client, $bob_key => $bob_client));
+
+        $factory = new Hm_Sieve_Client_Factory();
+
+        $this->assertSame($alice_client, $factory->init(null, $alice_account, false));
+        $this->assertSame($bob_client, $factory->init(null, $bob_account, false));
+    }
 }
