@@ -28,6 +28,19 @@ fi
 chown www-data:www-data ${ATTACHMENT_DIR}
 chown -R www-data:www-data /var/lib/nginx
 
+# When LOG_FILE is set, ensure its directory exists and is writable
+if [ -n "${LOG_FILE}" ]; then
+    case "${LOG_FILE}" in
+        /*) LOG_PATH="${LOG_FILE}" ;;
+        *)  LOG_PATH="${APP_DIR}/${LOG_FILE}" ;;
+    esac
+    LOG_DIR=$(dirname "${LOG_PATH}")
+    mkdir -p "${LOG_DIR}"
+    chown www-data:www-data "${LOG_DIR}"
+    touch "${LOG_PATH}"
+    chown www-data:www-data "${LOG_PATH}"
+fi
+
 rm -r /var/www
 ln -s $(pwd)/site /var/www
 
