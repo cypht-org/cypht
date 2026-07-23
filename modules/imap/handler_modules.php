@@ -336,28 +336,33 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
         $imap_id = $this->get('save_sent_server');
         $mime = $this->get('save_sent_msg');
 
-        if ($imap_id === false) {
-            return;
-        }
-        $msg = $mime->get_mime_msg();
-        $msg = str_replace("\r\n", "\n", $msg);
-        $msg = str_replace("\n", "\r\n", $msg);
-        $msg = rtrim($msg)."\r\n";
-        $imap_details = Hm_IMAP_List::dump($imap_id);
-        $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_id, $this->cache);
-        if ($mailbox && $mailbox->authed()) {
-            list($uid, $sent_folder) = save_sent_msg($this, $imap_id, $mailbox, $imap_details, $msg, $mime->get_headers()['Message-Id']);
-            if ($uid) {
-                $this->out('sent_msg_uid', $uid);
-                $this->out('sent_imap_id', $imap_id);
+        if ($imap_id !== false) {
+            $msg = $mime->get_mime_msg();
+            $msg = str_replace("\r\n", "\n", $msg);
+            $msg = str_replace("\n", "\r\n", $msg);
+            $msg = rtrim($msg)."\r\n";
+            $imap_details = Hm_IMAP_List::dump($imap_id);
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_id, $this->cache);
+            if ($mailbox && $mailbox->authed()) {
+                list($uid, $sent_folder) = save_sent_msg($this, $imap_id, $mailbox, $imap_details, $msg, $mime->get_headers()['Message-Id']);
+                if ($uid) {
+                    $this->out('sent_msg_uid', $uid);
+                    $this->out('sent_imap_id', $imap_id);
 
-                if ($this->user_config->get('review_sent_email_setting', false)) {
-                    $this->out('redirect_url', $this->build_page_url('message', array(
-                        'uid' => $uid,
-                        'list_path' => 'imap_'.$imap_id.'_'.bin2hex($sent_folder),
-                    )));
+                    if ($this->user_config->get('review_sent_email_setting', false)) {
+                        $this->out('redirect_url', $this->build_page_url('message', array(
+                            'uid' => $uid,
+                            'list_path' => 'imap_'.$imap_id.'_'.bin2hex($sent_folder),
+                        )));
+                    }
                 }
             }
+        }
+
+        $draft_id = $this->get('compose_draft_id', 0);
+        delete_uploaded_files($this->session, $draft_id);
+        if ($draft_id > 0) {
+            delete_uploaded_files($this->session, 0);
         }
     }
 }

@@ -477,6 +477,64 @@ class Hm_Mailbox {
         }
     }
 
+    /**
+     * Stream a message part (or, with $part_id = 0, the whole raw message)
+     * straight from the IMAP server into an encrypted local file, without
+     * ever buffering the full part in memory. Mirrors stream_message_part()
+     * above but writes to a Hm_Crypt_Stream_Writer instead of echoing to
+     * the HTTP response, so it can be used for attachment forwarding.
+     * @param string $folder IMAP folder
+     * @param int $msg_id IMAP message UID
+     * @param string $part_id IMAP part number, or 0 for the whole message
+     * @param string $dest_path destination file path
+     * @param string $key encryption key for the destination file
+     * @return int|false decoded byte count written, or false on failure
+     */
+    public function stream_message_part_to_file($folder, $msg_id, $part_id, $dest_path, $key) {
+        if (! $this->select_folder($folder)) {
+            return false;
+        }
+        if (! $this->is_imap()) {
+            return false;
+        }
+        $encoding = false;
+        $is_text = false;
+        $msg_struct = $this->connection->get_message_structure($msg_id);
+        $struct = $this->connection->search_bodystructure($msg_struct, array('imap_part_number' => $part_id));
+        if (! empty($struct)) {
+            $part_struct = array_shift($struct);
+            if (array_key_exists('encoding', $part_struct)) {
+                $encoding = trim(mb_strtolower($part_struct['encoding']));
+            }
+            $is_text = ($part_struct['type'] == 'text');
+        }
+        $stream_size = $this->connection->start_message_stream($msg_id, $part_id);
+        if (! ($stream_size > 0)) {
+            return false;
+        }
+        $writer = new Hm_Crypt_Stream_Writer($dest_path, $key);
+        $decoded_size = 0;
+        $output_line = '';
+        while ($line = $this->connection->read_stream_line()) {
+            if ($encoding == 'quoted-printable') {
+                $line = quoted_printable_decode($line);
+            }
+            elseif ($encoding == 'base64') {
+                $line = base64_decode($line);
+            }
+            $decoded_size += strlen($output_line);
+            $writer->write($output_line);
+            $output_line = $line;
+        }
+        if ($is_text) {
+            $output_line = preg_replace("/\)(\r\n)$/m", '$1', $output_line);
+        }
+        $decoded_size += strlen($output_line);
+        $writer->write($output_line);
+        $writer->close();
+        return $decoded_size;
+    }
+
     public function remove_attachment($folder, $msg_id, $part_id) {
         if (! $this->select_folder($folder)) {
             return;
@@ -630,6 +688,9 @@ class Hm_Mailbox {
             } else {
                 $from_params = '';
                 $recipients_params = '';
+            }
+            if ($message instanceof Hm_MIME_Msg) {
+                return $this->connection->send_mime_message($from, $recipients, $message, $from_params, $recipients_params);
             }
             return $this->connection->send_message($from, $recipients, $message, $from_params, $recipients_params);
         } else {

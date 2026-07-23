@@ -31,9 +31,14 @@
 .editor-statusbar { border-top: none !important; }
 .editor-toolbar:before, .editor-toolbar:after { background: none !important; }
 .meter { height: 5px; position: relative; background: #ede8e6; overflow: hidden;}
-.meter span {display: block; height: 100%; }
-.progress {background-color: #4323f5; animation: progressBar 1s ease-in-out; animation-fill-mode:both; }
-@keyframes progressBar { 0% { width: 0; } 100% { width: 100%; }}
+.meter span {display: block; height: 100%; transition: width 0.2s linear; }
+.progress {background-color: #4323f5; }
+.progress.processing {
+    background-image: repeating-linear-gradient(45deg, #4323f5, #4323f5 10px, #6a52f7 10px, #6a52f7 20px);
+    background-size: 28px 28px;
+    animation: progressStripes 1s linear infinite;
+}
+@keyframes progressStripes { 0% { background-position: 0 0; } 100% { background-position: 28px 0; } }
 .compose_container { min-height: calc(3.5rem + calc(var(--bs-border-width) * 2)); padding-left: 3px !important;}
 .bubbles { display: inline-block; background-color: #fff; cursor: pointer; padding: 5px; }
 .bubble { font-size: .9rem; border: 1px solid #ddd; border-radius: 4px; padding: 7px 14px; display: inline-block; margin: 0px 5px 5px 0px; }

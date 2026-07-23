@@ -627,17 +627,17 @@ function get_imap_size($vals) {
     }
     $size = intval($vals['size']);
     switch (true) {
-        case $size > 1000:
-            $size = $size/1000;
-            $label = 'KB';
+        case $size > 1000000000:
+            $size = $size/1000000000;
+            $label = 'GB';
             break;
         case $size > 1000000:
             $size = $size/1000000;
             $label = 'MB';
             break;
-        case $size > 1000000000:
-            $size = $size/1000000000;
-            $label = 'GB';
+        case $size > 1000:
+            $size = $size/1000;
+            $label = 'KB';
             break;
         default:
             $label = 'B';
@@ -715,36 +715,117 @@ function format_attachment($struct,  $output_mod, $part, $dl_args, $at_args) {
     return $res;
 }
 
+if (!hm_exists('get_attachment_tone')) {
+function get_attachment_tone($ext) {
+    $map = array(
+        'pdf' => 'pdf',
+        'doc' => 'doc', 'docx' => 'doc',
+        'xls' => 'xls', 'xlsx' => 'xls', 'csv' => 'xls',
+        'ppt' => 'ppt', 'pptx' => 'ppt',
+        'zip' => 'zip', 'rar' => 'zip', '7z' => 'zip',
+        'txt' => 'txt',
+    );
+    return $map[$ext] ?? 'default';
+}}
+
+if (!hm_exists('get_attachment_icon_class')) {
+function get_attachment_icon_class($ext) {
+    $map = array(
+        'pdf' => 'bi-file-earmark-pdf-fill',
+        'doc' => 'bi-file-earmark-word-fill', 'docx' => 'bi-file-earmark-word-fill',
+        'xls' => 'bi-file-earmark-excel-fill', 'xlsx' => 'bi-file-earmark-excel-fill',
+        'ppt' => 'bi-file-earmark-ppt-fill', 'pptx' => 'bi-file-earmark-ppt-fill',
+        'zip' => 'bi-file-earmark-zip-fill', 'rar' => 'bi-file-earmark-zip-fill', '7z' => 'bi-file-earmark-zip-fill',
+        'txt' => 'bi-file-earmark-text-fill',
+        'csv' => 'bi-file-earmark-spreadsheet-fill',
+    );
+    return 'bi '.($map[$ext] ?? 'bi-file-earmark-fill');
+}}
+
+if (!hm_exists('format_attachment_card')) {
+function format_attachment_card($id, $vals, $output_mod, $dl_link, $show_link) {
+    $name = get_part_desc($vals, $id, false);
+    $href = '?'.$dl_link.'&amp;imap_msg_part='.$output_mod->html_safe($id);
+    $download_btn = '<span class="attachment_card_download"><i class="bi bi-download"></i></span>';
+    if ($vals['type'] === 'image') {
+        $src = '?'.$show_link.'&amp;imap_msg_part='.$output_mod->html_safe($id);
+        $thumb = '<div class="attachment_card_thumb is_image">'.
+            '<img src="'.$src.'" loading="lazy" alt="">'.$download_btn.'</div>';
+    }
+    else {
+        $ext = mb_strtolower(pathinfo($name, PATHINFO_EXTENSION));
+        $tone = get_attachment_tone($ext);
+        $thumb = '<div class="attachment_card_thumb is_icon attachment_tone_'.$tone.'">'.
+            '<span class="attachment_card_icon '.get_attachment_icon_class($ext).'"></span>'.
+            '<span class="attachment_card_ext">'.$output_mod->html_safe($ext ?: '?').'</span>'.
+            $download_btn.'</div>';
+    }
+    return '<div class="col-6 col-md-3 col-lg-2">'.
+        '<a class="attachment_card" href="'.$href.'" data-src="'.$href.'" title="'.$output_mod->html_safe($name).'">'.
+            $thumb.
+            '<div class="attachment_card_meta">'.
+                '<div class="attachment_card_name">'.$output_mod->html_safe($name).'</div>'.
+                '<div class="attachment_card_size">'.$output_mod->html_safe(get_imap_size($vals)).'</div>'.
+            '</div>'.
+        '</a>'.
+        '</div>';
+}}
+
 /**
- * Format the attached images section
+ * Collect downloadable attachments and embedded images from a message
+ * structure
+ * @subpackage imap/functions
+ * @param array $struct message structure
+ * @return array list of [id, vals]
+ */
+if (!hm_exists('collect_attachment_parts')) {
+function collect_attachment_parts($struct) {
+    $found = array();
+    foreach ($struct as $id => $vals) {
+        if (is_array($vals) && (($vals['type'] ?? '') === 'image' || isset($vals['file_attributes']['attachment']))) {
+            $found[] = array($id, $vals);
+        }
+        if (isset($vals['subs'])) {
+            $found = array_merge($found, collect_attachment_parts($vals['subs']));
+        }
+    }
+    return $found;
+}}
+
+/**
+ * Card grid for downloadable attachments and embedded images, rendered
+ * above the technical message part table
  * @subpackage imap/functions
  * @param array $struct message structure
  * @param object $output_mod Hm_Output_Module
  * @param string $dl_link base arguments for a download link
+ * @param string $show_link base arguments for an inline display link
  * @return string
  */
-if (!hm_exists('format_attached_image_section')) {
-function format_attached_image_section($struct, $output_mod, $dl_link) {
-    $res = '';
-    $isThereAnyImg = false;
-    foreach ($struct as $id => $vals) {
-        if ($vals['type'] === 'image') {
-            $res .= '<div class="col-6 col-md-3">
-                        <img class="attached_image img-fluid" 
-                             src="?' . $dl_link . '&amp;imap_msg_part=' . $output_mod->html_safe($id) . '" >
-                     </div>';
-            $isThereAnyImg = true;
-        }
-        if (isset($vals['subs'])) {
-            $res .= format_attached_image_section($vals['subs'], $output_mod, $dl_link);
-        }
+if (!hm_exists('format_attached_files_section')) {
+function format_attached_files_section($struct, $output_mod, $dl_link, $show_link) {
+    $parts = collect_attachment_parts($struct);
+    if (! $parts) {
+        return '';
     }
-
-    if ($isThereAnyImg) {
-        $res = '<div class="container-fluid"><div class="row text-center attached_image_box">' . $res . '</div></div>';
+    $total_size = 0;
+    $cards = '';
+    foreach ($parts as $part) {
+        list($id, $vals) = $part;
+        $total_size += intval($vals['size'] ?? 0);
+        $cards .= format_attachment_card($id, $vals, $output_mod, $dl_link, $show_link);
     }
-
-    return $res;
+    $count = count($parts);
+    $heading = '<div class="attached_files_heading">'.
+        '<span class="attached_files_label"><i class="bi bi-paperclip"></i> '.
+            sprintf($output_mod->trans($count == 1 ? '%d attachment' : '%d attachments'), $count).
+            ' <span class="attached_files_total">&middot; '.$output_mod->html_safe(get_imap_size(array('size' => $total_size))).'</span>'.
+        '</span>';
+    if ($count > 1) {
+        $heading .= '<a href="#" class="attached_files_download_all"><i class="bi bi-download"></i> '.$output_mod->trans('Download all').'</a>';
+    }
+    $heading .= '</div>';
+    return '<div class="attached_files_box">'.$heading.'<div class="row attached_files_grid">'.$cards.'</div></div>';
 }}
 
 /**

@@ -287,6 +287,7 @@ var init_resumable_upload = function () {
         target:'?page=compose&hm_ajax_hook=ajax_upload_chunk&draft_smtp=' + $(".compose_server").val(),
         testTarget:'?page=compose&hm_ajax_hook=ajax_get_test_chunk&draft_smtp=' + $(".compose_server").val(),
         testMethod: 'POST',
+        simultaneousUploads: 1,
         headers: {
             'X-Requested-with': 'xmlhttprequest'
         }
@@ -325,17 +326,24 @@ var init_resumable_upload = function () {
     r.on('fileProgress', function(file) {
         var progress = Math.floor(file.progress() * 100);
         $('#progress-' + file.uniqueIdentifier).css('width', progress+'%');
+        // all bytes have reached the server, but it may still be busy
+        // reassembling/encrypting a large file before confirming success -
+        // switch to an indeterminate animation so the user sees it's still
+        // being processed rather than a bar stuck at 100%
+        if (progress >= 100) {
+            $('#progress-bar-' + file.uniqueIdentifier).addClass('processing');
+        }
     });
     r.on('fileSuccess', function(file) {
         $('.remove_attachment').css('display', '');
         $('.pause_upload').css('display', 'none');
         $('.resume_upload').css('display', 'none');
         $('#tr-'+file.uniqueIdentifier).append('<td style="display:none"><input name="uploaded_files[]" type="text" value="'+file.fileName+'" /></td>');
-        $('#progress-bar-' + file.uniqueIdentifier).css('background-color', 'green');
+        $('#progress-bar-' + file.uniqueIdentifier).removeClass('processing').css('background-color', 'green');
         $('#progress-' + file.uniqueIdentifier).parent().css('opacity', '0');
     });
     r.on('fileError', function(file, message) {
-        $('#progress-bar-' + file.uniqueIdentifier).css('background-color', 'red');
+        $('#progress-bar-' + file.uniqueIdentifier).removeClass('processing').css('background-color', 'red');
     });
     r.on('pause', function() {
         $('.remove_attachment').css('display', 'none');

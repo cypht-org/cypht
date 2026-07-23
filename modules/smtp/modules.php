@@ -77,8 +77,7 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                             $new_attachment['size'] = $sub['size'];
                             $new_attachment['type'] = $sub['type'];
                             $file_path = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$new_attachment['name'];
-                            $content = Hm_Crypt::ciphertext($mailbox->get_message_content(hex2bin($path[2]), $this->request->get['uid'], $ind), Hm_Request_Key::generate());
-                            file_put_contents($file_path, $content);
+                            $mailbox->stream_message_part_to_file(hex2bin($path[2]), $this->request->get['uid'], $ind, $file_path, Hm_Request_Key::generate());
                             $new_attachment['tmp_name'] = $file_path;
                             $new_attachment['filename'] = $file_path;
                             $attached_files[$this->request->get['uid']][] = $new_attachment;
@@ -135,8 +134,6 @@ class Hm_Handler_load_smtp_is_imap_forward_as_attachment extends Hm_Handler_Modu
                 if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
                     return;
                 }
-                $content = $mailbox->get_message_content(hex2bin($path[2]), $this->request->get['uid']);
-
                 # Attachment Download
                 $attached_files = [];
                 $this->session->set('uploaded_files', array());
@@ -148,16 +145,15 @@ class Hm_Handler_load_smtp_is_imap_forward_as_attachment extends Hm_Handler_Modu
                 $basename = str_replace(',', '', $msg_header['Subject']);
                 $name = $basename. '.eml';
                 $file_path = $file_dir . $name;
+                $size = $mailbox->stream_message_part_to_file(hex2bin($path[2]), $this->request->get['uid'], 0, $file_path, Hm_Request_Key::generate());
                 $attached_files[$this->request->get['uid']][] = array(
                     'name' => $name,
                     'type' => 'message/rfc822',
-                    'size' => strlen($content),
+                    'size' => $size,
                     'tmp_name' => $file_path,
                     'filename' => $file_path,
                     'basename' => $basename
                 );
-                $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
-                file_put_contents($file_path, $content);
                 $this->session->set('uploaded_files', $attached_files);
                 $this->out('as_attr', true);
             }
@@ -199,8 +195,7 @@ class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
                             $new_attachment['size'] = $sub['size'];
                             $new_attachment['type'] = $sub['type'] . "/" . $sub['subtype'];
                             $file_path = $file_dir . $new_attachment['name'];
-                            $content = Hm_Crypt::ciphertext($mailbox->get_message_content(hex2bin($path[2]), $this->request->get['uid'], $ind), Hm_Request_Key::generate());
-                            file_put_contents($file_path, $content);
+                            $mailbox->stream_message_part_to_file(hex2bin($path[2]), $this->request->get['uid'], $ind, $file_path, Hm_Request_Key::generate());
                             $new_attachment['tmp_name'] = $file_path;
                             $new_attachment['filename'] = $file_path;
                             $attached_files[$this->request->get['uid']][] = $new_attachment;
@@ -308,10 +303,16 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
                 Hm_Msgs::add('Error saving (move_uploaded_file) chunk '.$this->request->get['resumableChunkNumber'].' for file '.$this->request->get['resumableFilename'], 'danger');
             } else {
                 // check if all the parts present, and create the final destination file
-                $result = createFileFromChunks($temp_dir, $this->request->get['resumableFilename'],
-                                $this->request->get['resumableChunkSize'],
-                                $this->request->get['resumableTotalSize'],
-                                $this->request->get['resumableTotalChunks']);
+                try {
+                    $result = createFileFromChunks($temp_dir, $this->request->get['resumableFilename'],
+                                    $this->request->get['resumableChunkSize'],
+                                    $this->request->get['resumableTotalSize'],
+                                    $this->request->get['resumableTotalChunks']);
+                }
+                catch (Exception $e) {
+                    Hm_Debug::add(sprintf('Error finalizing uploaded file %s: %s', $this->request->get['resumableFilename'], $e->getMessage()));
+                    Hm_Msgs::add('Error processing uploaded file '.$this->request->get['resumableFilename'], 'danger');
+                }
             }
         }
     }
@@ -758,7 +759,6 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* add attachments */
         $mime->add_attachments($uploaded_files);
-        $res = $mime->process_attachments();
 
         /* get smtp recipients */
         $recipients = $mime->get_recipient_addresses();
@@ -769,7 +769,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* send the message */
-        $err_msg = $mailbox->send_message($from, $recipients, $mime->get_mime_msg(), $this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt']));
+        $err_msg = $mailbox->send_message($from, $recipients, $mime, $this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt']));
         if ($err_msg) {
             Hm_Msgs::add(sprintf("%s", $err_msg), 'danger');
             repopulate_compose_form($draft, $this);
@@ -780,7 +780,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', DEFAULT_SMTP_AUTO_BCC);
         if ($auto_bcc) {
             $mime->set_auto_bcc($from);
-            $bcc_err_msg = $mailbox->send_message($from, array($from), $mime->get_mime_msg());
+            $bcc_err_msg = $mailbox->send_message($from, array($from), $mime);
         }
 
         /* check for associated IMAP server to save a copy */
@@ -825,10 +825,15 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             $specials = get_special_folders($this, $imap_server);
             delete_draft($form['draft_id'], $this->cache, $imap_server, $specials['draft']);
         }
-        
-        delete_uploaded_files($this->session, $form['draft_id']);
-        if ($form['draft_id'] > 0) {
-            delete_uploaded_files($this->session, 0);
+
+        if ($imap_server === false) {
+            delete_uploaded_files($this->session, $form['draft_id']);
+            if ($form['draft_id'] > 0) {
+                delete_uploaded_files($this->session, 0);
+            }
+        }
+        else {
+            $this->out('compose_draft_id', $form['draft_id'], false);
         }
     }
 }
@@ -1981,39 +1986,74 @@ if (!hm_exists('rrmdir')) {
  */
 if (!hm_exists('createFileFromChunks')) {
     function createFileFromChunks($temp_dir, $fileName, $chunkSize, $totalSize,$total_files) {
-        // count all the parts of this file
-        // $fileName = Hm_Crypt::ciphertext($fileName, Hm_Request_Key::generate());
-        $total_files_on_server_size = 0;
-        $temp_total = 0;
-        foreach(scandir($temp_dir) as $file) {
-            $temp_total = $total_files_on_server_size;
-            $tempfilesize = filesize($temp_dir.'/'.$file);
-            $total_files_on_server_size = $temp_total + $tempfilesize;
+        if (! is_dir($temp_dir)) {
+            return true;
         }
-        // check that all the parts are present
-        // If the Size of all the chunks on the server is equal to the size of the file uploaded.
-        if ($total_files_on_server_size >= $totalSize) {
-        // create the final destination file
-            if (($fp = fopen($temp_dir.'/../'.$fileName, 'w')) !== false) {
-                for ($i=1; $i<=$total_files; $i++) {
-                    fwrite($fp, file_get_contents($temp_dir.'/'.$fileName.'.part'.$i));
-                }
-                fclose($fp);
-                $hashed_content = Hm_Crypt::ciphertext(file_get_contents($temp_dir.'/../'.$fileName), Hm_Request_Key::generate());
-                file_put_contents($temp_dir.'/../'.$fileName, $hashed_content);
-            } else {
-                return false;
-            }
 
-            // rename the temporary directory (to avoid access from other
-            // concurrent chunks uploads) and than delete it
-            if (rename($temp_dir, $temp_dir.'_UNUSED')) {
-                rrmdir($temp_dir.'_UNUSED');
-            } else {
-                rrmdir($temp_dir);
+        $lock_path = rtrim($temp_dir, '/\\').'.lock';
+        $lock_fp = @fopen($lock_path, 'c');
+        if (! $lock_fp || ! flock($lock_fp, LOCK_EX)) {
+            if ($lock_fp) {
+                fclose($lock_fp);
+            }
+            return true;
+        }
+
+        $result = true;
+        if (is_dir($temp_dir)) {
+            // count all the parts of this file
+            $total_files_on_server_size = 0;
+            foreach (scandir($temp_dir) as $file) {
+                if ($file === '.' || $file === '..') {
+                    continue;
+                }
+                $total_files_on_server_size += filesize($temp_dir.'/'.$file);
+            }
+            // check that all the parts are present
+            // If the Size of all the chunks on the server is equal to the size of the file uploaded.
+            if ($total_files_on_server_size >= $totalSize) {
+                // create the final destination file
+                if (($fp = fopen($temp_dir.'/../'.$fileName, 'w')) !== false) {
+                    for ($i=1; $i<=$total_files; $i++) {
+                        fwrite($fp, file_get_contents($temp_dir.'/'.$fileName.'.part'.$i));
+                    }
+                    fclose($fp);
+
+                    $plain_path = $temp_dir.'/../'.$fileName;
+                    $encrypted_path = $plain_path.'.enc';
+                    $writer = new Hm_Crypt_Stream_Writer($encrypted_path, Hm_Request_Key::generate());
+                    $src = fopen($plain_path, 'rb');
+                    while (! feof($src)) {
+                        $chunk = fread($src, 1048576);
+                        if ($chunk === false || $chunk === '') {
+                            break;
+                        }
+                        $writer->write($chunk);
+                    }
+                    fclose($src);
+                    $writer->close();
+                    rename($encrypted_path, $plain_path);
+                } else {
+                    $result = false;
+                }
+
+                if ($result) {
+                    // rename the temporary directory (to avoid access from other
+                    // concurrent chunks uploads) and than delete it
+                    if (rename($temp_dir, $temp_dir.'_UNUSED')) {
+                        rrmdir($temp_dir.'_UNUSED');
+                    } else {
+                        rrmdir($temp_dir);
+                    }
+                }
             }
         }
-        return true;
+
+        flock($lock_fp, LOCK_UN);
+        fclose($lock_fp);
+        @unlink($lock_path);
+
+        return $result;
     }
 }
 
@@ -2133,7 +2173,6 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     }
 
     $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name, $profile['id'], $body_type_for_mime);
-    $res = $mime->process_attachments();
 
     if (! empty($atts['schedule']) && empty($mime->get_recipient_addresses())) {
         Hm_Msgs::add("ERRNo valid recipients found");

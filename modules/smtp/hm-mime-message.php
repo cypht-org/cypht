@@ -19,6 +19,8 @@ class Hm_MIME_Msg {
     private $text_body = '';
     private $html = false;
     private $final_msg = '';
+    private $body_msg = '';
+    private $body_prepared = false;
 
     /* build mime message data */
     function __construct($to, $subject, $body, $from, $html=false, $cc='', $bcc='', $in_reply_to_id='', $from_name='', $reply_to='', $delivery_receipt='', $schedule='', $profile_id = '') {
@@ -75,11 +77,32 @@ class Hm_MIME_Msg {
         $this->attachments = $files;
     }
 
+    /**
+     * Fully read and decrypt an attachment file written by
+     * Hm_Crypt_Stream_Writer (used by attachment_dir files)
+     * @param string $path attachment file path
+     * @return string|false decrypted content, or false on failure
+     */
+    private static function read_attachment_file($path) {
+        try {
+            $reader = new Hm_Crypt_Stream_Reader($path, Hm_Request_Key::generate());
+            $content = '';
+            while (($chunk = $reader->read()) !== false) {
+                $content .= $chunk;
+            }
+            $reader->close();
+            return $content;
+        }
+        catch (Exception $e) {
+            return false;
+        }
+    }
+
     function process_attachments() {
         $res = '';
         $closing = false;
         foreach ($this->attachments as $file) {
-            $content = Hm_Crypt::plaintext(@file_get_contents($file['filename']), Hm_Request_Key::generate());
+            $content = self::read_attachment_file($file['filename']);
             if ($content) {
                 $closing = true;
                 if (array_key_exists('no_encoding', $file) || (array_key_exists('type', $file) && $file['type'] == 'message/rfc822')) {
@@ -104,8 +127,9 @@ class Hm_MIME_Msg {
 
     /* output mime message */
     function get_mime_msg() {
-        if (!empty($this->body)) {
+        if (!empty($this->body) && !$this->body_prepared) {
             $this->prep_message_body();
+            $this->body_prepared = true;
         }
         $res = '';
         $headers = '';
@@ -129,6 +153,74 @@ class Hm_MIME_Msg {
         }
         $this->final_msg = $res;
         return $headers.$res;
+    }
+
+    /**
+     * Like get_mime_msg(), but excludes attachment bodies so a caller can
+     * stream them separately instead of holding them fully in memory. See
+     * get_attachment_parts()/get_closing_boundary().
+     * @return string headers and non-attachment body
+     */
+    function get_headers_and_body() {
+        if (! $this->body_msg) {
+            if (!empty($this->body) && !$this->body_prepared) {
+                $this->prep_message_body();
+                $this->body_prepared = true;
+            }
+            $res = '';
+            if ($this->html) {
+                $res .= $this->text_body;
+            }
+            $res .= "\r\n".$this->body;
+            $this->body_msg = $res;
+        }
+        $headers = '';
+        foreach ($this->headers as $name => $val) {
+            if (!trim($val)) {
+                continue;
+            }
+            $headers .= sprintf("%s: %s\r\n", $name, rtrim($this->prep_fld($val, $name)));
+        }
+        return $headers.$this->body_msg;
+    }
+
+    /**
+     * Per-attachment MIME part headers and source file paths, for a caller
+     * to stream the file content directly rather than through
+     * process_attachments()/get_mime_msg(). Attachments whose file is
+     * missing or unreadable are silently omitted, matching
+     * process_attachments()'s existing behavior.
+     * @return array list of ['header' => string, 'filename' => string, 'base64' => bool]
+     */
+    function get_attachment_parts() {
+        $parts = array();
+        foreach ($this->attachments as $file) {
+            if (! is_readable($file['filename'])) {
+                continue;
+            }
+            if (array_key_exists('no_encoding', $file) || (array_key_exists('type', $file) && $file['type'] == 'message/rfc822')) {
+                $header = sprintf("\r\n--%s\r\nContent-Type: %s; name=\"%s\"\r\nContent-Description: %s\r\n".
+                    "Content-Disposition: attachment; filename=\"%s\"\r\nContent-Transfer-Encoding: 7bit\r\n\r\n",
+                    $this->boundary, $file['type'], $file['name'], $file['name'], $file['name']);
+                $base64 = false;
+            }
+            else {
+                $header = sprintf("\r\n--%s\r\nContent-Type: %s; name=\"%s\"\r\nContent-Description: %s\r\n".
+                    "Content-Disposition: attachment; filename=\"%s\"\r\nContent-Transfer-Encoding: base64\r\n\r\n",
+                    $this->boundary, $file['type'], $file['name'], $file['name'], $file['name']);
+                $base64 = true;
+            }
+            $parts[] = array('header' => $header, 'filename' => $file['filename'], 'base64' => $base64);
+        }
+        return $parts;
+    }
+
+    /**
+     * Closing MIME boundary, sent after the last attachment part
+     * @return string
+     */
+    function get_closing_boundary() {
+        return sprintf("\r\n--%s--\r\n", $this->boundary);
     }
 
     function set_auto_bcc($addr) {

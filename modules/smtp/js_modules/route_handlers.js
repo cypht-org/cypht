@@ -153,6 +153,13 @@ function applySmtpComposePageHandlers(routeParams) {
                         }
                     });
                 } else {
+                    const sendBtn = document.querySelector('.smtp_send_placeholder');
+                    if (sendBtn) {
+                        sendBtn.disabled = true;
+                        sendBtn.dataset.originalText = sendBtn.textContent;
+                        sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>' + hm_trans('Sending...');
+                    }
+                    showLoaderToast(hm_trans('Sending message...'));
                     document.getElementsByClassName("smtp_send")[0].click();
                 }
             } else {

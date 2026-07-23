@@ -474,14 +474,208 @@
   padding-left: 20px;
 }
 
-.attached_image {
-  margin-right: 20px;
-  margin-bottom: 20px;
-  height: 200px;
+.msg_parts_toggle {
+  padding: 0.75rem 0;
 }
-.attached_image_box {
-  border-top: solid 1px #ddd;
-  padding-top: 1rem;
+.msg_parts_toggle button {
+  font-size: 0.78rem;
+  color: var(--bs-secondary-color, #777);
+  text-decoration: none;
+}
+.msg_parts_toggle button:hover {
+  color: var(--bs-body-color, #333);
+}
+.msg_parts_toggle .bi-chevron-down {
+  display: inline-block;
+  transition: transform 150ms ease;
+}
+.msg_parts_toggle button[aria-expanded="true"] .bi-chevron-down {
+  transform: rotate(180deg);
+}
+
+:root {
+  --attachment_tone_pdf: #d64545;    --attachment_tint_pdf: #d6454514;
+  --attachment_tone_doc: #3161d1;    --attachment_tint_doc: #3161d114;
+  --attachment_tone_xls: #1c8a5e;    --attachment_tint_xls: #1c8a5e14;
+  --attachment_tone_ppt: #d1762f;    --attachment_tint_ppt: #d1762f14;
+  --attachment_tone_zip: #8438c9;    --attachment_tint_zip: #8438c914;
+  --attachment_tone_txt: var(--bs-secondary-color, #777); --attachment_tint_txt: var(--bs-secondary-bg, #f3f4f6);
+  --attachment_tone_default: var(--bs-secondary-color, #777); --attachment_tint_default: var(--bs-secondary-bg, #f3f4f6);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --attachment_tone_pdf: #ef6a6a;
+    --attachment_tone_doc: #6c9bff;
+    --attachment_tone_xls: #4fca97;
+    --attachment_tone_ppt: #e8974f;
+    --attachment_tone_zip: #b98af5;
+  }
+}
+
+.attached_files_box {
+  padding-bottom: 1.25rem;
+  margin-bottom: 1rem;
+  border-bottom: solid 1px var(--bs-border-color, #ddd);
+}
+.attached_files_heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.attached_files_label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--bs-secondary-color, #666);
+}
+.attached_files_total {
+  font-weight: 400;
+}
+.attached_files_download_all {
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.attached_files_grid {
+  --bs-gutter-y: 0.85rem;
+}
+
+.attachment_card {
+  display: flex;
+  flex-direction: column;
+  border: solid 1px var(--bs-border-color, #ddd);
+  border-radius: 12px;
+  background: var(--bs-body-bg, #fff);
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+}
+.attachment_card:hover,
+.attachment_card:focus-visible {
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.14), 0 3px 8px rgba(0, 0, 0, 0.08);
+  border-color: transparent;
+  transform: translateY(-3px);
+  color: inherit;
+  outline: none;
+}
+.attachment_card:focus-visible {
+  outline: 2px solid var(--bs-primary, #3161d1);
+  outline-offset: 2px;
+}
+
+.attachment_card_thumb {
+  position: relative;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.attachment_card_thumb.is_icon {
+  background: var(--attachment_tint_default);
+}
+.attachment_card_thumb.is_icon.attachment_tone_pdf { background: var(--attachment_tint_pdf); }
+.attachment_card_thumb.is_icon.attachment_tone_doc { background: var(--attachment_tint_doc); }
+.attachment_card_thumb.is_icon.attachment_tone_xls { background: var(--attachment_tint_xls); }
+.attachment_card_thumb.is_icon.attachment_tone_ppt { background: var(--attachment_tint_ppt); }
+.attachment_card_thumb.is_icon.attachment_tone_zip { background: var(--attachment_tint_zip); }
+.attachment_card_thumb.is_icon.attachment_tone_txt { background: var(--attachment_tint_txt); }
+
+.attachment_card_icon {
+  font-size: 2rem;
+  color: var(--attachment_tone_default);
+}
+.attachment_tone_pdf .attachment_card_icon,
+.attachment_tone_pdf .attachment_card_ext { color: var(--attachment_tone_pdf); }
+.attachment_tone_doc .attachment_card_icon,
+.attachment_tone_doc .attachment_card_ext { color: var(--attachment_tone_doc); }
+.attachment_tone_xls .attachment_card_icon,
+.attachment_tone_xls .attachment_card_ext { color: var(--attachment_tone_xls); }
+.attachment_tone_ppt .attachment_card_icon,
+.attachment_tone_ppt .attachment_card_ext { color: var(--attachment_tone_ppt); }
+.attachment_tone_zip .attachment_card_icon,
+.attachment_tone_zip .attachment_card_ext { color: var(--attachment_tone_zip); }
+.attachment_tone_txt .attachment_card_icon,
+.attachment_tone_txt .attachment_card_ext { color: var(--attachment_tone_txt); }
+
+.attachment_card_ext {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.attachment_card_thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.attachment_card_thumb.is_image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 65%);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.attachment_card_download {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+.attachment_card_download i {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bs-body-bg, #fff);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  font-size: 0.85rem;
+}
+.attachment_card_thumb.is_image .attachment_card_download i {
+  background: rgba(255, 255, 255, 0.92);
+  color: #1c1b29;
+}
+@media (hover: hover) {
+  .attachment_card:hover .attachment_card_download,
+  .attachment_card:focus-visible .attachment_card_download {
+    opacity: 1;
+  }
+  .attachment_card:hover .attachment_card_thumb.is_image::after,
+  .attachment_card:focus-visible .attachment_card_thumb.is_image::after {
+    opacity: 1;
+  }
+}
+@media (hover: none) {
+  .attachment_card_download { opacity: 1; }
+  .attachment_card_thumb.is_image::after { opacity: 1; background: linear-gradient(to top, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0) 70%); }
+}
+
+.attachment_card_meta {
+  padding: 0.55rem 0.65rem 0.65rem;
+}
+.attachment_card_name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.attachment_card_size {
+  font-size: 0.72rem;
+  color: var(--bs-secondary-color, #777);
+  margin-top: 0.1rem;
 }
 /* .list_meta { float: none; margin-left: 37%; } */
 

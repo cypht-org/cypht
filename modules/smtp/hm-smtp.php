@@ -584,19 +584,24 @@ class Hm_SMTP {
         return openssl_encrypt($challenge, 'DES-ECB', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
     }
 
-    /* Send a message */
-    function send_message($from, $recipients, $message, $from_params = '', $recipients_params = '') {
+    /**
+     * Run the MAIL FROM / RCPT TO / DATA negotiation shared by
+     * send_message() and send_mime_message()
+     * @param string $from sender address
+     * @param mixed $recipients recipient address or array of addresses
+     * @param string $from_params extra MAIL FROM parameters
+     * @param string $recipients_params extra RCPT TO parameters
+     * @return bool|string true once the server is ready for the message body,
+     *                      or a user-facing error string on failure
+     */
+    private function smtp_start_data($from, $recipients, $from_params = '', $recipients_params = '') {
         $this->clean($from);
-        if ($from_params) {
-            $from_params = ' ' . $from_params;
-        }
         $from_params = $from_params ? ' ' . $from_params : '';
         $command = 'MAIL FROM:<'.$from.'>' . $from_params;
         $this->send_command($command);
         $res = $this->get_response();
         $bail = false;
-        $result = "Sorry, we couldn't send your message through the SMTP server right now. Please check your connection and try again.";
-        if(is_array($recipients)) {
+        if (is_array($recipients)) {
             if ($recipients_params) {
                 $recipients_params = ' ' . $recipients_params;
             }
@@ -620,37 +625,141 @@ class Hm_SMTP {
                 $bail = true;
             }
         }
-        if (!$bail) {
-            $command = 'DATA';
-            $this->send_command($command);
-            $res = $this->get_response();
-            if ($this->compare_response($res, '354') != 0) {
-                // Log technical details for debugging
-                error_log("SMTP DATA command failed. Expected 354, got: " . print_r($res, true));
-                $result = "Sorry, we couldn't send your message right now. The SMTP server didn't accept the message for delivery (DATA command failed). Please try again later.";
-            }
-            else {
-                $this->send_command($message);
-                /* TODO: process attachments */
-                $command = $this->crlf.'.';
-                $this->send_command($command);
-                $res = $this->get_response();
-                if ($this->compare_response($res, '250') == 0) {
-                    $result = false;
-                }
-                else {
-                    // Log technical details for debugging
-                    error_log("SMTP message delivery failed. Expected 250, got: " . print_r($res, true));
-                    $result = "Your message could not be sent. The SMTP server did not confirm delivery. Please try again later.";
-                }
-            }
-        }
-        else {
+        if ($bail) {
             // Log technical details for debugging
             error_log("SMTP RCPT command failed for one or more recipients");
-            $result = "There was an error sending your message. One or more of the recipient addresses may be invalid (RCPT command failed). Please check the email addresses and try again.";
+            return "There was an error sending your message. One or more of the recipient addresses may be invalid (RCPT command failed). Please check the email addresses and try again.";
         }
-        return $result;
+        $command = 'DATA';
+        $this->send_command($command);
+        $res = $this->get_response();
+        if ($this->compare_response($res, '354') != 0) {
+            // Log technical details for debugging
+            error_log("SMTP DATA command failed. Expected 354, got: " . print_r($res, true));
+            return "Sorry, we couldn't send your message right now. The SMTP server didn't accept the message for delivery (DATA command failed). Please try again later.";
+        }
+        return true;
+    }
+
+    /**
+     * Send the closing "." after the message body has been written and
+     * check the server's final response
+     * @return bool|string false on success, or a user-facing error string
+     */
+    private function smtp_finish_data() {
+        $command = $this->crlf.'.';
+        $this->send_command($command);
+        $res = $this->get_response();
+        if ($this->compare_response($res, '250') == 0) {
+            return false;
+        }
+        // Log technical details for debugging
+        error_log("SMTP message delivery failed. Expected 250, got: " . print_r($res, true));
+        return "Your message could not be sent. The SMTP server did not confirm delivery. Please try again later.";
+    }
+
+    /**
+     * Write raw bytes straight to the socket, with no added CRLF (unlike
+     * send_command()) so callers can write a message piecemeal
+     * @param string $data
+     * @return void
+     */
+    private function write_raw($data) {
+        if (is_resource($this->handle)) {
+            fputs($this->handle, $data);
+        }
+    }
+
+    /* Send a message */
+    function send_message($from, $recipients, $message, $from_params = '', $recipients_params = '') {
+        $ready = $this->smtp_start_data($from, $recipients, $from_params, $recipients_params);
+        if ($ready !== true) {
+            return $ready;
+        }
+        $this->send_command($message);
+        return $this->smtp_finish_data();
+    }
+
+    /**
+     * Send a message built from a Hm_MIME_Msg, streaming each attachment's
+     * file content directly to the socket (decrypting and base64-encoding
+     * it in bounded-size chunks) instead of ever holding a whole attachment
+     * in memory.
+     * @param string $from sender address
+     * @param mixed $recipients recipient address or array of addresses
+     * @param Hm_MIME_Msg $mime message to send
+     * @param string $from_params extra MAIL FROM parameters
+     * @param string $recipients_params extra RCPT TO parameters
+     * @return bool|string false on success, or a user-facing error string
+     */
+    function send_mime_message($from, $recipients, $mime, $from_params = '', $recipients_params = '') {
+        $ready = $this->smtp_start_data($from, $recipients, $from_params, $recipients_params);
+        if ($ready !== true) {
+            return $ready;
+        }
+        $this->write_raw($mime->get_headers_and_body());
+        $sent_any = false;
+        foreach ($mime->get_attachment_parts() as $part) {
+            if ($this->stream_attachment_part($part)) {
+                $sent_any = true;
+            }
+        }
+        if ($sent_any) {
+            $this->write_raw($mime->get_closing_boundary());
+        }
+        return $this->smtp_finish_data();
+    }
+
+    /**
+     * Stream one attachment's decrypted content directly to the socket. A
+     * missing file, or a decryption/authentication failure, causes this
+     * attachment to be silently skipped (matching the previous
+     * Hm_MIME_Msg::process_attachments() behavior) rather than aborting the
+     * whole send.
+     * @param array $part one entry from Hm_MIME_Msg::get_attachment_parts()
+     * @return bool true if the attachment was written
+     */
+    private function stream_attachment_part($part) {
+        try {
+            $reader = new Hm_Crypt_Stream_Reader($part['filename'], Hm_Request_Key::generate());
+        }
+        catch (Exception $e) {
+            return false;
+        }
+        try {
+            $chunk = $reader->read();
+        }
+        catch (Exception $e) {
+            $reader->close();
+            return false;
+        }
+        $this->write_raw($part['header']);
+        $buffer = '';
+        try {
+            while ($chunk !== false) {
+                if ($part['base64']) {
+                    $buffer .= $chunk;
+                    $usable = strlen($buffer) - (strlen($buffer) % 57);
+                    if ($usable > 0) {
+                        $this->write_raw(chunk_split(base64_encode(substr($buffer, 0, $usable))));
+                        $buffer = substr($buffer, $usable);
+                    }
+                }
+                else {
+                    $this->write_raw($chunk);
+                }
+                $chunk = $reader->read();
+            }
+            if ($part['base64'] && $buffer !== '') {
+                $this->write_raw(chunk_split(base64_encode($buffer)));
+            }
+        }
+        catch (Exception $e) {
+            $reader->close();
+            return true;
+        }
+        $reader->close();
+        return true;
     }
 
     function supports_dsn() {

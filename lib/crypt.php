@@ -293,3 +293,229 @@ class Hm_Crypt_Base {
         }
     }
 }
+
+/**
+ * Streaming, chunked authenticated encryption for payloads that must not be
+ * fully buffered in memory (e.g. large mail attachments). This is a separate
+ * format from Hm_Crypt::ciphertext()/plaintext() (not used for sessions or
+ * passwords) and always uses OpenSSL, independent of the LIBSODIUM extension.
+ *
+ * File format:
+ *   [16 bytes salt]
+ *   repeated: [4 bytes BE ciphertext length][ciphertext][1 byte final-flag][32 bytes HMAC-SHA256 tag]
+ *   tag = HMAC-SHA256(chunk_index(4 bytes BE) . final-flag(1 byte) . ciphertext, hmac_key)
+ *
+ * Each chunk is individually authenticated so a reader can verify and reject
+ * tampered data before ever handing out its plaintext, and the final-flag
+ * lets a reader detect a truncated stream instead of silently accepting a
+ * short read as a complete one.
+ *
+ * @package framework
+ * @subpackage crypt
+ */
+class Hm_Crypt_Stream_Writer {
+
+    const CHUNK_SIZE = 1048576;
+    const PBKDF2_ROUNDS = 100;
+    const PBKDF2_ALGO = 'sha512';
+
+    private $fp;
+    private $crypt_key;
+    private $hmac_key;
+    private $chunk_index = 0;
+    private $buffer = '';
+    private $closed = false;
+    private $salt;
+
+    /**
+     * @param string $path destination file path
+     * @param string $key encryption key
+     * @param string|null $salt reuse a previously generated salt (see
+     *                           get_salt()) instead of generating a new one -
+     *                           needed to resume writing the same encrypted
+     *                           stream from a later, separate process/request
+     * @param int $start_index chunk index to continue counting from, when
+     *                         resuming a stream started by an earlier writer
+     * @param bool $append open the destination file for appending instead of
+     *                     truncating it, and skip writing the salt header
+     *                     again - set this together with $salt/$start_index
+     *                     when resuming
+     */
+    public function __construct($path, $key, $salt = null, $start_index = 0, $append = false) {
+        $this->fp = fopen($path, $append ? 'ab' : 'wb');
+        if (!$this->fp) {
+            throw new Exception(sprintf('Unable to open %s for writing', $path));
+        }
+        $this->salt = $salt !== null ? $salt : Hm_Crypt_Base::random(16);
+        $this->crypt_key = Hm_Crypt_Base::pbkdf2($key, $this->salt.'enc', 32, self::PBKDF2_ROUNDS, self::PBKDF2_ALGO);
+        $this->hmac_key = Hm_Crypt_Base::pbkdf2($key, $this->salt.'mac', 32, self::PBKDF2_ROUNDS, self::PBKDF2_ALGO);
+        $this->chunk_index = $start_index;
+        if (! $append) {
+            fwrite($this->fp, $this->salt);
+        }
+    }
+
+    /**
+     * The salt this writer generated (or was given), needed by a later
+     * writer to resume this same stream
+     * @return string
+     */
+    public function get_salt() {
+        return $this->salt;
+    }
+
+    /**
+     * The chunk index the next write will use, needed by a later writer to
+     * resume this same stream
+     * @return int
+     */
+    public function get_next_chunk_index() {
+        return $this->chunk_index;
+    }
+
+    /**
+     * Encrypt and write exactly one chunk immediately (no buffering), then
+     * release the file handle. For a writer used once per incoming piece of
+     * data across separate requests/processes (e.g. one HTTP request per
+     * upload chunk), where each caller must flush and hand off rather than
+     * hold the handle open.
+     * @param string $data plaintext chunk
+     * @param bool $final whether this is the last chunk of the stream
+     * @return void
+     */
+    public function write_chunk_now($data, $final) {
+        $this->write_chunk($data, $final);
+        fclose($this->fp);
+        $this->closed = true;
+    }
+
+    /**
+     * Encrypt and write a chunk of plaintext once enough has been buffered
+     * @param string $data plaintext to append to the stream
+     * @return void
+     */
+    public function write($data) {
+        $this->buffer .= $data;
+        while (strlen($this->buffer) >= self::CHUNK_SIZE) {
+            $this->write_chunk(substr($this->buffer, 0, self::CHUNK_SIZE), false);
+            $this->buffer = substr($this->buffer, self::CHUNK_SIZE);
+        }
+    }
+
+    /**
+     * Flush any buffered plaintext as the final, authenticated chunk and
+     * close the destination file
+     * @return void
+     */
+    public function close() {
+        if ($this->closed) {
+            return;
+        }
+        $this->write_chunk($this->buffer, true);
+        $this->buffer = '';
+        fclose($this->fp);
+        $this->closed = true;
+    }
+
+    private function write_chunk($data, $final) {
+        $iv = substr(hash_hmac('sha256', pack('N', $this->chunk_index), $this->crypt_key, true), 0, 16);
+        $ciphertext = openssl_encrypt($data, 'aes-256-cbc', $this->crypt_key, OPENSSL_RAW_DATA, $iv);
+        $flag = $final ? "\x01" : "\x00";
+        $tag = hash_hmac('sha256', pack('N', $this->chunk_index).$flag.$ciphertext, $this->hmac_key, true);
+        fwrite($this->fp, pack('N', strlen($ciphertext)).$ciphertext.$flag.$tag);
+        $this->chunk_index++;
+    }
+}
+
+/**
+ * Reader counterpart to Hm_Crypt_Stream_Writer. Verifies each chunk's
+ * authentication tag before returning its plaintext, so tampered or
+ * truncated data is rejected without ever handing out unauthenticated bytes.
+ * @package framework
+ * @subpackage crypt
+ */
+class Hm_Crypt_Stream_Reader {
+
+    private $fp;
+    private $crypt_key;
+    private $hmac_key;
+    private $chunk_index = 0;
+    private $finished = false;
+
+    /**
+     * @param string $path source file path, as written by Hm_Crypt_Stream_Writer
+     * @param string $key encryption key
+     */
+    public function __construct($path, $key) {
+        $this->fp = fopen($path, 'rb');
+        if (!$this->fp) {
+            throw new Exception(sprintf('Unable to open %s for reading', $path));
+        }
+        $salt = $this->read_exact(16);
+        if ($salt === false) {
+            throw new Exception('Truncated stream: missing salt');
+        }
+        $this->crypt_key = Hm_Crypt_Base::pbkdf2($key, $salt.'enc', 32, Hm_Crypt_Stream_Writer::PBKDF2_ROUNDS, Hm_Crypt_Stream_Writer::PBKDF2_ALGO);
+        $this->hmac_key = Hm_Crypt_Base::pbkdf2($key, $salt.'mac', 32, Hm_Crypt_Stream_Writer::PBKDF2_ROUNDS, Hm_Crypt_Stream_Writer::PBKDF2_ALGO);
+    }
+
+    /**
+     * Read, verify, and decrypt the next chunk
+     * @return string|false decrypted plaintext, or false once the
+     *                       authenticated end of the stream has been reached
+     */
+    public function read() {
+        if ($this->finished) {
+            return false;
+        }
+        $len_bytes = $this->read_exact(4);
+        if ($len_bytes === false) {
+            throw new Exception('Truncated stream: missing chunk header');
+        }
+        $len = unpack('N', $len_bytes)[1];
+        $ciphertext = $this->read_exact($len);
+        $flag = $this->read_exact(1);
+        $tag = $this->read_exact(32);
+        if ($ciphertext === false || $flag === false || $tag === false) {
+            throw new Exception('Truncated stream: incomplete chunk');
+        }
+        $expected_tag = hash_hmac('sha256', pack('N', $this->chunk_index).$flag.$ciphertext, $this->hmac_key, true);
+        if (!Hm_Crypt_Base::hash_compare($expected_tag, $tag)) {
+            throw new Exception('Stream authentication failed: data may have been tampered with');
+        }
+        $iv = substr(hash_hmac('sha256', pack('N', $this->chunk_index), $this->crypt_key, true), 0, 16);
+        $plaintext = openssl_decrypt($ciphertext, 'aes-256-cbc', $this->crypt_key, OPENSSL_RAW_DATA, $iv);
+        $this->chunk_index++;
+        if ($flag === "\x01") {
+            $this->finished = true;
+        }
+        return $plaintext;
+    }
+
+    /**
+     * @return void
+     */
+    public function close() {
+        if (is_resource($this->fp)) {
+            fclose($this->fp);
+        }
+    }
+
+    private function read_exact($size) {
+        if ($size === 0) {
+            return '';
+        }
+        $data = '';
+        while (strlen($data) < $size) {
+            if (feof($this->fp)) {
+                return false;
+            }
+            $chunk = fread($this->fp, $size - strlen($data));
+            if ($chunk === false || $chunk === '') {
+                return false;
+            }
+            $data .= $chunk;
+        }
+        return $data;
+    }
+}

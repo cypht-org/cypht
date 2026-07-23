@@ -56,6 +56,7 @@ xdebug.client_host=host.docker.internal" > /usr/local/etc/php/conf.d/xdebug.ini
 
 RUN printf "post_max_size = 60M \n\
 upload_max_filesize = 50M \n\
+memory_limit = 256M \n\
 open_basedir = /var/lib/hm3/:/usr/local/share/cypht/:/tmp:/usr/local/bin:/tmp/composer_cache:/tmp/composer_home:/etc" > /usr/local/etc/php/conf.d/cypht.ini
 
 # Composer
