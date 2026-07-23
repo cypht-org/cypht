@@ -44,5 +44,23 @@ fi
 rm -r /var/www
 ln -s $(pwd)/site /var/www
 
+# DEBUG_MODE serves per-module JS/CSS (and vendor/third_party assets) from WEB_ROOT.
+# Docker's nginx document root is site/, which only contains the production bundle
+# plus a subset of assets - breaking the UI (Offline banner, missing sidebar/home).
+# Link the live source trees into site/ when debug is enabled via the ENABLE_DEBUG
+# environment variable.
+case "$(printf '%s' "${ENABLE_DEBUG}" | tr '[:upper:]' '[:lower:]')" in
+    true|1|yes)
+        echo "ENABLE_DEBUG enabled: linking modules/vendor/third_party into site/"
+        for path in modules vendor third_party; do
+            target="${APP_DIR}/site/${path}"
+            if [ -e "${target}" ] && [ ! -L "${target}" ]; then
+                rm -rf "${target}"
+            fi
+            ln -sfn "${APP_DIR}/${path}" "${target}"
+        done
+        ;;
+esac
+
 # Start services
 exec /usr/bin/supervisord -c /etc/supervisord.conf
