@@ -235,15 +235,34 @@ trait Hm_Handler_Validate {
         if ($target == 'none') {
             $target = false;
         }
-        $server_vars = [
-            'HTTP_REFERER' => 'source',
-            'HTTP_ORIGIN' => 'source',
-            'HTTP_HOST' => 'target',
-            'HTTP_X_FORWARDED_HOST' => 'target'
-        ];
-        foreach ($server_vars as $header => $type) {
-            if (!empty($request->server[$header])) {
-                $$type = $request->server[$header];
+        if (!empty($request->server['HTTP_HOST'])) {
+            $target = $request->server['HTTP_HOST'];
+        }
+        if (!empty($request->server['HTTP_X_FORWARDED_HOST'])) {
+            $target = trim(explode(',', $request->server['HTTP_X_FORWARDED_HOST'])[0]);
+        }
+
+        $origin = !empty($request->server['HTTP_ORIGIN']) ? $request->server['HTTP_ORIGIN'] : false;
+        $referer = !empty($request->server['HTTP_REFERER']) ? $request->server['HTTP_REFERER'] : false;
+        $source = $origin ?: $referer;
+
+        // Some proxies rewrite Origin to localhost while Referer still has the public host.
+        if ($origin && $referer && $target) {
+            $origin_parts = parse_url($origin);
+            $referer_parts = parse_url($referer);
+            if (is_array($origin_parts) && array_key_exists('host', $origin_parts) &&
+                is_array($referer_parts) && array_key_exists('host', $referer_parts)) {
+                $origin_host = $origin_parts['host'];
+                if (array_key_exists('port', $origin_parts)) {
+                    $origin_host .= ':'.$origin_parts['port'];
+                }
+                $referer_host = $referer_parts['host'];
+                if (array_key_exists('port', $referer_parts)) {
+                    $referer_host .= ':'.$referer_parts['port'];
+                }
+                if ($origin_host !== $target && $referer_host === $target) {
+                    $source = $referer;
+                }
             }
         }
         return [$source, $target];
