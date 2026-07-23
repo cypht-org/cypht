@@ -243,12 +243,24 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
             $path = $request->path;
         }
         $domain = $this->site_config->get('cookie_domain', false);
+        if (!$domain && array_key_exists('HTTP_X_FORWARDED_HOST', $request->server)) {
+            $domain = trim(explode(',', $request->server['HTTP_X_FORWARDED_HOST'])[0]);
+        }
         if (!$domain && array_key_exists('HTTP_HOST', $request->server)) {
-            $host = parse_url($request->server['HTTP_HOST'],  PHP_URL_HOST);
+            $host = parse_url($request->server['HTTP_HOST'], PHP_URL_HOST);
             if (trim((string) $host)) {
                 $domain = $host;
             } else {
                 $domain = $request->server['HTTP_HOST'];
+            }
+        }
+        if ($domain) {
+            $host = parse_url($domain, PHP_URL_HOST);
+            if (trim((string) $host)) {
+                $domain = $host;
+            }
+            if (preg_match('/:\d+$/', $domain, $matches)) {
+                $domain = str_replace($matches[0], '', $domain);
             }
         }
         if ($domain == 'none') {
