@@ -199,7 +199,10 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
             $this->get_key($request);
             $this->existing = true;
             $this->start($request);
-            $this->check_fingerprint($request);
+            // Only enforce fingerprint for active sessions.
+            if ($this->is_active()) {
+                $this->check_fingerprint($request);
+            }
             $this->restore_long_session($request);
         }
         return $this->is_active();

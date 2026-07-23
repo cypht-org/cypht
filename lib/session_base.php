@@ -44,8 +44,8 @@ trait Hm_Session_Fingerprint {
             return;
         }
         $id = $this->build_fingerprint($request->server);
-        $fingerprint = $this->get('fingerprint', null);
-        if ($fingerprint === false) {
+        $fingerprint = $this->get('fingerprint', false);
+        if ($fingerprint === false || $fingerprint === null) {
             $this->set_fingerprint($request);
             return;
         }
