@@ -342,8 +342,8 @@ function subject_callback($vals, $style, $output_mod) {
 
     $safe_url = $output_mod->html_safe($vals[1]);
     $inline_active = $output_mod->get('inline_message_setting') && !$output_mod->get('is_mobile');
-    $link_href = $inline_active ? '#' : $safe_url;
-    $data_src_attr = $inline_active ? ' data-src="' . $safe_url . '"' : '';
+    $link_href = $safe_url;
+    $data_src_attr = $inline_active ? ' data-src="' . $safe_url . '" data-external="1"' : '';
 
     if ($style == 'news') {
         if ($output_mod->get('is_mobile')) {
