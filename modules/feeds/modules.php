@@ -356,8 +356,10 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
             $found = false;
             list($success, $form) = $this->process_form(array('new_feed_name', 'new_feed_address'));
             if ($success) {
-                $connection_test = address_from_url($form['new_feed_address']);
-                if ($con = @fsockopen($connection_test, 80, $errno, $errstr, 2)) {
+                if (!feed_url_is_allowed($form['new_feed_address'])) {
+                    Hm_Msgs::add('ERRFeed address is not allowed');
+                }
+                else {
                     $feed = is_news_feed($form['new_feed_address']);
                     if (!$feed) {
                         $feed = new Hm_Feed();
@@ -365,8 +367,13 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                         if (trim($homepage)) {
                             list($type, $href) = search_for_feeds($homepage);
                             if ($type && $href) {
-                                Hm_Msgs::add('Discovered a feed at that address');
-                                $found = true;
+                                if (!feed_url_is_allowed($href)) {
+                                    Hm_Msgs::add('ERRDiscovered feed address is not allowed');
+                                }
+                                else {
+                                    Hm_Msgs::add('Discovered a feed at that address');
+                                    $found = true;
+                                }
                             }
                             else {
                                 Hm_Msgs::add('ERRCould not find an RSS or ATOM feed at that address');
@@ -387,9 +394,6 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                         }
                         $href = $form['new_feed_address'];
                     }
-                }
-                else {
-                    Hm_Msgs::add(sprintf('ERRCound not add feed: %s', $errstr));
                 }
             }
             else {
