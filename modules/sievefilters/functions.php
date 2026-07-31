@@ -143,6 +143,10 @@ if (!hm_exists('get_mailbox_filters')) {
         $script_list = '';
         foreach ($scripts_sorted as $script_name => $sc) {
             $exp_name = explode('-', $script_name);
+            /* recomputed per row: $base_class from the loop above holds whatever
+               the last script happened to be, which mislabels every edit/delete
+               link once an account mixes filters and scripts */
+            $base_class = end($exp_name) == 'cyphtfilter' ? 'filter' : 'script';
             $parsed_name = str_replace('_', ' ', $exp_name[0]);
 
             if (count($exp_name) > 3) {
