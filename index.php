@@ -19,7 +19,6 @@ define('CACHE_ID', '');
 define('SITE_ID', '');
 define('JS_HASH', '');
 define('CSS_HASH', '');
-define('ASSETS_PATH', APP_PATH.'assets/');
 
 /* don't let anything output content until we are ready */
 ob_start();
@@ -70,6 +69,7 @@ date_default_timezone_set($config->get('default_setting_timezone', 'UTC'));
 $environment->define_default_constants($config);
 
 define('WEB_ROOT', $config->get('web_root'));
+define('ASSETS_PATH', WEB_ROOT.'assets/');
 
 /* setup ini settings */
 if (!$config->get('disable_ini_settings')) {
