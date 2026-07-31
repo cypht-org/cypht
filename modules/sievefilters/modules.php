@@ -2197,37 +2197,46 @@ class Hm_Output_save_custom_action extends Hm_Output_Module {
  */
 class Hm_Handler_delete_custom_action extends Hm_Handler_Module {
     public function process() {
-        $custom_action_id = $this->request->get('custom_action_id', '');
-        $account = $this->request->get('imap_account', '');
-        
-        if (!$custom_action_id || !$account) {
+        list($success, $form) = $this->process_form(['imap_account', 'custom_action_id']);
+        if (!$success) {
             $this->out('custom_action_deleted', 0);
             return;
         }
-        
-        $user_config = $this->get('user_config', []);
-        if (!isset($user_config['custom_actions']['by_account'][$account])) {
+
+        $account = trim($form['imap_account']);
+        $custom_action_id = trim($form['custom_action_id']);
+        if ($account === '' || $custom_action_id === '') {
             $this->out('custom_action_deleted', 0);
             return;
         }
-        
-        $custom_actions = &$user_config['custom_actions']['by_account'][$account];
+
+        $custom_actions = $this->user_config->get('custom_actions', []);
+        if (empty($custom_actions['by_account'][$account]) || !is_array($custom_actions['by_account'][$account])) {
+            $this->out('custom_action_deleted', 0);
+            return;
+        }
+
+        $account_actions = $custom_actions['by_account'][$account];
         $found = false;
-        
-        foreach ($custom_actions as $key => $action) {
-            if ($action['id'] === $custom_action_id) {
-                unset($custom_actions[$key]);
+
+        foreach ($account_actions as $key => $action) {
+            if (isset($action['id']) && $action['id'] === $custom_action_id) {
+                unset($account_actions[$key]);
                 $found = true;
                 break;
             }
         }
-        
-        if ($found) {
-            $this->out('user_config', $user_config);
-            $this->out('custom_action_deleted', 1);
-        } else {
+
+        if (!$found) {
             $this->out('custom_action_deleted', 0);
+            return;
         }
+
+        $custom_actions['by_account'][$account] = $account_actions;
+        $this->user_config->set('custom_actions', $custom_actions);
+        $this->session->record_unsaved('Custom action deleted');
+        $this->session->set('user_data', $this->user_config->dump());
+        $this->out('custom_action_deleted', 1);
     }
 }
 
