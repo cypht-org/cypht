@@ -1629,7 +1629,7 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
         $accounts = $this->get('imap_accounts');
         if (isset($accounts[$form['imap_server_id']])) {
             $account = $accounts[$form['imap_server_id']];
-            $client = initialize_sieve_client_factory($this->config, null, $account);
+            $client = initialize_sieve_client_factory($this->config, $this->user_config, $account);
             $account['sieve_extensions'] = [];
 
             if ($client) {

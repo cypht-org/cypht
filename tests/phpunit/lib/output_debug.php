@@ -24,10 +24,10 @@ class Hm_Test_Output_Debug extends TestCase {
      */
     public function test_send_response_injects_debug_panel_when_body_tag_present_and_debug_messages_exist() {
         Hm_Debug::add('Debug entry for panel', 'info');
-        $http = new Hm_Output_HTTP();
+        $http = new Hm_Output_HTTP('<html><body>Page Content</body></html>');
         ob_start();
         ob_start();
-        $http->send_response('<html><body>Page Content</body></html>');
+        $http->send_response();
         $output = ob_get_clean();
         $this->assertStringContainsString('cypht-debug-panel', $output);
         $this->assertStringContainsString('Debug Panel', $output);
@@ -38,10 +38,10 @@ class Hm_Test_Output_Debug extends TestCase {
      * @runInSeparateProcess
      */
     public function test_send_response_skips_panel_when_no_debug_messages() {
-        $http = new Hm_Output_HTTP();
+        $http = new Hm_Output_HTTP('<html><body>Page Content</body></html>');
         ob_start();
         ob_start();
-        $http->send_response('<html><body>Page Content</body></html>');
+        $http->send_response();
         $output = ob_get_clean();
         $this->assertStringNotContainsString('cypht-debug-panel', $output);
     }
@@ -71,10 +71,10 @@ class Hm_Test_Output_Debug extends TestCase {
         Hm_Debug::add('Low priority debug', 'debug');
         Hm_Debug::add('High priority error', 'danger');
         putenv('LOG_LEVEL=ERROR');
-        $http = new Hm_Output_HTTP();
+        $http = new Hm_Output_HTTP('<html><body>Content</body></html>');
         ob_start();
         ob_start();
-        $http->send_response('<html><body>Content</body></html>');
+        $http->send_response();
         $output = ob_get_clean();
         putenv('LOG_LEVEL=WARNING');
         $this->assertStringContainsString('cypht-debug-panel', $output);

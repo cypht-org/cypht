@@ -2,21 +2,6 @@
 
 use PHPUnit\Framework\TestCase;
 
-class Hm_Test_Sieve_Failing_Factory {
-    public function init($user_config = null, $imap_account = null, $is_nux_supported = false) {
-        throw new Exception('Connection refused');
-    }
-}
-
-class Hm_Test_Failing_Sieve_Site_Config {
-    public function get($name) {
-        return 'Hm_Test_Sieve_Failing_Factory';
-    }
-    public function get_modules($include_setup = false) {
-        return array();
-    }
-}
-
 class Hm_Test_Mock_Sieve_Module {
     public $config;
     public $user_config;
@@ -371,9 +356,9 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_get_sieve_client_factory_uses_class_from_site_config() {
+    public function test_get_sieve_client_factory_uses_custom_class_as_configured() {
         $factory = get_sieve_client_factory(new Hm_Test_Mock_Sieve_Site_Config());
-        $this->assertInstanceOf('Hm_Test_Mock_Sieve_Client_Factory', $factory);
+        $this->assertInstanceOf('Hm_Custom_Sieve_Client_Factory', $factory);
     }
 
     /**
@@ -382,8 +367,13 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
      */
     public function test_initialize_sieve_client_factory_returns_null_and_adds_message_on_exception() {
         require_once APP_PATH.'modules/sievefilters/hm-sieve.php';
+
+        Hm_Custom_Sieve_Client_Factory::setMockCreator(function () {
+            throw new Exception('Connection refused');
+        });
+
         $result = initialize_sieve_client_factory(
-            new Hm_Test_Failing_Sieve_Site_Config(),
+            new Hm_Test_Mock_Sieve_Site_Config(),
             new Hm_Mock_Config(),
             array('sieve_config_host' => 'sieve.example.com')
         );
@@ -399,7 +389,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
      */
     public function test_get_blocked_senders_array_returns_empty_when_no_blocked_senders_script() {
         MockSieveClientStorage::setScripts(array('other_script' => 'discard;'));
-        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+        Hm_Custom_Sieve_Client_Factory::setMockCreator(function () {
             return $this->makeMockSieveClient();
         });
         $result = get_blocked_senders_array(
@@ -424,7 +414,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
                 'discard; stop;',
             )),
         ));
-        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+        Hm_Custom_Sieve_Client_Factory::setMockCreator(function () {
             return $this->makeMockSieveClient();
         });
         $result = get_blocked_senders_array(
@@ -442,7 +432,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
      * @runInSeparateProcess
      */
     public function test_get_blocked_senders_array_returns_empty_and_adds_message_on_exception() {
-        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+        Hm_Custom_Sieve_Client_Factory::setMockCreator(function () {
             throw new Exception('Client connection failed');
         });
         $result = get_blocked_senders_array(
@@ -460,7 +450,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
      */
     public function test_get_blocked_senders_returns_empty_string_when_script_not_present() {
         MockSieveClientStorage::setScripts(array());
-        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+        Hm_Custom_Sieve_Client_Factory::setMockCreator(function () {
             return $this->makeMockSieveClient();
         });
         $mod = new Hm_Output_Test(array(), array());
@@ -488,7 +478,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
                 'discard; stop;',
             )),
         ));
-        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+        Hm_Custom_Sieve_Client_Factory::setMockCreator(function () {
             return $this->makeMockSieveClient();
         });
         $mod = new Hm_Output_Test(array(), array());
@@ -522,7 +512,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
                 '}',
             )),
         ));
-        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+        Hm_Custom_Sieve_Client_Factory::setMockCreator(function () {
             return $this->makeMockSieveClient();
         });
         $user_config = new Hm_Mock_Config();
@@ -565,7 +555,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
                 'fileinto "Archive";',
             )),
         ));
-        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function () {
+        Hm_Custom_Sieve_Client_Factory::setMockCreator(function () {
             return $this->makeMockSieveClient();
         });
         $user_config = new Hm_Mock_Config();
