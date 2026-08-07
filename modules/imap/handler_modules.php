@@ -351,7 +351,11 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
                 $this->out('sent_msg_uid', $uid);
                 $this->out('sent_imap_id', $imap_id);
 
-                if ($this->user_config->get('review_sent_email_setting', false)) {
+                // Only redirect when we have a real message uid (APPENDUID). Some
+                // servers acknowledge APPEND without APPENDUID; store_message then
+                // returns true and urlencode() would fatal on a non-string value.
+                if ($this->user_config->get('review_sent_email_setting', false)
+                        && is_scalar($uid) && $uid !== true) {
                     $this->out('redirect_url', $this->build_page_url('message', array(
                         'uid' => $uid,
                         'list_path' => 'imap_'.$imap_id.'_'.bin2hex($sent_folder),
