@@ -2561,7 +2561,15 @@ if (!class_exists('Hm_IMAP')) {
 
             /* select the mailbox if need be */
             if (!$this->selected_mailbox || $this->selected_mailbox['name'] != $mailbox) {
-                $this->select_mailbox($mailbox);
+                /* Bail out if the mailbox cannot be selected. Without this check the
+                 * SORT/SEARCH/FETCH commands below run against whatever mailbox is still
+                 * selected on the connection, so a failed switch either returns an empty
+                 * list or - worse - messages from the previously selected mailbox.
+                 * Same contract as Hm_Mailbox::get_messages(), which already returns
+                 * [0, []] when select_folder() fails. */
+                if (!$this->select_mailbox($mailbox)) {
+                    return array(0, array());
+                }
             }
 
             /* use the SORT extension if we can */
