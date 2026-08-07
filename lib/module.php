@@ -479,7 +479,10 @@ abstract class Hm_Handler_Module {
     public function build_page_url($page, $params = []) {
         $url = '?'.$this->config->get('page_param_name').'='.$page;
         foreach ($params as $key => $value) {
-            $url .= '&'.urlencode($key).'='.urlencode($value);
+            if (!is_scalar($value)) {
+                continue;
+            }
+            $url .= '&'.urlencode((string) $key).'='.urlencode((string) $value);
         }
         return $url;
     }
