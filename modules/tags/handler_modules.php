@@ -95,53 +95,25 @@ class Hm_Handler_remove_tag_from_message extends Hm_Handler_Module {
 /**
  * @subpackage tags/handler
  */
-class Hm_Handler_tag_edit_data extends Hm_Handler_Module {
-    public function process() {
-        $id = false;
-        if (array_key_exists('tag_id', $this->request->get)) {
-            $id = $this->request->get['tag_id'];
-        }
-        $folders = $this->get('tags');
-        $folder = null;
-        foreach ($folders as $f) {
-            if ($f['id'] === $id) {
-                $folder = $f;
-            }
-        }
-        if ($id !== false) {
-            $this->out('edit_tag', $folder);
-            $this->out('edit_tag_id', $id);
-        }
-        else {
-            $this->out('new_tag_id', count($folders));
-        }
-    }
-}
-/**
- * @subpackage tags/handler
- */
 class Hm_Handler_process_tag_update extends Hm_Handler_Module {
     public function process() {
-        if (array_key_exists('tag_delete', $this->request->post)) {
-            return;
-        }
-        list($success, $form) = $this->process_form(array('tag_name','parent_tag','tag_id'));// 'tag_id', parent_tag
+        list($success, $form) = $this->process_form(array('tag_name','parent_tag','tag_id','tag_color'));
         if (!$success) {
             return;
         }
         $tag = array(
             'name' => html_entity_decode($form['tag_name'], ENT_QUOTES),
-            'parent' => $form['parent_tag'] ?? null
+            'parent' => $form['parent_tag'] ?? null,
+            'color' => Hm_Tags::sanitizeColor($form['tag_color'] ?? null)
         );
-        if (!is_null($form['tag_id']) AND Hm_Tags::get($form['tag_id'])) {
-            $tag['id'] = $form['tag_id'];
+        if (!empty($form['tag_id']) && Hm_Tags::get($form['tag_id'])) {
             Hm_Tags::edit($form['tag_id'], $tag);
             Hm_Msgs::add('Tag Edited');
         } else {
             Hm_Tags::add($tag);
             Hm_Msgs::add('Tag Created');
         }
-        $this->session->set('tags_updated', true);
+        $this->out('tag_success', true);
     }
 }
 
@@ -157,7 +129,7 @@ class Hm_Handler_process_tag_delete extends Hm_Handler_Module {
         if (($tag = Hm_Tags::get($form['tag_id']))) {
             Hm_Tags::del($tag['id']);
             Hm_Msgs::add('Tag Deleted');
-            $this->session->set('tags_updated', true);
+            $this->out('tag_success', true);
         } else {
             Hm_Msgs::add('Tag ID not found', 'warning');
             return;
@@ -230,10 +202,6 @@ class Hm_Handler_tag_data extends Hm_Handler_Module {
     public function process() {
         Hm_Tags::init($this);
         $this->out('tags', Hm_Tags::getAll());
-        if ($this->session->get('tags_updated')) {
-            $this->out('tags_updated', true);
-            $this->session->set('tags_updated', false);
-        }
     }
 }
 

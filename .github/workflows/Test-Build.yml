@@ -109,6 +109,17 @@ jobs:
         DB: ${{ matrix.database }}
         TEST_ARG: 'selenium'
 
+    services:
+      openldap:
+        image: osixia/openldap:1.5.0
+        env:
+          LDAP_ORGANISATION: cypht
+          LDAP_DOMAIN: cypht.test
+          LDAP_ADMIN_PASSWORD: cypht_test
+        ports:
+          - 389:389
+        options: --health-cmd="ldapsearch -x -H ldap://localhost:389 -b dc=cypht,dc=test -D cn=admin,dc=cypht,dc=test -w cypht_test" --health-interval=10s --health-timeout=5s --health-retries=5
+
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4

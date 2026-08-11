@@ -136,6 +136,25 @@ class WebTest:
         print(" - logging out")
         self.driver.find_element(By.CLASS_NAME, 'logout_link').click()
 
+    def save_and_logout(self):
+        print(" - saving and logging out")
+        # Navigate directly to the save page (avoids SPA/modal complexity)
+        self.go(SITE_URL + '?page=save')
+        self.wait(By.ID, 'password', timeout=15)
+        self.driver.find_element(By.ID, 'password').send_keys(PASS)
+        btn = WebDriverWait(self.driver, 10).until(
+            exp_cond.element_to_be_clickable(
+                (By.NAME, 'save_settings_permanently_then_logout')
+            )
+        )
+        self.driver.execute_script("arguments[0].click();", btn)
+        # Wait for PHP to save and redirect to login
+        try:
+            WebDriverWait(self.driver, 30).until(exp_cond.staleness_of(btn))
+        except Exception:
+            pass
+        self.wait(By.NAME, 'username', timeout=30)
+
     def end(self):
         self.driver.quit()
 
@@ -369,8 +388,9 @@ class wait_for_non_empty_text(object):
 
     def __call__(self, driver):
         try:
-            element_text = exp_cond._find_element(driver, self.locator).text.strip()
+            element_text = driver.find_element(*self.locator).text.strip()
             print(element_text)
             return element_text != ""
-        except exceptions.StaleElementReferenceException:
+        except (exceptions.StaleElementReferenceException,
+                exceptions.NoSuchElementException):
             return False

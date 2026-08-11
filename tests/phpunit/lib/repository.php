@@ -255,4 +255,74 @@ class Hm_Test_Repository extends TestCase {
         $servers = $this->user_config->get('imap_servers', []);
         $this->assertArrayHasKey($existingId, $servers);
     }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_migrate_replaces_integer_feed_ids(): void {
+        $this->user_config->set('feeds', [
+            0 => ['url' => 'https://example.com/feed.rss'],
+            1 => ['url' => 'https://other.com/feed.rss'],
+        ]);
+
+        Hm_Repository_Wrapper::init($this->user_config, $this->session);
+
+        $feeds = $this->user_config->get('feeds', []);
+        foreach (array_keys($feeds) as $key) {
+            $this->assertFalse(is_numeric($key), "Feed key '$key' should not be numeric after migration");
+        }
+        $this->assertCount(2, $feeds);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_migrate_replaces_integer_special_imap_folder_ids(): void {
+        $this->user_config->set('imap_servers', [
+            0 => ['server' => 'imap.example.com', 'port' => 993],
+        ]);
+        $this->user_config->set('special_imap_folders', [
+            0 => ['trash' => 'Trash', 'sent' => 'Sent'],
+        ]);
+
+        Hm_Repository_Wrapper::init($this->user_config, $this->session);
+
+        $specials = $this->user_config->get('special_imap_folders', []);
+        foreach (array_keys($specials) as $key) {
+            $this->assertFalse(is_numeric($key), "Special folder key '$key' should not be numeric");
+        }
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_migrate_updates_custom_imap_source_pattern_keys(): void {
+        $this->user_config->set('imap_servers', [
+            0 => ['server' => 'imap.example.com', 'port' => 993],
+        ]);
+        $this->user_config->set('custom_imap_sources', [
+            'imap_0_inbox' => ['folder' => 'INBOX'],
+        ]);
+
+        Hm_Repository_Wrapper::init($this->user_config, $this->session);
+
+        $sources = $this->user_config->get('custom_imap_sources', []);
+        $this->assertArrayNotHasKey('imap_0_inbox', $sources);
+        $this->assertCount(1, $sources);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_save_persists_entities_to_user_config_and_session(): void {
+        $id = Hm_Repository_Wrapper::add(['name' => 'Persist Me'], false);
+        Hm_Repository_Wrapper::save();
+
+        $user_data = $this->session->get('user_data');
+        $this->assertIsArray($user_data);
+    }
 }

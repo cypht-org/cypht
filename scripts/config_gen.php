@@ -497,8 +497,11 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
             $settings['encrypt_local_storage'])) {
             $js_lib .= file_get_contents("third_party/forge.min.js");
         }
+        /* Fresh identifier baked into every build, exposed as the JS global
+         * HM_BUILD_VERSION. Helps remove/invalidate cached pages after every rebuild. */
+        $build_version_js = 'var HM_BUILD_VERSION = ' . json_encode(Hm_Crypt::unique_id(16)) . ";\n";
         file_put_contents('tmp.js', $js);
-        $js_out = $js_lib.compress($js, $js_compress, 'tmp.js');
+        $js_out = $js_lib.$build_version_js.compress($js, $js_compress, 'tmp.js');
         $js_hash = build_integrity_hash($js_out);
         file_put_contents('site.js', $js_out);
         unlink('./tmp.js');

@@ -532,6 +532,40 @@ class Hm_Test_Hm_IMAP extends TestCase {
         $this->assertEquals($res, $list);
     }
     /**
+     * A failed mailbox switch must not fall through to SORT/SEARCH/FETCH.
+     *
+     * get_mailbox_page() used to call select_mailbox() without checking the result.
+     * Those commands carry no mailbox argument - they act on whatever is selected on
+     * the connection. So when the switch failed, the page was either empty or built
+     * from the *previously* selected mailbox, and the caller had no way to tell.
+     *
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_mailbox_page_bails_out_when_select_fails() {
+        /* Anonymous class so it is only resolved at runtime, after setUp() has
+         * required hm-imap.php. Makes select_mailbox() fail without needing a broken
+         * server or a hand-crafted IMAP fixture. */
+        $imap = new class extends Hm_IMAP {
+            public $select_calls = 0;
+            public function select_mailbox($mailbox) {
+                $this->select_calls++;
+                return false;
+            }
+        };
+        $imap->connect($this->config);
+        /* The connection sits on INBOX ... */
+        $imap->selected_mailbox = array('name' => 'INBOX', 'detail' => array());
+        /* ... and switching away from it fails. */
+        $res = $imap->get_mailbox_page('Spam', 'ARRIVAL', false, 'ALL');
+
+        $this->assertEquals(1, $imap->select_calls, 'select_mailbox() should be attempted once');
+        $this->assertEquals(array(0, array()), $res, 'must not return messages from the old mailbox');
+        /* Guard against the empty result being a coincidence: the mailbox we could not
+         * select must not be recorded as the selected one. */
+        $this->assertEquals('INBOX', $imap->selected_mailbox['name']);
+    }
+    /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */

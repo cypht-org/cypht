@@ -1105,4 +1105,481 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $res = $test->run();
         $this->assertEquals(array('</tbody></table></div></div>'), $res->output_response);
     }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_logout_outputs_confirmation_markup() {
+        $test = new Output_Test('logout', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('confirm-logout', $res->output_response[0]);
+        $this->assertStringContainsString('Yes, log me out', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_logout_hides_cancel_button_when_no_cancel_url() {
+        $test = new Output_Test('logout', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('style="display:none;"', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_logout_shows_cancel_link_when_url_provided() {
+        $test = new Output_Test('logout', 'core');
+        $test->handler_response = array('cancel_logout_url' => '?page=home');
+        $res = $test->run();
+        $this->assertStringContainsString('?page=home', $res->output_response[0]);
+        $this->assertStringContainsString('No, go back', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_msgs_outputs_system_messages_container_and_js_variable() {
+        $test = new Output_Test('msgs', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('sys_messages', $res->output_response[0]);
+        $this->assertStringContainsString('hm_msgs', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_default_sort_order_setting_outputs_select_with_arrival_and_date_options() {
+        $test = new Output_Test('default_sort_order_setting', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('default_sort_order', $res->output_response[0]);
+        $this->assertStringContainsString('value="arrival"', $res->output_response[0]);
+        $this->assertStringContainsString('value="date"', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_default_sort_order_setting_shows_reset_button_for_non_default_sort() {
+        $test = new Output_Test('default_sort_order_setting', 'core');
+        $test->handler_response = array('user_settings' => array('default_sort_order' => 'date'));
+        $res = $test->run();
+        $this->assertStringContainsString('reset_default_value_select', $res->output_response[0]);
+        $this->assertStringContainsString('selected="selected"', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_delete_attachment_setting_outputs_unchecked_checkbox_by_default() {
+        $test = new Output_Test('delete_attachment_setting', 'core');
+        $test->handler_response = array('user_settings' => array());
+        $res = $test->run();
+        $this->assertStringContainsString('allow_delete_attachment', $res->output_response[0]);
+        $this->assertStringContainsString('type="checkbox"', $res->output_response[0]);
+        $this->assertStringNotContainsString('checked="checked"', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_delete_attachment_setting_shows_checked_when_enabled_in_user_settings() {
+        $test = new Output_Test('delete_attachment_setting', 'core');
+        $test->handler_response = array('user_settings' => array('allow_delete_attachment' => true));
+        $res = $test->run();
+        $this->assertStringContainsString('checked="checked"', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_start_search_settings_outputs_search_input_and_no_results_message() {
+        $test = new Output_Test('start_search_settings', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('settingsSearch', $res->output_response[0]);
+        $this->assertStringContainsString('noSettingsFound', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_expand_search_banner_returns_empty_string_when_search_all_folders_disabled() {
+        $test = new Output_Test('expand_search_banner', 'core');
+        $res = $test->run();
+        $this->assertEmpty($res->output_response);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_expand_search_banner_shows_banner_when_search_all_folders_enabled() {
+        $test = new Output_Test('expand_search_banner', 'core');
+        $test->handler_response = array('search_all_folders_enabled' => true);
+        $res = $test->run();
+        $this->assertStringContainsString('expand-search-banner', $res->output_response[0]);
+        $this->assertStringContainsString('expand-search-btn', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_search_all_folders_setting_outputs_checkbox_with_experimental_badge() {
+        $test = new Output_Test('search_all_folders_setting', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('search_all_folders', $res->output_response[0]);
+        $this->assertStringContainsString('Experimental', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_search_move_copy_controls_concatenates_copy_and_move_buttons_to_output() {
+        $test = new Output_Test('search_move_copy_controls', 'core');
+        $res = $test->run();
+        $this->assertArrayHasKey('msg_controls_extra', $res->output_response);
+        $this->assertStringContainsString('imap_move', $res->output_response['msg_controls_extra']);
+        $this->assertStringContainsString('Copy', $res->output_response['msg_controls_extra']);
+        $this->assertStringContainsString('Move', $res->output_response['msg_controls_extra']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_start_trash_settings_outputs_trash_section_header_with_icon() {
+        $test = new Output_Test('start_trash_settings', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('trash_setting', $res->output_response[0]);
+        $this->assertStringContainsString('Trash', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_start_snoozed_settings_outputs_snoozed_section_header_with_icon() {
+        $test = new Output_Test('start_snoozed_settings', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('snoozed_setting', $res->output_response[0]);
+        $this->assertStringContainsString('Snoozed', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_snoozed_source_max_setting_outputs_input_for_per_source_count() {
+        $test = new Output_Test('snoozed_source_max_setting', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('snoozed_per_source', $res->output_response[0]);
+        $this->assertStringContainsString('Max messages per source', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_snoozed_since_setting_outputs_since_dropdown_for_snoozed() {
+        $test = new Output_Test('snoozed_since_setting', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('snoozed_since', $res->output_response[0]);
+        $this->assertStringContainsString('Show snoozed messages since', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_start_drafts_settings_outputs_drafts_section_header() {
+        $test = new Output_Test('start_drafts_settings', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('drafts_setting', $res->output_response[0]);
+        $this->assertStringContainsString('Drafts', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_warn_for_unsaved_changes_setting_outputs_unchecked_checkbox_by_default() {
+        $test = new Output_Test('warn_for_unsaved_changes_setting', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('warn_for_unsaved_changes', $res->output_response[0]);
+        $this->assertStringNotContainsString('checked="checked"', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_warn_for_unsaved_changes_setting_shows_checked_and_reset_when_enabled() {
+        $test = new Output_Test('warn_for_unsaved_changes_setting', 'core');
+        $test->handler_response = array('user_settings' => array('warn_for_unsaved_changes' => true));
+        $res = $test->run();
+        $this->assertStringContainsString('checked="checked"', $res->output_response[0]);
+        $this->assertStringContainsString('reset_default_value_checkbox', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_server_config_stepper_returns_empty_when_no_essential_modules_active() {
+        $test = new Output_Test('server_config_stepper', 'core');
+        $test->handler_response = array('router_module_list' => array());
+        $res = $test->run();
+        $this->assertArrayNotHasKey(0, $res->output_response);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_server_config_stepper_end_part_outputs_add_server_button() {
+        $test = new Output_Test('server_config_stepper_end_part', 'core');
+        $test->handler_response = array('router_module_list' => array());
+        $res = $test->run();
+        $this->assertStringContainsString('add_new_server_button', $res->output_response[0]);
+        $this->assertStringContainsString('Add a new server', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_server_config_stepper_accordion_end_part_outputs_closing_divs() {
+        $test = new Output_Test('server_config_stepper_accordion_end_part', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('</div></div></div>'), $res->output_response);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_privacy_settings_outputs_whitelist_and_blacklist_fields() {
+        $test = new Output_Test('privacy_settings', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('images_whitelist', $res->output_response[0]);
+        $this->assertStringContainsString('images_blacklist', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_combined_message_list_sets_empty_formatted_list_when_no_data() {
+        $test = new Output_Test('combined_message_list', 'core');
+        $res = $test->run();
+        $this->assertEquals(array(), $res->output_response['formatted_message_list']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_version_upgrade_checker_returns_empty_when_upgrade_not_needed() {
+        $test = new Output_Test('version_upgrade_checker', 'core');
+        $res = $test->run();
+        $this->assertEmpty($res->output_response);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_version_upgrade_checker_shows_alert_when_new_version_available() {
+        $test = new Output_Test('version_upgrade_checker', 'core');
+        $test->handler_response = array('need_upgrade' => true, 'latest_version' => '99.0.0');
+        $res = $test->run();
+        $this->assertStringContainsString('99.0.0', $res->output_response[0]);
+        $this->assertStringContainsString('cypht-upgrade-alert', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_server_content_end_returns_closing_div() {
+        $test = new Output_Test('server_content_end', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('</div>'), $res->output_response);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_js_search_data_outputs_hm_search_terms_js_function() {
+        $test = new Output_Test('js_search_data', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('hm_search_terms', $res->output_response[0]);
+        $this->assertStringContainsString('hm_run_search', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_js_search_data_includes_search_terms_value() {
+        $test = new Output_Test('js_search_data', 'core');
+        $test->handler_response = array('search_terms' => 'hello world', 'run_search' => 1);
+        $res = $test->run();
+        $this->assertStringContainsString('hello world', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_start_all_email_settings_returns_empty_when_no_email_modules() {
+        $test = new Output_Test('start_all_email_settings', 'core');
+        $test->handler_response = array('router_module_list' => array());
+        $res = $test->run();
+        $this->assertArrayNotHasKey(0, $res->output_response);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_start_all_email_settings_outputs_section_header_when_imap_active() {
+        $test = new Output_Test('start_all_email_settings', 'core');
+        $test->handler_response = array('router_module_list' => array('imap'));
+        $res = $test->run();
+        $this->assertStringContainsString('email_setting', $res->output_response[0]);
+        $this->assertStringContainsString('All Email', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_end_settings_form_outputs_save_and_restore_buttons() {
+        $test = new Output_Test('end_settings_form', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('save_settings', $res->output_response[0]);
+        $this->assertStringContainsString('reset_factory_button', $res->output_response[0]);
+        $this->assertStringContainsString('Restore Defaults', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_main_menu_end_outputs_closing_tags_in_html5_format() {
+        $test = new Output_Test('main_menu_end', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('</ul></div>'), $res->output_response);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_no_folder_icon_setting_outputs_unchecked_checkbox_by_default() {
+        $test = new Output_Test('no_folder_icon_setting', 'core');
+        $test->handler_response = array('user_settings' => array());
+        $res = $test->run();
+        $this->assertStringContainsString('no_folder_icons', $res->output_response[0]);
+        $this->assertStringContainsString('type="checkbox"', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_list_style_setting_outputs_email_and_news_options() {
+        $test = new Output_Test('list_style_setting', 'core');
+        $test->handler_response = array('user_settings' => array());
+        $res = $test->run();
+        $this->assertStringContainsString('list_style', $res->output_response[0]);
+        $this->assertStringContainsString('email_style', $res->output_response[0]);
+        $this->assertStringContainsString('news_style', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_home_heading_outputs_home_title() {
+        $test = new Output_Test('home_heading', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('Home', $res->output_response[0]);
+        $this->assertStringContainsString('content_title', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_login_output_generates_standard_login_form_when_not_logged_in() {
+        $test = new Output_Test('login', 'core');
+        $res = $test->run();
+        $this->assertStringContainsString('username', $res->output_response[0]);
+        $this->assertStringContainsString('password', $res->output_response[0]);
+        $this->assertStringContainsString('Login', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_login_output_shows_logout_modal_when_logged_in() {
+        $test = new Output_Test('login', 'core');
+        $test->handler_response = array('router_login_state' => true, 'changed_settings' => array());
+        $res = $test->run();
+        $this->assertStringContainsString('confirmLogoutModal', $res->output_response[0]);
+        $this->assertStringContainsString('logout', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_login_output_includes_stay_logged_in_when_allowed() {
+        $test = new Output_Test('login', 'core');
+        $test->handler_response = array('allow_long_session' => true);
+        $res = $test->run();
+        $this->assertStringContainsString('stay_logged_in', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_header_css_includes_integrity_attribute_when_css_hash_defined() {
+        if (!defined('CSS_HASH')) {
+            define('CSS_HASH', 'sha256-test-hash=');
+        }
+        $test = new Output_Test('header_css', 'core');
+        $test->handler_response = array('router_module_list' => array());
+        $res = $test->run();
+        $this->assertStringContainsString('integrity="sha256-test-hash="', $res->output_response[0]);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_no_folder_icon_setting_shows_reset_when_value_differs_from_default() {
+        $test = new Output_Test('no_folder_icon_setting', 'core');
+        $test->handler_response = array('user_settings' => array('no_folder_icons' => true));
+        $res = $test->run();
+        $this->assertStringContainsString('checked="checked"', $res->output_response[0]);
+        $this->assertStringContainsString('reset_default_value_checkbox', $res->output_response[0]);
+    }
 }

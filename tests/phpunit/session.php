@@ -183,8 +183,11 @@ class Hm_Test_PHP_Session extends TestCase {
         $request = new Hm_Mock_Request('HTTP');
         $request->server['HTTP_HOST'] = 'test';
         $this->assertEquals(array(false, 'asdf', 'test'), $session->set_session_params($request));
+        $request->server['HTTP_X_FORWARDED_HOST'] = 'proxy.test:8080, internal.test';
+        $this->assertEquals(array(false, 'asdf', 'proxy.test'), $session->set_session_params($request));
         $request->tls = true;
         $request->path = 'test';
+        $request->server['HTTP_X_FORWARDED_HOST'] = 'test';
         $this->assertEquals(array(true, 'test', 'test'), $session->set_session_params($request));
         $session->destroy($request);
 
@@ -264,6 +267,60 @@ class Hm_Test_PHP_Session extends TestCase {
         $session->set('test', 'testvalue');
         $session->save_data();
         $this->assertEquals(array(), $_SESSION);
+        $session->destroy($request);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_set_session_params_with_real_cookie_domain() {
+        $this->config->set('cookie_domain', 'example.com');
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
+        $result = $session->set_session_params($request);
+        $this->assertEquals('example.com', $result[2]);
+        $session->destroy($request);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_restore_long_session_sets_lifetime_and_refreshes_cookie() {
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
+        $request->server['HTTP_HOST'] = 'test';
+        $session->start($request);
+        $session->set('long_session_enabled', true);
+        $session->set('long_session_lifetime', 3600);
+        $reflection = new ReflectionClass($session);
+        $method = $reflection->getMethod('restore_long_session');
+        $method->setAccessible(true);
+        $method->invoke($session, $request);
+        $prop = $reflection->getProperty('lifetime');
+        $prop->setAccessible(true);
+        $this->assertEquals(3600, $prop->getValue($session));
+        $session->destroy($request);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_restore_long_session_does_nothing_when_not_enabled() {
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_DB');
+        $request = new Hm_Mock_Request('HTTP');
+        $request->server['HTTP_HOST'] = 'test';
+        $session->start($request);
+        $session->set('long_session_enabled', false);
+        $reflection = new ReflectionClass($session);
+        $method = $reflection->getMethod('restore_long_session');
+        $method->setAccessible(true);
+        $method->invoke($session, $request);
+        $prop = $reflection->getProperty('lifetime');
+        $prop->setAccessible(true);
+        $this->assertEquals(0, $prop->getValue($session));
         $session->destroy($request);
     }
 }
