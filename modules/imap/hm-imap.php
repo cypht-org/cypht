@@ -2079,7 +2079,8 @@ if (!class_exists('Hm_IMAP')) {
 
         /**
          * finish an IMAP APPEND operation
-         * @return bool true on success
+         * @return int|string|bool message uid when APPENDUID is present, true on
+         *                         success without a uid, false on failure
          */
         public function append_end() {
             $result = $this->get_response(false, true);
@@ -2087,10 +2088,14 @@ if (!class_exists('Hm_IMAP')) {
                 $res = preg_grep('/APPENDUID/', array_map('json_encode', $result));
                 if ($res) {
                     $line = json_decode(reset($res), true);
-                    return $line[5];
+                    if (is_array($line) && isset($line[5]) && is_scalar($line[5])) {
+                        return $line[5];
+                    }
                 }
+                // APPEND succeeded but server did not return a usable APPENDUID
+                return true;
             }
-            return $result;
+            return false;
         }
 
         /* ------------------ HELPERS ------------------------------------------ */
