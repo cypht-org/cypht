@@ -52,17 +52,23 @@ class Hm_Tags {
         return self::edit($tagId, $tag);
     }
 
-    public static function removeMessage($messageId, $tagId) {
+    public static function removeMessage($messageId, $tagId, $serverId = null, $folder = null) {
         $tag = self::get($tagId);
         if (!$tag) {
             return false;
         }
-        foreach ($tag['server'] as $serverId => $folders) {
-            foreach ($folders as $folder => $messages) {
+        foreach ($tag['server'] as $currentServerId => $folders) {
+            if ($serverId !== null && $currentServerId != $serverId) {
+                continue;
+            }
+            foreach ($folders as $currentFolder => $messages) {
+                if ($folder !== null && $currentFolder !== $folder) {
+                    continue;
+                }
                 $newMessages = array_filter($messages, function($msgId) use ($messageId) {
                     return $msgId != $messageId;
                 });
-                $tag['server'][$serverId][$folder] = $newMessages;
+                $tag['server'][$currentServerId][$currentFolder] = $newMessages;
             }
         }
         return self::edit($tagId, $tag);
@@ -84,12 +90,18 @@ class Hm_Tags {
         return [];
     }
 
-    public static function getTagIdsWithMessage($messageId) {
+    public static function getTagIdsWithMessage($messageId, $serverId = null, $folder = null) {
         $tags = self::getAll();
         $tagIds = [];
         foreach ($tags as $tagId => $tag) {
-            foreach ($tag['server'] as $serverId => $folders) {
-                foreach ($folders as $messages) {
+            foreach ($tag['server'] as $currentServerId => $folders) {
+                if ($serverId !== null && $currentServerId != $serverId) {
+                    continue;
+                }
+                foreach ($folders as $currentFolder => $messages) {
+                    if ($folder !== null && $currentFolder !== $folder) {
+                        continue;
+                    }
                     // Exclude folder indentifiers
                     if (! is_array($messages)) {
                         continue;
@@ -111,7 +123,7 @@ class Hm_Tags {
         $oldServer = $params['oldServer'];
         $newServer = $params['newServer'] ?? '';
 
-        $tagIds = self::getTagIdsWithMessage($oldId);
+        $tagIds = self::getTagIdsWithMessage($oldId, $oldServer, $oldFolder);
         foreach ($tagIds as $tagId) {
             $tag = self::get($tagId);
             $folders = $tag['server'][$oldServer];
