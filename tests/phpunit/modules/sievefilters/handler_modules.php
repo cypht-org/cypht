@@ -107,17 +107,15 @@ class Hm_Test_Sieve_Client {
     }
 }
 
-class Hm_Test_Sieve_Client_Factory {
-    public function init($user_config = null, $imap_account = null, $is_nux_supported = false)
-    {
-        return new Hm_Test_Sieve_Client();
-    }
-}
-
-class Hm_Test_Sieve_Client_Failing_Factory {
-    public function init($user_config = null, $imap_account = null, $is_nux_supported = false)
-    {
-        throw new Exception('Test failure');
+if (! class_exists('Hm_Custom_Sieve_Client_Factory')) {
+    class Hm_Custom_Sieve_Client_Factory {
+        public function init($user_config = null, $imap_account = null, $is_nux_supported = false)
+        {
+            if (! $user_config || ! $imap_account) {
+                throw new Exception('Test failure');
+            }
+            return new Hm_Test_Sieve_Client();
+        }
     }
 }
 
@@ -239,7 +237,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
         );
 
         $test = new Sieve_Handler_Test('load_custom_actions', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->get = array('list_path' => 'imap_serverA_INBOX');
         $test->user_config = array(
             'imap_servers' => $this->imapServersConfig(),
@@ -264,7 +262,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
         );
 
         $test = new Sieve_Handler_Test('sieve_edit_filter', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array(
             'imap_account' => 'Primary Account',
             'sieve_script_name' => 'important_sender-10-cyphtfilter',
@@ -291,7 +289,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
         );
 
         $test = new Sieve_Handler_Test('sieve_edit_script', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array(
             'imap_account' => 'Primary Account',
             'sieve_script_name' => 'manual_script-15-cypht',
@@ -318,7 +316,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
         );
 
         $test = new Sieve_Handler_Test('sieve_delete_filter', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array(
             'imap_account' => 'Primary Account',
             'sieve_script_name' => 'important_sender-10-cyphtfilter',
@@ -349,7 +347,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
         );
 
         $test = new Sieve_Handler_Test('sieve_delete_script', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array(
             'imap_account' => 'Primary Account',
             'sieve_script_name' => 'manual_script-15-cypht',
@@ -374,7 +372,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
      */
     public function test_sieve_filters_enabled_message_content_outputs_client_when_configured() {
         $test = new Sieve_Handler_Test('sieve_filters_enabled_message_content', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array('imap_server_id' => 'serverA');
         $test->user_config = array(
             'imap_servers' => $this->imapServersConfig(),
@@ -393,7 +391,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
      */
     public function test_sieve_save_filter_adds_success_message() {
         $test = new Sieve_Handler_Test('sieve_save_filter', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array(
             'imap_account' => 'Primary Account',
             'sieve_filter_name' => 'Important Sender',
@@ -430,7 +428,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
      */
     public function test_sieve_save_filter_gen_script_returns_script_details_without_persisting_script() {
         $test = new Sieve_Handler_Test('sieve_save_filter', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array(
             'imap_account' => 'Primary Account',
             'sieve_filter_name' => 'Important Sender',
@@ -471,7 +469,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
      */
     public function test_sieve_save_script_adds_success_message() {
         $test = new Sieve_Handler_Test('sieve_save_script', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array(
             'imap_account' => 'Primary Account',
             'sieve_script_name' => 'Manual Script',
@@ -510,7 +508,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
         ));
 
         $test = new Sieve_Handler_Test('sieve_toggle_script_state', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array(
             'imap_account' => 0,
             'script_state' => 0,
@@ -535,9 +533,9 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
      */
     public function test_sieve_save_filter_adds_error_message_when_factory_fails() {
         $test = new Sieve_Handler_Test('sieve_save_filter', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Failing_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array(
-            'imap_account' => 'Primary Account',
+            'imap_account' => null, // Simulate failure by not providing a valid imap account
             'sieve_filter_name' => 'Important Sender',
             'sieve_filter_priority' => '10',
             'current_editing_filter_name' => '',
@@ -656,7 +654,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
             'blocked_senders' => $this->blockedSendersScript(array('spam@example.com')),
         );
         $test = new Sieve_Handler_Test('sieve_unblock_sender', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array('imap_server_id' => 'serverA', 'sender' => 'spam@example.com');
         $test->user_config = array('imap_servers' => $this->imapServersConfig(), 'enable_sieve_filter_setting' => true);
         $test->run();
@@ -671,7 +669,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
     public function test_sieve_block_domain_blocks_wildcard_domain_and_sets_reload_page() {
         Hm_Test_Sieve_Client::$scripts = array('main_script' => 'require ["include"];');
         $test = new Sieve_Handler_Test('sieve_block_domain_script', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array('imap_server_id' => 'serverA', 'sender' => 'spam@example.com');
         $test->user_config = array('imap_servers' => $this->imapServersConfig(), 'enable_sieve_filter_setting' => true);
         $res = $test->run();
@@ -687,7 +685,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
     public function test_sieve_block_unblock_script_blocks_new_sender_with_discard_action() {
         Hm_Test_Sieve_Client::$scripts = array();
         $test = new Sieve_Handler_Test('sieve_block_unblock_script', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array(
             'imap_server_id' => 'serverA',
             'block_action' => 'discard',
@@ -713,7 +711,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
             'blocked_senders' => $this->blockedSendersScript($senders, $actions),
         );
         $test = new Sieve_Handler_Test('sieve_block_unblock_script', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array(
             'imap_server_id' => 'serverA',
             'block_action' => 'discard',
@@ -745,7 +743,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
             'id' => 0,
         ));
         $test = new Sieve_Handler_Test('list_block_sieve_script', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array('imap_server_id' => 0);
         $test->user_config = array('imap_servers' => $this->imapServersConfig(), 'enable_sieve_filter_setting' => true);
         $res = $test->run();
@@ -759,7 +757,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
     public function test_load_account_sieve_filters_outputs_mailbox_with_extensions() {
         Hm_Test_Sieve_Client::$scripts = array();
         $test = new Sieve_Handler_Test('load_account_sieve_filters', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array('imap_server_id' => 'serverA');
         $test->input = array('imap_accounts' => $this->imapServersConfig());
         $test->user_config = array('imap_servers' => $this->imapServersConfig(), 'enable_sieve_filter_setting' => true);
@@ -787,7 +785,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
             'id' => 0,
         ));
         $test = new Sieve_Handler_Test('sieve_toggle_script_state', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array(
             'imap_account' => 0,
             'script_state' => 1,
@@ -806,9 +804,9 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
      */
     public function test_sieve_save_script_adds_error_message_when_factory_fails() {
         $test = new Sieve_Handler_Test('sieve_save_script', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Failing_Factory');
+        $test->config = array('enable_custom_sieve_factory' => true);
         $test->post = array(
-            'imap_account' => 'Primary Account',
+            'imap_account' => null, // Simulate failure by not providing a valid imap account
             'sieve_script_name' => 'Manual Script',
             'sieve_script_priority' => '15',
             'current_editing_script' => '',

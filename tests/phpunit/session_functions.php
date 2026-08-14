@@ -35,7 +35,7 @@ class Hm_Test_Session_Functions extends TestCase {
         $this->config->set('session_type', 'custom');
         $this->config->set('auth_type', 'custom');
         $setup = new Hm_Session_Setup($this->config);
-        $this->assertEquals('Custom_Session', get_class(($setup->setup_session())));
+        $this->assertEquals('Hm_Custom_Session', get_class(($setup->setup_session())));
 
         $this->config->set('session_type', 'REDIS');
         $setup = new Hm_Session_Setup($this->config);

@@ -12,13 +12,21 @@
  */
 abstract class Hm_Output {
 
+    protected $content;
+    protected $data;
+
+    public function __construct($content = null, $data = []) {
+        $this->content = $content;
+        $this->data = $data;
+    }
+
     /**
      * Extended classes must override this method to output content
      * @param mixed $content data to output
      * @param array $headers headers to send
      * @return void
      */
-    abstract protected function output_content($content, $headers);
+    abstract protected function output_content();
 
     /**
      * Wrapper around extended class output_content() calls
@@ -26,8 +34,8 @@ abstract class Hm_Output {
      * @param array $input raw module data
      * @return void
      */
-    public function send_response($response, $input = []) {
-        $this->output_content($response, $input['http_headers'] ?? []);
+    public function send_response() {
+        $this->output_content();
     }
 }
 
@@ -38,10 +46,10 @@ class Hm_Output_HTTP extends Hm_Output {
 
     /**
      * Send HTTP headers
-     * @param array $headers headers to send
      * @return void
      */
-    protected function output_headers($headers) {
+    protected function output_headers() {
+        $headers = $this->data['http_headers'] ?? [];
         foreach ($headers as $name => $value) {
             Hm_Functions::header($name.': '.$value);
         }
@@ -49,21 +57,24 @@ class Hm_Output_HTTP extends Hm_Output {
 
     /**
      * Send response content to the browser
-     * @param mixed $content data to send
-     * @param array $headers HTTP headers to set
      * @return void
      */
-    protected function output_content($content, $headers = []) {
-        $this->output_headers($headers);
+    protected function output_content() {
+        $this->output_headers();
         ob_end_clean();
 
-        // Append debug panel if DEBUG_MODE is enabled and it's an HTML response
-        if (DEBUG_MODE && is_string($content) && stripos($content, '</body>') !== false) {
-            $debug_panel = $this->get_debug_panel_html();
-            $content = str_replace('</body>', $debug_panel.'</body>', $content);
-        }
+        echo $this->get_content($this->content);
+    }
 
-        echo $content;
+    public function get_content() {
+        $this->output_headers();
+        
+        // Append debug panel if DEBUG_MODE is enabled and it's an HTML response
+        if (DEBUG_MODE && is_string($this->content) && stripos($this->content, '</body>') !== false) {
+            $debug_panel = $this->get_debug_panel_html();
+            return str_replace('</body>', $debug_panel.'</body>', $this->content);
+        }
+        return $this->content;
     }
 
     /**
