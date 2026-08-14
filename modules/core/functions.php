@@ -418,6 +418,7 @@ function process_site_setting($type, $handler, $callback=false, $default=false, 
             $result = $default;
         }
         $new_settings[$type.'_setting'] = $result;
+        $settings[$type] = $result;
     }
     else {
         $settings[$type] = $handler->user_config->get($type.'_setting', $default);
