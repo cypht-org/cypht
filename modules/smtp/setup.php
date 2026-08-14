@@ -122,10 +122,14 @@ return array(
         'resumableChunkSize' => FILTER_VALIDATE_INT,
         'resumableCurrentChunkSize' => FILTER_VALIDATE_INT,
         'resumableTotalSize' => FILTER_VALIDATE_INT,
-        'resumableType' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'resumableIdentifier' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'resumableFilename' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'resumableRelativePath' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'resumableType' => FILTER_UNSAFE_RAW,
+        // Keep raw values so the on-disk name matches the original filename from
+        // the browser (e.g. "café.txt"). FILTER_SANITIZE_FULL_SPECIAL_CHARS would
+        // HTML-entity-encode characters (é -> &eacute;), breaking send-time lookup.
+        // Path traversal is prevented in the upload handlers via basename()/dirname().
+        'resumableIdentifier' => FILTER_UNSAFE_RAW,
+        'resumableFilename' => FILTER_UNSAFE_RAW,
+        'resumableRelativePath' => FILTER_UNSAFE_RAW,
         'draft_smtp' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
     'allowed_output' => array(
@@ -173,8 +177,8 @@ return array(
         'draft_notice' => FILTER_VALIDATE_BOOLEAN,
         'smtp_auto_bcc' => FILTER_VALIDATE_INT,
         'profile_value' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'uploaded_files' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'send_uploaded_files' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'uploaded_files' => FILTER_UNSAFE_RAW,
+        'send_uploaded_files' => FILTER_UNSAFE_RAW,
         'next_email_post' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     )
 );
