@@ -484,6 +484,11 @@ abstract class Hm_Handler_Module {
             }
             $url .= '&'.urlencode((string) $key).'='.urlencode((string) $value);
         }
+
+        if ($extra_url_query = $this->config->get('append_url_query')) {
+            $url .= '&'.$extra_url_query;
+        }
+
         return $url;
     }
 
@@ -609,6 +614,11 @@ abstract class Hm_Output_Module {
         foreach ($params as $key => $value) {
             $url .= ($htm_context ? '&amp;': '&').$key.'='.$value;
         }
+
+        if ($extra_url_query = $this->get('append_url_query')) {
+            $url .= ($htm_context ? '&amp;': '&').$extra_url_query;
+        }
+        
         return $url;
     }
 
