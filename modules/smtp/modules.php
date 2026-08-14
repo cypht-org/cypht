@@ -192,10 +192,13 @@ class Hm_Handler_process_auto_bcc extends Hm_Handler_Module {
  */
 class Hm_Handler_get_test_chunk extends Hm_Handler_Module {
     public function process() {
-        $filepath = $this->config->get('attachment_dir');
-        $filepath = $filepath.'/chunks-'.$this->request->get['resumableIdentifier'];
-        $chunk_file = $filepath.'/'.$this->request->get['resumableFilename'].'.part'.$this->request->get['resumableChunkNumber'];
-        if (file_exists($chunk_file)) {
+        $resumable_identifier = trim(basename((string) ($this->request->get['resumableIdentifier'] ?? '')));
+        $resumable_filename = trim(basename((string) ($this->request->get['resumableFilename'] ?? '')));
+
+        $expected_dir = $this->config->get('attachment_dir').'/chunks-'.$resumable_identifier;
+        $chunk_file = $expected_dir.'/'.$resumable_filename.'.part'.$this->request->get['resumableChunkNumber'];
+        if ($resumable_identifier !== '' && $resumable_filename !== ''
+                && dirname($chunk_file) === $expected_dir && file_exists($chunk_file)) {
             header("HTTP/1.0 200 Ok");
         } else {
             header("HTTP/1.0 404 Not Found");
@@ -218,31 +221,38 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
             mkdir($filepath.'/'.$userpath, 0777, true);
         }
 
+        $resumable_identifier = trim(basename((string) ($this->request->get['resumableIdentifier'] ?? '')));
+        $resumable_filename = trim(basename((string) ($this->request->get['resumableFilename'] ?? '')));
+
         if (!empty($this->request->files)) foreach ($this->request->files as $file) {
             if ($file['error'] != 0) {
-                Hm_Msgs::add('ERRerror '.$file['error'].' in file '.$this->request->get['resumableFilename']);
+                Hm_Msgs::add('ERRerror '.$file['error'].' in file '.$resumable_filename);
                 continue;
             }
-    
-            if(isset($this->request->get['resumableIdentifier']) && trim($this->request->get['resumableIdentifier'])!=''){
-                $temp_dir = $filepath.'/'.$userpath.'/chunks-'.$this->request->get['resumableIdentifier'];
+
+            $temp_dir = $filepath.'/'.$userpath.'/chunks-'.$resumable_identifier;
+            $dest_file = $temp_dir.'/'.$resumable_filename.'.part'.$this->request->get['resumableChunkNumber'];
+
+            if ($resumable_identifier === '' || $resumable_filename === ''
+                    || dirname($dest_file) !== $temp_dir) {
+                Hm_Msgs::add('ERRInvalid upload request');
+                continue;
             }
-            $dest_file = $temp_dir.'/'.$this->request->get['resumableFilename'].'.part'.$this->request->get['resumableChunkNumber'];
-        
+
             // create the temporary directory
             if (!is_dir($temp_dir)) {
                 mkdir($temp_dir, 0777, true);
             }
-        
+
             // move the temporary file
             if (!move_uploaded_file($file['tmp_name'], $dest_file)) {
-                Hm_Msgs::add('ERRError saving (move_uploaded_file) chunk '.$this->request->get['resumableChunkNumber'].' for file '.$this->request->get['resumableFilename']);
+                Hm_Msgs::add('ERRError saving (move_uploaded_file) chunk '.$this->request->get['resumableChunkNumber'].' for file '.$resumable_filename);
             } else {
                 // check if all the parts present, and create the final destination file
-                $result = createFileFromChunks($temp_dir, $this->request->get['resumableFilename'],
-                                $this->request->get['resumableChunkSize'], 
+                $result = createFileFromChunks($temp_dir, $resumable_filename,
+                                $this->request->get['resumableChunkSize'],
                                 $this->request->get['resumableTotalSize'],
-                                $this->request->get['resumableTotalChunks']);    
+                                $this->request->get['resumableTotalChunks']);
             }
         }
     }
@@ -269,13 +279,19 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
             return;
         }
 
-        $uploaded_files = !$uploaded_files ? []: explode(',', $uploaded_files);
+        $uploaded_files = !$uploaded_files ? [] : parse_uploaded_files_list($uploaded_files);
 
         if ($this->module_is_supported('imap')) {
             $userpath = md5($this->session->get('username', false));
-            foreach($uploaded_files as $key => $file) {
-                $uploaded_files[$key] = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$userpath.DIRECTORY_SEPARATOR.$file;
+            $attachment_dir = $this->config->get('attachment_dir');
+            $resolved = [];
+            foreach ($uploaded_files as $file) {
+                $path = user_attachment_path($attachment_dir, $userpath, $file);
+                if ($path !== false) {
+                    $resolved[] = $path;
+                }
             }
+            $uploaded_files = $resolved;
             $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
                     'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
                     'draft_in_reply_to' => $inreplyto), $draft_id, $this->session,
@@ -668,9 +684,13 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* parse attachments */
         $uploaded_files = [];
         if (!empty($this->request->post['send_uploaded_files'])) {
-            $uploaded_files = explode(',', $this->request->post['send_uploaded_files']);
-            foreach($uploaded_files as $key => $file) {
-                $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.md5($this->session->get('username', false)).'/'.$file;
+            $userpath = md5($this->session->get('username', false));
+            $attachment_dir = $this->config->get('attachment_dir');
+            foreach (parse_uploaded_files_list($this->request->post['send_uploaded_files']) as $file) {
+                $path = user_attachment_path($attachment_dir, $userpath, $file);
+                if ($path !== false) {
+                    $uploaded_files[] = $path;
+                }
             }
         }
 
@@ -1603,6 +1623,15 @@ if (!hm_exists('rrmdir')) {
  */
 if (!hm_exists('createFileFromChunks')) {
     function createFileFromChunks($temp_dir, $fileName, $chunkSize, $totalSize,$total_files) {
+        // defense in depth: strip directory components and verify the assembled
+        // file stays in the parent of $temp_dir (the per-user attachment dir).
+        $fileName = trim(basename((string) $fileName));
+        $expected_dir = dirname($temp_dir);
+        $dest_file = $expected_dir.'/'.$fileName;
+        if ($fileName === '' || $fileName === '.' || $fileName === '..'
+                || dirname($dest_file) !== $expected_dir) {
+            return false;
+        }
         // count all the parts of this file
         // $fileName = Hm_Crypt::ciphertext($fileName, Hm_Request_Key::generate());
         $total_files_on_server_size = 0;
@@ -1615,20 +1644,20 @@ if (!hm_exists('createFileFromChunks')) {
         // check that all the parts are present
         // If the Size of all the chunks on the server is equal to the size of the file uploaded.
         if ($total_files_on_server_size >= $totalSize) {
-        // create the final destination file 
-            if (($fp = fopen($temp_dir.'/../'.$fileName, 'w')) !== false) {
+        // create the final destination file
+            if (($fp = fopen($dest_file, 'w')) !== false) {
                 for ($i=1; $i<=$total_files; $i++) {
                     fwrite($fp, file_get_contents($temp_dir.'/'.$fileName.'.part'.$i));
                 }
                 fclose($fp);
-                $hashed_content = Hm_Crypt::ciphertext(file_get_contents($temp_dir.'/../'.$fileName), Hm_Request_Key::generate());
-                file_put_contents($temp_dir.'/../'.$fileName, $hashed_content);
+                $hashed_content = Hm_Crypt::ciphertext(file_get_contents($dest_file), Hm_Request_Key::generate());
+                file_put_contents($dest_file, $hashed_content);
             } else {
                 return false;
             }
 
-            // rename the temporary directory (to avoid access from other 
-            // concurrent chunks uploads) and than delete it
+            // rename the temporary directory (to avoid access from other
+            // concurrent chunks uploads) and then delete it
             if (rename($temp_dir, $temp_dir.'_UNUSED')) {
                 rrmdir($temp_dir.'_UNUSED');
             } else {
@@ -1638,6 +1667,57 @@ if (!hm_exists('createFileFromChunks')) {
         return true;
     }
 }
+
+/**
+ * Parse a list of uploaded attachment filenames from a request value.
+ * Prefers JSON (handles commas/unicode in names); falls back to comma-split
+ * for older clients. Each name is reduced to a basename so "../" cannot escape
+ * the per-user attachment directory when paths are built later.
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('parse_uploaded_files_list')) {
+function parse_uploaded_files_list($raw) {
+    if ($raw === false || $raw === null || $raw === '') {
+        return [];
+    }
+    if (is_array($raw)) {
+        $names = $raw;
+    } else {
+        $decoded = json_decode($raw, true);
+        $names = is_array($decoded) ? $decoded : explode(',', $raw);
+    }
+    $safe = [];
+    foreach ($names as $name) {
+        if (!is_string($name) && !is_numeric($name)) {
+            continue;
+        }
+        $name = trim(basename((string) $name));
+        if ($name === '' || $name === '.' || $name === '..') {
+            continue;
+        }
+        $safe[] = $name;
+    }
+    return $safe;
+}}
+
+/**
+ * Build a path under the current user's attachment directory.
+ * Returns false if the filename would escape that directory.
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('user_attachment_path')) {
+function user_attachment_path($attachment_dir, $userpath, $filename) {
+    $filename = trim(basename((string) $filename));
+    if ($filename === '' || $filename === '.' || $filename === '..') {
+        return false;
+    }
+    $expected_dir = rtrim($attachment_dir, '/\\').DIRECTORY_SEPARATOR.$userpath;
+    $path = $expected_dir.DIRECTORY_SEPARATOR.$filename;
+    if (dirname($path) !== $expected_dir) {
+        return false;
+    }
+    return $path;
+}}
 
 /**
  * @subpackage smtp/functions

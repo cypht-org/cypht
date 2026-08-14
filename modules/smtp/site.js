@@ -153,7 +153,7 @@ var save_compose_state = function(no_files, notice) {
         {'name': 'draft_in_reply_to', 'value': inreplyto},
         {'name': 'delete_uploaded_files', 'value': no_files},
         {'name': 'draft_to', 'value': to},
-        {'name': 'uploaded_files', 'value': uploaded_files}],
+        {'name': 'uploaded_files', 'value': JSON.stringify(uploaded_files)}],
         function(res) {
             $('.smtp_send').prop('disabled', false);
             $('.smtp_send').removeClass('disabled_input');
@@ -387,7 +387,7 @@ $(function() {
                 $('.compose_next_email_data').val(next_message);
             }
             var uploaded_files = $("input[name='uploaded_files[]']").map(function(){return $(this).val();}).get();
-            $('#send_uploaded_files').val(uploaded_files);
+            $('#send_uploaded_files').val(JSON.stringify(uploaded_files));
             Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input');
             $('.smtp_send_archive').addClass('disabled_input'); 
             $('.smtp_send').on("click", function() { return false; }); 
