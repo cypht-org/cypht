@@ -2,124 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-class Sieve_Handler_Test {
-    public $post = array();
-    public $get = array();
-    public $user_config = array();
-    public $config = array();
-    public $input = array();
-    public $modules = array();
-    public $mod = false;
-    public $tls = false;
-    public $rtype = 'HTTP';
-    public $session = array();
-    public $req_obj = false;
-    public $ses_obj = false;
-    public $set;
-    public $module_exec;
-
-    public function __construct($name, $set) {
-        $this->mod = $name;
-        $this->set = $set;
-    }
-
-    public function prep() {
-        $config = new Hm_Mock_Config();
-        $config->mods = $this->modules;
-        foreach ($this->config as $name => $val) {
-            $config->set($name, $val);
-        }
-        $this->module_exec = new Hm_Module_Exec($config);
-        $this->module_exec->user_config = new Hm_Mock_Config();
-        foreach ($this->user_config as $name => $val) {
-            $this->module_exec->user_config->set($name, $val);
-        }
-        $this->req_obj = new Hm_Mock_Request($this->rtype);
-        $this->req_obj->tls = $this->tls;
-        $this->req_obj->post = $this->post;
-        $this->req_obj->get = $this->get;
-        $this->ses_obj = new Hm_Mock_Session();
-        foreach ($this->session as $name => $val) {
-            $this->ses_obj->set($name, $val);
-        }
-        Hm_Handler_Modules::add('test', $this->mod, false, false, false, true, $this->set);
-        $this->module_exec->handler_response = $this->input;
-        Hm_Server_Wrapper::init($this->module_exec->user_config, $this->ses_obj);
-    }
-
-    public function run() {
-        $this->prep();
-        $this->module_exec->run_handler_modules($this->req_obj, $this->ses_obj, 'test');
-        return $this->module_exec;
-    }
-}
-
-class Hm_Test_Sieve_Client {
-    public static $scripts = array();
-    public static $activated = '';
-    public static $renamed = array();
-
-    public function listScripts() {
-        return array_keys(self::$scripts);
-    }
-
-    public function getScript($name) {
-        return self::$scripts[$name] ?? '';
-    }
-
-    public function putScript($name, $script) {
-        self::$scripts[$name] = $script;
-        return true;
-    }
-
-    public function removeScripts($name) {
-        unset(self::$scripts[$name]);
-        return true;
-    }
-
-    public function activateScript($name) {
-        self::$activated = $name;
-        return true;
-    }
-
-    public function renameScript($name, $prefix) {
-        $new_name = $prefix.$name;
-        self::$scripts[$new_name] = self::$scripts[$name] ?? '';
-        unset(self::$scripts[$name]);
-        self::$renamed[] = array($name, $new_name);
-        return true;
-    }
-
-    public function close() {
-        return true;
-    }
-
-    public function getErrorMessage() {
-        return '';
-    }
-
-    public function getExtensions() {
-        return array('fileinto', 'reject');
-    }
-
-    public function getCapabilities() {
-        return array('fileinto', 'reject', 'vacation');
-    }
-}
-
-class Hm_Test_Sieve_Client_Factory {
-    public function init($user_config = null, $imap_account = null, $is_nux_supported = false)
-    {
-        return new Hm_Test_Sieve_Client();
-    }
-}
-
-class Hm_Test_Sieve_Client_Failing_Factory {
-    public function init($user_config = null, $imap_account = null, $is_nux_supported = false)
-    {
-        throw new Exception('Test failure');
-    }
-}
+require_once __DIR__.'/sieve_test_helpers.php';
 
 class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
 
@@ -129,17 +12,6 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
         Hm_Test_Sieve_Client::$activated = '';
         Hm_Test_Sieve_Client::$renamed = array();
         Hm_Msgs::flush();
-    }
-
-    private function sieveScriptWithSource($source) {
-        return implode("\n", array(
-            "# CYPHT CONFIG HEADER - DON'T REMOVE",
-            '# '.base64_encode(json_encode(array(array('condition' => 'from', 'type' => 'Contains', 'value' => 'sender@example.com')))),
-            '# '.base64_encode(json_encode(array(array('action' => 'keep', 'value' => '')))),
-            '# '.base64_encode($source),
-            '',
-            'require ["fileinto"];',
-        ));
     }
 
     private function editableFilterScript($test_type = 'allof') {
@@ -225,33 +97,6 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
         $res = $test->run();
 
         $this->assertEquals('Primary Account', $res->handler_response['mailbox_name']);
-    }
-
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_load_custom_actions_returns_all_cypht_filters() {
-        Hm_Test_Sieve_Client::$scripts = array(
-            'from_list-10-cyphtfilter' => $this->sieveScriptWithSource('message_list'),
-            'from_message-20-cyphtfilter' => $this->sieveScriptWithSource('message'),
-            'manual_script-30-cypht' => "require [\"fileinto\"];",
-        );
-
-        $test = new Sieve_Handler_Test('load_custom_actions', 'sievefilters');
-        $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
-        $test->get = array('list_path' => 'imap_serverA_INBOX');
-        $test->user_config = array(
-            'imap_servers' => $this->imapServersConfig(),
-            'enable_sieve_filter_setting' => true,
-        );
-
-        $res = $test->run();
-        $actions = $res->handler_response['custom_actions'];
-
-        $this->assertCount(2, $actions);
-        $this->assertEquals('from_list-10-cyphtfilter', $actions[0]['id']);
-        $this->assertEquals('from message', $actions[1]['name']);
     }
 
     /**
@@ -823,4 +668,54 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
 
         $this->assertEquals(array('Sieve: Test failure'), Hm_Msgs::get());
     }
+
+    /* ------------------------------------------------------------------ *
+     * process_enable_sieve_filter_setting - the switch every handler above
+     * checks with should_skip_execution()
+     * ------------------------------------------------------------------ */
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_process_enable_sieve_filter_setting_saves_checked_box() {
+        $test = new Sieve_Handler_Test('process_enable_sieve_filter_setting', 'sievefilters');
+        $test->post = array('save_settings' => 1, 'enable_sieve_filter' => 1);
+
+        $res = $test->run();
+
+        $this->assertEquals(1, $res->handler_response['new_user_settings']['enable_sieve_filter_setting']);
+    }
+
+    /**
+     * An unchecked box is absent from the POST entirely, which has to be read
+     * as "off" rather than "unchanged".
+     *
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_process_enable_sieve_filter_setting_saves_unchecked_box_as_false() {
+        $test = new Sieve_Handler_Test('process_enable_sieve_filter_setting', 'sievefilters');
+        $test->post = array('save_settings' => 1);
+
+        $res = $test->run();
+
+        $this->assertFalse($res->handler_response['new_user_settings']['enable_sieve_filter_setting']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_process_enable_sieve_filter_setting_reads_stored_value_when_not_saving() {
+        $test = new Sieve_Handler_Test('process_enable_sieve_filter_setting', 'sievefilters');
+        $test->post = array();
+        $test->user_config = array('enable_sieve_filter_setting' => true);
+
+        $res = $test->run();
+
+        $this->assertTrue($res->handler_response['user_settings']['enable_sieve_filter']);
+        $this->assertSame(array(), $res->handler_response['new_user_settings']);
+    }
+
 }

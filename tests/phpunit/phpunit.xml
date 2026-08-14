@@ -158,6 +158,11 @@
     <testsuite name="modules_sievefilters">
       <file>./modules/sievefilters/functions.php</file>
       <file>./modules/sievefilters/handler_modules.php</file>
+      <file>./modules/sievefilters/output_modules.php</file>
+      <file>./modules/sievefilters/custom_actions_handlers.php</file>
+      <file>./modules/sievefilters/custom_actions_outputs.php</file>
+      <file>./modules/sievefilters/automatic_actions_handlers.php</file>
+      <file>./modules/sievefilters/automatic_actions_outputs.php</file>
     </testsuite>
     <testsuite name="modules_brute_force">
       <file>./modules/brute_force/handler_modules.php</file>

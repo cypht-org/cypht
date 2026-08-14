@@ -467,6 +467,10 @@ function message_controls($output_mod) {
         $res .= tags_dropdown($output_mod, []);
     }
 
+    if ($output_mod->get('msg_controls_automatic_actions')) {
+        $res .= $output_mod->get('msg_controls_automatic_actions');
+    }
+
     if ($output_mod->get('msg_controls_custom_actions')) {
         $res .= $output_mod->get('msg_controls_custom_actions');
     }

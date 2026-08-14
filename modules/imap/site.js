@@ -723,6 +723,38 @@ var expand_imap_folders = function(element) {
     return false;
 };
 
+/**
+ * Fetches and appends the "Custom actions" dropdown for the current message.
+ * Kept separate from get_message_content() because custom actions may change
+ * independently of the cached message response.
+ *
+ * @param {Object} detail - IMAP message details.
+ * @param {string} detail.server_id - IMAP server ID.
+ * @param {string} detail.folder - IMAP folder containing the message.
+ * @param {string|number} uid - IMAP message UID.
+ */
+function loadMessageCustomActions(detail, uid) {
+    if (!detail || detail.type !== 'imap' || !uid) {
+        return;
+    }
+    Hm_Ajax.request(
+        [
+            {'name': 'hm_ajax_hook', 'value': 'ajax_message_custom_actions'},
+            {'name': 'imap_server_id', 'value': detail.server_id},
+            {'name': 'imap_msg_uid', 'value': uid},
+            {'name': 'folder', 'value': detail.folder}
+        ],
+        function(res) {
+            localStorage.setItem("message_page_custom_actions_res", JSON.stringify(res));
+            if (res.message_custom_actions) {
+                $("#extra-header-buttons").append(res.message_custom_actions);
+            }
+        },
+        [],
+        true
+    );
+}
+
 var get_message_content = function(msg_part, uid, list_path, listParent, detail, callback, noupdate) {
     if (!uid) {
         uid = $('.msg_uid').val();
@@ -741,8 +773,12 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
             $('.msg_text').append(res.msg_parts);
 
             if (res.new_filter) {
-              $("#extra-header-buttons").append(res.new_filter);
+                $("#extra-header-buttons").append(res.new_filter);
             }
+
+            // Custom actions are fetched separately since they may change without the message changing.
+            loadMessageCustomActions(detail, uid);
+
             document.title = $('.msg_text .small_header').first().text();
             imap_message_view_finished(uid, detail, listParent);
 

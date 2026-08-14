@@ -87,6 +87,16 @@ class Hm_Test_Mock_Sieve_Site_Config {
     }
 }
 
+/**
+ * Stands in for an output module where the markup helpers only need trans().
+ * Returning the key verbatim keeps the assertions independent of translations.
+ */
+class Hm_Test_Sieve_Trans_Stub {
+    public function trans($string) {
+        return $string;
+    }
+}
+
 class Hm_Test_Sievefilters_Functions extends TestCase {
 
     public function setUp(): void {
@@ -673,5 +683,42 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
         $this->assertStringContainsString('from message', $result['list']);
         $this->assertStringContainsString('project archive', $result['list']);
         $this->assertStringNotContainsString('external-script', $result['list']);
+    }
+
+    /* ------------------------------------------------------------------ *
+     * block_filter_dropdown
+     * ------------------------------------------------------------------ */
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_block_filter_dropdown_includes_scope_and_all_block_actions() {
+        $html = block_filter_dropdown(new Hm_Test_Sieve_Trans_Stub(), 'serverA');
+
+        $this->assertStringContainsString('id="blockSenderScope"', $html);
+        $this->assertStringContainsString('value="sender"', $html);
+        $this->assertStringContainsString('value="domain"', $html);
+        foreach (array('default', 'discard', 'blocked', 'reject_default', 'reject_with_message') as $action) {
+            $this->assertStringContainsString('value="'.$action.'"', $html);
+        }
+        $this->assertStringContainsString('id="block_sender"', $html);
+        $this->assertStringContainsString('mailbox_id="serverA"', $html);
+    }
+
+    /**
+     * The message page reuses the dropdown without the sender/domain choice.
+     *
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_block_filter_dropdown_can_drop_the_scope_selector_and_take_an_increment() {
+        $html = block_filter_dropdown(new Hm_Test_Sieve_Trans_Stub(), 'serverA', false, 'unblock_sender', 'Unblock', '_2');
+
+        $this->assertStringNotContainsString('id="blockSenderScope"', $html);
+        $this->assertStringContainsString('id="dropdownMenuBlockSender_2"', $html);
+        $this->assertStringContainsString('id="block_sender_form_2"', $html);
+        $this->assertStringContainsString('id="unblock_sender_2"', $html);
+        $this->assertStringContainsString('Unblock', $html);
     }
 }
