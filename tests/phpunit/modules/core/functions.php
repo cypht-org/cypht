@@ -362,4 +362,31 @@ class Hm_Test_Core_Functions extends TestCase {
         $this->assertIsArray($formats);
         $this->assertNotEmpty($formats);
     }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_logout_back_query_round_trip() {
+        $encoded = encode_logout_back_query(array('page' => 'home', 'list_path' => 'unread'));
+        $decoded = decode_logout_back_query($encoded);
+        $this->assertSame(array('page' => 'home', 'list_path' => 'unread'), $decoded);
+        $this->assertStringNotContainsString('a:', base64_decode($encoded, true));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_logout_back_query_rejects_php_serialized_payloads() {
+        $this->assertSame(array(), decode_logout_back_query(base64_encode(serialize(array('page' => 'home')))));
+        $this->assertSame(array(), decode_logout_back_query(base64_encode('O:8:"stdClass":0:{}')));
+        $this->assertSame(array(), decode_logout_back_query('not-valid-base64!'));
+        $this->assertSame(array(), decode_logout_back_query(''));
+        $this->assertSame(array(), decode_logout_back_query(encode_logout_back_query(null)));
+        $this->assertSame(array('page' => 'home'), decode_logout_back_query(encode_logout_back_query(array(
+            'page' => 'home',
+            'nested' => array('x' => 1),
+        ))));
+    }
 }
