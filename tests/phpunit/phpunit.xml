@@ -175,6 +175,9 @@
     <testsuite name="mta_sts">
       <file>./mta_sts.php</file>
     </testsuite>
+    <!-- <testsuite name="integration_mail_server">
+      <file>./integration/mail_server.php</file>
+    </testsuite> -->
   </testsuites>
   <source>
     <include>

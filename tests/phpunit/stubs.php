@@ -114,6 +114,16 @@ if (!defined("IMAP_TEST")) {
         public function search() { return null; }
         public function sort_by_fetch() { return null; }
         public function message_action() { return null; }
+        public function get_message_headers() { return null; }
+        public function get_message_content() { return null; }
+        public function get_message_structure() { return null; }
+        public function append_start() { return null; }
+        public function append_feed() { return null; }
+        public function append_end() { return null; }
+        public function search_bodystructure() { return null; }
+        public function start_message_stream() { return null; }
+        public function read_stream_line() { return null; }
+        public function get_first_message_part() { return null; }
     }
 }
 
