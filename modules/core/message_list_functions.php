@@ -428,8 +428,14 @@ function icon_callback($vals, $style, $output_mod) {
 if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
     $txt = '';
-    $controls = ['read', 'unread', 'flag', 'unflag', 'delete', 'archive', 'junk', 'restore'];
+    $controls = ['read', 'unread', 'flag', 'unflag', 'delete', 'archive', 'junk', 'not_junk', 'restore'];
     $controls = array_filter($controls, function($val) use ($output_mod) {
+        if ($val === 'not_junk') {
+            return $output_mod->get('list_path', '') === 'junk' || $output_mod->get('is_junk_folder', false);
+        }
+        if ($val === 'junk' && $output_mod->get('is_junk_folder', false)) {
+            return false;
+        }
         if (in_array($val, [$output_mod->get('list_path', ''), strtolower($output_mod->get('core_msg_control_folder', ''))])) {
             return false;
         }
@@ -445,19 +451,26 @@ function message_controls($output_mod) {
         return true;
     });
 
+    $msg_control_label = function($control) use ($output_mod) {
+        if ($control === 'not_junk') {
+            return $output_mod->trans('Not junk');
+        }
+        return $output_mod->trans(ucfirst($control));
+    };
+
     $res = '<a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a>'.
         '<div class="msg_controls fs-6 d-none gap-1 align-items-center">'.
             '<div class="dropdown on_mobile">'.
                 '<button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" id="coreMsgControlDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Actions</button>'.
                 '<ul class="dropdown-menu" aria-labelledby="coreMsgControlDropdown">';
     foreach ($controls as $control) {
-        $res .= '<li><a class="dropdown-item msg_'.$control.' core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="'.$control.'">'.$output_mod->trans(ucfirst($control)).'</a></li>';
+        $res .= '<li><a class="dropdown-item msg_'.$control.' core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="'.$control.'">'.$msg_control_label($control).'</a></li>';
     }
     $res .= '</ul>'.
             '</div>';
 
     foreach ($controls as $control) {
-        $res .= '<a class="msg_'.$control.' core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="'.$control.'">'.$output_mod->trans(ucfirst($control)).'</a>';
+        $res .= '<a class="msg_'.$control.' core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="'.$control.'">'.$msg_control_label($control).'</a>';
     }
 
     if ($output_mod->get('msg_controls_extra')) {

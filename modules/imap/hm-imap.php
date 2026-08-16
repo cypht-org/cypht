@@ -1953,6 +1953,9 @@ if (!class_exists('Hm_IMAP')) {
                     case 'JUNK':
                         $command = "UID STORE $uid_string +FLAGS (\Junk)\r\n";
                         break;
+                    case 'NOT_JUNK':
+                        $command = "UID STORE $uid_string -FLAGS (\Junk)\r\n";
+                        break;
                     case 'FLAG':
                         $command = "UID STORE $uid_string +FLAGS (\Flagged)\r\n";
                         break;

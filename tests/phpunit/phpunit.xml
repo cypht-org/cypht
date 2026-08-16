@@ -127,6 +127,11 @@
     <testsuite name="tags">
       <file>./tags.php</file>
     </testsuite>
+     <testsuite name="modules_imap">
+      <!-- <file>./modules/imap/hm-imap.php</file> -->
+      <file>./modules/imap/is_imap_junk_folder.php</file>
+      <file>./modules/imap/imap_message_action_not_junk.php</file>
+    </testsuite>
     <testsuite name="lib">
       <file>./lib/searchable.php</file>
       <file>./lib/scram_authenticator.php</file>

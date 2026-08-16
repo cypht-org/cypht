@@ -676,6 +676,7 @@ return array(
     'Are you sure you want to send this message?' => false,
     'IMAP and JMAP Servers' => false,
     'Junk' => false,
+    'Not junk' => false,
     'Trash' => false,
     'Pasted text has leading or trailing spaces' => false,
     'No tags available yet.' => false,
