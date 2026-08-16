@@ -1701,7 +1701,7 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
         $res = '<div class="sidebar-footer">';
         $res .= '<a class="logout_link" id="js-logout_link" href="'.$this->build_page_url('logout', [
             'prompt' => 'true',
-            'back_query' => base64_encode(serialize($this->get('router_get_export'))),
+            'back_query' => encode_logout_back_query($this->get('router_get_export', array())),
         ]).'" title="'. $this->trans('Logout') .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-power menu-icon"></i>';

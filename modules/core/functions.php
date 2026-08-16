@@ -926,3 +926,59 @@ function isPageConfigured($page) {
     return in_array($page, $pages);
 }
 
+/**
+ * Encode a GET query array for the logout cancel-return parameter.
+ * JSON cannot instantiate PHP objects, unlike serialize().
+ * @subpackage core/functions
+ * @param mixed $query
+ * @return string
+ */
+if (!hm_exists('encode_logout_back_query')) {
+function encode_logout_back_query($query) {
+    if (!is_array($query)) {
+        $query = array();
+    }
+    $safe = array();
+    foreach ($query as $key => $value) {
+        if (!is_string($key) && !is_int($key)) {
+            continue;
+        }
+        if (is_scalar($value) || $value === null) {
+            $safe[(string) $key] = $value;
+        }
+    }
+    return base64_encode(json_encode($safe));
+}}
+
+/**
+ * Decode a logout cancel-return parameter into a GET query array.
+ * Rejects anything that is not a JSON object/array of scalars.
+ * @subpackage core/functions
+ * @param mixed $encoded
+ * @return array
+ */
+if (!hm_exists('decode_logout_back_query')) {
+function decode_logout_back_query($encoded) {
+    if (!is_string($encoded) || $encoded === '') {
+        return array();
+    }
+    $json = base64_decode($encoded, true);
+    if ($json === false || $json === '') {
+        return array();
+    }
+    $data = json_decode($json, true);
+    if (!is_array($data)) {
+        return array();
+    }
+    $safe = array();
+    foreach ($data as $key => $value) {
+        if (!is_string($key) && !is_int($key)) {
+            continue;
+        }
+        if (is_scalar($value) || $value === null) {
+            $safe[(string) $key] = $value;
+        }
+    }
+    return $safe;
+}}
+

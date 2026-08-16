@@ -819,7 +819,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
      */
     public function process() {
         if ($this->request->get['prompt'] ?? false) {
-            $backQuery = isset($this->request->get['back_query']) ? unserialize(base64_decode($this->request->get['back_query'])): [];
+            $backQuery = isset($this->request->get['back_query']) ? decode_logout_back_query($this->request->get['back_query']) : [];
 
             $this->out('cancel_logout_url', '?' . http_build_query($backQuery));
             
