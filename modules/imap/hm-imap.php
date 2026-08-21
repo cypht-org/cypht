@@ -2079,7 +2079,8 @@ if (!class_exists('Hm_IMAP')) {
 
         /**
          * finish an IMAP APPEND operation
-         * @return bool true on success
+         * @return int|string|bool message uid when APPENDUID is present, true on
+         *                         success without a uid, false on failure
          */
         public function append_end() {
             $result = $this->get_response(false, true);
@@ -2087,10 +2088,14 @@ if (!class_exists('Hm_IMAP')) {
                 $res = preg_grep('/APPENDUID/', array_map('json_encode', $result));
                 if ($res) {
                     $line = json_decode(reset($res), true);
-                    return $line[5];
+                    if (is_array($line) && isset($line[5]) && is_scalar($line[5])) {
+                        return $line[5];
+                    }
                 }
+                // APPEND succeeded but server did not return a usable APPENDUID
+                return true;
             }
-            return $result;
+            return false;
         }
 
         /* ------------------ HELPERS ------------------------------------------ */
@@ -2561,7 +2566,15 @@ if (!class_exists('Hm_IMAP')) {
 
             /* select the mailbox if need be */
             if (!$this->selected_mailbox || $this->selected_mailbox['name'] != $mailbox) {
-                $this->select_mailbox($mailbox);
+                /* Bail out if the mailbox cannot be selected. Without this check the
+                 * SORT/SEARCH/FETCH commands below run against whatever mailbox is still
+                 * selected on the connection, so a failed switch either returns an empty
+                 * list or - worse - messages from the previously selected mailbox.
+                 * Same contract as Hm_Mailbox::get_messages(), which already returns
+                 * [0, []] when select_folder() fails. */
+                if (!$this->select_mailbox($mailbox)) {
+                    return array(0, array());
+                }
             }
 
             /* use the SORT extension if we can */

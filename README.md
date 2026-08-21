@@ -10,7 +10,7 @@ All your email, from all your accounts, in one place. Supports IMAP/SMTP,
 news reader, but for E-mail. Cypht does not replace your existing accounts - it
 combines them into one. And it's also a news reader.
 
-![screenshot](https://github.com/cypht-org/cypht-website/blob/master/static/img/Inbox.PNG "Inbox View").
+![screenshot](https://github.com/cypht-org/cypht-website/blob/master/static//img/home/message_list_light.webp "Inbox View").
 
 The driving force behind Cypht development is to provide combined views for
 multiple accounts, but it's also a standard E-mail client that lets you browse

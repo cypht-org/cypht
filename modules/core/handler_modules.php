@@ -742,6 +742,7 @@ class Hm_Handler_default_page_data extends Hm_Handler_Module {
         $this->out('default_timezone', $this->user_config->get('default_setting_timezone', 'UTC'));
         $this->out('enabled_modules', $this->config->get_modules());
         $this->out('page_param_name', $this->config->get('page_param_name'));
+        $this->out('append_url_query', $this->config->get('append_url_query'));
         if (!crypt_state($this->config)) {
             $this->out('single_server_mode', true);
         }

@@ -666,6 +666,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_check_dirty_flag = function() { return '.($this->get('warn_for_unsaved_changes', '') ? '1' : '0').'; };'.
             'var hm_special_folders = function() { return '.json_encode($formattedSpecialFolders).'; };'.
             'var hm_page_param_name = function() { return "'.$this->get('page_param_name').'"; };'.
+            'var hm_append_url_query = function() { return "'.$this->get('append_url_query').'"; };'.
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {

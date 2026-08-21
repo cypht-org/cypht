@@ -183,8 +183,11 @@ class Hm_Test_PHP_Session extends TestCase {
         $request = new Hm_Mock_Request('HTTP');
         $request->server['HTTP_HOST'] = 'test';
         $this->assertEquals(array(false, 'asdf', 'test'), $session->set_session_params($request));
+        $request->server['HTTP_X_FORWARDED_HOST'] = 'proxy.test:8080, internal.test';
+        $this->assertEquals(array(false, 'asdf', 'proxy.test'), $session->set_session_params($request));
         $request->tls = true;
         $request->path = 'test';
+        $request->server['HTTP_X_FORWARDED_HOST'] = 'test';
         $this->assertEquals(array(true, 'test', 'test'), $session->set_session_params($request));
         $session->destroy($request);
 
