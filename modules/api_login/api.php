@@ -42,8 +42,9 @@ function cypht_login($user, $pass, $url, $lifetime=0) {
         $user_data = $user_config->dump();
         $session->set('user_data', $user_data);
         $session->set('username', rtrim($user));
-        Hm_Functions::setcookie('hm_id', stripslashes($session->enc_key), $lifetime, $path, $domain, $secure, true);
-        Hm_Functions::setcookie('hm_session', stripslashes($session->session_key), $lifetime, $path, $domain, $secure, true);
+        $same_site = $session->same_site_policy($request, 'Strict');
+        Hm_Functions::setcookie('hm_id', stripslashes($session->enc_key), $lifetime, $path, $domain, $secure, true, $same_site);
+        Hm_Functions::setcookie($session->get_cookie_name(), stripslashes($session->session_key), $lifetime, $path, $domain, $secure, true, $same_site);
         $session->end();
         return true;
     }
@@ -89,8 +90,26 @@ function cypht_logout() {
  */
 function url_parse($url) {
     $parsed = parse_url($url);
-    $secure = $parsed['scheme'] === 'https' ? true : false;
-    return array($parsed['host'], '/', $secure);
+    $secure = isset($parsed['scheme']) && $parsed['scheme'] === 'https';
+
+    /* Honour cookie_path/cookie_domain so a library style embed served under a
+       sub path (e.g. /webmail/) does not scope its cookies to the whole host and
+       collide with the host application's own cookies. Falls back to the previous
+       behaviour when neither is configured. */
+    $config = new Hm_Site_Config_File();
+    $path = $config->get('cookie_path', false);
+    if ($path === 'none') {
+        $path = '';
+    } elseif (!$path) {
+        $path = '/';
+    }
+    $domain = $config->get('cookie_domain', false);
+    if ($domain === 'none') {
+        $domain = '';
+    } elseif (!$domain) {
+        $domain = isset($parsed['host']) ? $parsed['host'] : '';
+    }
+    return array($domain, $path, $secure);
 }
 
 /**
