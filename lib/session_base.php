@@ -229,6 +229,17 @@ abstract class Hm_Session {
     }
 
     /**
+     * Name of the session cookie. A session class may change $cname - the site
+     * module set does, to namespace cookies when Cypht is embedded in another
+     * application - so callers outside the session must ask for it rather than
+     * assume the default "hm_session".
+     * @return string
+     */
+    public function get_cookie_name() {
+        return $this->cname;
+    }
+
+    /**
      * Returns bool true if the user is an admin
      * @return bool
      */
@@ -333,12 +344,39 @@ abstract class Hm_Session {
      * @param string $value cookie value
      * @param string $path cookie path
      * @param string $domain cookie domain
-     * @param string $same_site cookie SameSite
+     * @param string $same_site cookie SameSite, overridden by the cookie_samesite setting
      * @return boolean
      */
     public function secure_cookie($request, $name, $value, $path='', $domain='', $same_site = 'Strict') {
         list($path, $domain, $html_only) = $this->prep_cookie_params($request, $name, $path, $domain);
+        $same_site = $this->same_site_policy($request, $same_site);
         return Hm_Functions::setcookie($name, $value, $this->lifetime, $path, $domain, $request->tls, $html_only, $same_site);
+    }
+
+    /**
+     * Resolve the SameSite policy for a cookie. When cookie_samesite is unset the
+     * per-call default is kept, so behaviour is unchanged. Setting it to "None" is
+     * what an iframe embed needs, since a Strict cookie is dropped by the browser
+     * on cross site navigation and the user appears to be logged straight back out.
+     * @param object $request request details
+     * @param string $default value the caller asked for
+     * @return string
+     */
+    public function same_site_policy($request, $default) {
+        $configured = $this->site_config->get('cookie_samesite', '');
+        if (!$configured || !is_string($configured)) {
+            return $default;
+        }
+        $allowed = ['strict' => 'Strict', 'lax' => 'Lax', 'none' => 'None'];
+        $key = strtolower(trim($configured));
+        if (!array_key_exists($key, $allowed)) {
+            Hm_Debug::add(sprintf('Invalid cookie_samesite value "%s", using %s', $configured, $default), 'warning');
+            return $default;
+        }
+        if ($allowed[$key] === 'None' && empty($request->tls)) {
+            Hm_Debug::add('cookie_samesite=None requires HTTPS, browsers will reject these cookies over plain HTTP', 'warning');
+        }
+        return $allowed[$key];
     }
 
     /**
@@ -395,9 +433,22 @@ class Hm_Session_Setup {
      */
     public function __construct($config) {
         $this->config = $config;
-        $this->auth_type = $config->get('auth_type', false);
-        $this->session_type = $config->get('session_type', false);
+        /* Values come from .env, where case is easy to get wrong. AUTH_TYPE=CUSTOM
+           used to fall through every branch and cease() with "Invalid auth
+           configuration"; normalising here makes DB/db and custom/CUSTOM equivalent. */
+        $this->auth_type = $this->normalize($config->get('auth_type', false));
+        $this->session_type = $this->normalize($config->get('session_type', false));
+    }
 
+    /**
+     * @param mixed $value raw setting value
+     * @return string|false lowercased and trimmed, or false if not set
+     */
+    private function normalize($value) {
+        if (!is_string($value) || trim($value) === '') {
+            return false;
+        }
+        return strtolower(trim($value));
     }
 
     /**
@@ -418,17 +469,18 @@ class Hm_Session_Setup {
      */
     private function get_session_class() {
         switch ($this->session_type) {
-            case 'DB':
+            case 'db':
                 $session_class = 'Hm_DB_Session';
                 break;
-            case 'MEM':
+            case 'mem':
+            case 'memcached':
                 $session_class = 'Hm_Memcached_Session';
                 break;
-            case 'REDIS':
+            case 'redis':
                 $session_class = 'Hm_Redis_Session';
                 break;
             case 'custom':
-                $session_class = $this->config->get('session_class', 'Custom_Session');
+                $session_class = $this->config->get('session_class') ?: 'Custom_Session';
                 break;
         }
         return (isset($session_class) && class_exists($session_class))
@@ -458,7 +510,7 @@ class Hm_Session_Setup {
      * @return string|false
      */
     private function dynamic_auth() {
-        if ($this->auth_type == 'dynamic' && in_array('dynamic_login', $this->config->get_modules(), true)) {
+        if ($this->auth_type === 'dynamic' && in_array('dynamic_login', $this->config->get_modules(), true)) {
             return 'Hm_Auth_Dynamic';
         }
         return false;
@@ -468,8 +520,8 @@ class Hm_Session_Setup {
      * @return string|false
      */
     private function standard_auth() {
-        if ($this->auth_type && in_array($this->auth_type, ['DB', 'LDAP', 'IMAP'], true)) {
-            return sprintf('Hm_Auth_%s', $this->auth_type);
+        if ($this->auth_type && in_array($this->auth_type, ['db', 'ldap', 'imap'], true)) {
+            return sprintf('Hm_Auth_%s', strtoupper($this->auth_type));
         }
         return false;
     }
@@ -478,8 +530,8 @@ class Hm_Session_Setup {
      * @return string|false
      */
     private function custom_auth() {
-        $custom_auth_class = $this->config->get('auth_class', 'Custom_Auth');
-        if ($this->auth_type == 'custom' && Hm_Functions::class_exists($custom_auth_class)) {
+        $custom_auth_class = $this->config->get('auth_class') ?: 'Custom_Auth';
+        if ($this->auth_type === 'custom' && Hm_Functions::class_exists($custom_auth_class)) {
             return $custom_auth_class;
         }
         return false;

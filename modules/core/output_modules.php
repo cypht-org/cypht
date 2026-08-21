@@ -1700,15 +1700,18 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<div class="sidebar-footer">';
-        $res .= '<a class="logout_link" id="js-logout_link" href="'.$this->build_page_url('logout', [
-            'prompt' => 'true',
-            'back_query' => base64_encode(serialize($this->get('router_get_export'))),
-        ]).'" title="'. $this->trans('Logout') .'">';
-        if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-power menu-icon"></i>';
+
+        if (!$this->get('hide_logout')) {
+            $res .= '<a class="logout_link" id="js-logout_link" href="'.$this->build_page_url('logout', [
+                'prompt' => 'true',
+                'back_query' => base64_encode(serialize($this->get('router_get_export'))),
+            ]).'" title="'. $this->trans('Logout') .'">';
+            if (!$this->get('hide_folder_icons')) {
+                $res .= '<i class="bi bi-power menu-icon"></i>';
+            }
+            $res .= '<span class="nav-label">' . $this->trans('Logout') .'</span>';
+            $res .= '</a>';
         }
-        $res .= '<span class="nav-label">' . $this->trans('Logout') .'</span>';
-        $res .= '</a>';
         $res .= '<a href="#" class="update_message_list" title="'. $this->trans('Reload') .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-arrow-clockwise menu-icon"></i>';

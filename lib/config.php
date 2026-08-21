@@ -518,23 +518,34 @@ class Hm_Site_Config_File extends Hm_Config {
  * @return object
  */
 function load_user_config_object($config) {
-    $type = $config->get('user_config_type', 'file');
+    $type = (string) $config->get('user_config_type', 'file');
+
+    /* The class can be named inline as "custom:My_Class". When it isn't, fall back
+       to the user_config_class setting and then to the site module default, so a
+       bare "custom" behaves the way "auth_class" and "session_class" already do. */
+    $class = $config->get('user_config_class', 'Custom_User_Config');
     if (mb_strstr($type, ':')) {
-        list($type, $class) = explode(':', $type);
+        list($type, $inline_class) = explode(':', $type, 2);
+        if (trim($inline_class) !== '') {
+            $class = trim($inline_class);
+        }
     }
-    switch ($type) {
-        case 'DB':
+
+    switch (strtolower(trim($type))) {
+        case 'db':
             $user_config = new Hm_User_Config_DB($config);
             Hm_Debug::add("Using DB user configuration", 'info');
             break;
         case 'custom':
-            if (class_exists($class)) {
+            if ($class && class_exists($class)) {
                 $user_config = new $class($config);
                 Hm_Debug::add("Using custom user configuration: {$class}", 'info');
                 break;
-            } else {
-                Hm_Debug::add("User configuration class does not exist: {$class}");
             }
+            Hm_Debug::add("User configuration class does not exist: {$class}", 'warning');
+            $user_config = new Hm_User_Config_File($config);
+            Hm_Debug::add("Falling back to file based user configuration", 'info');
+            break;
         default:
             $user_config = new Hm_User_Config_File($config);
             Hm_Debug::add("Using file based user configuration", "info");

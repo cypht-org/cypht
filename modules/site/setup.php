@@ -5,6 +5,14 @@ if (!defined('DEBUG_MODE')) { die(); }
 handler_source('site');
 output_source('site');
 
+/* Embedded mode: logout must not exist. These take effect only when
+   CYPHT_HIDE_LOGOUT=true; otherwise each handler defers to its parent. */
+replace_module('handler', 'logout', 'site_logout');
+replace_module('handler', 'idle_time_check', 'site_idle_time_check');
+
+/* Save settings without demanding a password the user does not have (SSO). */
+replace_module('handler', 'process_save_form', 'site_process_save_form');
+
 /* replace module just on the home page */
 //replace_module('handler', 'http_headers', 'site_http_headers', 'home');
 
