@@ -22,25 +22,33 @@
  */
 class Custom_Session extends Hm_PHP_Session {
 
-    use Hm_Session_Auth;
-    
-    private $existing = false;
+    protected $existing = false;
     private $sessionPrefix;
     private $sessionDir;
     private $sessionTtl;
     private $gcDivisor;
     private $debug;
-    
-    public function __construct() {
-        parent::__construct();
-        
+
+    /* length in characters of a session key (16 random bytes, hex encoded) */
+    const KEY_LEN = 32;
+
+    /**
+     * The parent (Hm_Session) requires the site config and the auth class name,
+     * and dereferences $auth_type::$internal_users straight away. Both must be
+     * accepted here and forwarded, or instantiating this class is a fatal error.
+     * @param object $config site config
+     * @param string $auth_type authentication class
+     */
+    public function __construct($config, $auth_type = 'Hm_Auth_DB') {
+        parent::__construct($config, $auth_type);
+
         // ALL from .env - no hardcoding
         $this->sessionPrefix = getenv('CYPHT_SESSION_PREFIX') ?: 'cypht_';
         $this->sessionDir = getenv('CYPHT_SESSION_DIR') ?: null;
         $this->sessionTtl = (int) (getenv('CYPHT_SESSION_TTL') ?: 604800);
         $this->gcDivisor = (int) (getenv('CYPHT_SESSION_GC_DIVISOR') ?: 200);
         $this->debug = getenv('CYPHT_SESSION_DEBUG') === 'true';
-        
+
         $this->cname = $this->sessionPrefix . 'session';
     }
 
@@ -61,8 +69,41 @@ class Custom_Session extends Hm_PHP_Session {
         return $fullDir;
     }
 
+    /**
+     * The key arrives from a client supplied cookie, so it is sanitised down to
+     * hex and length checked before it is ever used to build a path.
+     * @param string $key session key
+     * @return string|false path to the session file, false if the key is not valid
+     */
     private function session_file($key) {
-        return $this->session_dir() . '/' . preg_replace('/[^a-f0-9]/', '', (string) $key) . '.session';
+        $safe = preg_replace('/[^a-f0-9]/', '', (string) $key);
+        if (strlen($safe) !== self::KEY_LEN) {
+            return false;
+        }
+        return $this->session_dir() . '/' . $safe . '.session';
+    }
+
+    /**
+     * Mint a fresh session key
+     * @return string
+     */
+    private function new_key() {
+        return bin2hex(random_bytes(self::KEY_LEN / 2));
+    }
+
+    /**
+     * Write the session cookie. The parent class gets this for free from
+     * session_start(); this backend stores its own files, so it has to set
+     * the cookie itself or the key never reaches the browser.
+     * @param object $request request details
+     * @return void
+     */
+    private function write_cookie($request) {
+        if (!$this->session_key) {
+            return;
+        }
+        $this->secure_cookie($request, $this->cname, $this->session_key);
+        $this->dbg('session cookie written');
     }
 
     private function dbg($line) {
@@ -104,7 +145,12 @@ class Custom_Session extends Hm_PHP_Session {
     }
 
     private function write_locked() {
-        $fh = @fopen($this->session_file($this->session_key), 'cb');
+        $file = $this->session_file($this->session_key);
+        if ($file === false) {
+            $this->dbg('refusing to write, invalid session key');
+            return;
+        }
+        $fh = @fopen($file, 'cb');
         if ($fh !== false) {
             flock($fh, LOCK_EX);
             ftruncate($fh, 0);
@@ -125,10 +171,11 @@ class Custom_Session extends Hm_PHP_Session {
         if ($user !== false && $pass !== false) {
             if ($this->auth($user, $pass)) {
                 $this->set_key($request);
-                $this->session_key = bin2hex(random_bytes(16));
+                $this->session_key = $this->new_key();
                 $this->loaded = true;
                 $this->data = [];
                 $this->active = true;
+                $this->write_cookie($request);
                 $this->dbg('NEW LOGIN established');
                 $this->gc();
                 if ($fingerprint) {
@@ -150,25 +197,51 @@ class Custom_Session extends Hm_PHP_Session {
                 $this->check_fingerprint($request);
                 $this->dbg('active after fingerprint check = ' . ($this->active ? 'yes' : 'no'));
             }
+            if ($this->active) {
+                /* re-issue the cookie so a long session slides forward instead
+                   of expiring mid-use */
+                if ($this->get('long_session_enabled', false)) {
+                    $stored_lifetime = $this->get('long_session_lifetime', 0);
+                    if ($stored_lifetime > 0) {
+                        $this->lifetime = $stored_lifetime;
+                    }
+                }
+                $this->write_cookie($request);
+            }
         } else {
             $this->dbg('no cookie, no user/pass; anonymous request');
         }
         return $this->is_active();
-        // return parent::check($request, $user, $pass, $fingerprint);
     }
 
     /**
-     * Start the session. This could be an existing session or a new login
+     * Start the session. This could be an existing session or a new login.
+     *
+     * The parent declares start($request) and calls it that way from authed().
+     * $existing_session therefore defaults to null and falls back to $this->existing,
+     * so a one argument call behaves correctly instead of silently doing nothing.
+     *
      * @param object $request request details
+     * @param bool|null $existing_session true to load from storage, null to infer
      * @return void
      */
-    public function start($request, $existing_session=false) {
-        // return parent::start($request, $existing_session);
-             if (!$existing_session) {
+    public function start($request, $existing_session=null) {
+        if ($existing_session === null) {
+            $existing_session = $this->existing;
+        }
+        if (!$existing_session) {
+            /* new login: nothing on disk yet, establish an empty active session */
+            if (!$this->session_key) {
+                $this->session_key = $this->new_key();
+            }
+            $this->data = [];
+            $this->active = true;
+            $this->write_cookie($request);
             return;
         }
         $file = $this->session_file($this->session_key);
-        if (!is_readable($file)) {
+        if ($file === false || !is_readable($file)) {
+            $this->dbg('no readable session file for this key');
             $this->active = false;
             return;
         }
@@ -251,11 +324,20 @@ class Custom_Session extends Hm_PHP_Session {
      * @return void
      */
     public function end() {
-        // return parent::end();
         if ($this->active && !$this->session_closed) {
             $this->write_locked();
         }
         $this->active = false;
+    }
+
+    /**
+     * Write session data out without ending the session, so a long running
+     * request does not hold the file lock. Mirrors Hm_PHP_Session::close_early().
+     * @return void
+     */
+    public function close_early() {
+        $this->session_closed = true;
+        $this->write_locked();
     }
 
     /**
@@ -264,10 +346,18 @@ class Custom_Session extends Hm_PHP_Session {
      * @return void
      */
     public function destroy($request) {
-        // return parent::destroy($request);
-        @unlink($this->session_file($this->session_key));
+        if (function_exists('delete_uploaded_files')) {
+            delete_uploaded_files($this);
+        }
+        $file = $this->session_file($this->session_key);
+        if ($file !== false) {
+            @unlink($file);
+        }
         $this->delete_cookie($request, $this->cname);
         $this->delete_cookie($request, 'hm_id');
+        $this->delete_cookie($request, 'hm_reload_folders');
+        $this->delete_cookie($request, 'hm_msgs');
+        $this->data = [];
         $this->active = false;
     }
 
@@ -291,13 +381,28 @@ class Custom_Auth extends Hm_Auth_DB {
     private $ssoSecret;
     private $ssoTimeout;
     private $ssoAlgorithm;
-    
-    public function __construct() {
-        parent::__construct();
+    private $ssoDelimiter;
+    private $authType;
+
+    /**
+     * Hm_Auth::__construct() requires the site config, so it must be accepted
+     * and forwarded here or instantiating this class is a fatal error.
+     * @param object $config site config
+     */
+    public function __construct($config) {
+        parent::__construct($config);
 
         $this->ssoSecret = getenv('CYPHT_SSO_SECRET') ?: '';
         $this->ssoTimeout = (int) (getenv('CYPHT_SSO_TIMEOUT') ?: 60);
-        $this->ssoAlgorithm = getenv('CYPHT_SSO_ALGORITHM') ?: 'sha256';
+        $this->ssoDelimiter = getenv('CYPHT_SSO_DELIMITER') ?: '|';
+        $this->authType = strtolower(getenv('CYPHT_AUTH_TYPE') ?: 'db');
+
+        $algorithm = strtolower(getenv('CYPHT_SSO_ALGORITHM') ?: 'sha256');
+        if (!in_array($algorithm, hash_hmac_algos(), true)) {
+            Hm_Debug::add(sprintf('Unsupported CYPHT_SSO_ALGORITHM "%s", falling back to sha256', $algorithm));
+            $algorithm = 'sha256';
+        }
+        $this->ssoAlgorithm = $algorithm;
     }
 
     /**
@@ -307,30 +412,41 @@ class Custom_Auth extends Hm_Auth_DB {
      * @return bool true if the user is authenticated, false otherwise
      */
     public function check_credentials($user, $pass) {
-        $authType = getenv('CYPHT_AUTH_TYPE') ?: 'db';
-        
-        if ($authType === 'sso') {
+        if ($this->authType === 'sso') {
             return $this->check_sso($user, $pass);
         }
-    
+
         return parent::check_credentials($user, $pass);
     }
 
+    /**
+     * Validate an HMAC token minted by the host application. The token is passed
+     * in the password field as "<timestamp>.<signature>", where the signature is
+     * hash_hmac(algo, username <delimiter> timestamp, shared secret).
+     * @param string $user username
+     * @param string $pass SSO token
+     * @return bool
+     */
     private function check_sso($user, $pass) {
-        if ($this->ssoSecret === '' || strpos($pass, '.') === false) {
+        if ($this->ssoSecret === '' || !is_string($pass) || strpos($pass, '.') === false) {
             return false;
         }
-        
+
         list($timestamp, $signature) = explode('.', $pass, 2);
-        if (!ctype_digit($timestamp)) {
+        if (!ctype_digit($timestamp) || $signature === '') {
             return false;
         }
-        
+
         if (abs(time() - (int) $timestamp) > $this->ssoTimeout) {
+            Hm_Debug::add('SSO token outside the allowed time window');
             return false;
         }
-        
-        $expected = hash_hmac($this->ssoAlgorithm, $user . '|' . $timestamp, $this->ssoSecret);
+
+        $expected = hash_hmac(
+            $this->ssoAlgorithm,
+            $user . $this->ssoDelimiter . $timestamp,
+            $this->ssoSecret
+        );
         return hash_equals($expected, $signature);
     }
 }
@@ -369,6 +485,16 @@ class Custom_User_Config extends Hm_Config {
         $this->entityField = getenv('CYPHT_USER_ENTITY_FIELD') ?: '';
     }
     
+    /**
+     * This backend encrypts with CYPHT_CONFIG_ENCRYPTION_SECRET rather than the
+     * user's password, so saving needs no user supplied key. Core's save flow
+     * re-authenticates to obtain that key; under token auth it never can.
+     * @return bool
+     */
+    public function save_needs_password() {
+        return false;
+    }
+
     private function get_path($username) {
         $dir = rtrim((string) $this->site_config->get('user_settings_dir', false), '/\\');
         $safe = preg_replace('/[^a-zA-Z0-9_.@-]/', '_', (string) $username);
@@ -520,14 +646,7 @@ class Custom_User_Config extends Hm_Config {
         $this->username = $username;
         $this->config = $data;
         $this->set_tz();
-        if (!$username) {
-            return;
-        }
-        $this->dirty = true;
-        if (!$this->flush_registered) {
-            $this->flush_registered = true;
-            register_shutdown_function(array($this, 'flush_pending'));
-        }
+        $this->mark_dirty();
     }
 
     public function flush_pending() {
@@ -583,6 +702,30 @@ class Custom_User_Config extends Hm_Config {
 
     public function set($name, $value) {
         $this->config[$name] = $value;
+        $this->mark_dirty();
+    }
+
+    /**
+     * Reset to defaults and persist. 
+     * @return void
+     */
+    public function reset_factory() {
+        $this->config = array(
+            'version' => $this->config['version'] ?? null,
+            'feeds' => $this->config['feeds'] ?? array(),
+            'imap_servers' => $this->config['imap_servers'] ?? array(),
+            'smtp_servers' => $this->config['smtp_servers'] ?? array()
+        );
+        if ($this->username) {
+            $this->save($this->username);
+        }
+    }
+
+    /**
+     * Flag pending changes and arrange for a single deferred write at shutdown
+     * @return void
+     */
+    private function mark_dirty() {
         if (!$this->username) {
             return;
         }
