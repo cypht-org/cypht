@@ -30,22 +30,24 @@ class Hm_Handler_disable_servers_page extends Hm_Handler_Module {
  * Embedded deployments: logout does not exist.
  *
  * Login is automatic and owned by the host application, so hide_logout keeps the
- * button out of the UI and this handler makes sure the route cannot end the session
- * either - otherwise a user who reaches ?page=logout directly would be logged out of
- * Cypht while still logged into the host app. The host ends the session on its own
- * logout by calling cypht_logout().
+ * button out of the UI and this handler makes sure the route cannot end the session either
  *
  * Registered via replace_module('handler', 'logout', 'site_logout') in setup.php.
  * @subpackage site/handler
  */
 class Hm_Handler_site_logout extends Hm_Handler_logout {
     public function process() {
-        if ($this->config->get('hide_logout', false)) {
-            Hm_Debug::add('Logout is disabled, ignoring logout request', 'info');
-            Hm_Dispatch::page_redirect($this->build_page_url('home'));
+        if (!$this->config->get('hide_logout', false)) {
+            parent::process();
             return;
         }
-        parent::process();
+        if ($this->page !== 'logout'
+            && !array_key_exists('logout', $this->request->post)
+            && !array_key_exists('save_and_logout', $this->request->post)) {
+            return;
+        }
+        Hm_Debug::add('Logout is disabled, ignoring logout request', 'info');
+        Hm_Dispatch::page_redirect($this->build_page_url('home'));
     }
 }
 
