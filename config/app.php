@@ -211,12 +211,20 @@ return [
     |
     | Valid values for this setting:
     | file    Store user settings in the filesystem
-    | DB      Store user settings in a database
-    | custom  Store user settings via custom implementation. Specify class name
-    |      after colon, e.g. custom:Custom_User_Config
+    | DB      Store user settings in a database (case insensitive, "db" also works)
+    | custom  Store user settings via custom implementation. The class can be named
+    |      inline after a colon, e.g. custom:Custom_User_Config, or left off and set
+    |      with user_config_class below.
     */
 
     'user_config_type' => env('USER_CONFIG_TYPE', 'file'),
+
+    /*
+    | Class used when user_config_type is "custom" without an inline class name.
+    | Defaults to Custom_User_Config from the site module set.
+    */
+
+    'user_config_class' => env('USER_CONFIG_CLASS', 'Custom_User_Config'),
 
     /*
     | -----------------
@@ -300,6 +308,29 @@ return [
     |
     */
     'cookie_path' => env('COOKIE_PATH'),
+
+    /*
+    | ----------------
+    | Cookie SameSite
+    | ----------------
+    |
+    | SameSite policy for the session cookies. Leave blank to keep Cypht's defaults
+    | (Strict for the session cookie, Lax for hm_id). Those defaults are correct for
+    | a standalone install and for a library style embed, where the host application
+    | boots Cypht in-process via modules/api_login/api.php and Cypht is served from
+    | the same site.
+    |
+    | The axis that matters is same-origin vs cross-origin, not whether an iframe is
+    | involved. Set this to "None" only when Cypht is served from a different site
+    | than the page the user is viewing: the browser treats that as a cross-site
+    | context and will not send a Strict cookie, so the user logs in and immediately
+    | appears logged out. Browsers only honour "None" over HTTPS.
+    |
+    | Applies to both the normal login and the api_login/cypht_login() paths.
+    | Valid values: Strict, Lax, None.
+    |
+    */
+    'cookie_samesite' => env('COOKIE_SAMESITE'),
 
     /*
     | ---------------------
@@ -585,6 +616,24 @@ return [
     | BE ENCRYPTED WITH THIS ENABLED
     */
     'single_server_mode' => env('SINGLE_SERVER_MODE', false),
+
+    /*
+    | --------------
+    | Disable Logout
+    | --------------
+    |
+    | Turn logout off completely. For embedded or kiosk deployments where login is
+    | automatic and owned by the host application, there is no meaningful "log out
+    | of Cypht" - ending the session on its own would just leave the user signed
+    | into the host app but not its mailbox.
+    |
+    | When true this does three things: the logout button is not rendered, the
+    | ?page=logout route stops destroying the session and redirects home instead,
+    | and the idle timer stops auto-logging users out. The host application ends
+    | the session by calling cypht_logout() from modules/api_login/api.php in its
+    | own logout hook.
+    */
+    'hide_logout' => env('CYPHT_HIDE_LOGOUT', false),
 
     /*
     | -------------------

@@ -723,6 +723,7 @@ function profiles_by_smtp_id($profiles, $id) {
 /**
  * @subpackage cores/functions
  */
+if (!hm_exists('get_special_folders')) {
 function get_special_folders($mod, $id) {
     $server = Hm_IMAP_List::dump($id);
     if (!$server) {
@@ -742,7 +743,7 @@ function get_special_folders($mod, $id) {
         return $specials[$id];
     }
     return array();
-}
+}}
 
 /**
  * @subpackage core/functions
@@ -758,6 +759,7 @@ function check_file_upload($request, $key) {
     return true;
 }}
 
+if (!hm_exists('privacy_setting_callback')) {
 function privacy_setting_callback($val, $key, $mod) {
     $setting = Hm_Output_privacy_settings::$settings[$key];
     $key .= '_setting';
@@ -784,7 +786,7 @@ function privacy_setting_callback($val, $key, $mod) {
         return $new_value;
     }
     return $val;
-}
+}}
 
 if (!hm_exists('get_scheduled_date')) {
     function get_scheduled_date($format, $only_label = false) {
@@ -897,6 +899,7 @@ if (!hm_exists('parse_delayed_header')) {
     }
 }
 
+if (!hm_exists('getSettingsSectionOutput')) {
 function getSettingsSectionOutput($section, $sectionLabel, $sectionIcon, $settingsOptions, $userSettings) {
     $res = '<tr><td data-target=".'. $section .'_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
         '<i class="bi bi-'. $sectionIcon . ' fs-5 me-2"></i>'. $sectionLabel .'</td></tr>';
@@ -919,10 +922,11 @@ function getSettingsSectionOutput($section, $sectionLabel, $sectionIcon, $settin
         "</tr>";
     }
     return $res;
-}
+}}
 
+if (!hm_exists('isPageConfigured')) {
 function isPageConfigured($page) {
     $pages = array_keys(Hm_Handler_Modules::dump());
     return in_array($page, $pages);
-}
+}}
 
