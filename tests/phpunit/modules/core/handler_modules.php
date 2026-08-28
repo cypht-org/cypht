@@ -746,11 +746,26 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
      */
     public function test_logout_handler_outputs_cancel_url_when_prompt_is_set() {
         $test = new Handler_Test('logout', 'core');
-        $back_query = base64_encode(serialize(array('page' => 'home')));
+        $back_query = encode_logout_back_query(array('page' => 'home'));
         $test->get = array('prompt' => '1', 'back_query' => $back_query);
         $res = $test->run();
         $this->assertNotEmpty($res->handler_response['cancel_logout_url']);
         $this->assertStringContainsString('page=home', $res->handler_response['cancel_logout_url']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_logout_handler_ignores_php_serialized_back_query() {
+        $test = new Handler_Test('logout', 'core');
+        $test->get = array(
+            'prompt' => '1',
+            'back_query' => base64_encode('O:8:"stdClass":0:{}'),
+        );
+        $res = $test->run();
+        $this->assertArrayHasKey('cancel_logout_url', $res->handler_response);
+        $this->assertSame('?', $res->handler_response['cancel_logout_url']);
     }
 
     /**
