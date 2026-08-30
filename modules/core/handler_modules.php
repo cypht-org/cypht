@@ -1271,9 +1271,8 @@ class Hm_Handler_version_upgrade_checker extends Hm_Handler_Module {
 
     public function process()
     {
-        if ($this->session->get('latest_version')) {
-            $latestVersion = $this->session->get('latest_version');
-        } else {
+        $latestVersion = $this->session->get('latest_version') ?: null;
+        if (! $latestVersion) {
             $api = new Hm_API_Curl();
             $data = $api->command('https://api.github.com/repos/cypht-org/cypht/releases');
 
@@ -1285,7 +1284,7 @@ class Hm_Handler_version_upgrade_checker extends Hm_Handler_Module {
             }
         }
 
-        if (version_compare(CYPHT_VERSION, $latestVersion, '<')) {
+        if ($latestVersion && version_compare(CYPHT_VERSION, $latestVersion, '<')) {
             $needUpgrade = true;
         } else {
             $needUpgrade = false;
