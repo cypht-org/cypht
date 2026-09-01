@@ -41,7 +41,6 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
             } else {
                 $this->out('test_type', 'ANYOF');
             }
-            $client->close();
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
@@ -109,7 +108,6 @@ class Hm_Handler_sieve_edit_script extends Hm_Handler_Module {
         try {
             $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
             $script = $client->getScript($this->request->post['sieve_script_name']);
-            $client->close();
             $this->out('script', $script);
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
@@ -158,7 +156,6 @@ class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
             $main_script = generate_main_script($scripts);
             save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
-            $client->close();
             Hm_Msgs::add('Script removed');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
@@ -198,7 +195,6 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
 
             save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
-            $client->close();
             Hm_Msgs::add('Script removed');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
@@ -277,7 +273,6 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
             );
             save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
-            $client->close();
             $this->out('reload_page', true);
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
@@ -439,7 +434,6 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
             );
             save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
-            $client->close();
 
             if ($unblock_sender) {
                 Hm_Msgs::add('Sender Unblocked');
@@ -610,7 +604,6 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             );
             save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
-            $client->close();
 
             if (isset($this->request->post['change_behavior'])) {
                 Hm_Msgs::add($scope_title . ' Behavior Changed');
@@ -1032,7 +1025,6 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
 
             save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
-            $client->close();
             Hm_Msgs::add('Filter saved');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
@@ -1071,7 +1063,6 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
                 $script_name,
                 $this->request->post['script']
             );
-            $client->close();
             Hm_Msgs::add('Script saved');
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
@@ -1535,7 +1526,6 @@ class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
             $main_script = generate_main_script($scripts);
             save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
-            $client->close();
 
             Hm_Msgs::add("Script $state");
         } catch (Exception $e) {
@@ -1732,7 +1722,6 @@ class Hm_Handler_load_custom_actions extends Hm_Handler_Module
                     ];
                 }
             }
-            $client->close();
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
         }
@@ -1827,7 +1816,6 @@ class Hm_Handler_sieve_remame_folder extends Hm_Handler_Module
                             $script_parsed
                         );
                     }
-                    $client->close();
                     Hm_Msgs::add('Sieve filters using the folder were also updated to use the new folder name.', 'info');
                 } catch (Exception $e) {
                     Hm_Msgs::add("Failed to rename folder in sieve scripts", "warning");
