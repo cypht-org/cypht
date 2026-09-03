@@ -170,10 +170,23 @@ var Hm_Ajax_Request = function() { return {
         Hm_Ajax.active_requests.push(this);
 
         var data = '';
+
+        if (hm_extra_ajax_request_data()) {
+            if (!config.data) {
+                config.data = [];
+            }
+            
+            const extraData = hm_extra_ajax_request_data().split(',');
+            extraData.forEach((item) => {
+                const [key, value] = item.split(':');
+                config.data.push({name: key, value: value});
+            })
+        }
+
         if (config.data) {
             data = this.format_xhr_data(config.data);
         }
-        const url = new URL(window.location.href);
+        const url = new URL(hm_custom_ajax_request_endpoint() || window.location.href);
         if (window.location.next) {
             url.search = window.location.next.split('?')[1];
         }
