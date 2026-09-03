@@ -135,7 +135,7 @@ class Hm_Output_create_account_link extends Hm_Output_Module {
         else {
             $res = '<li class="menu_create_account"><a class="unread_link" href="' . $this->build_page_url('accounts') . '">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<i class="bi bi-europe-africa account_icon"></i> ';
+                $res .= '<i class="bi bi-people-fill menu-icon"></i> ';
             }
             $res .= $this->trans('Accounts').'</a></li>';
         }
