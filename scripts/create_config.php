@@ -7,13 +7,11 @@ if (mb_strtolower(php_sapi_name()) !== 'cli') {
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
 define('WEB_ROOT', '');
+require APP_PATH.'lib/define_vendor_path.php';
 
 /* get the framework */
-require APP_PATH.'lib/framework.php';
-
-Hm_Functions::define_vendor_path();
-
 require VENDOR_PATH.'autoload.php';
+require APP_PATH.'lib/framework.php';
 
 $environment = Hm_Environment::getInstance();
 $environment->load();

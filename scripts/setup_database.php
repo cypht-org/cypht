@@ -4,12 +4,10 @@
 
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
 define('MIGRATIONS_PATH', APP_PATH.'database/migrations');
-
-require APP_PATH.'lib/framework.php';
-
-Hm_Functions::define_vendor_path();
+require APP_PATH.'lib/define_vendor_path.php';
 
 require VENDOR_PATH.'autoload.php';
+require APP_PATH.'lib/framework.php';
 
 // Allow specifying environment file via --env argument
 // Usage: php setup_database.php --env=.env.test

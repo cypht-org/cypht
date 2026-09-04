@@ -250,17 +250,6 @@ if (!class_exists('Hm_Functions')) {
         public static function stream_socket_enable_crypto($socket, $type) {
             return stream_socket_enable_crypto($socket, true, $type);
         }
-
-        public static function define_vendor_path() {
-            if (defined('VENDOR_PATH') && file_exists(VENDOR_PATH)) { // Could have already been defined in integrating app code.
-                return;
-            } elseif (file_exists(APP_PATH.'vendor/')) {
-                define('VENDOR_PATH', APP_PATH.'vendor/');
-            } else {
-                // When installed via composer, the vendor path is generally two levels up (jason-munro/cypht) from APP_PATH.
-                define('VENDOR_PATH', APP_PATH . '../../');
-            }
-        }
     }
 }
 

@@ -21,16 +21,14 @@ define('SITE_ID', '');
 define('JS_HASH', '');
 define('CSS_HASH', '');
 define('ASSETS_PATH', APP_PATH.'assets/');
+require APP_PATH.'lib/define_vendor_path.php';
 
 /* don't let anything output content until we are ready */
 ob_start();
 
 /* get includes */
-require APP_PATH.'lib/framework.php';
-
-Hm_Functions::define_vendor_path();
-
 require VENDOR_PATH.'autoload.php';
+require APP_PATH.'lib/framework.php';
 
 $environment = Hm_Environment::getInstance();
 $environment->load();

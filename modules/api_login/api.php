@@ -8,11 +8,10 @@
 /* Constants */
 define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
 define('WEB_ROOT', '');
+require APP_PATH.'lib/define_vendor_path.php';
 
 /* Init the framework */
 require_once APP_PATH.'lib/framework.php';
-
-Hm_Functions::define_vendor_path();
 
 require_once VENDOR_PATH.'autoload.php';
 
