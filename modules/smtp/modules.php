@@ -264,9 +264,10 @@ class Hm_Handler_get_test_chunk extends Hm_Handler_Module {
         $resumable_identifier = trim(basename((string) ($this->request->get['resumableIdentifier'] ?? '')));
         $resumable_filename = trim(basename((string) ($this->request->get['resumableFilename'] ?? '')));
 
-        $expected_dir = $this->config->get('attachment_dir').'/chunks-'.$resumable_identifier;
-        $chunk_file = $expected_dir.'/'.$resumable_filename.'.part'.$this->request->get['resumableChunkNumber'];
-        if ($resumable_identifier !== '' && $resumable_filename !== ''
+        $user_dir = user_attachment_dir($this->config->get('attachment_dir'), $this->session->get('username', false));
+        $expected_dir = $user_dir ? $user_dir.DIRECTORY_SEPARATOR.'chunks-'.$resumable_identifier : '';
+        $chunk_file = $expected_dir !== '' ? $expected_dir.DIRECTORY_SEPARATOR.$resumable_filename.'.part'.$this->request->get['resumableChunkNumber'] : '';
+        if ($user_dir && $resumable_identifier !== '' && $resumable_filename !== ''
                 && dirname($chunk_file) === $expected_dir && file_exists($chunk_file)) {
             header("HTTP/1.0 200 Ok");
         } else {
@@ -283,11 +284,14 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
         $from = $this->request->get['draft_smtp'];
         $filepath = $this->config->get('attachment_dir');
 
-        $userpath = md5($this->session->get('username', false));
+        $user_dir = user_attachment_dir($filepath, $this->session->get('username', false));
+        if (!$user_dir) {
+            Hm_Msgs::add('Invalid upload request', 'danger');
+            return;
+        }
 
-        // create the attachment folder for the profile to avoid
-        if (!is_dir($filepath.'/'.$userpath)) {
-            mkdir($filepath.'/'.$userpath, 0777, true);
+        if (!is_dir($user_dir)) {
+            mkdir($user_dir, 0700, true);
         }
 
         $resumable_identifier = trim(basename((string) ($this->request->get['resumableIdentifier'] ?? '')));
@@ -299,8 +303,8 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
                 continue;
             }
 
-            $temp_dir = $filepath.'/'.$userpath.'/chunks-'.$resumable_identifier;
-            $dest_file = $temp_dir.'/'.$resumable_filename.'.part'.$this->request->get['resumableChunkNumber'];
+            $temp_dir = $user_dir.DIRECTORY_SEPARATOR.'chunks-'.$resumable_identifier;
+            $dest_file = $temp_dir.DIRECTORY_SEPARATOR.$resumable_filename.'.part'.$this->request->get['resumableChunkNumber'];
 
             if ($resumable_identifier === '' || $resumable_filename === ''
                     || dirname($dest_file) !== $temp_dir) {
@@ -308,9 +312,8 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
                 continue;
             }
 
-            // create the temporary directory
             if (!is_dir($temp_dir)) {
-                mkdir($temp_dir, 0777, true);
+                mkdir($temp_dir, 0700, true);
             }
 
             // move the temporary file
@@ -904,7 +907,9 @@ class Hm_Handler_process_enable_attachment_reminder_setting extends Hm_Handler_M
  */
 class Hm_Handler_attachment_dir extends Hm_Handler_Module {
     public function process() {
-        $this->out('attachment_dir', $this->config->get('attachment_dir'));
+        $attachment_dir = $this->config->get('attachment_dir');
+        $this->out('attachment_dir', $attachment_dir);
+        $this->out('user_attachment_dir', user_attachment_dir($attachment_dir, $this->session->get('username', false)));
     }
 }
 
@@ -913,17 +918,9 @@ class Hm_Handler_attachment_dir extends Hm_Handler_Module {
  */
 class Hm_Handler_clear_attachment_chunks extends Hm_Handler_Module {
     public function process() {
-        $attachment_dir = $this->config->get('attachment_dir');
-        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($attachment_dir));
-        foreach ($rii as $file) {
-            if ($file->getFilename() == '.' || $file->getFilename() == '..') {
-                continue;
-            }
-            if (is_dir($file->getPath()) && $file->getPath() != $attachment_dir){
-                if (mb_strpos($file->getPath(), 'chunks-') !== False) {
-                    rrmdir($file->getPath());
-                }
-            }
+        $user_dir = user_attachment_dir($this->config->get('attachment_dir'), $this->session->get('username', false));
+        foreach (user_attachment_chunk_dirs($user_dir) as $chunk_dir) {
+            rrmdir($chunk_dir);
         }
         Hm_Msgs::add('Attachment chunks cleaned');
     }
@@ -961,27 +958,7 @@ class Hm_Output_enable_compose_delivery_receipt_setting extends Hm_Output_Module
  */
 class Hm_Output_attachment_setting extends Hm_Output_Module {
     protected function output() {
-        $size_in_kbs = 0;
-        $num_chunks = 0;
-        if (!is_dir($this->get('attachment_dir'))) {
-            return;
-        }
-        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->get('attachment_dir')));
-        $files = array();
-
-        foreach ($rii as $file) {
-            if ($file->getFilename() == '.' || $file->getFilename() == '..') {
-                continue;
-            }
-            if ($file->isDir()){
-                continue;
-            }
-            if (mb_strpos($file->getPathname(), '.part') !== False) {
-                $num_chunks++;
-                $size_in_kbs += filesize($file->getPathname());
-                $files[] = $file->getPathname();
-            }
-        }
+        list($num_chunks, $size_in_kbs) = count_user_attachment_chunk_parts($this->get('user_attachment_dir'));
         if ($size_in_kbs > 0) {
             $size_in_kbs = round(($size_in_kbs / 1024), 2);
         }
@@ -2076,6 +2053,83 @@ function parse_uploaded_files_list($raw) {
         $safe[] = $name;
     }
     return $safe;
+}}
+
+/**
+ * Per-user attachment directory: attachment_dir/md5(username).
+ * Returns false if the username or base path is missing, or the path would escape the base.
+ * @subpackage smtp/functions
+ * @param string $attachment_dir
+ * @param mixed $username
+ * @return string|false
+ */
+if (!hm_exists('user_attachment_dir')) {
+function user_attachment_dir($attachment_dir, $username) {
+    if (!is_string($username) || $username === '' || !is_string($attachment_dir) || $attachment_dir === '') {
+        return false;
+    }
+    $base = rtrim($attachment_dir, '/\\');
+    if ($base === '') {
+        return false;
+    }
+    $dir = $base.DIRECTORY_SEPARATOR.md5($username);
+    if (dirname($dir) !== $base) {
+        return false;
+    }
+    return $dir;
+}}
+
+/**
+ * Immediate chunk directories under a per-user attachment folder.
+ * @subpackage smtp/functions
+ * @param string|false $user_dir
+ * @return array
+ */
+if (!hm_exists('user_attachment_chunk_dirs')) {
+function user_attachment_chunk_dirs($user_dir) {
+    $dirs = [];
+    if (!is_string($user_dir) || $user_dir === '' || !is_dir($user_dir)) {
+        return $dirs;
+    }
+    $user_dir = rtrim($user_dir, '/\\');
+    $entries = @scandir($user_dir);
+    if (!is_array($entries)) {
+        return $dirs;
+    }
+    foreach ($entries as $entry) {
+        if ($entry === '.' || $entry === '..' || !str_starts_with($entry, 'chunks-')) {
+            continue;
+        }
+        $path = $user_dir.DIRECTORY_SEPARATOR.$entry;
+        if (is_dir($path) && dirname($path) === $user_dir) {
+            $dirs[] = $path;
+        }
+    }
+    return $dirs;
+}}
+
+/**
+ * Count in-progress .part files for one user only.
+ * @subpackage smtp/functions
+ * @param string|false $user_dir
+ * @return array{0:int,1:int}
+ */
+if (!hm_exists('count_user_attachment_chunk_parts')) {
+function count_user_attachment_chunk_parts($user_dir) {
+    $num_chunks = 0;
+    $size_in_bytes = 0;
+    foreach (user_attachment_chunk_dirs($user_dir) as $chunk_dir) {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($chunk_dir, FilesystemIterator::SKIP_DOTS)
+        );
+        foreach ($iterator as $file) {
+            if ($file->isFile() && mb_strpos($file->getFilename(), '.part') !== false) {
+                $num_chunks++;
+                $size_in_bytes += $file->getSize();
+            }
+        }
+    }
+    return [$num_chunks, $size_in_bytes];
 }}
 
 /**
