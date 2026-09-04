@@ -437,6 +437,7 @@ return array(
     'Added repository' => false,
     'Added server!' => false,
     'Are you sure you want to delete this server?' => false,
+    'Are you sure you want to delete the account "%s"? This cannot be undone.' => false,
     'Could not find that repository/owner combination at github.com' => false,
     'Disable prompts when deleting' => false,
     'Enable keyboard shortcuts' => false,
