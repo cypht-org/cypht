@@ -175,6 +175,9 @@
     <testsuite name="modules_ldap_contacts">
       <file>./modules/ldap_contacts/ldap_contacts.php</file>
     </testsuite>
+    <testsuite name="modules_smtp">
+      <file>./modules/smtp/attachment_chunks.php</file>
+    </testsuite>
     <testsuite name="mta_sts">
       <file>./mta_sts.php</file>
     </testsuite>
