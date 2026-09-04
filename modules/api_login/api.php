@@ -11,9 +11,8 @@ define('WEB_ROOT', '');
 require APP_PATH.'lib/define_vendor_path.php';
 
 /* Init the framework */
-require_once APP_PATH.'lib/framework.php';
-
 require_once VENDOR_PATH.'autoload.php';
+require_once APP_PATH.'lib/framework.php';
 
 $environment = Hm_Environment::getInstance();
 $environment->load();

@@ -16,9 +16,8 @@ require APP_PATH.'lib/define_vendor_path.php';
 chdir(APP_PATH);
 
 /* get the framework */
-require APP_PATH.'lib/framework.php';
-
 require VENDOR_PATH.'autoload.php';
+require APP_PATH.'lib/framework.php';
 
 $environment = Hm_Environment::getInstance();
 $environment->load();
