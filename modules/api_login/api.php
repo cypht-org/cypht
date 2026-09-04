@@ -7,8 +7,8 @@
 
 /* Constants */
 define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
-define('VENDOR_PATH', APP_PATH.'vendor/');
 define('WEB_ROOT', '');
+require APP_PATH.'lib/define_vendor_path.php';
 
 /* Init the framework */
 require_once VENDOR_PATH.'autoload.php';

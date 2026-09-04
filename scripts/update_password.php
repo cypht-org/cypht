@@ -38,8 +38,8 @@ if (is_array($argv)) {
 
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
-define('VENDOR_PATH', APP_PATH.'vendor/');
 define('WEB_ROOT', '');
+require APP_PATH.'lib/define_vendor_path.php';
 
 /* get the framework */
 require VENDOR_PATH.'autoload.php';
