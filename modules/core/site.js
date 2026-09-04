@@ -186,10 +186,25 @@ var Hm_Ajax_Request = function() { return {
         if (config.data) {
             data = this.format_xhr_data(config.data);
         }
-        const url = new URL(hm_custom_ajax_request_endpoint() || window.location.href);
-        if (window.location.next) {
-            url.search = window.location.next.split('?')[1];
+
+        let url;
+        if (hm_custom_ajax_request_endpoint()) {
+            url = new URL(hm_custom_ajax_request_endpoint());
+            const queryParams = new URLSearchParams(window.location.search);
+            for (const [key, value] of queryParams.entries()) {
+                url.searchParams.set(key, value);
+            }
+        } else {
+            url = new URL(window.location.href);
         }
+
+        if (window.location.next) {
+            const nextQueryParams = new URLSearchParams(window.location.next.split('?')[1]);
+            for (const [key, value] of nextQueryParams.entries()) {
+                url.searchParams.set(key, value);
+            }
+        }
+
         for (const param of url.searchParams) {
             const configItem = config.data.find(item => item.name === param[0]);
             if (configItem) {
