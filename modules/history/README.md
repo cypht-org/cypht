@@ -1,6 +1,3 @@
 ## History
 
-This module set provides a history of all the content a user has access since
-they last logged in to Cypht. The history itself is entirely saved in Javascript,
-and only records content views like reading an E-mail message, github notice, feed
-item, etc.
+This module tracks and displays a history of all messages viewed by a user during their current session. It records content views such as reading emails, GitHub notices, feed items, etc. The history is stored server-side in the user's session and persists for the duration of their login.
