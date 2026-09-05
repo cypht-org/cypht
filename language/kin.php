@@ -571,7 +571,7 @@ return array(
     'terms: %d' => 'amagambo: %d',
     'sources' => 'amasoko',
     'sources: %d' => 'amasoko: %d',
-    'targets' => 'intego',
+    'target' => 'intego',
     'Targets' => 'Intego',
     'targets: %d' => 'intego: %d',
     'Body' => 'Ubutumwa',
