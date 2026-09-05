@@ -556,7 +556,7 @@ return array(
     'STARTTLS or unencrypted' => 'STARTTLS cyangwa bitarimo guhishurwa',
     'Sent Folder' => 'Dosiye yoherejwe',
     'Settings updated' => 'Imiterere yavuguruwe',
-    'So Alone' => 'Wonyine cyane',
+    'So Alone' => 'Wenyine cyane',
     'Stay logged in' => 'Guma winjiye',
     'Submit' => 'Ohereza',
     'Trash Folder' => 'Dosiye y\'ibisibwa',
