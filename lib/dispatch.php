@@ -165,8 +165,9 @@ class Hm_Dispatch {
     /**
      * Setup object needed to process a request
      * @param object $config site configuration
+     * @param bool $do_it set to false to not process the request immediately
      */
-    public function __construct($config) {
+    public function __construct($config, $do_it = true) {
 
         /* get the site config defined in the config/app.php file */
         $this->site_config = $config;
@@ -185,7 +186,9 @@ class Hm_Dispatch {
         $this->request = new Hm_Request($this->module_exec->filters, $config);
 
         /* do it */
-        $this->process_request();
+        if ($do_it) {
+            $this->process_request();
+        }
     }
 
     /**
@@ -344,6 +347,68 @@ class Hm_Dispatch {
         }
         $this->module_exec->page = $this->page;
         Hm_Debug::add('Page ID: '.$this->page, 'info');
+    }
+
+    /**
+     * Process a handler module in an isolated context
+     * @param string $module_name module name to process
+     * @param array $request_get GET request data to pass to the handler module
+     * @param array $request_post POST request data to pass to the handler module
+     * @return array output from the module
+     */
+    public function process_handler_module($module_name, $request_get = [], $request_post = []) {
+        $this->module_exec->load_module_set_files(['core', Hm_Handler_Modules::get_module_source($module_name)], $this->site_config->get_modules());
+
+        $this->request->post = $request_post;
+        $this->request->get = $request_get;
+
+        $res = $this->module_exec->run_handler_module([], [], $module_name, [], $this->session);
+
+        return $res[0];
+    }
+
+    /**
+     * Process an output module in an isolated context
+     * @param string $module_name module name to process
+     * @param array $input data to pass to the output module
+     * @return array output from the module
+     */
+    public function process_output_module($module_name, $input) {
+        $this->module_exec->load_module_set_files(
+            ['core', Hm_Output_Modules::get_module_source($module_name)],
+            $this->site_config->get_modules()
+        );
+
+        $res = $this->module_exec->run_output_module(
+            $input,
+            [],
+            $module_name,
+            [],
+            $this->session,
+            $this->request->format,
+            $this->module_exec->get_current_language()
+        );
+
+        return $res[0];
+    }
+
+    /**
+     * Process many output modules with the same handler module as data source in an isolated context
+     * @param array $output_modules list of output modules to process
+     * @param string $handler_module module name to process
+     * @param array $request_get GET request data to pass to the handler module
+     * @param array $request_post POST request data to pass to the handler module
+     * @return array output from the modules
+     */
+    public function process_output_modules_with_handler($output_modules, $handler_module, $request_get = [], $request_post = []) {
+        $handler_output = $this->process_handler_module($handler_module, $request_get, $request_post);
+
+        $output = [];
+        foreach ($output_modules as $output_module) {
+            $output[$output_module] = $this->process_output_module($output_module, $handler_output);
+        }
+
+        return $output;
     }
 
     /**
