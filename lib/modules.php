@@ -333,6 +333,15 @@ trait Hm_Modules {
     public static function dump() {
         return self::$module_list;
     }
+
+    public static function get_module_source($module) {
+        foreach (self::$module_list as $page => $modules) {
+            if (array_key_exists($module, $modules)) {
+                return $modules[$module][0];
+            }
+        }
+        return false;
+    }
 }
 
 /**
