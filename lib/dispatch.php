@@ -357,10 +357,17 @@ class Hm_Dispatch {
      * @return array output from the module
      */
     public function process_handler_module($module_name, $request_get = [], $request_post = []) {
-        $this->module_exec->load_module_set_files(['core', Hm_Handler_Modules::get_module_source($module_name)], $this->site_config->get_modules());
+        // Define global constants if they are not already defined
+        Hm_Environment::getInstance()->define_default_constants($this->site_config);
+
+        $this->module_exec->load_module_set_files(['core', $this->get_module_source($module_name)], $this->site_config->get_modules());
 
         $this->request->post = $request_post;
         $this->request->get = $request_get;
+
+        $this->module_exec->request = $this->request;
+        $this->module_exec->session = $this->session;
+        $this->module_exec->cache = (new Hm_Cache_Setup($this->site_config, $this->session))->setup_cache();
 
         $res = $this->module_exec->run_handler_module([], [], $module_name, [], $this->session);
 
@@ -374,8 +381,11 @@ class Hm_Dispatch {
      * @return array output from the module
      */
     public function process_output_module($module_name, $input) {
+        // Define global constants if they are not already defined
+        Hm_Environment::getInstance()->define_default_constants($this->site_config);
+        
         $this->module_exec->load_module_set_files(
-            ['core', Hm_Output_Modules::get_module_source($module_name)],
+            ['core', $this->get_module_source($module_name)],
             $this->site_config->get_modules()
         );
 
@@ -390,6 +400,37 @@ class Hm_Dispatch {
         );
 
         return $res[0];
+    }
+
+    /**
+     * Get the source of a given module from the dynamically generated list through config/dynamic.php
+     * @param string $module_name module name to look up
+     * @return string|false module source or false if not found
+     */
+    private function get_module_source($module_name) {
+        $handlers = $this->site_config->get('handler_modules', []);
+        $outputs = $this->site_config->get('output_modules', []);
+        $all_modules = array_merge(array_merge(...array_values($handlers)), array_merge(...array_values($outputs)));
+
+        foreach ($all_modules as $module => $args) {
+            if ($module === $module_name) {
+                return $args[0];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Load the required module sets files. Useful when processing modules in an isolated context.
+     * @param array $module_sets list of module sets to load
+     * @return void
+     */
+    public function load_required_module_sets($module_sets) {
+        // Define global constants if they are not already defined
+        Hm_Environment::getInstance()->define_default_constants($this->site_config);
+        
+        $this->module_exec->load_module_set_files(['core', ...$module_sets], $this->site_config->get_modules());
     }
 
     /**
