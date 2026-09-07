@@ -60,5 +60,21 @@
         "post-update-cmd": "composer suggest",
         "post-package-install":"composer suggest",
         "post-install-cmd": "composer suggest"
+    },
+    "repositories": {
+        "tiki.org": {
+            "type": "composer",
+            "url": "https://composer.tiki.org",
+            "canonical": false,
+            "_comment": [
+                "-------------------------------------------------------------",
+                "IMPORTANT: php-sieve-manager is tempotarily preferred from composer.tiki.org",
+                "until the github repo issue is resolved.",
+                "-------------------------------------------------------------"
+            ],
+            "only": [
+                "henrique-borba/php-sieve-manager"
+            ]
+        }
     }
 }

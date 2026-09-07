@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ffbdf4b8fa2d474a70df7e5a590c539e",
+    "content-hash": "8b457d7d0df49583e8cc98cf672d4c3c",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -406,9 +406,9 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/php-sieve-manager/zipball/845e59954c5418db50f3c6a134eb587660331f6e",
+                "url": "https://composer.tiki.org/dist/henrique-borba/php-sieve-manager/henrique-borba-php-sieve-manager-845e59954c5418db50f3c6a134eb587660331f6e-zip-f98a2d.zip",
                 "reference": "845e59954c5418db50f3c6a134eb587660331f6e",
-                "shasum": ""
+                "shasum": "8c8f8ded1f38f0cd18bf5e13a42092a2a2f5d486"
             },
             "require": {
                 "php": ">=5.4"
@@ -419,7 +419,6 @@
                     "PhpSieveManager\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -439,8 +438,8 @@
                 },
                 {
                     "name": "Marc Laporte",
-                    "homepage": "https://MarcLaporte.com",
-                    "role": "Maintainer"
+                    "role": "Maintainer",
+                    "homepage": "https://MarcLaporte.com"
                 }
             ],
             "description": "A modern (started in 2022) PHP library for the ManageSieve protocol (RFC5804) to create/edit Sieve scripts (RFC5228). Used by Cypht Webmail.",
@@ -458,10 +457,10 @@
                 "sieve"
             ],
             "support": {
-                "chat": "https://gitter.im/cypht-org/community",
                 "issues": "https://github.com/cypht-org/php-sieve-manager/issues",
+                "wiki": "https://github.com/cypht-org/php-sieve-manager/wiki",
                 "source": "https://github.com/cypht-org/php-sieve-manager",
-                "wiki": "https://github.com/cypht-org/php-sieve-manager/wiki"
+                "chat": "https://gitter.im/cypht-org/community"
             },
             "time": "2025-03-25T17:14:17+00:00"
         },
@@ -2958,6 +2957,6 @@
         "ext-fileinfo": "*",
         "composer": "^2.0.0"
     },
-    "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
 }
