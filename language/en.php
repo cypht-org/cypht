@@ -258,6 +258,7 @@ return array(
     '%d year' => false,
     '%d years' => false,
     'English' => false,
+    'Kinyarwanda' => false,
     'German' => false,
     'Italian' => false,
     'Attachment' => false,

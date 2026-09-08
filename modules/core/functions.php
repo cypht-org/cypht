@@ -69,6 +69,7 @@ function interface_langs() {
         'az' => 'Azerbaijani',
         'zh-Hans' => 'Chinese Simplified',
         'zh-TW' => 'Traditional Chinese',
+        'rw' => 'Kinyarwanda',
     );
 }}
 
