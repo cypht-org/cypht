@@ -743,6 +743,8 @@ class Hm_Handler_default_page_data extends Hm_Handler_Module {
         $this->out('enabled_modules', $this->config->get_modules());
         $this->out('page_param_name', $this->config->get('page_param_name'));
         $this->out('append_url_query', $this->config->get('append_url_query'));
+        $this->out('custom_ajax_request_endpoint', $this->config->get('custom_ajax_request_endpoint'));
+        $this->out('extra_ajax_request_data', $this->config->get('extra_ajax_request_data'));
         if (!crypt_state($this->config)) {
             $this->out('single_server_mode', true);
         }
