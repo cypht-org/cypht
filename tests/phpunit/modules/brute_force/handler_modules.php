@@ -46,8 +46,8 @@ class Hm_Test_Brute_Force_Handler_Modules extends TestCase {
     // Hm_Brute_Force_Tracker unit tests
     // -------------------------------------------------------------------------
 
-    /** @runInSeparateProcess */
     /**
+     * @runInSeparateProcess
      * @dataProvider brute_force_policy_cases
      */
     public function test_make_key_returns_consistent_hash($case) {

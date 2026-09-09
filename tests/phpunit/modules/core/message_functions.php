@@ -18,8 +18,6 @@ class Hm_Test_Core_Message_Functions extends TestCase {
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
-     */
-    /**
      * @dataProvider external_resource_cases
      */
     public function test_sanitize_email_html_blocks_css_tracking($case) {

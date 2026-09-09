@@ -84,8 +84,6 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
-     */
-    /**
      * @dataProvider http_security_header_cases
      */
     public function test_http_headers($case) {
@@ -316,8 +314,6 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
-     */
-    /**
      * @dataProvider settings_persistence_cases
      */
     public function test_process_save_form($case) {

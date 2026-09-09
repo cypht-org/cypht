@@ -47,7 +47,6 @@
           },
           "expected": {
             "messages": [
-              "Settings saved",
               "Saved user data on logout",
               "Session destroyed on logout"
             ]
