@@ -32,9 +32,19 @@ remain ordinary tests unless the project has adopted them as requirements.
 6. Run the focused PHPUnit test and validate the JSON against
    [policy-cases.schema.json](policy-cases.schema.json).
 
-A case should describe the behavior in domain terms where possible. Test
-adapters may translate the normalized `input` and `expected` objects into
-HTTP requests, handler inputs, or other framework-specific values.
+Run the repository validator with:
+
+```bash
+php scripts/validate_policy_cases.php
+```
+
+The validator checks the JSON Schema, duplicate policy and case IDs, and that
+each test reference declared by a policy points to a PHPUnit class and method
+under `tests/`.
+
+A case should describe the behavior in domain terms where possible. The
+PHPUnit test translates the normalized `input` and `expected` objects into the
+framework-specific values needed by the test.
 
 ## Example
 
@@ -62,6 +72,5 @@ HTTP requests, handler inputs, or other framework-specific values.
 }
 ```
 
-The `tests` metadata makes ownership explicit. It is deliberately separate
-from the test adapter so a policy can later be covered by PHPUnit, Selenium,
-or another executable test without changing the policy vocabulary.
+The `tests` metadata makes PHPUnit ownership explicit. Each entry must name a
+PHPUnit class and method under `tests/`.
