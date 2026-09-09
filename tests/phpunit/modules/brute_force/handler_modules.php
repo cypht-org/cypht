@@ -47,15 +47,17 @@ class Hm_Test_Brute_Force_Handler_Modules extends TestCase {
     // -------------------------------------------------------------------------
 
     /** @runInSeparateProcess */
-    public function test_make_key_returns_consistent_hash() {
-        $key1 = $this->tracker->make_key('ip', '127.0.0.1');
-        $key2 = $this->tracker->make_key('ip', '127.0.0.1');
-        $key3 = $this->tracker->make_key('ip', '10.0.0.1');
+    /**
+     * @dataProvider brute_force_policy_cases
+     */
+    public function test_make_key_returns_consistent_hash($case) {
+        $key1 = $this->tracker->make_key($case['input']['prefix'], $case['input']['value']);
+        $key2 = $this->tracker->make_key($case['input']['prefix'], $case['input']['value']);
+        $key3 = $this->tracker->make_key($case['input']['prefix'], $case['input']['different_value']);
 
-        $this->assertSame($key1, $key2);
-        $this->assertNotSame($key1, $key3);
-        // Must not expose the raw value
-        $this->assertStringNotContainsString('127.0.0.1', $key1);
+        $this->assertSame($case['expected']['same_value_same_key'], $key1 === $key2);
+        $this->assertSame($case['expected']['different_value_different_key'], $key1 !== $key3);
+        $this->assertStringNotContainsString($case['expected']['key_must_not_contain'], $key1);
     }
 
     /** @runInSeparateProcess */
@@ -124,6 +126,16 @@ class Hm_Test_Brute_Force_Handler_Modules extends TestCase {
         $data = $this->tracker->load();
         $this->assertGreaterThan(time(), $entry['locked_until']);
         $this->assertGreaterThan(time(), $data[$key]['locked_until']);
+    }
+
+    public static function brute_force_policy_cases() {
+        $policy = json_decode(file_get_contents(APP_PATH.'docs/policy-cases.json'), true, 512, JSON_THROW_ON_ERROR);
+        foreach ($policy['policies'] as $policy_case) {
+            if ($policy_case['id'] === 'brute-force-protection') {
+                return array($policy_case['cases'][0]['id'] => array($policy_case['cases'][0]));
+            }
+        }
+        return array();
     }
 
     /** @runInSeparateProcess */
