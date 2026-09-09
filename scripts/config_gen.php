@@ -10,8 +10,9 @@ if (strtolower(php_sapi_name()) !== 'cli') {
 
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
-define('VENDOR_PATH', APP_PATH.'vendor/');
 define('WEB_ROOT', '');
+require APP_PATH.'lib/define_vendor_path.php';
+
 chdir(APP_PATH);
 
 /* get the framework */
