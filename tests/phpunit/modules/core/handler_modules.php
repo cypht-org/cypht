@@ -101,17 +101,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
     }
 
     public static function http_security_header_cases() {
-        $policy = json_decode(file_get_contents(APP_PATH.'docs/policy-cases.json'), true, 512, JSON_THROW_ON_ERROR);
-        foreach ($policy['policies'] as $policy_case) {
-            if ($policy_case['id'] === 'http-security-headers') {
-                $cases = array();
-                foreach ($policy_case['cases'] as $case) {
-                    $cases[$case['id']] = array($case);
-                }
-                return $cases;
-            }
-        }
-        return array();
+        return PolicyCases::forPolicy('http-security-headers');
     }
     /**
      * @preserveGlobalState disabled
@@ -339,24 +329,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
     }
 
     public static function settings_persistence_cases() {
-        $policy = json_decode(
-            file_get_contents(APP_PATH.'docs/policy-cases.json'),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        foreach ($policy['policies'] as $policy_case) {
-            if ($policy_case['id'] === 'user-settings-persistence') {
-                $cases = array();
-                foreach ($policy_case['cases'] as $case) {
-                    $cases[$case['id']] = array($case);
-                }
-                return $cases;
-            }
-        }
-
-        return array();
+        return PolicyCases::forPolicy('user-settings-persistence');
     }
     /**
      * @preserveGlobalState disabled

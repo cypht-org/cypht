@@ -31,24 +31,7 @@ class Hm_Test_Core_Message_Functions extends TestCase {
     }
 
     public static function external_resource_cases() {
-        $policy = json_decode(
-            file_get_contents(APP_PATH.'docs/policy-cases.json'),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
-        foreach ($policy['policies'] as $policy_case) {
-            if ($policy_case['id'] === 'message-external-resource-blocking') {
-                $cases = array();
-                foreach ($policy_case['cases'] as $case) {
-                    $cases[$case['id']] = array($case);
-                }
-                return $cases;
-            }
-        }
-
-        return array();
+        return PolicyCases::forPolicy('message-external-resource-blocking');
     }
 
     public function test_format_msg_html_keeps_images_non_loading_by_default() {

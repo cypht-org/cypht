@@ -129,13 +129,7 @@ class Hm_Test_Brute_Force_Handler_Modules extends TestCase {
     }
 
     public static function brute_force_policy_cases() {
-        $policy = json_decode(file_get_contents(APP_PATH.'docs/policy-cases.json'), true, 512, JSON_THROW_ON_ERROR);
-        foreach ($policy['policies'] as $policy_case) {
-            if ($policy_case['id'] === 'brute-force-protection') {
-                return array($policy_case['cases'][0]['id'] => array($policy_case['cases'][0]));
-            }
-        }
-        return array();
+        return PolicyCases::forPolicy('brute-force-protection');
     }
 
     /** @runInSeparateProcess */
