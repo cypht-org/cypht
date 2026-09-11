@@ -1,0 +1,161 @@
+{
+  "policies": [
+    {
+      "id": "user-settings-persistence",
+      "title": "User settings persistence",
+      "description": "Saving settings without permanently persisting them, permanently saving them, and saving them while logging out.",
+      "tests": [
+        "Hm_Test_Core_Handler_Modules::test_process_save_form"
+      ],
+      "cases": [
+        {
+          "id": "session-only-save",
+          "description": "A normal settings save does not report permanent persistence.",
+          "input": {
+            "post": {
+              "save_settings": true,
+              "password": "foo"
+            }
+          },
+          "expected": {
+            "messages": []
+          }
+        },
+        {
+          "id": "permanent-save",
+          "description": "A permanent settings save reports that settings were saved.",
+          "input": {
+            "post": {
+              "save_settings_permanently": 1,
+              "save_settings": true,
+              "password": "foo"
+            }
+          },
+          "expected": {
+            "messages": ["Settings saved"]
+          }
+        },
+        {
+          "id": "permanent-save-and-logout",
+          "description": "A permanent settings save followed by logout reports both operations.",
+          "input": {
+            "post": {
+              "save_settings_permanently_then_logout": 1,
+              "save_settings": true,
+              "password": "foo"
+            }
+          },
+          "expected": {
+            "messages": [
+              "Saved user data on logout",
+              "Session destroyed on logout"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "message-external-resource-blocking",
+      "title": "Message external-resource blocking",
+      "description": "Remote resources in message HTML are not loaded or retained as active resources.",
+      "tests": [
+        "Hm_Test_Core_Message_Functions::test_sanitize_email_html_blocks_css_tracking"
+      ],
+      "cases": [
+        {
+          "id": "block-css-tracking-resource",
+          "description": "A remote CSS tracking resource is removed before rendering.",
+          "input": {
+            "html": "<ul style=\"list-style-image: url(https://tracker.example.com/test)\"><li>x</li></ul>"
+          },
+          "expected": {
+            "blocked_count": 1,
+            "must_not_contain": "tracker.example.com"
+          }
+        },
+        {
+          "id": "block-background-tracking-resource",
+          "description": "A remote background tracking resource is removed before rendering.",
+          "input": {
+            "html": "<div style=\"background: url(https://tracker.example.com/bg)\">x</div>"
+          },
+          "expected": {
+            "must_not_contain": "tracker.example.com"
+          }
+        }
+      ]
+    },
+    {
+      "id": "http-security-headers",
+      "title": "Restrictive HTTP security headers",
+      "description": "Secure response headers are emitted by default and external images remain blocked unless explicitly enabled.",
+      "tests": [
+        "Hm_Test_Core_Handler_Modules::test_http_headers"
+      ],
+      "cases": [
+        {
+          "id": "tls-ajax-default-image-policy",
+          "description": "TLS AJAX responses include HSTS, JSON content type, and a same-origin image policy.",
+          "input": {
+            "tls": true,
+            "request_type": "AJAX",
+            "language": "English",
+            "config": {}
+          },
+          "expected": {
+            "headers": {
+              "Content-Language": "En",
+              "Strict-Transport-Security": "max-age=31536000",
+              "X-Frame-Options": "SAMEORIGIN",
+              "X-XSS-Protection": "1; mode=block",
+              "X-Content-Type-Options": "nosniff",
+              "Content-Security-Policy": "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+              "Content-Type": "application/json"
+            }
+          }
+        },
+        {
+          "id": "explicit-external-image-policy",
+          "description": "External image sources are allowed only when the administrator enables the setting.",
+          "input": {
+            "tls": true,
+            "request_type": "AJAX",
+            "language": "English",
+            "config": {
+              "allow_external_image_sources": true
+            }
+          },
+          "expected": {
+            "headers": {
+              "Content-Security-Policy": "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self' https://fonts.gstatic.com; img-src * data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "brute-force-protection",
+      "title": "Brute-force protection",
+      "description": "Failed-login tracking uses non-reversible identifiers and locks an identifier after the configured threshold.",
+      "tests": [
+        "Hm_Test_Brute_Force_Handler_Modules::test_make_key_returns_consistent_hash"
+      ],
+      "cases": [
+        {
+          "id": "hash-login-attempt-identifier",
+          "description": "The tracker namespaces and hashes identifiers instead of storing the raw value.",
+          "input": {
+            "prefix": "ip",
+            "value": "127.0.0.1",
+            "different_value": "10.0.0.1"
+          },
+          "expected": {
+            "same_value_same_key": true,
+            "different_value_different_key": true,
+            "key_must_not_contain": "127.0.0.1"
+          }
+        }
+      ]
+    }
+  ]
+}

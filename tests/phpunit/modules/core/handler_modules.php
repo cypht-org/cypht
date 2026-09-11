@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Core_Handler_Modules extends TestCase {
 
     public function setUp(): void {
-        require __DIR__.'/../../helpers.php';
+        require_once __DIR__.'/../../helpers.php';
     }
     /**
      * @preserveGlobalState disabled
@@ -84,43 +84,22 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
+     * @dataProvider http_security_header_cases
      */
-    public function test_http_headers() {
+    public function test_http_headers($case) {
         $test = new Handler_Test('http_headers', 'core');
-        $test->tls = true;
-        $test->rtype = 'AJAX';
-        $test->input = array('language' => 'English');
+        $test->tls = $case['input']['tls'];
+        $test->rtype = $case['input']['request_type'];
+        $test->input = array('language' => $case['input']['language']);
+        $test->config = $case['input']['config'];
         $res = $test->run();
-		$out = array(
-			'Content-Language' => 'En',
-            'Strict-Transport-Security' => 'max-age=31536000',
-            'X-Frame-Options' => 'SAMEORIGIN',
-            'X-XSS-Protection' => '1; mode=block',
-            'X-Content-Type-Options' => 'nosniff',
-            'Content-Security-Policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-            'Content-Type' => 'application/json',
-		);
-        foreach ($out as $key => $val) {
-            $this->assertEquals($out[$key], $res->handler_response['http_headers'][$key]);
+		foreach ($case['expected']['headers'] as $key => $value) {
+            $this->assertEquals($value, $res->handler_response['http_headers'][$key]);
         }
     }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_http_headers_allow_images() {
-        $test = new Handler_Test('http_headers', 'core');
-        $test->tls = true;
-        $test->rtype = 'AJAX';
-        $test->input = array('language' => 'English');
-        $test->config['allow_external_image_sources'] = true;
-        $res = $test->run();
-		$out = array(
-            'Content-Security-Policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self' https://fonts.gstatic.com; img-src * data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-		);
-        foreach ($out as $key => $val) {
-            $this->assertEquals($out[$key], $res->handler_response['http_headers'][$key]);
-        }
+
+    public static function http_security_header_cases() {
+        return PolicyCases::forPolicy('http-security-headers');
     }
     /**
      * @preserveGlobalState disabled
@@ -335,21 +314,18 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
+     * @dataProvider settings_persistence_cases
      */
-    public function test_process_save_form() {
+    public function test_process_save_form($case) {
         $test = new Handler_Test('process_save_form', 'core');
         $test->session = array('username' => 'foo');
+        $test->post = $case['input']['post'];
         $test->run();
-        $test->post = array('save_settings' => true, 'password' => 'foo');
-        $this->assertEquals(array(), Hm_Msgs::get());
-        $test->run();
-        $test->post = array('save_settings_permanently' => 1, 'save_settings' => true, 'password' => 'foo');
-        $test->run();
-        $this->assertEquals(array('Settings saved'), Hm_Msgs::get());
-        Hm_Msgs::flush();
-        $test->post = array('save_settings_permanently_then_logout' => 1, 'save_settings' => true, 'password' => 'foo');
-        $test->run();
-        $this->assertEquals(array('Saved user data on logout', 'Session destroyed on logout'), Hm_Msgs::get());
+        $this->assertEquals($case['expected']['messages'], Hm_Msgs::get());
+    }
+
+    public static function settings_persistence_cases() {
+        return PolicyCases::forPolicy('user-settings-persistence');
     }
     /**
      * @preserveGlobalState disabled
