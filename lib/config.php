@@ -357,7 +357,15 @@ class Hm_User_Config_DB extends Hm_Config {
      */
     private function decrypt_settings($data, $key) {
         if (!$this->crypt) {
-            $data = $this->decode($data['settings']);
+            $settings = $data['settings'];
+            if (is_resource($settings)) {
+                $settings = stream_get_contents($settings);
+            }
+            if ($settings === false) {
+                $this->decrypt_failed = true;
+                return false;
+            }
+            $data = $this->decode($settings);
         } else {
             $data = $this->decode(Hm_Crypt::plaintext($data['settings'], $key));
         }
