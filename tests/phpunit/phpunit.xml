@@ -162,6 +162,9 @@
       <file>./modules/sievefilters/functions.php</file>
       <file>./modules/sievefilters/handler_modules.php</file>
     </testsuite>
+    <testsuite name="modules_smtp">
+      <file>./modules/smtp/handler_modules.php</file>
+    </testsuite>
     <testsuite name="modules_brute_force">
       <file>./modules/brute_force/handler_modules.php</file>
     </testsuite>
