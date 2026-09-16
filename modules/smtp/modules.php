@@ -1629,6 +1629,12 @@ class Hm_Output_stepper_setup_server_smtp extends Hm_Output_Module {
  * @subpackage smtp/handler
  */
 class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
+    /* seconds to wait before retrying a server that just failed to connect */
+    const FAILED_SERVER_COOLDOWN = 300;
+
+    /* short connect timeout for this background check */
+    const CONNECT_TIMEOUT = 3;
+
     /**
      * Send delayed messages
      * This should use cron
@@ -1640,10 +1646,23 @@ class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
 
         $servers = Hm_IMAP_List::dumpForMailbox();
         $scheduled_msg_count = 0;
+        $failed_servers = $this->session->get('scheduled_send_failed_servers', array());
+        $now = time();
 
         foreach ($servers as $server_id => $config) {
+            // dumpForMailbox() doesn't filter hidden servers like the source list does
+            if (! empty($config['hide'])) {
+                continue;
+            }
+
+            if (isset($failed_servers[$server_id]) && ($now - $failed_servers[$server_id]) < self::FAILED_SERVER_COOLDOWN) {
+                continue;
+            }
+
+            $config['timeout'] = self::CONNECT_TIMEOUT;
             $mailbox = new Hm_Mailbox($server_id, $this->user_config, $this->session, $config);
             if ($mailbox->connect()) {
+                unset($failed_servers[$server_id]);
                 $folder = 'Scheduled';
                 if (! $mailbox->folder_exists($folder)) {
                     continue;
@@ -1660,9 +1679,12 @@ class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
                         $scheduled_msg_count++;
                     }
                 }
+            } else {
+                $failed_servers[$server_id] = $now;
             }
         }
 
+        $this->session->set('scheduled_send_failed_servers', $failed_servers);
         $this->out('scheduled_msg_count', $scheduled_msg_count);
     }
 }
