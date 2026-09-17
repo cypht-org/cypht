@@ -512,7 +512,7 @@ class Hm_Output_header_css extends Hm_Output_Module {
             $res .= '<link href="' . WEB_ROOT . 'modules/themes/assets/default/css/default.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />';
         }
         if (DEBUG_MODE) {
-            $res .= '<link href="'.WEB_ROOT.'vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />';
+            $res .= get_js_libs_css(explode(',', $this->get('router_js_exclude_deps', '')));
             foreach (glob(APP_PATH.'modules'.DIRECTORY_SEPARATOR.'**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $rel_name = str_replace(APP_PATH, '', $name);
                 $mod = str_replace(array('modules', DIRECTORY_SEPARATOR), '', $rel_name);
@@ -520,7 +520,6 @@ class Hm_Output_header_css extends Hm_Output_Module {
                     $res .= '<link href="'.WEB_ROOT.sprintf("%ssite.css", $rel_name).'" media="all" rel="stylesheet" type="text/css" />';
                 }
             }
-            $res .= '<link href="'.WEB_ROOT.'third_party/nprogress.css" media="all" rel="stylesheet" type="text/css" />';
         }
         else {
             $res .= '<link href="'.WEB_ROOT.'site.css?v='.CACHE_ID.'" ';
