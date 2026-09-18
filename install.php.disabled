@@ -6,10 +6,15 @@
  * never duplicates Hm_Installer's or Hm_Web_Installer's logic, only calls
  * them.
  *
- * Access is gated by a one-time token written to install.token next to this
- * file. Retrieve that token over FTP/SSH/file manager and pass it as
- * ?token=... before any form is shown, so a bystander who finds this URL
- * while it's enabled still cannot use it.
+ * Access is gated by a one-time token written to .install_token next to this
+ * file. The leading dot matters: the project's .htaccess denies HTTP access
+ * to dotfiles, so the token is only reachable over FTP/SSH/file manager, not
+ * by requesting it as a URL. Retrieve it that way and pass it as ?token=...
+ * before any form is shown, so a bystander who finds this URL while it's
+ * enabled still cannot use it. This protection needs Apache (or another
+ * server honoring .htaccess) with AllowOverride enabled, which is the norm
+ * on the shared hosting this installer targets; on Nginx or other servers,
+ * use scripts/install.php instead.
  */
 
 error_reporting(E_ALL);
@@ -29,14 +34,14 @@ if ($installer->envExists()) {
     exit;
 }
 
-$web_installer = new Hm_Web_Installer($installer, APP_PATH.'install.token');
+$web_installer = new Hm_Web_Installer($installer, APP_PATH.'.install_token');
 
 session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => Hm_Web_Installer::isHttps($_SERVER)]);
 session_start();
 
 if (!$web_installer->tokenExists()) {
     $web_installer->generateToken();
-    render_page('Installer locked', '<p>A one-time access token was generated. Retrieve it from <code>install.token</code> next to this script (over FTP, SSH, or your host\'s file manager), then reopen this page with <code>?token=</code> appended.</p>');
+    render_page('Installer locked', '<p>A one-time access token was generated. Retrieve it from <code>.install_token</code> next to this script (over FTP, SSH, or your host\'s file manager; enable "show hidden files" if needed), then reopen this page with <code>?token=</code> appended.</p>');
     exit;
 }
 
