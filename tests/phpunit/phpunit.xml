@@ -138,6 +138,7 @@
       <file>./lib/js_libs.php</file>
       <file>./lib/repository.php</file>
       <file>./lib/version.php</file>
+      <file>./lib/installer.php</file>
       <file>./lib/logging.php</file>
       <file>./lib/output_debug.php</file>
     </testsuite>
