@@ -108,7 +108,7 @@ function field($name, $label, $type = 'text', $hint = '', $required = false) {
     $hint_html = $hint ? '<span class="hint">'.htmlspecialchars($hint).'</span>' : '';
     return '<label>'.htmlspecialchars($label).$hint_html.
         '<input type="'.$type.'" name="'.htmlspecialchars($name).'" autocomplete="off"'.
-        ($required ? ' required' : '').'></label>';
+        ($required ? ' data-required' : '').'></label>';
 }
 
 function driver_select() {
@@ -116,7 +116,7 @@ function driver_select() {
     foreach (['mysql', 'pgsql', 'sqlite'] as $driver) {
         $opts .= '<option value="'.$driver.'">'.$driver.'</option>';
     }
-    return '<label>Driver<select name="DB_DRIVER" required>'.$opts.'</select></label>';
+    return '<label>Driver<select name="DB_DRIVER" data-required>'.$opts.'</select></label>';
 }
 
 function render_form($csrf_token, $token) {
@@ -173,7 +173,15 @@ function step_script($step_count) {
 
             function show(n) {
                 steps.forEach(function (el) {
-                    el.hidden = Number(el.dataset.step) !== n;
+                    var isCurrent = Number(el.dataset.step) === n;
+                    el.hidden = !isCurrent;
+                    // A hidden step's required fields are still counted by
+                    // the browser's constraint validation and, being
+                    // unfocusable, break reportValidity() with a console
+                    // error. Only the visible step's fields carry `required`.
+                    el.querySelectorAll('[data-required]').forEach(function (input) {
+                        input.required = isCurrent;
+                    });
                 });
                 dots.forEach(function (el, i) {
                     el.classList.toggle('active', i === n - 1);
@@ -186,12 +194,12 @@ function step_script($step_count) {
             }
 
             nextBtn.addEventListener('click', function () {
-                // Hidden steps are barred from constraint validation, so this
-                // only checks the fields the operator can currently see.
                 if (!form.reportValidity()) return;
                 show(Math.min(current + 1, total));
             });
             backBtn.addEventListener('click', function () { show(Math.max(current - 1, 1)); });
+
+            show(1);
         })();
         </script>
         HTML;
