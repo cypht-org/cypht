@@ -207,6 +207,7 @@ function step_script($step_count) {
 
 function render_page($title, $body, $variant = 'info') {
     echo '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'.
+        '<link rel="icon" href="data:,">'.
         '<title>'.htmlspecialchars($title).'</title>'.
         page_style().
         '</head><body><main class="card '.$variant.'">'.
