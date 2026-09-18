@@ -35,4 +35,4 @@ lib/hm3/users/
 venv
 /logs/*.log
 /install.php
-/install.token
+/.install_token
