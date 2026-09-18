@@ -58,22 +58,51 @@ class Hm_Test_Installer extends TestCase {
     public function test_write_env_overrides_existing_key() {
         $installer = new Hm_Installer($this->tmp_dir);
         $installer->writeEnv(['DB_NAME' => 'my_custom_db']);
-        $env = file_get_contents($this->tmp_dir.'.env');
-        $this->assertMatchesRegularExpression('/^DB_NAME=my_custom_db$/m', $env);
+        $this->assertSame('my_custom_db', $this->parseEnvValue('DB_NAME'));
     }
 
     public function test_write_env_appends_unknown_key() {
         $installer = new Hm_Installer($this->tmp_dir);
         $installer->writeEnv(['CYPHT_NOT_IN_EXAMPLE' => 'value']);
-        $env = file_get_contents($this->tmp_dir.'.env');
-        $this->assertMatchesRegularExpression('/^CYPHT_NOT_IN_EXAMPLE=value$/m', $env);
+        $this->assertSame('value', $this->parseEnvValue('CYPHT_NOT_IN_EXAMPLE'));
     }
 
     public function test_write_env_quotes_values_with_special_characters() {
         $installer = new Hm_Installer($this->tmp_dir);
         $installer->writeEnv(['DB_PASS' => 'pass "word" with spaces']);
-        $env = file_get_contents($this->tmp_dir.'.env');
-        $this->assertStringContainsString('DB_PASS="pass \"word\" with spaces"', $env);
+        $this->assertSame('pass "word" with spaces', $this->parseEnvValue('DB_PASS'));
+    }
+
+    /**
+     * Symfony Dotenv supports multi-line quoted values and ${VAR}
+     * interpolation, like bash. A value ending in a backslash, or
+     * containing a dollar sign, must still round-trip literally and must
+     * not swallow the next line or resolve another variable.
+     */
+    public function test_write_env_escapes_values_that_are_dotenv_metacharacters() {
+        $installer = new Hm_Installer($this->tmp_dir);
+        $installer->writeEnv([
+            'DB_NAME' => 'other_db',
+            'DB_PASS' => 'trailing\\backslash\\',
+        ]);
+        $this->assertSame('trailing\\backslash\\', $this->parseEnvValue('DB_PASS'));
+        $this->assertSame('other_db', $this->parseEnvValue('DB_NAME'));
+        $this->assertSame('/var/lib/mysqld/mysqld.sock', $this->parseEnvValue('DB_SOCKET'));
+    }
+
+    public function test_write_env_does_not_interpolate_dollar_variables() {
+        $installer = new Hm_Installer($this->tmp_dir);
+        $installer->writeEnv([
+            'DB_NAME' => 'secret_db_name',
+            'DB_PASS' => '${DB_NAME}',
+        ]);
+        $this->assertSame('${DB_NAME}', $this->parseEnvValue('DB_PASS'));
+    }
+
+    private function parseEnvValue($key) {
+        $dotenv = new \Symfony\Component\Dotenv\Dotenv();
+        $vars = $dotenv->parse(file_get_contents($this->tmp_dir.'.env'));
+        return $vars[$key] ?? null;
     }
 
     public function test_create_directories_creates_nested_path() {
