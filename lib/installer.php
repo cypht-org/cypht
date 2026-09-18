@@ -34,18 +34,27 @@ class Hm_Installer {
         foreach ($values as $key => $value) {
             $line = $key.'='.$this->escapeEnvValue($value);
             $pattern = '/^'.preg_quote($key, '/').'=.*$/m';
-            $template = preg_match($pattern, $template)
-                ? preg_replace($pattern, $line, $template, 1)
-                : $template."\n".$line;
+            if (preg_match($pattern, $template)) {
+                // preg_replace_callback, not preg_replace: a string replacement
+                // would reinterpret backslashes and $ in $line as backreferences.
+                $template = preg_replace_callback($pattern, fn() => $line, $template, 1);
+            }
+            else {
+                $template .= "\n".$line;
+            }
         }
         file_put_contents($this->app_path.'.env', $template);
     }
 
+    /**
+     * Always double-quotes and escapes backslash, double quote and dollar
+     * sign, in that order, so Symfony Dotenv (which supports multi-line
+     * quoted values and ${VAR} interpolation, like bash) treats the result
+     * as one opaque literal, whatever the value contains.
+     */
     private function escapeEnvValue($value) {
-        if (preg_match('/[\s#"]/', $value)) {
-            return '"'.str_replace('"', '\"', $value).'"';
-        }
-        return $value;
+        $escaped = str_replace(['\\', '"', '$'], ['\\\\', '\\"', '\\$'], $value);
+        return '"'.$escaped.'"';
     }
 
     public function createDirectories(array $dirs) {
