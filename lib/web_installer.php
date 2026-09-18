@@ -7,6 +7,8 @@
  */
 class Hm_Web_Installer {
 
+    private const ALLOWED_DB_DRIVERS = ['mysql', 'pgsql', 'sqlite'];
+
     private $installer;
     private $token_file;
 
@@ -46,6 +48,39 @@ class Hm_Web_Installer {
     public static function isHttps(array $server) {
         return (!empty($server['HTTPS']) && $server['HTTPS'] !== 'off')
             || (($server['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+    }
+
+    /**
+     * Server-side validation, since a form's client-side constraints (a
+     * restricted <select>, required attributes) can always be bypassed by
+     * whoever is submitting directly. Keeping the settings/attachment
+     * directories out of the web root is the exact protection issue #17's
+     * security discussion asked for, not just a UX nicety.
+     */
+    public static function validate(array $values, $app_path) {
+        $errors = [];
+        if (!in_array($values['DB_DRIVER'], self::ALLOWED_DB_DRIVERS, true)) {
+            $errors[] = 'Database driver must be one of: '.implode(', ', self::ALLOWED_DB_DRIVERS);
+        }
+        foreach (['USER_SETTINGS_DIR' => 'User settings directory', 'ATTACHMENT_DIR' => 'Attachment directory'] as $key => $label) {
+            if ($values[$key] === '') {
+                $errors[] = $label.' is required';
+            }
+            elseif (self::isUnderPath($values[$key], $app_path)) {
+                $errors[] = $label.' must be outside the web root ('.$values[$key].' is inside it)';
+            }
+        }
+        return $errors;
+    }
+
+    public static function isUnderPath($candidate, $base) {
+        $normalize = fn($path) => rtrim(str_replace('\\', '/', $path), '/');
+        $candidate = $normalize($candidate);
+        $base = $normalize(realpath($base) ?: $base);
+        if ($candidate === '' || $base === '') {
+            return false;
+        }
+        return $candidate === $base || str_starts_with($candidate.'/', $base.'/');
     }
 
     public static function collectFormValues(array $post) {

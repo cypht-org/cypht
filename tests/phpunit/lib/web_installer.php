@@ -118,4 +118,55 @@ class Hm_Test_Web_Installer extends TestCase {
         $values = Hm_Web_Installer::collectFormValues(['DB_NAME' => 'db', 'unexpected' => 'x']);
         $this->assertArrayNotHasKey('unexpected', $values);
     }
+
+    public function test_is_under_path_true_for_a_direct_subdirectory() {
+        $this->assertTrue(Hm_Web_Installer::isUnderPath($this->tmp_dir.'data', $this->tmp_dir));
+    }
+
+    public function test_is_under_path_true_for_the_base_itself() {
+        $this->assertTrue(Hm_Web_Installer::isUnderPath(rtrim($this->tmp_dir, '/'), $this->tmp_dir));
+    }
+
+    public function test_is_under_path_false_for_a_sibling_directory() {
+        $sibling = rtrim($this->tmp_dir, '/').'-sibling/data';
+        $this->assertFalse(Hm_Web_Installer::isUnderPath($sibling, $this->tmp_dir));
+    }
+
+    public function test_is_under_path_false_for_a_path_that_merely_shares_a_prefix() {
+        // e.g. base "/var/www/cypht" must not match "/var/www/cypht-old/data"
+        $lookalike = rtrim($this->tmp_dir, '/').'-old/data';
+        $this->assertFalse(Hm_Web_Installer::isUnderPath($lookalike, $this->tmp_dir));
+    }
+
+    public function test_validate_accepts_a_driver_from_the_allowed_list() {
+        $values = Hm_Web_Installer::collectFormValues(['DB_DRIVER' => 'pgsql']);
+        $values['USER_SETTINGS_DIR'] = '/var/lib/hm3/users';
+        $values['ATTACHMENT_DIR'] = '/var/lib/hm3/attachments';
+        $this->assertSame([], Hm_Web_Installer::validate($values, $this->tmp_dir));
+    }
+
+    public function test_validate_rejects_a_driver_outside_the_allowed_list() {
+        $values = Hm_Web_Installer::collectFormValues(['DB_DRIVER' => 'mongodb']);
+        $values['USER_SETTINGS_DIR'] = '/var/lib/hm3/users';
+        $values['ATTACHMENT_DIR'] = '/var/lib/hm3/attachments';
+        $errors = Hm_Web_Installer::validate($values, $this->tmp_dir);
+        $this->assertNotEmpty($errors);
+        $this->assertStringContainsString('driver', $errors[0]);
+    }
+
+    public function test_validate_rejects_a_storage_directory_inside_the_web_root() {
+        $values = Hm_Web_Installer::collectFormValues([]);
+        $values['USER_SETTINGS_DIR'] = $this->tmp_dir.'data/users';
+        $values['ATTACHMENT_DIR'] = '/var/lib/hm3/attachments';
+        $errors = Hm_Web_Installer::validate($values, $this->tmp_dir);
+        $this->assertNotEmpty($errors);
+        $this->assertStringContainsString('User settings directory', $errors[0]);
+    }
+
+    public function test_validate_rejects_an_empty_storage_directory() {
+        $values = Hm_Web_Installer::collectFormValues([]);
+        $values['ATTACHMENT_DIR'] = '';
+        $errors = Hm_Web_Installer::validate($values, $this->tmp_dir);
+        $this->assertNotEmpty($errors);
+    }
 }
