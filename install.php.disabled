@@ -51,6 +51,15 @@ if (!$web_installer->tokenMatches($given_token)) {
     exit;
 }
 
+// A valid token proves filesystem access, promoting this session from
+// anonymous to installer-operator: regenerate the id so a session fixed
+// before that point (e.g. via a cookie set on a shared subdomain) can't
+// be reused to submit the form on the operator's behalf.
+if (empty($_SESSION['token_verified'])) {
+    session_regenerate_id(true);
+    $_SESSION['token_verified'] = true;
+}
+
 $missing = array_keys(array_filter($installer->checkRequirements(), fn($ok) => !$ok));
 if (!empty($missing)) {
     render_page('Missing requirements', '<p>The server is missing: '.htmlspecialchars(implode(', ', $missing)).'</p>');
@@ -78,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             render_page('Installation complete', $body.'<p><strong>Delete or rename install.php now.</strong></p>');
         }
         else {
-            render_page('Installation failed', $body);
+            render_page('Installation failed', $body.'<p>The .env file may have been written before this step failed. If you retry, delete .env first or the installer will report itself as already configured.</p>');
         }
     }
     catch (Throwable $e) {
