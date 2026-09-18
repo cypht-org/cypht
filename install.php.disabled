@@ -3,7 +3,8 @@
 /**
  * One-time web installer. Disabled by default: rename this file to
  * install.php to activate it. It refuses to run once .env exists, and it
- * never duplicates Hm_Installer's logic, only calls it.
+ * never duplicates Hm_Installer's or Hm_Web_Installer's logic, only calls
+ * them.
  *
  * Access is gated by a one-time token written to install.token next to this
  * file. Retrieve that token over FTP/SSH/file manager and pass it as
@@ -16,6 +17,7 @@ ini_set('display_errors', '0');
 
 define('APP_PATH', __DIR__.'/');
 require APP_PATH.'lib/installer.php';
+require APP_PATH.'lib/web_installer.php';
 
 header('X-Content-Type-Options: nosniff');
 header('Cache-Control: no-store');
@@ -27,21 +29,19 @@ if ($installer->envExists()) {
     exit;
 }
 
-session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => is_https()]);
+$web_installer = new Hm_Web_Installer($installer, APP_PATH.'install.token');
+
+session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => Hm_Web_Installer::isHttps($_SERVER)]);
 session_start();
 
-$token_file = APP_PATH.'install.token';
-if (!file_exists($token_file)) {
-    $token = bin2hex(random_bytes(24));
-    file_put_contents($token_file, $token);
-    @chmod($token_file, 0600);
+if (!$web_installer->tokenExists()) {
+    $web_installer->generateToken();
     render_page('Installer locked', '<p>A one-time access token was generated. Retrieve it from <code>install.token</code> next to this script (over FTP, SSH, or your host\'s file manager), then reopen this page with <code>?token=</code> appended.</p>');
     exit;
 }
 
-$expected_token = trim(file_get_contents($token_file));
 $given_token = $_GET['token'] ?? ($_POST['token'] ?? '');
-if (!is_string($given_token) || $given_token === '' || !hash_equals($expected_token, $given_token)) {
+if (!$web_installer->tokenMatches($given_token)) {
     render_page('Installer locked', '<p>Missing or invalid token.</p>');
     exit;
 }
@@ -58,32 +58,18 @@ if (empty($_SESSION['csrf_token'])) {
 $csrf_token = $_SESSION['csrf_token'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (empty($_POST['csrf_token']) || !hash_equals($csrf_token, $_POST['csrf_token'])) {
+    if (!Hm_Web_Installer::secretMatches($csrf_token, $_POST['csrf_token'] ?? '')) {
         render_page('Installer locked', '<p>Invalid session, reload the form and try again.</p>');
         exit;
     }
 
     try {
-        $values = collect_form_values($_POST);
-        $installer->writeEnv($values);
-        $installer->createDirectories([$values['USER_SETTINGS_DIR'], $values['ATTACHMENT_DIR']]);
+        $values = Hm_Web_Installer::collectFormValues($_POST);
+        $result = $web_installer->install($values, $_POST['admin_user'] ?? '', $_POST['admin_pass'] ?? '');
+        $body = '<pre>'.htmlspecialchars($result['output']).'</pre>';
 
-        $db_result = $installer->setupDatabase();
-
-        $admin_result = ['success' => true, 'output' => '', 'error' => ''];
-        if (trim($_POST['admin_user'] ?? '') !== '') {
-            $admin_result = $installer->createAdminAccount(trim($_POST['admin_user']), (string) ($_POST['admin_pass'] ?? ''));
-        }
-
-        $build_result = $installer->buildConfig();
-
-        $ok = $db_result['success'] && $admin_result['success'] && $build_result['success'];
-        $body = '<pre>'.htmlspecialchars($db_result['output'].$db_result['error']."\n".
-            $admin_result['output'].$admin_result['error']."\n".
-            $build_result['output'].$build_result['error']).'</pre>';
-
-        if ($ok) {
-            @unlink($token_file);
+        if ($result['success']) {
+            $web_installer->consumeToken();
             render_page('Installation complete', $body.'<p><strong>Delete or rename install.php now.</strong></p>');
         }
         else {
@@ -98,30 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 render_form($csrf_token, $given_token);
-
-function collect_form_values(array $post) {
-    $fields = [
-        'DB_DRIVER' => 'mysql',
-        'DB_HOST' => '127.0.0.1',
-        'DB_NAME' => 'cypht_db',
-        'DB_USER' => 'cypht',
-        'DB_PASS' => '',
-        'USER_SETTINGS_DIR' => '/var/lib/hm3/users',
-        'ATTACHMENT_DIR' => '/var/lib/hm3/attachments',
-    ];
-    $values = [];
-    foreach ($fields as $key => $default) {
-        $values[$key] = trim((string) ($post[$key] ?? $default));
-    }
-    $values['AUTH_TYPE'] = 'DB';
-    $values['USER_CONFIG_TYPE'] = 'file';
-    return $values;
-}
-
-function is_https() {
-    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
-}
 
 function render_form($csrf_token, $token) {
     $fields = [
