@@ -1,0 +1,156 @@
+<?php
+
+/**
+ * One-time web installer. Disabled by default: rename this file to
+ * install.php to activate it. It refuses to run once .env exists, and it
+ * never duplicates Hm_Installer's logic, only calls it.
+ *
+ * Access is gated by a one-time token written to install.token next to this
+ * file. Retrieve that token over FTP/SSH/file manager and pass it as
+ * ?token=... before any form is shown, so a bystander who finds this URL
+ * while it's enabled still cannot use it.
+ */
+
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+
+define('APP_PATH', __DIR__.'/');
+require APP_PATH.'lib/installer.php';
+
+header('X-Content-Type-Options: nosniff');
+header('Cache-Control: no-store');
+
+$installer = new Hm_Installer();
+
+if ($installer->envExists()) {
+    render_page('Already installed', '<p>Cypht is already configured. Delete .env first if you really want to run the installer again.</p>');
+    exit;
+}
+
+session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => is_https()]);
+session_start();
+
+$token_file = APP_PATH.'install.token';
+if (!file_exists($token_file)) {
+    $token = bin2hex(random_bytes(24));
+    file_put_contents($token_file, $token);
+    @chmod($token_file, 0600);
+    render_page('Installer locked', '<p>A one-time access token was generated. Retrieve it from <code>install.token</code> next to this script (over FTP, SSH, or your host\'s file manager), then reopen this page with <code>?token=</code> appended.</p>');
+    exit;
+}
+
+$expected_token = trim(file_get_contents($token_file));
+$given_token = $_GET['token'] ?? ($_POST['token'] ?? '');
+if (!is_string($given_token) || $given_token === '' || !hash_equals($expected_token, $given_token)) {
+    render_page('Installer locked', '<p>Missing or invalid token.</p>');
+    exit;
+}
+
+$missing = array_keys(array_filter($installer->checkRequirements(), fn($ok) => !$ok));
+if (!empty($missing)) {
+    render_page('Missing requirements', '<p>The server is missing: '.htmlspecialchars(implode(', ', $missing)).'</p>');
+    exit;
+}
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(24));
+}
+$csrf_token = $_SESSION['csrf_token'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (empty($_POST['csrf_token']) || !hash_equals($csrf_token, $_POST['csrf_token'])) {
+        render_page('Installer locked', '<p>Invalid session, reload the form and try again.</p>');
+        exit;
+    }
+
+    try {
+        $values = collect_form_values($_POST);
+        $installer->writeEnv($values);
+        $installer->createDirectories([$values['USER_SETTINGS_DIR'], $values['ATTACHMENT_DIR']]);
+
+        $db_result = $installer->setupDatabase();
+
+        $admin_result = ['success' => true, 'output' => '', 'error' => ''];
+        if (trim($_POST['admin_user'] ?? '') !== '') {
+            $admin_result = $installer->createAdminAccount(trim($_POST['admin_user']), (string) ($_POST['admin_pass'] ?? ''));
+        }
+
+        $build_result = $installer->buildConfig();
+
+        $ok = $db_result['success'] && $admin_result['success'] && $build_result['success'];
+        $body = '<pre>'.htmlspecialchars($db_result['output'].$db_result['error']."\n".
+            $admin_result['output'].$admin_result['error']."\n".
+            $build_result['output'].$build_result['error']).'</pre>';
+
+        if ($ok) {
+            @unlink($token_file);
+            render_page('Installation complete', $body.'<p><strong>Delete or rename install.php now.</strong></p>');
+        }
+        else {
+            render_page('Installation failed', $body);
+        }
+    }
+    catch (Throwable $e) {
+        error_log('Cypht installer error: '.$e->getMessage());
+        render_page('Installation failed', '<p>An unexpected error occurred. Check the server error log.</p>');
+    }
+    exit;
+}
+
+render_form($csrf_token, $given_token);
+
+function collect_form_values(array $post) {
+    $fields = [
+        'DB_DRIVER' => 'mysql',
+        'DB_HOST' => '127.0.0.1',
+        'DB_NAME' => 'cypht_db',
+        'DB_USER' => 'cypht',
+        'DB_PASS' => '',
+        'USER_SETTINGS_DIR' => '/var/lib/hm3/users',
+        'ATTACHMENT_DIR' => '/var/lib/hm3/attachments',
+    ];
+    $values = [];
+    foreach ($fields as $key => $default) {
+        $values[$key] = trim((string) ($post[$key] ?? $default));
+    }
+    $values['AUTH_TYPE'] = 'DB';
+    $values['USER_CONFIG_TYPE'] = 'file';
+    return $values;
+}
+
+function is_https() {
+    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+}
+
+function render_form($csrf_token, $token) {
+    $fields = [
+        'DB_DRIVER' => 'Database driver (mysql, pgsql, sqlite)',
+        'DB_HOST' => 'Database host',
+        'DB_NAME' => 'Database name',
+        'DB_USER' => 'Database user',
+        'DB_PASS' => 'Database password',
+        'USER_SETTINGS_DIR' => 'User settings directory (outside the web root)',
+        'ATTACHMENT_DIR' => 'Attachment directory (outside the web root)',
+    ];
+    $rows = '';
+    foreach ($fields as $name => $label) {
+        $type = str_contains($name, 'PASS') ? 'password' : 'text';
+        $rows .= '<p><label>'.htmlspecialchars($label).'<br><input type="'.$type.'" name="'.htmlspecialchars($name).'"></label></p>';
+    }
+    $rows .= '<p><label>Admin username (optional)<br><input type="text" name="admin_user"></label></p>';
+    $rows .= '<p><label>Admin password<br><input type="password" name="admin_pass"></label></p>';
+
+    $body = '<form method="post">'.
+        '<input type="hidden" name="csrf_token" value="'.htmlspecialchars($csrf_token).'">'.
+        '<input type="hidden" name="token" value="'.htmlspecialchars($token).'">'.
+        $rows.
+        '<p><button type="submit">Install</button></p>'.
+        '</form>';
+    render_page('Cypht installer', $body);
+}
+
+function render_page($title, $body) {
+    echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>'.htmlspecialchars($title).'</title></head>'.
+        '<body>'.'<h1>'.htmlspecialchars($title).'</h1>'.$body.'</body></html>';
+}
