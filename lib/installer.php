@@ -8,13 +8,15 @@
 class Hm_Installer {
 
     private $php_binary;
+    private $app_path;
 
-    public function __construct() {
+    public function __construct($app_path = APP_PATH) {
         $this->php_binary = PHP_BINARY;
+        $this->app_path = $app_path;
     }
 
     public function envExists() {
-        return file_exists(APP_PATH.'.env');
+        return file_exists($this->app_path.'.env');
     }
 
     public function checkRequirements() {
@@ -28,7 +30,7 @@ class Hm_Installer {
     }
 
     public function writeEnv(array $values) {
-        $template = file_get_contents(APP_PATH.'.env.example');
+        $template = file_get_contents($this->app_path.'.env.example');
         foreach ($values as $key => $value) {
             $line = $key.'='.$this->escapeEnvValue($value);
             $pattern = '/^'.preg_quote($key, '/').'=.*$/m';
@@ -36,7 +38,7 @@ class Hm_Installer {
                 ? preg_replace($pattern, $line, $template, 1)
                 : $template."\n".$line;
         }
-        file_put_contents(APP_PATH.'.env', $template);
+        file_put_contents($this->app_path.'.env', $template);
     }
 
     private function escapeEnvValue($value) {
@@ -48,7 +50,7 @@ class Hm_Installer {
 
     public function createDirectories(array $dirs) {
         foreach ($dirs as $dir) {
-            if (!is_dir($dir) && !mkdir($dir, 0755, true)) {
+            if (!is_dir($dir) && !@mkdir($dir, 0755, true)) {
                 throw new RuntimeException('Unable to create directory: '.$dir);
             }
         }
@@ -67,10 +69,10 @@ class Hm_Installer {
     }
 
     private function runScript($relative_path, array $args = []) {
-        $parts = array_merge([$this->php_binary, APP_PATH.$relative_path], $args);
+        $parts = array_merge([$this->php_binary, $this->app_path.$relative_path], $args);
         $command = implode(' ', array_map('escapeshellarg', $parts));
 
-        $process = proc_open($command, [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, APP_PATH);
+        $process = proc_open($command, [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, $this->app_path);
         if (!is_resource($process)) {
             return ['success' => false, 'output' => '', 'error' => 'Unable to start '.$relative_path];
         }
