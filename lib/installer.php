@@ -2,16 +2,17 @@
 
 /**
  * Orchestrates the install steps (env, directories, database, admin account,
- * config build) by driving the existing CLI scripts. Holds no business logic
- * of its own so the CLI wizard and, later, a web installer share one path.
+ * config build) by calling the same lib functions the CLI scripts use, in
+ * the current process. Not a subprocess: PHP_BINARY is unreliable outside
+ * the CLI SAPI (under Apache's module SAPI it resolves to httpd itself, not
+ * php), and many shared hosts disable proc_open/exec entirely.
  */
 class Hm_Installer {
 
-    private $php_binary;
     private $app_path;
+    private $bootstrapped = false;
 
     public function __construct($app_path = APP_PATH) {
-        $this->php_binary = PHP_BINARY;
         $this->app_path = $app_path;
     }
 
@@ -66,31 +67,66 @@ class Hm_Installer {
     }
 
     public function setupDatabase() {
-        return $this->runScript('scripts/setup_database.php');
+        return $this->run(function () {
+            $config = $this->siteConfig();
+            run_database_setup($config, $this->app_path.'database/migrations');
+        });
     }
 
     public function createAdminAccount($username, $password) {
-        return $this->runScript('scripts/create_account.php', [$username, $password]);
+        return $this->run(function () use ($username, $password) {
+            $result = create_user_account($username, $password, $this->siteConfig());
+            echo $result['message']."\n";
+        });
     }
 
     public function buildConfig() {
-        return $this->runScript('scripts/config_gen.php');
+        return $this->run(function () {
+            // Several build steps (combine_includes, create_production_site, ...)
+            // use paths relative to the app directory, like the CLI script does.
+            $previous_cwd = getcwd();
+            chdir($this->app_path);
+            try {
+                build_config();
+            }
+            finally {
+                chdir($previous_cwd);
+            }
+        });
     }
 
-    private function runScript($relative_path, array $args = []) {
-        $parts = array_merge([$this->php_binary, $this->app_path.$relative_path], $args);
-        $command = implode(' ', array_map('escapeshellarg', $parts));
+    private function siteConfig() {
+        $config = new Hm_Site_Config_File();
+        Hm_Environment::getInstance()->define_default_constants($config);
+        return $config;
+    }
 
-        $process = proc_open($command, [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, $this->app_path);
-        if (!is_resource($process)) {
-            return ['success' => false, 'output' => '', 'error' => 'Unable to start '.$relative_path];
+    private function bootstrap() {
+        if ($this->bootstrapped) {
+            return;
         }
+        require_once $this->app_path.'lib/define_vendor_path.php';
+        require_once VENDOR_PATH.'autoload.php';
+        require_once $this->app_path.'lib/framework.php';
+        require_once $this->app_path.'lib/config_builder.php';
+        require_once $this->app_path.'lib/database_setup.php';
+        require_once $this->app_path.'lib/account_manager.php';
+        Hm_Environment::getInstance()->load();
+        if (!defined('DEBUG_MODE')) {
+            define('DEBUG_MODE', filter_var(env('ENABLE_DEBUG', false), FILTER_VALIDATE_BOOLEAN));
+        }
+        $this->bootstrapped = true;
+    }
 
-        $output = stream_get_contents($pipes[1]);
-        $error = stream_get_contents($pipes[2]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-
-        return ['success' => proc_close($process) === 0, 'output' => $output, 'error' => $error];
+    private function run(callable $fn) {
+        $this->bootstrap();
+        ob_start();
+        try {
+            $fn();
+            return ['success' => true, 'output' => ob_get_clean(), 'error' => ''];
+        }
+        catch (Throwable $e) {
+            return ['success' => false, 'output' => ob_get_clean(), 'error' => $e->getMessage()];
+        }
     }
 }
