@@ -103,23 +103,34 @@ class Hm_Web_Installer {
     }
 
     public function install(array $values, $admin_user, $admin_pass) {
+        $connection_check = $this->installer->testDatabaseConnection($values);
+        if (!$connection_check['success']) {
+            return ['success' => false, 'env_written' => false,
+                'output' => 'Could not connect to the database: '.$connection_check['error']];
+        }
+
         $this->installer->writeEnv($values);
         $this->installer->createDirectories([$values['USER_SETTINGS_DIR'], $values['ATTACHMENT_DIR']]);
 
-        $db_result = $this->installer->setupDatabase();
+        $output = '';
 
-        $admin_result = ['success' => true, 'output' => '', 'error' => ''];
+        $db_result = $this->installer->setupDatabase();
+        $output .= $db_result['output'].$db_result['error'];
+        if (!$db_result['success']) {
+            return ['success' => false, 'env_written' => true, 'output' => $output];
+        }
+
         if (trim((string) $admin_user) !== '') {
             $admin_result = $this->installer->createAdminAccount(trim($admin_user), (string) $admin_pass);
+            $output .= "\n".$admin_result['output'].$admin_result['error'];
+            if (!$admin_result['success']) {
+                return ['success' => false, 'env_written' => true, 'output' => $output];
+            }
         }
 
         $build_result = $this->installer->buildConfig();
+        $output .= "\n".$build_result['output'].$build_result['error'];
 
-        return [
-            'success' => $db_result['success'] && $admin_result['success'] && $build_result['success'],
-            'output' => $db_result['output'].$db_result['error']."\n".
-                $admin_result['output'].$admin_result['error']."\n".
-                $build_result['output'].$build_result['error'],
-        ];
+        return ['success' => $build_result['success'], 'env_written' => true, 'output' => $output];
     }
 }

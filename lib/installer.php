@@ -66,6 +66,26 @@ class Hm_Installer {
         }
     }
 
+    /**
+     * A single, fast connection attempt with the values as submitted, before
+     * .env is written or any directory is created. Lets a wrong password or
+     * unreachable host fail immediately instead of after the 10-retry loop
+     * in run_database_setup(), and without leaving a half-written .env.
+     */
+    public function testDatabaseConnection(array $values) {
+        $driver = $values['DB_DRIVER'] ?? '';
+        $dsn = $driver === 'sqlite'
+            ? "sqlite:{$values['DB_NAME']}"
+            : "{$driver}:host={$values['DB_HOST']};dbname={$values['DB_NAME']}";
+        try {
+            new PDO($dsn, $values['DB_USER'] ?? '', $values['DB_PASS'] ?? '');
+            return ['success' => true, 'error' => ''];
+        }
+        catch (Throwable $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
     public function setupDatabase() {
         return $this->run(function () {
             $config = $this->siteConfig();

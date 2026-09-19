@@ -2,6 +2,10 @@
 
 use PHPUnit\Framework\TestCase;
 
+// Required at file scope, not just in setUp(): Hm_Installer_Test_Double below
+// extends Hm_Installer, and that needs resolving as soon as this file loads.
+require_once APP_PATH.'lib/installer.php';
+
 class Hm_Test_Web_Installer extends TestCase {
 
     private $tmp_dir;
@@ -17,12 +21,23 @@ class Hm_Test_Web_Installer extends TestCase {
     }
 
     public function tearDown(): void {
-        foreach (scandir($this->tmp_dir) as $entry) {
-            if ($entry !== '.' && $entry !== '..') {
-                unlink($this->tmp_dir.$entry);
+        $this->removeDirectory($this->tmp_dir);
+    }
+
+    private function removeDirectory($dir) {
+        foreach (scandir($dir) as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            $path = $dir.$entry;
+            if (is_dir($path)) {
+                $this->removeDirectory($path.'/');
+            }
+            else {
+                unlink($path);
             }
         }
-        rmdir($this->tmp_dir);
+        rmdir($dir);
     }
 
     private function webInstaller() {
@@ -168,5 +183,107 @@ class Hm_Test_Web_Installer extends TestCase {
         $values['ATTACHMENT_DIR'] = '';
         $errors = Hm_Web_Installer::validate($values, $this->tmp_dir);
         $this->assertNotEmpty($errors);
+    }
+
+    private function formValues() {
+        $values = Hm_Web_Installer::collectFormValues([]);
+        $values['USER_SETTINGS_DIR'] = $this->tmp_dir.'users';
+        $values['ATTACHMENT_DIR'] = $this->tmp_dir.'attachments';
+        return $values;
+    }
+
+    public function test_install_stops_before_writing_env_when_connection_check_fails() {
+        $stub = new Hm_Installer_Test_Double($this->tmp_dir, [
+            'testDatabaseConnection' => ['success' => false, 'error' => 'connection refused'],
+        ]);
+        $web_installer = new Hm_Web_Installer($stub, $this->token_file);
+
+        $result = $web_installer->install($this->formValues(), '', '');
+
+        $this->assertFalse($result['success']);
+        $this->assertSame(['testDatabaseConnection'], $stub->calls);
+        $this->assertFileDoesNotExist($this->tmp_dir.'.env');
+    }
+
+    public function test_install_stops_after_database_setup_fails() {
+        $stub = new Hm_Installer_Test_Double($this->tmp_dir, [
+            'setupDatabase' => ['success' => false, 'output' => '', 'error' => 'db down'],
+        ]);
+        $web_installer = new Hm_Web_Installer($stub, $this->token_file);
+
+        $result = $web_installer->install($this->formValues(), '', '');
+
+        $this->assertFalse($result['success']);
+        $this->assertSame(['testDatabaseConnection', 'setupDatabase'], $stub->calls);
+    }
+
+    public function test_install_stops_after_admin_account_creation_fails() {
+        $stub = new Hm_Installer_Test_Double($this->tmp_dir, [
+            'setupDatabase' => ['success' => true, 'output' => '', 'error' => ''],
+            'createAdminAccount' => ['success' => false, 'output' => '', 'error' => 'bad admin'],
+        ]);
+        $web_installer = new Hm_Web_Installer($stub, $this->token_file);
+
+        $result = $web_installer->install($this->formValues(), 'alice', 'secret');
+
+        $this->assertFalse($result['success']);
+        $this->assertSame(['testDatabaseConnection', 'setupDatabase', 'createAdminAccount'], $stub->calls);
+    }
+
+    public function test_install_skips_admin_account_step_when_no_username_given() {
+        $stub = new Hm_Installer_Test_Double($this->tmp_dir, [
+            'setupDatabase' => ['success' => true, 'output' => '', 'error' => ''],
+            'buildConfig' => ['success' => true, 'output' => '', 'error' => ''],
+        ]);
+        $web_installer = new Hm_Web_Installer($stub, $this->token_file);
+
+        $web_installer->install($this->formValues(), '', '');
+
+        $this->assertSame(['testDatabaseConnection', 'setupDatabase', 'buildConfig'], $stub->calls);
+    }
+
+    public function test_install_runs_every_step_and_succeeds() {
+        $stub = new Hm_Installer_Test_Double($this->tmp_dir, [
+            'setupDatabase' => ['success' => true, 'output' => '', 'error' => ''],
+            'createAdminAccount' => ['success' => true, 'output' => '', 'error' => ''],
+            'buildConfig' => ['success' => true, 'output' => 'built', 'error' => ''],
+        ]);
+        $web_installer = new Hm_Web_Installer($stub, $this->token_file);
+
+        $result = $web_installer->install($this->formValues(), 'alice', 'secret');
+
+        $this->assertTrue($result['success']);
+        $this->assertSame(['testDatabaseConnection', 'setupDatabase', 'createAdminAccount', 'buildConfig'], $stub->calls);
+    }
+}
+
+class Hm_Installer_Test_Double extends Hm_Installer {
+
+    public $calls = [];
+    private $stub_results;
+
+    public function __construct($app_path, array $stub_results) {
+        parent::__construct($app_path);
+        $this->stub_results = $stub_results;
+    }
+
+    public function testDatabaseConnection(array $values) {
+        $this->calls[] = 'testDatabaseConnection';
+        return $this->stub_results['testDatabaseConnection'] ?? ['success' => true, 'error' => ''];
+    }
+
+    public function setupDatabase() {
+        $this->calls[] = 'setupDatabase';
+        return $this->stub_results['setupDatabase'];
+    }
+
+    public function createAdminAccount($username, $password) {
+        $this->calls[] = 'createAdminAccount';
+        return $this->stub_results['createAdminAccount'];
+    }
+
+    public function buildConfig() {
+        $this->calls[] = 'buildConfig';
+        return $this->stub_results['buildConfig'];
     }
 }

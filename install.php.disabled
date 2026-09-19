@@ -92,7 +92,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             render_page('Installation complete', $body.'<p><strong>Delete or rename install.php now.</strong></p>', 'success');
         }
         else {
-            render_page('Installation failed', $body.'<p>The .env file may have been written before this step failed. If you retry, delete .env first or the installer will report itself as already configured.</p>', 'error');
+            $hint = $result['env_written']
+                ? '<p>.env was written before this step failed. If you retry, delete .env first or the installer will report itself as already configured.</p>'
+                : '';
+            render_page('Installation failed', $body.$hint, 'error');
         }
     }
     catch (Throwable $e) {
