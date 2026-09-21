@@ -248,21 +248,9 @@ trait Hm_Handler_Validate {
 
         // Some proxies rewrite Origin to localhost while Referer still has the public host.
         if ($origin && $referer && $target) {
-            $origin_parts = parse_url($origin);
-            $referer_parts = parse_url($referer);
-            if (is_array($origin_parts) && array_key_exists('host', $origin_parts) &&
-                is_array($referer_parts) && array_key_exists('host', $referer_parts)) {
-                $origin_host = $origin_parts['host'];
-                if (array_key_exists('port', $origin_parts)) {
-                    $origin_host .= ':'.$origin_parts['port'];
-                }
-                $referer_host = $referer_parts['host'];
-                if (array_key_exists('port', $referer_parts)) {
-                    $referer_host .= ':'.$referer_parts['port'];
-                }
-                if ($origin_host !== $target && $referer_host === $target) {
-                    $source = $referer;
-                }
+            if (!$this->source_matches_target(parse_url($origin), $target) &&
+                $this->source_matches_target(parse_url($referer), $target)) {
+                $source = $referer;
             }
         }
         return [$source, $target];
@@ -288,21 +276,44 @@ trait Hm_Handler_Validate {
      * @return boolean
      */
     private function validate_source($target, $source, $session, $request) {
-        $source = parse_url($source);
-        if (!is_array($source) || !array_key_exists('host', $source)) {
-            $session->destroy($request);
-            Hm_Debug::add('LOGGED OUT: invalid source origin', 'warning');
-            return false;
-        }
-        if (array_key_exists('port', $source)) {
-            $source['host'] .= ':'.$source['port'];
-        }
-        if ($source['host'] !== $target) {
+        if (!$this->source_matches_target(parse_url($source), $target)) {
             $session->destroy($request);
             Hm_Debug::add('LOGGED OUT: invalid source origin', 'warning');
             return false;
         }
         return true;
+    }
+
+    /**
+     * Compare the host of a request source (Origin or Referer) with the target host
+     *
+     * The port is only compared when both sides carry one. The target comes from
+     * HTTP_HOST, which does not always keep the port the client used: nginx's
+     * $host drops it, while $http_host keeps it. Origin and Referer always keep
+     * it. Appending the source port before a strict comparison therefore rejects
+     * every request to a deployment served on a non-default port, even though no
+     * mismatch was ever observed. When a port is present on both sides it still
+     * has to match, so a genuine cross-origin request is rejected as before.
+     *
+     * @param array $source parse_url() result for the source
+     * @param string $target target host, with or without a port
+     * @return boolean
+     */
+    private function source_matches_target($source, $target) {
+        if (!is_array($source) || !array_key_exists('host', $source)) {
+            return false;
+        }
+        $target = parse_url('//'.$target);
+        if (!is_array($target) || !array_key_exists('host', $target)) {
+            return false;
+        }
+        if ($source['host'] !== $target['host']) {
+            return false;
+        }
+        if (!array_key_exists('port', $source) || !array_key_exists('port', $target)) {
+            return true;
+        }
+        return $source['port'] === $target['port'];
     }
 }
 
