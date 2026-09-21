@@ -1416,4 +1416,8 @@ return [
     'enable_mstnef_viewer' => env('ENABLE_MSTNEF_VIEWER', false),
 
     'append_url_query' => env('APPEND_URL_QUERY', ''),
+
+    'custom_ajax_request_endpoint' => env('CUSTOM_AJAX_REQUEST_ENDPOINT', ''),
+
+    'extra_ajax_request_data' => env('EXTRA_AJAX_REQUEST_DATA', ''),
 ];

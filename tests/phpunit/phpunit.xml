@@ -127,6 +127,9 @@
     <testsuite name="tags">
       <file>./tags.php</file>
     </testsuite>
+    <testsuite name="tags_multi_account">
+      <file>./tags_multi_account.php</file>
+    </testsuite>
     <testsuite name="lib">
       <file>./lib/searchable.php</file>
       <file>./lib/scram_authenticator.php</file>

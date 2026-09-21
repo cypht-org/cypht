@@ -112,9 +112,9 @@ class Hm_Output_tags extends hm_output_module {
             $this->flatten_tags($folderTree, 0, $flat);
             $res .= '<script type="application/json" class="tags_json_data">'.
                 json_encode($flat, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP).'</script>';
-            $res .= '<script type="application/json" class="tags_palette_data">'.
-                json_encode(Hm_Tags::colorPalette(), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP).'</script>';
         }
+        $res .= '<script type="application/json" class="tags_palette_data">'.
+            json_encode(Hm_Tags::colorPalette(), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP).'</script>';
         $res .= '<li class="tags_add_new"><a href="#" class="tag_add_new_btn">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-plus-square menu-icon"></i>';

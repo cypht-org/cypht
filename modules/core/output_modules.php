@@ -667,6 +667,8 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_special_folders = function() { return '.json_encode($formattedSpecialFolders).'; };'.
             'var hm_page_param_name = function() { return "'.$this->get('page_param_name').'"; };'.
             'var hm_append_url_query = function() { return "'.$this->get('append_url_query').'"; };'.
+            'var hm_custom_ajax_request_endpoint = function() { return "'.$this->get('custom_ajax_request_endpoint').'"; };'.
+            'var hm_extra_ajax_request_data = function() { return "'.$this->get('extra_ajax_request_data').'"; };'.
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {
@@ -1702,7 +1704,7 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
         $res = '<div class="sidebar-footer">';
         $res .= '<a class="logout_link" id="js-logout_link" href="'.$this->build_page_url('logout', [
             'prompt' => 'true',
-            'back_query' => base64_encode(serialize($this->get('router_get_export'))),
+            'back_query' => encode_logout_back_query($this->get('router_get_export', array())),
         ]).'" title="'. $this->trans('Logout') .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-power menu-icon"></i>';

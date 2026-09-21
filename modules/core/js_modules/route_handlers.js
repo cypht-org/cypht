@@ -156,6 +156,19 @@ function applyMessageListPageHandlers(routeParams) {
         Hm_Message_List.sort($(this).val());
     });
 
+    Hm_MessagesStore.bindSourceToggleInputs(routeParams.list_path, async () => {
+        messagesStore.removeFromLocalStorage();
+
+        // Reuse the existing in-page list refresh flow for combined/message-list pages.
+        if (typeof select_imap_folder === 'function') {
+            await select_imap_folder(routeParams.list_path, Hm_Utils.get_url_page_number(), true);
+            return;
+        }
+
+        // Fallback for routes that do not provide the in-page IMAP refresh helper.
+        Hm_Utils.redirect(window.location.search);
+    });
+
     if (window.handleSieveCustomAction) handleSieveCustomAction();
 
     // TODO: Refactor this handler to be more modular(applicable only for the imap list type)

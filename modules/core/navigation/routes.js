@@ -89,6 +89,10 @@ const routes = [
         page: 'change_password'
     },
     {
+        page: 'accounts',
+        handler: 'applyAccountsPageHandlers'
+    },
+    {
         page: 'highlights',
         handler: 'applyHighlightsPageHandlers'
     },

@@ -1,6 +1,3 @@
-.create_user { margin-top: 20px; margin-left: 10px; }
-.create_user input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
-.create_account_link { margin-left: 120px; float: left; clear: left; font-size: 115%; padding: 5px; }
-.user_list { padding-left: 40px; padding-top: 20px; }
-.user_list td {padding-bottom: 10px; }
-.user_list .user_delete { cursor: pointer; margin-right: 10px; }
+.accounts_page .user_list td {
+    vertical-align: middle;
+}

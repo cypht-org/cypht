@@ -25,6 +25,11 @@ class Hm_Test_Tags_Output_Modules extends TestCase {
         $this->assertEquals('tags_folders', $sources[0][0]);
         $this->assertStringContainsString('tag_add_new_btn', $sources[0][1]);
         $this->assertStringNotContainsString('tag_row', $sources[0][1]);
+        $this->assertStringContainsString('tags_palette_data', $sources[0][1]);
+        $this->assertStringNotContainsString('tags_json_data', $sources[0][1]);
+        foreach (Hm_Tags::colorPalette() as $color) {
+            $this->assertStringContainsString($color, $sources[0][1]);
+        }
     }
 
     /**

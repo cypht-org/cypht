@@ -759,7 +759,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('language_setting', 'core');
         $test->handler_response = array('language'=> 'en');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="language">Language</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select id="language" class="form-select form-select-sm w-auto" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="zh-Hans">Chinese Simplified</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="pl">Polish</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option><option value="zh-TW">Traditional Chinese</option></select></div></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="language">Language</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select id="language" class="form-select form-select-sm w-auto" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="zh-Hans">Chinese Simplified</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="rw">Kinyarwanda</option><option value="pl">Polish</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option><option value="zh-TW">Traditional Chinese</option></select></div></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -946,7 +946,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('folder_list_content_end', 'core');
         $test->handler_response = array('router_get_export' => array('page' => 'compose'));
         $res = $test->run();
-        $expectedLogoutBackQuery = base64_encode(serialize(array('page' => 'compose')));
+        $expectedLogoutBackQuery = encode_logout_back_query(array('page' => 'compose'));
         $this->assertEquals(array('<div class="sidebar-footer"><a class="logout_link" id="js-logout_link" href="?page=logout&prompt=true&back_query=' . $expectedLogoutBackQuery . '" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
         $test->rtype = 'AJAX';
 
@@ -954,7 +954,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test->handler_response = array('router_get_export' => $router_get_params);
         $res = $test->run();
 
-        $expectedLogoutBackQuery = base64_encode(serialize($router_get_params));
+        $expectedLogoutBackQuery = encode_logout_back_query($router_get_params);
         $this->assertEquals(array('formatted_folder_list' => '<div class="sidebar-footer"><a class="logout_link" id="js-logout_link" href="?page=logout&prompt=true&back_query=' . $expectedLogoutBackQuery . '" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>', 'router_get_export' => $router_get_params), $res->output_response);
     }
     /**

@@ -32,6 +32,7 @@ require_once APP_PATH.'vendor/autoload.php';
 
 /* get mock objects */
 require_once APP_PATH.'tests/phpunit/mocks.php';
+require_once APP_PATH.'tests/phpunit/policy_cases.php';
 
 /* get the framework */
 require_once APP_PATH.'lib/framework.php';

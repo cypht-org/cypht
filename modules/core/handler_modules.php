@@ -743,6 +743,8 @@ class Hm_Handler_default_page_data extends Hm_Handler_Module {
         $this->out('enabled_modules', $this->config->get_modules());
         $this->out('page_param_name', $this->config->get('page_param_name'));
         $this->out('append_url_query', $this->config->get('append_url_query'));
+        $this->out('custom_ajax_request_endpoint', $this->config->get('custom_ajax_request_endpoint'));
+        $this->out('extra_ajax_request_data', $this->config->get('extra_ajax_request_data'));
         if (!crypt_state($this->config)) {
             $this->out('single_server_mode', true);
         }
@@ -820,7 +822,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
      */
     public function process() {
         if ($this->request->get['prompt'] ?? false) {
-            $backQuery = isset($this->request->get['back_query']) ? unserialize(base64_decode($this->request->get['back_query'])): [];
+            $backQuery = isset($this->request->get['back_query']) ? decode_logout_back_query($this->request->get['back_query']) : [];
 
             $this->out('cancel_logout_url', '?' . http_build_query($backQuery));
             
@@ -1271,9 +1273,8 @@ class Hm_Handler_version_upgrade_checker extends Hm_Handler_Module {
 
     public function process()
     {
-        if ($this->session->get('latest_version')) {
-            $latestVersion = $this->session->get('latest_version');
-        } else {
+        $latestVersion = $this->session->get('latest_version') ?: null;
+        if (! $latestVersion) {
             $api = new Hm_API_Curl();
             $data = $api->command('https://api.github.com/repos/cypht-org/cypht/releases');
 
@@ -1285,7 +1286,7 @@ class Hm_Handler_version_upgrade_checker extends Hm_Handler_Module {
             }
         }
 
-        if (version_compare(CYPHT_VERSION, $latestVersion, '<')) {
+        if ($latestVersion && version_compare(CYPHT_VERSION, $latestVersion, '<')) {
             $needUpgrade = true;
         } else {
             $needUpgrade = false;

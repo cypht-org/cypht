@@ -77,8 +77,8 @@ var add_contact_from_popup = function(event) {
         var name = contact.replace(EMAIL_REGEX, "");
 
         var saveContactContent = `<div><table>
-                                            <tr><td><strong>${hm_trans('Name')} :</strong></td><td>${name}</td></tr>
-                                            <tr><td><strong>${hm_trans('Email')} :</strong></td><td>${email}</td></tr>
+                                            <tr><td><strong>${hm_trans('Name')} :</strong></td><td>${$('<span>').text(name).html()}</td></tr>
+                                            <tr><td><strong>${hm_trans('Email')} :</strong></td><td>${$('<span>').text(email).html()}</td></tr>
                                             <tr><td><strong>${hm_trans('Source')} :</strong></td><td>Local</td></tr>
                                 </table></div>`
 

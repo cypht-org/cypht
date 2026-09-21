@@ -61,7 +61,8 @@
         "zbateson/mail-mime-parser": "^3.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.5.62"
+        "phpunit/phpunit": "^10.5.62",
+        "opis/json-schema": "^2.4"
     },
     "suggest": {
         "ext-pdo": "To use database features, this needs to be installed",
@@ -83,5 +84,21 @@
     "scripts": {
         "post-update-cmd": "composer suggest",
         "post-install-cmd": "composer suggest"
+    },
+    "repositories": {
+        "tiki.org": {
+            "type": "composer",
+            "url": "https://composer.tiki.org",
+            "canonical": false,
+            "_comment": [
+                "-------------------------------------------------------------",
+                "IMPORTANT: php-sieve-manager is tempotarily preferred from composer.tiki.org",
+                "until the github repo issue is resolved.",
+                "-------------------------------------------------------------"
+            ],
+            "only": [
+                "henrique-borba/php-sieve-manager"
+            ]
+        }
     }
 }

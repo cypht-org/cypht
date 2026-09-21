@@ -113,7 +113,7 @@ var show_tag_form_modal = function(tag) {
     var isEdit = !!tag.id;
     var parentTag = tag.parent ? get_tags_json_data().find(function(t) { return t.id === tag.parent; }) : null;
     var palette = get_tags_palette_data();
-    var currentColor = tag.color || palette[0];
+    var currentColor = tag.color || palette[0] || '#5f6368'; //same as Hm_Tags::defaultColor()
     var modal = new Hm_Modal({
         modalId: 'tagFormModal',
         title: tag_modal_icon('bi-tag-fill') + (isEdit ? hm_trans('Edit label') : hm_trans('Create new label'))
