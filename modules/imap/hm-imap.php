@@ -111,6 +111,9 @@ if (!class_exists('Hm_IMAP')) {
         /* IP port to connect to. Standard port is 143, TLS is 993 */
         public $port = 143;
 
+        /* socket connect timeout in seconds, overridable via 'timeout' config key */
+        public $timeout = 10;
+
         /* enable TLS when connecting to the IMAP server */
         public $tls = false;
 
@@ -228,8 +231,7 @@ if (!class_exists('Hm_IMAP')) {
                 stream_context_set_option($ctx, 'ssl', 'verify_peer_name', $this->verify_peer_name);
                 stream_context_set_option($ctx, 'ssl', 'verify_peer', $this->verify_peer);
 
-                $timeout = 10;
-                $this->handle = Hm_Functions::stream_socket_client($this->server, $this->port, $errorno, $errorstr, $timeout, STREAM_CLIENT_CONNECT, $ctx);
+                $this->handle = Hm_Functions::stream_socket_client($this->server, $this->port, $errorno, $errorstr, $this->timeout, STREAM_CLIENT_CONNECT, $ctx);
                 if (is_resource($this->handle)) {
                     $this->debug[] = 'Successfully opened port to the IMAP server';
                     $this->state = 'connected';
