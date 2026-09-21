@@ -1,0 +1,374 @@
+<?php
+
+/**
+ * One-time web installer. Disabled by default: rename this file to
+ * install.php to activate it. It refuses to run once .env exists, and it
+ * never duplicates Hm_Installer's or Hm_Web_Installer's logic, only calls
+ * them.
+ *
+ * Access is gated by a one-time token written to .install_token next to this
+ * file. The leading dot matters: the project's .htaccess denies HTTP access
+ * to dotfiles, so the token is only reachable over FTP/SSH/file manager, not
+ * by requesting it as a URL. Retrieve it that way and pass it as ?token=...
+ * before any form is shown, so a bystander who finds this URL while it's
+ * enabled still cannot use it. This protection needs Apache (or another
+ * server honoring .htaccess) with AllowOverride enabled, which is the norm
+ * on the shared hosting this installer targets; on Nginx or other servers,
+ * use scripts/install.php instead.
+ */
+
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+
+define('APP_PATH', __DIR__.'/');
+require APP_PATH.'lib/installer.php';
+require APP_PATH.'lib/web_installer.php';
+
+header('X-Content-Type-Options: nosniff');
+header('Cache-Control: no-store');
+
+$installer = new Hm_Installer();
+
+if ($installer->envExists()) {
+    render_page('Already installed', '<p>Cypht is already configured. Delete .env first if you really want to run the installer again.</p>', 'locked');
+    exit;
+}
+
+$web_installer = new Hm_Web_Installer($installer, APP_PATH.'.install_token');
+
+session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => Hm_Web_Installer::isHttps($_SERVER)]);
+session_start();
+
+if (!$web_installer->tokenExists()) {
+    $web_installer->generateToken();
+}
+
+$given_token = $_GET['token'] ?? ($_POST['token'] ?? '');
+if (!$web_installer->tokenMatches($given_token)) {
+    render_page('Installer locked', '<p>Missing or invalid access token.</p>'.
+        '<p>Retrieve it from <code>.install_token</code> next to this script (over FTP, SSH, or your host\'s file manager; enable "show hidden files" if needed), then reopen this page with <code>?token=</code> appended.</p>', 'locked');
+    exit;
+}
+
+// A valid token proves filesystem access, promoting this session from
+// anonymous to installer-operator: regenerate the id so a session fixed
+// before that point (e.g. via a cookie set on a shared subdomain) can't
+// be reused to submit the form on the operator's behalf.
+if (empty($_SESSION['token_verified'])) {
+    session_regenerate_id(true);
+    $_SESSION['token_verified'] = true;
+}
+
+$missing = array_keys(array_filter($installer->checkRequirements(), fn($ok) => !$ok));
+if (!empty($missing)) {
+    render_page('Missing requirements', '<p>The server is missing: '.htmlspecialchars(implode(', ', $missing)).'</p>', 'error');
+    exit;
+}
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(24));
+}
+$csrf_token = $_SESSION['csrf_token'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!Hm_Web_Installer::secretMatches($csrf_token, $_POST['csrf_token'] ?? '')) {
+        render_page('Installer locked', '<p>Invalid session, reload the form and try again.</p>', 'locked');
+        exit;
+    }
+
+    $values = Hm_Web_Installer::collectFormValues($_POST);
+    $errors = Hm_Web_Installer::validate($values, APP_PATH);
+    if (!empty($errors)) {
+        render_page('Installation failed', '<ul><li>'.implode('</li><li>', array_map('htmlspecialchars', $errors)).'</li></ul>', 'error');
+        exit;
+    }
+
+    try {
+        $result = $web_installer->install($values, $_POST['admin_user'] ?? '', $_POST['admin_pass'] ?? '');
+        $body = '<pre>'.htmlspecialchars($result['output']).'</pre>';
+
+        if ($result['success']) {
+            $web_installer->consumeToken();
+            render_page('Installation complete', $body.'<p><strong>Delete or rename install.php now.</strong></p>', 'success');
+        }
+        else {
+            $hint = $result['env_written']
+                ? '<p>.env was written before this step failed. If you retry, delete .env first or the installer will report itself as already configured.</p>'
+                : '';
+            render_page('Installation failed', $body.$hint, 'error');
+        }
+    }
+    catch (Throwable $e) {
+        error_log('Cypht installer error: '.$e->getMessage());
+        render_page('Installation failed', '<p>An unexpected error occurred. Check the server error log.</p>', 'error');
+    }
+    exit;
+}
+
+render_form($csrf_token, $given_token);
+
+function field($name, $label, $type = 'text', $hint = '', $required = false) {
+    $hint_html = $hint ? '<span class="hint">'.htmlspecialchars($hint).'</span>' : '';
+    return '<label>'.htmlspecialchars($label).$hint_html.
+        '<input type="'.$type.'" name="'.htmlspecialchars($name).'" autocomplete="off"'.
+        ($required ? ' data-required' : '').'></label>';
+}
+
+function driver_select() {
+    $opts = '';
+    foreach (['mysql', 'pgsql', 'sqlite'] as $driver) {
+        $opts .= '<option value="'.$driver.'">'.$driver.'</option>';
+    }
+    return '<label>Driver<select name="DB_DRIVER" data-required>'.$opts.'</select></label>';
+}
+
+function render_form($csrf_token, $token) {
+    $steps = [
+        'Database' => driver_select().
+            field('DB_HOST', 'Host', 'text', '', true).
+            field('DB_NAME', 'Name', 'text', '', true).
+            field('DB_USER', 'User', 'text', '', true).
+            field('DB_PASS', 'Password', 'password'),
+        'Storage' => field('USER_SETTINGS_DIR', 'User settings directory', 'text', 'outside the web root', true).
+            field('ATTACHMENT_DIR', 'Attachment directory', 'text', 'outside the web root', true),
+        'Admin account (optional)' => field('admin_user', 'Username').
+            field('admin_pass', 'Password', 'password'),
+    ];
+
+    $step_count = count($steps);
+    $panels = '';
+    $dots = '';
+    $i = 0;
+    foreach ($steps as $title => $fields) {
+        $i++;
+        $panels .= '<section class="step" data-step="'.$i.'"'.($i === 1 ? '' : ' hidden').'>'.
+            '<h2>'.htmlspecialchars($title).'</h2>'.$fields.'</section>';
+        $dots .= '<li'.($i === 1 ? ' class="active"' : '').'></li>';
+    }
+
+    $body = '<ol class="steps">'.$dots.'</ol>'.
+        '<form method="post" id="install-form">'.
+        '<input type="hidden" name="csrf_token" value="'.htmlspecialchars($csrf_token).'">'.
+        '<input type="hidden" name="token" value="'.htmlspecialchars($token).'">'.
+        $panels.
+        '<div class="nav">'.
+        '<button type="button" id="back-btn" hidden>Back</button>'.
+        '<button type="button" id="next-btn">Next</button>'.
+        '<button type="submit" id="submit-btn" hidden>Install</button>'.
+        '</div>'.
+        '</form>'.
+        step_script($step_count);
+    render_page('Cypht installer', $body);
+}
+
+function step_script($step_count) {
+    return <<<HTML
+        <script>
+        (function () {
+            var current = 1;
+            var total = {$step_count};
+            var form = document.getElementById('install-form');
+            var steps = document.querySelectorAll('.step');
+            var dots = document.querySelectorAll('.steps li');
+            var backBtn = document.getElementById('back-btn');
+            var nextBtn = document.getElementById('next-btn');
+            var submitBtn = document.getElementById('submit-btn');
+
+            function show(n) {
+                steps.forEach(function (el) {
+                    var isCurrent = Number(el.dataset.step) === n;
+                    el.hidden = !isCurrent;
+                    // A hidden step's required fields are still counted by
+                    // the browser's constraint validation and, being
+                    // unfocusable, break reportValidity() with a console
+                    // error. Only the visible step's fields carry `required`.
+                    el.querySelectorAll('[data-required]').forEach(function (input) {
+                        input.required = isCurrent;
+                    });
+                });
+                dots.forEach(function (el, i) {
+                    el.classList.toggle('active', i === n - 1);
+                    el.classList.toggle('done', i < n - 1);
+                });
+                backBtn.hidden = n === 1;
+                nextBtn.hidden = n === total;
+                submitBtn.hidden = n !== total;
+                current = n;
+            }
+
+            nextBtn.addEventListener('click', function () {
+                if (!form.reportValidity()) return;
+                show(Math.min(current + 1, total));
+            });
+            backBtn.addEventListener('click', function () { show(Math.max(current - 1, 1)); });
+
+            show(1);
+        })();
+        </script>
+        HTML;
+}
+
+function render_page($title, $body, $variant = 'info') {
+    echo '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'.
+        '<link rel="icon" href="data:,">'.
+        '<title>'.htmlspecialchars($title).'</title>'.
+        page_style().
+        '</head><body><main class="card '.$variant.'">'.
+        '<h1>'.htmlspecialchars($title).'</h1>'.
+        $body.
+        '</main></body></html>';
+}
+
+function page_style() {
+    return <<<'CSS'
+        <style>
+            :root {
+                color-scheme: light dark;
+                --bg: #f4f5f7;
+                --card-bg: #fff;
+                --text: #1f2430;
+                --muted: #6b7280;
+                --border: #d8dbe1;
+                --accent: #006363;
+                --accent-hover: #005555;
+                --accent-text: #fff;
+                --locked-border: #d97706;
+                --error-border: #dc2626;
+                --success-border: #16a34a;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --bg: #14161c;
+                    --card-bg: #1c1f28;
+                    --text: #e7e9ee;
+                    --muted: #9aa1b1;
+                    --border: #2c303b;
+                }
+            }
+            * { box-sizing: border-box; }
+            body {
+                margin: 0;
+                padding: 40px 16px;
+                background: var(--bg);
+                color: var(--text);
+                font: 15px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            }
+            .card {
+                max-width: 480px;
+                margin: 0 auto;
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-top: 4px solid var(--border);
+                border-radius: 8px;
+                padding: 28px 28px 24px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+            }
+            .card.locked { border-top-color: var(--locked-border); }
+            .card.error { border-top-color: var(--error-border); }
+            .card.success { border-top-color: var(--success-border); }
+            ol.steps {
+                display: flex;
+                gap: 6px;
+                list-style: none;
+                margin: 0 0 20px;
+                padding: 0;
+            }
+            ol.steps li {
+                flex: 1;
+                height: 4px;
+                border-radius: 2px;
+                background: var(--border);
+            }
+            ol.steps li.active, ol.steps li.done { background: var(--accent); }
+            .step h2 {
+                font-size: 13px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: .04em;
+                color: var(--muted);
+                margin: 0 0 4px;
+            }
+            .nav {
+                display: flex;
+                gap: 10px;
+                margin-top: 20px;
+            }
+            .nav button { flex: 1; width: auto; margin-top: 0; }
+            #back-btn {
+                background: transparent;
+                color: var(--text);
+                border: 1px solid var(--border);
+            }
+            h1 { font-size: 19px; margin: 0 0 16px; }
+            p { margin: 0 0 12px; color: var(--muted); }
+            code {
+                background: var(--bg);
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                padding: 1px 5px;
+                font-size: 13px;
+            }
+            pre {
+                background: var(--bg);
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                padding: 12px;
+                font-size: 13px;
+                white-space: pre-wrap;
+                word-break: break-word;
+                max-height: 320px;
+                overflow-y: auto;
+            }
+            fieldset {
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                margin: 0 0 16px;
+                padding: 4px 14px 14px;
+            }
+            legend {
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: .04em;
+                color: var(--muted);
+                padding: 0 4px;
+            }
+            label {
+                display: block;
+                font-size: 13px;
+                font-weight: 500;
+                margin-top: 10px;
+            }
+            ul { margin: 0 0 12px; padding-left: 20px; color: var(--muted); }
+            .hint { color: var(--muted); font-weight: 400; }
+            .hint::before { content: " \2014 "; }
+            input, select {
+                display: block;
+                width: 100%;
+                margin-top: 4px;
+                padding: 8px 10px;
+                font-size: 14px;
+                color: var(--text);
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: 5px;
+            }
+            input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+            input:invalid:not(:placeholder-shown) { border-color: var(--error-border); }
+            button {
+                width: 100%;
+                margin-top: 20px;
+                padding: 10px;
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--accent-text);
+                background: var(--accent);
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+            }
+            button:hover { background: var(--accent-hover); }
+            #back-btn:hover { background: var(--bg); }
+        </style>
+        CSS;
+}
