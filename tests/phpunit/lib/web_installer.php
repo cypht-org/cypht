@@ -185,6 +185,41 @@ class Hm_Test_Web_Installer extends TestCase {
         $this->assertNotEmpty($errors);
     }
 
+    public function test_check_storage_writable_succeeds_for_an_existing_writable_directory() {
+        $values = Hm_Web_Installer::collectFormValues([]);
+        $values['USER_SETTINGS_DIR'] = rtrim($this->tmp_dir, '/');
+        $values['ATTACHMENT_DIR'] = rtrim($this->tmp_dir, '/');
+        $result = Hm_Web_Installer::checkStorageWritable($values);
+        $this->assertTrue($result['success']);
+    }
+
+    public function test_check_storage_writable_succeeds_when_only_the_parent_exists_yet() {
+        $values = Hm_Web_Installer::collectFormValues([]);
+        $values['USER_SETTINGS_DIR'] = $this->tmp_dir.'users';
+        $values['ATTACHMENT_DIR'] = $this->tmp_dir.'attachments';
+        $result = Hm_Web_Installer::checkStorageWritable($values);
+        $this->assertTrue($result['success']);
+    }
+
+    public function test_check_storage_writable_fails_when_nearest_existing_ancestor_is_not_writable() {
+        if (DIRECTORY_SEPARATOR === '\\') {
+            $this->markTestSkipped('is_writable() reflects POSIX permission bits, not honored by chmod() on Windows.');
+        }
+        $locked = $this->tmp_dir.'locked';
+        mkdir($locked, 0500);
+        $values = Hm_Web_Installer::collectFormValues([]);
+        $values['USER_SETTINGS_DIR'] = $locked.'/users';
+        $values['ATTACHMENT_DIR'] = $this->tmp_dir.'attachments';
+        try {
+            $result = Hm_Web_Installer::checkStorageWritable($values);
+            $this->assertFalse($result['success']);
+            $this->assertStringContainsString('not writable', $result['error']);
+        }
+        finally {
+            chmod($locked, 0700);
+        }
+    }
+
     private function formValues() {
         $values = Hm_Web_Installer::collectFormValues([]);
         $values['USER_SETTINGS_DIR'] = $this->tmp_dir.'users';

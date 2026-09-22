@@ -70,22 +70,32 @@ if (empty($_SESSION['csrf_token'])) {
 }
 $csrf_token = $_SESSION['csrf_token'];
 
-// Checked from the Database step's Next button before the wizard moves on,
-// so a bad password/host is caught immediately instead of after the Storage
-// and Admin steps have also been filled in.
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['ajax_action'] ?? '') === 'test_db_connection') {
+$ajax_action = $_POST['ajax_action'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($ajax_action, ['test_db_connection', 'test_storage_dirs'], true)) {
     header('Content-Type: application/json');
     if (!Hm_Web_Installer::secretMatches($csrf_token, $_POST['csrf_token'] ?? '')) {
         echo json_encode(['success' => false, 'error' => 'Invalid session, reload the form and try again.']);
         exit;
     }
     $values = Hm_Web_Installer::collectFormValues($_POST);
-    $errors = Hm_Web_Installer::validate($values, APP_PATH, ['DB_DRIVER']);
+
+    if ($ajax_action === 'test_db_connection') {
+        $errors = Hm_Web_Installer::validate($values, APP_PATH, ['DB_DRIVER']);
+        if (!empty($errors)) {
+            echo json_encode(['success' => false, 'error' => implode(' ', $errors)]);
+            exit;
+        }
+        $result = $installer->testDatabaseConnection($values);
+        echo json_encode(['success' => $result['success'], 'error' => $result['error']]);
+        exit;
+    }
+
+    $errors = Hm_Web_Installer::validate($values, APP_PATH, ['DIRS']);
     if (!empty($errors)) {
         echo json_encode(['success' => false, 'error' => implode(' ', $errors)]);
         exit;
     }
-    $result = $installer->testDatabaseConnection($values);
+    $result = Hm_Web_Installer::checkStorageWritable($values);
     echo json_encode(['success' => $result['success'], 'error' => $result['error']]);
     exit;
 }
@@ -150,7 +160,7 @@ function render_form($csrf_token, $token) {
             field('DB_NAME', 'Name', 'text', '', true).
             field('DB_USER', 'User', 'text', '', true).
             field('DB_PASS', 'Password', 'password')],
-        ['title' => 'Storage', 'validate' => '', 'fields' =>
+        ['title' => 'Storage', 'validate' => 'dirs', 'fields' =>
             field('USER_SETTINGS_DIR', 'User settings directory', 'text', 'outside the web root', true).
             field('ATTACHMENT_DIR', 'Attachment directory', 'text', 'outside the web root', true)],
         ['title' => 'Admin account (optional)', 'validate' => '', 'fields' =>
@@ -232,13 +242,18 @@ function step_script($step_count) {
                 errorEl.hidden = !message;
             }
 
-            // The Database step is flagged data-validate="db": its "Next"
-            // must confirm the credentials actually connect before the
-            // wizard lets the user move on, instead of only finding out
-            // after the Storage and Admin steps have also been filled in.
-            function testDbConnection() {
+            var AJAX_ACTIONS = {
+                db: 'test_db_connection',
+                dirs: 'test_storage_dirs'
+            };
+            var DEFAULT_ERRORS = {
+                db: 'Could not connect to the database.',
+                dirs: 'Storage directories are not usable.'
+            };
+
+            function validateStep(validate) {
                 var data = new FormData(form);
-                data.set('ajax_action', 'test_db_connection');
+                data.set('ajax_action', AJAX_ACTIONS[validate]);
                 nextBtn.disabled = true;
                 var previousLabel = nextBtn.textContent;
                 nextBtn.textContent = 'Checking…';
@@ -256,13 +271,14 @@ function step_script($step_count) {
                 if (!form.reportValidity()) return;
                 var stepEl = currentStepEl();
                 showStepError(stepEl, '');
-                if (stepEl.dataset.validate === 'db') {
-                    testDbConnection().then(function (result) {
+                var validate = stepEl.dataset.validate;
+                if (validate && AJAX_ACTIONS[validate]) {
+                    validateStep(validate).then(function (result) {
                         if (result.success) {
                             show(Math.min(current + 1, total));
                         }
                         else {
-                            showStepError(stepEl, result.error || 'Could not connect to the database.');
+                            showStepError(stepEl, result.error || DEFAULT_ERRORS[validate]);
                         }
                     });
                     return;
