@@ -57,17 +57,25 @@ class Hm_Web_Installer {
      * directories out of the web root is the exact protection issue #17's
      * security discussion asked for, not just a UX nicety.
      */
-    public static function validate(array $values, $app_path) {
+    /**
+     * $only restricts which groups get checked ('DB_DRIVER', 'DIRS'), so the
+     * Database step's own connection check can validate just the driver
+     * without failing on the Storage step's fields, which aren't filled in
+     * yet at that point in the wizard.
+     */
+    public static function validate(array $values, $app_path, array $only = ['DB_DRIVER', 'DIRS']) {
         $errors = [];
-        if (!in_array($values['DB_DRIVER'], self::ALLOWED_DB_DRIVERS, true)) {
+        if (in_array('DB_DRIVER', $only, true) && !in_array($values['DB_DRIVER'], self::ALLOWED_DB_DRIVERS, true)) {
             $errors[] = 'Database driver must be one of: '.implode(', ', self::ALLOWED_DB_DRIVERS);
         }
-        foreach (['USER_SETTINGS_DIR' => 'User settings directory', 'ATTACHMENT_DIR' => 'Attachment directory'] as $key => $label) {
-            if ($values[$key] === '') {
-                $errors[] = $label.' is required';
-            }
-            elseif (self::isUnderPath($values[$key], $app_path)) {
-                $errors[] = $label.' must be outside the web root ('.$values[$key].' is inside it)';
+        if (in_array('DIRS', $only, true)) {
+            foreach (['USER_SETTINGS_DIR' => 'User settings directory', 'ATTACHMENT_DIR' => 'Attachment directory'] as $key => $label) {
+                if ($values[$key] === '') {
+                    $errors[] = $label.' is required';
+                }
+                elseif (self::isUnderPath($values[$key], $app_path)) {
+                    $errors[] = $label.' must be outside the web root ('.$values[$key].' is inside it)';
+                }
             }
         }
         return $errors;
