@@ -56,12 +56,8 @@ class Hm_Web_Installer {
      * whoever is submitting directly. Keeping the settings/attachment
      * directories out of the web root is the exact protection issue #17's
      * security discussion asked for, not just a UX nicety.
-     */
-    /**
-     * $only restricts which groups get checked ('DB_DRIVER', 'DIRS'), so the
-     * Database step's own connection check can validate just the driver
-     * without failing on the Storage step's fields, which aren't filled in
-     * yet at that point in the wizard.
+     *
+     * $only lets a single wizard step validate just its own fields.
      */
     public static function validate(array $values, $app_path, array $only = ['DB_DRIVER', 'DIRS']) {
         $errors = [];
@@ -79,6 +75,29 @@ class Hm_Web_Installer {
             }
         }
         return $errors;
+    }
+
+    // Walks up to the nearest existing ancestor (mkdir() elsewhere is
+    // recursive) and checks that one is writable, without creating anything.
+    public static function checkStorageWritable(array $values) {
+        foreach (['USER_SETTINGS_DIR' => 'User settings directory', 'ATTACHMENT_DIR' => 'Attachment directory'] as $key => $label) {
+            $dir = rtrim(str_replace('\\', '/', $values[$key]), '/');
+            $probe = $dir;
+            while ($probe !== '' && $probe !== '.' && !is_dir($probe)) {
+                $parent = dirname($probe);
+                if ($parent === $probe) {
+                    break;
+                }
+                $probe = $parent;
+            }
+            if ($probe === '' || $probe === '.' || !is_dir($probe)) {
+                return ['success' => false, 'error' => $label.': no existing parent directory found for '.$dir];
+            }
+            if (!is_writable($probe)) {
+                return ['success' => false, 'error' => $label.' is not writable: '.$probe];
+            }
+        }
+        return ['success' => true, 'error' => ''];
     }
 
     public static function isUnderPath($candidate, $base) {
