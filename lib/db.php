@@ -35,6 +35,10 @@ class Hm_DB {
             'db_socket' => $site_config->get('db_socket', false),
             'db_conn_type' => $site_config->get('db_connection_type', 'host'),
             'db_port' => $site_config->get('db_port', false),
+            'db_ssl_ca' => $site_config->get('db_ssl_ca', false),
+            'db_ssl_cert' => $site_config->get('db_ssl_cert', false),
+            'db_ssl_key' => $site_config->get('db_ssl_key', false),
+            'db_ssl_verify_server_cert' => $site_config->get('db_ssl_verify_server_cert', true),
         ];
 
         foreach (self::$required_config as $v) {
@@ -56,7 +60,10 @@ class Hm_DB {
                 self::$config['db_user'].
                 self::$config['db_pass'].
                 self::$config['db_conn_type'].
-                self::$config['db_socket']
+                self::$config['db_socket'].
+                self::$config['db_ssl_ca'].
+                self::$config['db_ssl_cert'].
+                self::$config['db_ssl_key']
         );
     }
 
@@ -149,6 +156,34 @@ class Hm_DB {
     }
 
     /**
+     * Build the PDO driver options used to connect to the db
+     *
+     * Only MySQL/MariaDB supports TLS options through PDO attributes, and only
+     * when at least one of the SSL attributes is set: passing
+     * MYSQL_ATTR_SSL_VERIFY_SERVER_CERT on its own does not enable TLS.
+     * @return array PDO driver options
+     */
+    static public function build_pdo_options() {
+        $options = [];
+        if (self::$config['db_driver'] != 'mysql') {
+            return $options;
+        }
+        if (self::$config['db_ssl_ca']) {
+            $options[PDO::MYSQL_ATTR_SSL_CA] = self::$config['db_ssl_ca'];
+        }
+        if (self::$config['db_ssl_cert']) {
+            $options[PDO::MYSQL_ATTR_SSL_CERT] = self::$config['db_ssl_cert'];
+        }
+        if (self::$config['db_ssl_key']) {
+            $options[PDO::MYSQL_ATTR_SSL_KEY] = self::$config['db_ssl_key'];
+        }
+        if ($options && !self::$config['db_ssl_verify_server_cert']) {
+            $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+        }
+        return $options;
+    }
+
+    /**
      * Connect to a DB server
      * @param object $site_config site settings
      * @return object|false database connection on success
@@ -162,7 +197,7 @@ class Hm_DB {
         }
         $dsn = self::build_dsn();
         try {
-            self::$dbh[$key] = new PDO($dsn, self::$config['db_user'], self::$config['db_pass']);
+            self::$dbh[$key] = new PDO($dsn, self::$config['db_user'], self::$config['db_pass'], self::build_pdo_options());
             self::$dbh[$key]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             self::$dbh[$key]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             Hm_Debug::add(sprintf('Connecting to dsn: %s', $dsn), "info");
