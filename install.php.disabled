@@ -70,6 +70,26 @@ if (empty($_SESSION['csrf_token'])) {
 }
 $csrf_token = $_SESSION['csrf_token'];
 
+// Checked from the Database step's Next button before the wizard moves on,
+// so a bad password/host is caught immediately instead of after the Storage
+// and Admin steps have also been filled in.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['ajax_action'] ?? '') === 'test_db_connection') {
+    header('Content-Type: application/json');
+    if (!Hm_Web_Installer::secretMatches($csrf_token, $_POST['csrf_token'] ?? '')) {
+        echo json_encode(['success' => false, 'error' => 'Invalid session, reload the form and try again.']);
+        exit;
+    }
+    $values = Hm_Web_Installer::collectFormValues($_POST);
+    $errors = Hm_Web_Installer::validate($values, APP_PATH, ['DB_DRIVER']);
+    if (!empty($errors)) {
+        echo json_encode(['success' => false, 'error' => implode(' ', $errors)]);
+        exit;
+    }
+    $result = $installer->testDatabaseConnection($values);
+    echo json_encode(['success' => $result['success'], 'error' => $result['error']]);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!Hm_Web_Installer::secretMatches($csrf_token, $_POST['csrf_token'] ?? '')) {
         render_page('Installer locked', '<p>Invalid session, reload the form and try again.</p>', 'locked');
@@ -124,25 +144,31 @@ function driver_select() {
 
 function render_form($csrf_token, $token) {
     $steps = [
-        'Database' => driver_select().
+        ['title' => 'Database', 'validate' => 'db', 'fields' =>
+            driver_select().
             field('DB_HOST', 'Host', 'text', '', true).
             field('DB_NAME', 'Name', 'text', '', true).
             field('DB_USER', 'User', 'text', '', true).
-            field('DB_PASS', 'Password', 'password'),
-        'Storage' => field('USER_SETTINGS_DIR', 'User settings directory', 'text', 'outside the web root', true).
-            field('ATTACHMENT_DIR', 'Attachment directory', 'text', 'outside the web root', true),
-        'Admin account (optional)' => field('admin_user', 'Username').
-            field('admin_pass', 'Password', 'password'),
+            field('DB_PASS', 'Password', 'password')],
+        ['title' => 'Storage', 'validate' => '', 'fields' =>
+            field('USER_SETTINGS_DIR', 'User settings directory', 'text', 'outside the web root', true).
+            field('ATTACHMENT_DIR', 'Attachment directory', 'text', 'outside the web root', true)],
+        ['title' => 'Admin account (optional)', 'validate' => '', 'fields' =>
+            field('admin_user', 'Username').
+            field('admin_pass', 'Password', 'password')],
     ];
 
     $step_count = count($steps);
     $panels = '';
     $dots = '';
     $i = 0;
-    foreach ($steps as $title => $fields) {
+    foreach ($steps as $step) {
         $i++;
-        $panels .= '<section class="step" data-step="'.$i.'"'.($i === 1 ? '' : ' hidden').'>'.
-            '<h2>'.htmlspecialchars($title).'</h2>'.$fields.'</section>';
+        $panels .= '<section class="step" data-step="'.$i.'"'.($i === 1 ? '' : ' hidden').
+            ($step['validate'] !== '' ? ' data-validate="'.htmlspecialchars($step['validate']).'"' : '').'>'.
+            '<h2>'.htmlspecialchars($step['title']).'</h2>'.
+            '<p class="step-error" hidden></p>'.
+            $step['fields'].'</section>';
         $dots .= '<li'.($i === 1 ? ' class="active"' : '').'></li>';
     }
 
@@ -196,8 +222,51 @@ function step_script($step_count) {
                 current = n;
             }
 
+            function currentStepEl() {
+                return document.querySelector('.step[data-step="' + current + '"]');
+            }
+
+            function showStepError(stepEl, message) {
+                var errorEl = stepEl.querySelector('.step-error');
+                errorEl.textContent = message || '';
+                errorEl.hidden = !message;
+            }
+
+            // The Database step is flagged data-validate="db": its "Next"
+            // must confirm the credentials actually connect before the
+            // wizard lets the user move on, instead of only finding out
+            // after the Storage and Admin steps have also been filled in.
+            function testDbConnection() {
+                var data = new FormData(form);
+                data.set('ajax_action', 'test_db_connection');
+                nextBtn.disabled = true;
+                var previousLabel = nextBtn.textContent;
+                nextBtn.textContent = 'Checking…';
+                return fetch(window.location.href, { method: 'POST', body: data, credentials: 'same-origin' })
+                    .then(function (response) { return response.json(); })
+                    .catch(function () { return { success: false, error: 'Could not reach the server to validate.' }; })
+                    .then(function (result) {
+                        nextBtn.disabled = false;
+                        nextBtn.textContent = previousLabel;
+                        return result;
+                    });
+            }
+
             nextBtn.addEventListener('click', function () {
                 if (!form.reportValidity()) return;
+                var stepEl = currentStepEl();
+                showStepError(stepEl, '');
+                if (stepEl.dataset.validate === 'db') {
+                    testDbConnection().then(function (result) {
+                        if (result.success) {
+                            show(Math.min(current + 1, total));
+                        }
+                        else {
+                            showStepError(stepEl, result.error || 'Could not connect to the database.');
+                        }
+                    });
+                    return;
+                }
                 show(Math.min(current + 1, total));
             });
             backBtn.addEventListener('click', function () { show(Math.max(current - 1, 1)); });
@@ -342,6 +411,11 @@ function page_style() {
             ul { margin: 0 0 12px; padding-left: 20px; color: var(--muted); }
             .hint { color: var(--muted); font-weight: 400; }
             .hint::before { content: " \2014 "; }
+            .step-error {
+                color: var(--error-border);
+                font-size: 13px;
+                margin: 8px 0 0;
+            }
             input, select {
                 display: block;
                 width: 100%;
