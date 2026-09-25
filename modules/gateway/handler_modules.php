@@ -1,5 +1,12 @@
 <?php
 
+class Hm_Handler_gateway_login extends Hm_Handler_login {
+    public function process() {
+        $this->validate_request = false;
+        parent::process();
+    }
+}
+
 /**
  * All bridge handlers deliberately return JSON (or a bounded binary attachment)
  * and stop dispatch immediately. Secrets from server repositories are never exposed.
@@ -12,6 +19,7 @@ class Hm_Handler_gateway_guard extends Hm_Handler_Module {
         if (!$configured || !$provided || !hash_equals((string)$configured, (string)$provided)) {
             gateway_json_error('bridge authentication failed', 403);
         }
+        Hm_Request_Key::load($this->session, $this->request, false);
         Hm_Gateway_Response::bind_session($this->session);
     }
 }

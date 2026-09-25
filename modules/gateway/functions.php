@@ -273,37 +273,39 @@ function gateway_extract_attachments($structure) {
 }}
 
 if (!hm_exists('gateway_walk_structure')) {
-function gateway_walk_structure($node, &$result) {
+function gateway_walk_structure($node, &$result, $current_part = "") {
     if (!is_array($node)) return;
     $filename = null;
-    foreach (array('filename', 'name', 'file_name', 'description') as $key) {
-        if (isset($node[$key]) && is_string($node[$key]) && $node[$key] !== '') {
-            $filename = $node[$key];
-            break;
+    if (isset($node["attributes"]) && is_array($node["attributes"])) {
+        $filename = $node["attributes"]["filename"] ?? ($node["attributes"]["name"] ?? null);
+    }
+    if (!$filename && isset($node["disposition"]) && is_array($node["disposition"]) && isset($node["disposition"]["attachment"])) {
+        $att = $node["disposition"]["attachment"];
+        if (is_array($att) && count($att) >= 2) $filename = $att[1];
+    }
+    if (!$filename && isset($node["file_attributes"]) && is_array($node["file_attributes"]) && isset($node["file_attributes"]["attachment"])) {
+        $att = $node["file_attributes"]["attachment"];
+        if (is_array($att) && count($att) >= 2) $filename = $att[1];
+    }
+    $type = $node["type"] ?? "";
+    $subtype = $node["subtype"] ?? "";
+    $mime_type = $type && $subtype ? "$type/$subtype" : ($type ?: "application/octet-stream");
+    $is_attachment = ($filename !== null && $filename !== "") || strtolower($type) === "image" || isset($node["disposition"]["attachment"]) || isset($node["file_attributes"]["attachment"]);
+    if ($is_attachment && $current_part !== "" && $current_part !== "0" && $current_part !== "0.1") {
+        $result[] = [
+            "part" => (string)$current_part,
+            "filename" => $filename ?: "attachment-" . $current_part,
+            "content_type" => $mime_type,
+            "size" => isset($node["size"]) ? (int)$node["size"] : null,
+            "inline" => false
+        ];
+    }
+    foreach ($node as $k => $v) {
+        if (is_array($v)) {
+            $next_part = (is_string($k) && preg_match("/^[0-9.]+$/", $k)) ? $k : $current_part;
+            gateway_walk_structure($v, $result, $next_part);
         }
     }
-    if (!$filename && isset($node['attributes']) && is_array($node['attributes'])) {
-        $filename = $node['attributes']['filename'] ?? ($node['attributes']['name'] ?? null);
-    }
-    $disposition = isset($node['disposition']) ? strtolower((string)$node['disposition']) : '';
-    if ($filename || $disposition === 'attachment' || $disposition === 'inline') {
-        $type = null;
-        if (isset($node['content-type'])) $type = $node['content-type'];
-        elseif (isset($node['content_type'])) $type = $node['content_type'];
-        elseif (isset($node['type']) && isset($node['subtype'])) $type = $node['type'].'/'.$node['subtype'];
-        elseif (isset($node['type'])) $type = $node['type'];
-        $part = isset($node['part']) ? $node['part'] : (isset($node['id']) ? $node['id'] : (isset($node['part_id']) ? $node['part_id'] : ''));
-        if ((string)$part !== '') {
-            $result[] = array(
-                'part' => (string)$part,
-                'filename' => $filename ? (string)$filename : null,
-                'content_type' => $type ? (string)$type : null,
-                'size' => isset($node['size']) && is_numeric($node['size']) ? (int)$node['size'] : null,
-                'inline' => $disposition === 'inline'
-            );
-        }
-    }
-    foreach ($node as $value) if (is_array($value)) gateway_walk_structure($value, $result);
 }}
 
 if (!hm_exists('gateway_header_text')) {
