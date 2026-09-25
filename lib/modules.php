@@ -42,8 +42,8 @@ trait Hm_Modules_Queue {
      * @param string $source the module set containing this module
      * return void
      */
-    public static function queue_module_for_all_pages($module, $logged_in, $marker, $placement, $source) {
-        self::$all_page_queue[] = [$module, $logged_in, $marker, $placement, $source];
+    public static function queue_module_for_all_pages($module, $logged_in, $marker, $placement, $source, $include_ajax = false) {
+        self::$all_page_queue[] = [$module, $logged_in, $marker, $placement, $source, $include_ajax];
     }
 
     /**
@@ -52,7 +52,7 @@ trait Hm_Modules_Queue {
      */
     public static function process_all_page_queue() {
         foreach (self::$all_page_queue as $mod) {
-            self::add_to_all_pages($mod[0], $mod[1], $mod[2], $mod[3], $mod[4]);
+            self::add_to_all_pages($mod[0], $mod[1], $mod[2], $mod[3], $mod[4], !empty($mod[5]));
         }
     }
 
@@ -155,9 +155,9 @@ trait Hm_Modules {
      * @param string $source the module set containing this module
      * @return void
      */
-    public static function add_to_all_pages($module, $logged_in, $marker, $placement, $source) {
+    public static function add_to_all_pages($module, $logged_in, $marker, $placement, $source, $include_ajax = false) {
         foreach (self::$module_list as $page => $modules) {
-            if (!preg_match("/^ajax_/", $page)) {
+            if ($include_ajax || !preg_match("/^ajax_/", $page)) {
                 self::add($page, $module, $logged_in, $marker, $placement, true, $source);
             }
         }
@@ -338,7 +338,53 @@ trait Hm_Modules {
 /**
  * Class to manage all the input processing modules
  */
-class Hm_Handler_Modules { use Hm_Modules; }
+class Hm_Handler_Modules {
+    use Hm_Modules;
+
+    /* handler names that still run after another handler halts */
+    private static $after_halt = array();
+
+    /**
+     * Remember a handler that must run after a halt
+     * @param string $module handler name
+     * @return void
+     */
+    public static function mark_after_halt($module) {
+        self::$after_halt[$module] = true;
+    }
+
+    /**
+     * @param string $module handler name
+     * @return bool
+     */
+    public static function runs_after_halt($module) {
+        return !empty(self::$after_halt[$module]);
+    }
+
+    /**
+     * @return array handler names
+     */
+    public static function after_halt_list() {
+        return array_keys(self::$after_halt);
+    }
+
+    /**
+     * Replace the after-halt list from site config
+     * @param array $names handler names
+     * @return void
+     */
+    public static function load_after_halt($names) {
+        self::$after_halt = array();
+        if (!is_array($names)) {
+            return;
+        }
+        foreach ($names as $name) {
+            if (is_string($name) && $name !== '') {
+                self::$after_halt[$name] = true;
+            }
+        }
+    }
+}
 
 /**
  * Class to manage all the output modules
@@ -403,6 +449,15 @@ function add_handler($page, $mod, $logged_in, $source=false, $marker=false, $pla
 }
 
 /**
+ * Let a handler run after another handler halts the rest of the page
+ * @param string $mod handler name
+ * @return void
+ */
+function handler_runs_after_halt($mod) {
+    Hm_Handler_Modules::mark_after_halt($mod);
+}
+
+/**
  * Add a repository to the module
  *
  * Repository name for ProfileRepository class is 'profile'
@@ -439,11 +494,11 @@ function add_output($page, $mod, $logged_in, $source=false, $marker=false, $plac
  * @param string $placement "before" or "after" the $marker module name
  * @return void
  */
-function add_module_to_all_pages($type, $mod, $logged_in, $source, $marker, $placement) {
+function add_module_to_all_pages($type, $mod, $logged_in, $source, $marker, $placement, $include_ajax = false) {
     if ($type == 'output') {
-        Hm_Output_Modules::queue_module_for_all_pages($mod, $logged_in, $marker, $placement, $source);
+        Hm_Output_Modules::queue_module_for_all_pages($mod, $logged_in, $marker, $placement, $source, $include_ajax);
     }
     elseif ( $type == 'handler') {
-        Hm_Handler_Modules::queue_module_for_all_pages($mod, $logged_in, $marker, $placement, $source);
+        Hm_Handler_Modules::queue_module_for_all_pages($mod, $logged_in, $marker, $placement, $source, $include_ajax);
     }
 }

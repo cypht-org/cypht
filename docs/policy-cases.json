@@ -156,6 +156,76 @@
           }
         }
       ]
+    },
+    {
+      "id": "second-factor-gates-password-only-session",
+      "title": "Second factor gates a password-only session",
+      "description": "A session that has not confirmed TOTP cannot run later account changes or receive an authenticated AJAX payload.",
+      "tests": [
+        "Hm_Test_2fa_Handler_Modules::test_password_only_session_is_gated"
+      ],
+      "cases": [
+        {
+          "id": "unconfirmed-session-skips-later-handlers",
+          "description": "A password-only session does not run a later write handler, still saves session user data, and closes the session.",
+          "input": {
+            "request_type": "HTTP",
+            "two_factor_confirmed": false,
+            "logout": false
+          },
+          "expected": {
+            "halted": true,
+            "password_changed": false,
+            "user_data_saved": true,
+            "session_closed": true,
+            "handler_halt_in_response": false
+          }
+        },
+        {
+          "id": "confirmed-session-runs-later-handlers",
+          "description": "A session that has confirmed TOTP runs later handlers and leaves the session open.",
+          "input": {
+            "request_type": "HTTP",
+            "two_factor_confirmed": true,
+            "logout": false
+          },
+          "expected": {
+            "halted": false,
+            "password_changed": true,
+            "session_closed": false,
+            "handler_halt_in_response": false
+          }
+        },
+        {
+          "id": "unconfirmed-ajax-returns-status-only",
+          "description": "An AJAX request on a password-only session returns the second-factor status and no authenticated payload.",
+          "input": {
+            "request_type": "AJAX",
+            "two_factor_confirmed": false,
+            "logout": false
+          },
+          "expected": {
+            "halted": true,
+            "password_changed": false,
+            "ajax_status": "2fa required",
+            "folder_list_present": false,
+            "handler_halt_in_response": false
+          }
+        },
+        {
+          "id": "logout-destroys-before-session-close",
+          "description": "Logout on a gated session destroys the session before the executor closes it.",
+          "input": {
+            "request_type": "HTTP",
+            "two_factor_confirmed": false,
+            "logout": true
+          },
+          "expected": {
+            "destroy_before_close": true,
+            "password_changed": false
+          }
+        }
+      ]
     }
   ]
 }

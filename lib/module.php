@@ -359,14 +359,18 @@ abstract class Hm_Handler_Module {
 
     public $cache;
 
+    /* module executor that runs this handler */
+    protected $parent;
+
     /**
      * Assign input and state sources
-     * @param object $parent instance of the Hm_Request_Handler class
+     * @param object $parent module executor
      * @param string $page page id
      * @param array $output data from handler modules
      * @param array $protected list of protected output names
      */
     public function __construct($parent, $page, $output = [], $protected = []) {
+        $this->parent = $parent;
         $this->session = $parent->session;
         $this->request = $parent->request;
         $this->cache = $parent->cache;
@@ -375,6 +379,14 @@ abstract class Hm_Handler_Module {
         $this->user_config = $parent->user_config;
         $this->output = $output;
         $this->protected = $protected;
+    }
+
+    /**
+     * Stop later handler modules. The executor decides which modules still run.
+     * @return void
+     */
+    protected function halt() {
+        $this->parent->halt();
     }
 
     /**

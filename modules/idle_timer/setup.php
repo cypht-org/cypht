@@ -4,6 +4,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 handler_source('idle_timer');
 output_source('idle_timer');
+handler_runs_after_halt('idle_time_check');
 
 
 /* settings page */
