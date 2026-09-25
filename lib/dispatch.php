@@ -244,6 +244,9 @@ class Hm_Dispatch {
         if (!$this->session->loaded) {
             return;
         }
+        if ($this->module_exec->is_halted()) {
+            return;
+        }
         try {
             if ($this->module_exec->user_config->save_on_login) {
                 $this->module_exec->user_config->save($this->request->post['username'], $this->request->post['password']);

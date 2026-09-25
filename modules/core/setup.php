@@ -10,6 +10,8 @@ require_once APP_PATH.'modules/core/functions.php';
 
 handler_source('core');
 output_source('core');
+handler_runs_after_halt('save_user_data');
+handler_runs_after_halt('logout');
 
 /* homepage */
 setup_base_page('home');
@@ -238,6 +240,7 @@ return array(
     ),
     'allowed_output' => array(
         'date' => array(FILTER_UNSAFE_RAW, false),
+        'status' => array(FILTER_UNSAFE_RAW, false),
         'formatted_folder_list' => array(FILTER_UNSAFE_RAW, false),
         'router_user_msgs' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'router_login_state' => array(FILTER_VALIDATE_BOOLEAN, false),
