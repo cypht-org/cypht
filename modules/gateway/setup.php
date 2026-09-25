@@ -9,9 +9,6 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 handler_source('gateway');
-if (function_exists('output_source')) {
-    output_source('gateway');
-}
 if (function_exists('setup_base_page')) {
     setup_base_page('gateway', 'core');
 }
@@ -56,12 +53,15 @@ $gateway_pages = array_merge($gateway_pages, $gateway_feed_read_pages);
 
 foreach ($gateway_pages as $page) {
     setup_base_ajax_page($page, 'core');
+    replace_module('handler', 'login', 'gateway_login', $page);
     add_handler($page, 'gateway_guard', true, 'gateway', 'load_user_data', 'after');
     add_handler($page, 'load_imap_servers_from_config', true, 'imap', 'gateway_guard', 'after');
+    add_handler($page, 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
 }
 
 foreach (array_merge($gateway_calendar_read_pages, $gateway_calendar_write_pages) as $page) {
     setup_base_ajax_page($page, 'core');
+    replace_module('handler', 'login', 'gateway_login', $page);
     add_handler($page, 'gateway_guard', true, 'gateway', 'load_user_data', 'after');
     $gateway_pages[] = $page;
 }
@@ -100,6 +100,7 @@ $gateway_contact_handlers = array(
 );
 foreach ($gateway_contact_handlers as $page => $handler) {
     setup_base_ajax_page($page, 'core');
+    replace_module('handler', 'login', 'gateway_login', $page);
     add_handler($page, 'gateway_guard', true, 'gateway', 'load_user_data', 'after');
     add_handler($page, $handler, true, 'gateway', 'gateway_guard', 'after');
     $gateway_pages[] = $page;
@@ -112,6 +113,7 @@ $gateway_tag_handlers = array(
 );
 foreach ($gateway_tag_handlers as $page => $handler) {
     setup_base_ajax_page($page, 'core');
+    replace_module('handler', 'login', 'gateway_login', $page);
     add_handler($page, 'gateway_guard', true, 'gateway', 'load_user_data', 'after');
     add_handler($page, $handler, true, 'gateway', 'gateway_guard', 'after');
     $gateway_pages[] = $page;
@@ -123,15 +125,19 @@ $gateway_message_tag_handlers = array(
 );
 foreach ($gateway_message_tag_handlers as $page => $handler) {
     setup_base_ajax_page($page, 'core');
+    replace_module('handler', 'login', 'gateway_login', $page);
     add_handler($page, 'gateway_guard', true, 'gateway', 'load_user_data', 'after');
     add_handler($page, 'load_imap_servers_from_config', true, 'imap', 'gateway_guard', 'after');
+    add_handler($page, 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
     add_handler($page, $handler, true, 'gateway', 'load_imap_servers_from_config', 'after');
     $gateway_pages[] = $page;
 }
 foreach (array_merge($gateway_saved_search_read_pages, $gateway_saved_search_write_pages) as $page) {
     setup_base_ajax_page($page, 'core');
+    replace_module('handler', 'login', 'gateway_login', $page);
     add_handler($page, 'gateway_guard', true, 'gateway', 'load_user_data', 'after');
     add_handler($page, 'load_imap_servers_from_config', true, 'imap', 'gateway_guard', 'after');
+    add_handler($page, 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
     $gateway_pages[] = $page;
 }
 add_handler('ajax_gateway_saved_searches', 'gateway_saved_searches', true, 'gateway', 'gateway_guard', 'after');
