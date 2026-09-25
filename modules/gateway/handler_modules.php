@@ -1,9 +1,11 @@
 <?php
 
-class Hm_Handler_gateway_login extends Hm_Handler_login {
-    public function process() {
-        $this->validate_request = false;
-        parent::process();
+if (class_exists('Hm_Handler_login')) {
+    class Hm_Handler_gateway_login extends Hm_Handler_login {
+        public function process() {
+            $this->validate_request = false;
+            parent::process();
+        }
     }
 }
 
