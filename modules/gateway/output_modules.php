@@ -5,7 +5,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 if (class_exists('Hm_Output_Module')) {
     class Hm_Output_gateway_settings_link extends Hm_Output_Module {
         protected function output() {
-            $res = '<li class="menu_gateway"><a class="unread_link" data-external="1" href="'.$this->build_page_url('gateway').'">';
+            $res = '<li class="menu_gateway"><a class="unread_link" href="'.$this->build_page_url('gateway').'">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-cpu-fill menu-icon"></i>';
             }
