@@ -193,7 +193,7 @@ class Hm_Output_user_list extends Hm_Output_Module {
     protected function output() {
         $current_user = $this->get('username', '');
         $users = $this->get('user_list', array());
-        $res = '<div class="settings_subtitle p-3 border-bottom mt-3">'.$this->trans('Existing Accounts').'</div>';
+        $res = '<div class="settings_subtitle p-3 border-bottom mt-3"><i class="bi bi-people-fill me-2"></i>'.$this->trans('Existing Accounts').'</div>';
         $res .= '<div class="row px-3 pb-3"><div class="col-lg-8 col-xl-6">';
         $res .= '<div class="table-responsive">';
         if (!$users) {
