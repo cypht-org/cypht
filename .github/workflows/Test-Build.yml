@@ -64,7 +64,7 @@ jobs:
 
     steps:
       - name: "System Install Dependencies"
-        run: sudo apt-get install -y mysql-client postgresql-client sqlite3 libsodium-dev ldap-utils libldap2-dev
+        run: sudo apt-get install -y mysql-client postgresql-client sqlite3 libsodium-dev ldap-utils libldap2-dev dovecot-imapd dovecot-lmtpd postfix
 
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -90,8 +90,14 @@ jobs:
       - name: "Script: setup.sh"
         run: bash .github/tests/setup.sh
 
+
       - name: "Script: test.sh"
         run: bash tests/phpunit/run.sh
+
+      - name: "Real mail server integration tests"
+        env:
+          CYPHT_REAL_MAIL_SERVER: 'true'
+        run: vendor/bin/phpunit --configuration tests/phpunit/phpunit.xml --testsuite integration_mail_server
 
 
   Test-selenium:

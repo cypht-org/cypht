@@ -223,7 +223,11 @@ setup_site() {
 setup_unit_tests() {
     setup_cypht
     bootstrap_unit_tests
+    setup_user
+    setup_dovecot
+    setup_postfix
     setup_ldap
+    test_user_setup
 }
 
 setup_ui_tests() {
