@@ -13,6 +13,26 @@ if (class_exists('Hm_Handler_login')) {
  * All bridge handlers deliberately return JSON (or a bounded binary attachment)
  * and stop dispatch immediately. Secrets from server repositories are never exposed.
  */
+class Hm_Handler_gateway_http_headers extends Hm_Handler_Module {
+    public function process() {
+        $headers = $this->get('http_headers', array());
+        if (isset($headers['Content-Security-Policy'])) {
+            if (strpos($headers['Content-Security-Policy'], 'frame-src') === false) {
+                if (strpos($headers['Content-Security-Policy'], "default-src 'none';") !== false) {
+                    $headers['Content-Security-Policy'] = str_replace(
+                        "default-src 'none';",
+                        "default-src 'none'; frame-src 'self';",
+                        $headers['Content-Security-Policy']
+                    );
+                } else {
+                    $headers['Content-Security-Policy'] .= " frame-src 'self';";
+                }
+            }
+            $this->out('http_headers', $headers);
+        }
+    }
+}
+
 class Hm_Handler_gateway_guard extends Hm_Handler_Module {
     public function process() {
         $configured = env('GATEWAY_BRIDGE_KEY', '');

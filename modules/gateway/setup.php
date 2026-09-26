@@ -12,6 +12,9 @@ handler_source('gateway');
 if (function_exists('setup_base_page')) {
     setup_base_page('gateway', 'core');
 }
+if (function_exists('add_handler')) {
+    add_handler('gateway', 'gateway_http_headers', true, 'gateway', 'http_headers', 'after');
+}
 if (function_exists('add_output')) {
     add_output('ajax_hm_folders', 'gateway_settings_link', true, 'gateway', 'settings_menu_end', 'before');
     add_output('gateway', 'gateway_page_content', true, 'gateway', 'content_section_start', 'after');
