@@ -37,4 +37,23 @@ if (class_exists('Hm_Output_Module')) {
                 . '</div>';
         }
     }
-}
+
+    class Hm_Output_gateway_settings_section extends Hm_Output_Module {
+        protected function output() {
+            return '<tr><td data-target=".gateway_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'
+                . '<i class="bi bi-cpu-fill fs-5 me-2"></i>' . $this->trans('API & MCP Gateway') . '</td></tr>'
+                . '<tr class="gateway_setting">'
+                . '<td class="d-block d-md-table-cell"><label>' . $this->trans('Status & Endpoints') . '</label></td>'
+                . '<td class="d-block d-md-table-cell">'
+                . '<div class="d-flex align-items-center mb-2">'
+                . '<span class="badge bg-success me-2">Active</span>'
+                . '<code class="me-3">REST /api/v1</code>'
+                . '<code class="me-3">MCP /mcp</code>'
+                . '<a href="/gateway/" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">' . $this->trans('Manage Tokens & Keys') . '</a>'
+                . '</div>'
+                . '<div class="setting_description text-muted small">'
+                . $this->trans('Connect AI assistants (Claude, Cursor, Codex) via Model Context Protocol or automate email workflows via REST API.')
+                . '</div>'
+                . '</td></tr>';
+        }
+    }}

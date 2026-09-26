@@ -15,6 +15,7 @@ if (function_exists('setup_base_page')) {
 if (function_exists('add_output')) {
     add_output('ajax_hm_folders', 'gateway_settings_link', true, 'gateway', 'settings_menu_end', 'before');
     add_output('gateway', 'gateway_page_content', true, 'gateway', 'content_section_start', 'after');
+    add_output('settings', 'gateway_settings_section', true, 'gateway', 'end_settings_form', 'before');
 }
 
 $gateway_read_pages = array(
