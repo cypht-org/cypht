@@ -1492,7 +1492,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
             return '';
         }
 
-        $res = '<div class="subtitle mt-4 fw-bold border-top pt-4">'.$this->trans('SMTP Servers').'</div>';
+        $res = '<div class="subtitle mt-4 fw-bold border-top pt-4"><i class="bi bi-send-check-fill me-2"></i>'.$this->trans('SMTP Servers').'</div>';
         foreach ($list as $index => $vals) {
 
             $no_edit = false;

@@ -160,7 +160,7 @@ class Hm_Output_create_form extends Hm_Output_Module {
         }
         return '<div class="accounts_page px-0">'.
             '<div class="content_title px-3">'.$this->trans('Accounts').'</div>'.
-            '<div class="settings_subtitle p-3 border-bottom">'.$this->trans('Create Account').'</div>'.
+            '<div class="settings_subtitle p-3 border-bottom"><i class="bi bi-person-plus-fill me-2"></i>'.$this->trans('Create Account').'</div>'.
             '<div class="create_user row px-3 mt-3">'.
                 '<div class="col-lg-4 col-sm-12">'.
                     '<form method="POST" autocomplete="off">'.
@@ -281,7 +281,7 @@ class Hm_Output_change_password extends Hm_Output_Module {
         $res = '';
         if ($this->get('internal_users')) {
             $res .= '<div class="chg_pass_page px-0">
-                        <div class="content_title px-3">'.$this->trans('Change Password').'</div>
+                        <div class="content_title px-3"><i class="bi bi-key-fill me-2"></i>'.$this->trans('Change Password').'</div>
                         <div class="change_pass row px-3 mt-3">
                             <div class="col-lg-4 col-sm-12">
                                 <form method="POST">
