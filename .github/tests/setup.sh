@@ -116,6 +116,19 @@ test_user_setup() {
     STATUS_DONE
 }
 
+# verify Hm_IMAP's configurable connect timeout against the real Dovecot instance
+test_imap_timeout() {
+    STATUS_TITLE "Test IMAP connect timeout"
+
+    php .github/tests/scripts/verify_imap_timeout.php
+    if [ $? -eq 0 ]; then
+        STATUS_DONE
+    else
+        STATUS_ERROR
+        exit 1
+    fi
+}
+
 # config Dovecot
 setup_dovecot() {
 	STATUS_TITLE "Setup Dovecot"
@@ -223,7 +236,12 @@ setup_site() {
 setup_unit_tests() {
     setup_cypht
     bootstrap_unit_tests
+    setup_user
+    setup_dovecot
+    setup_postfix
     setup_ldap
+    test_user_setup
+    test_imap_timeout
 }
 
 setup_ui_tests() {
