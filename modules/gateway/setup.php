@@ -14,6 +14,7 @@ if (function_exists('setup_base_page')) {
 }
 if (function_exists('add_handler')) {
     add_handler('gateway', 'gateway_http_headers', true, 'gateway', 'http_headers', 'after');
+    add_handler('gateway', 'gateway_sso_data', true, 'gateway', 'load_user_data', 'after');
 }
 if (function_exists('add_output')) {
     add_output('ajax_hm_folders', 'gateway_settings_link', true, 'gateway', 'settings_menu_end', 'before');

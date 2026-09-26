@@ -17,42 +17,15 @@ if (class_exists('Hm_Output_Module')) {
         }
     }
 
-    class Hm_Output_gateway_page_content extends Hm_Output_Module {
+        class Hm_Output_gateway_page_content extends Hm_Output_Module {
         protected function output() {
-            $username = $this->session->get('username', '');
-            $hm_id = $_COOKIE['hm_id'] ?? '';
-            $hm_session = $_COOKIE['hm_session'] ?? '';
-            $bridge_key = env('GATEWAY_BRIDGE_KEY', '');
-            $token = '';
-            if ($username && $hm_id && $hm_session && $bridge_key) {
-                $payload = json_encode(array(
-                    'username' => $username,
-                    'hm_id' => $hm_id,
-                    'hm_session' => $hm_session
-                ));
-                $opts = array(
-                    'http' => array(
-                        'method'  => 'POST',
-                        'header'  => "Content-Type: application/json\r\nX-Cypht-Gateway-Key: ".$bridge_key."\r\n",
-                        'content' => $payload,
-                        'timeout' => 2
-                    )
-                );
-                $context = @stream_context_create($opts);
-                $res = @file_get_contents('http://127.0.0.1:18080/api/v1/auth/sso', false, $context);
-                if ($res) {
-                    $data = @json_decode($res, true);
-                    if (!empty($data['access_token'])) {
-                        $token = $data['access_token'];
-                    }
-                }
-            }
+            $token = $this->get('gateway_sso_token', '');
             $iframe_url = '/gateway/' . ($token ? '#token=' . htmlspecialchars($token, ENT_QUOTES) : '');
 
             return '<div class="gateway_content px-0">'
                 . '<div class="content_title d-flex align-items-center justify-content-between px-3 py-2">'
                 . '<span><i class="bi bi-cpu-fill me-2"></i>' . $this->trans('API & MCP Gateway') . '</span>'
-                . '<a href="/gateway/" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">'
+                . '<a href="' . $iframe_url . '" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">'
                 . $this->trans('Open Full Console') . '</a>'
                 . '</div>'
                 . '<div class="px-3 pb-3">'

@@ -33,9 +33,50 @@ class Hm_Handler_gateway_http_headers extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_gateway_sso_data extends Hm_Handler_Module {
+    public function process() {
+        $username = $this->session->get('username', '');
+        $hm_id = $this->request->cookie['hm_id'] ?? '';
+        $hm_session = $this->request->cookie['hm_session'] ?? '';
+        $bridge_key = function_exists('gateway_bridge_key') ? gateway_bridge_key() : env('GATEWAY_BRIDGE_KEY', '');
+        if (!$bridge_key && file_exists('/var/lib/hm3/app_data/gateway/bridge.key')) {
+            $bridge_key = trim((string)@file_get_contents('/var/lib/hm3/app_data/gateway/bridge.key'));
+        }
+        $token = '';
+        if ($username && $hm_id && $hm_session && $bridge_key) {
+            $payload = json_encode(array(
+                'username' => $username,
+                'hm_id' => $hm_id,
+                'hm_session' => $hm_session
+            ));
+            $opts = array(
+                'http' => array(
+                    'method'  => 'POST',
+                    'header'  => "Content-Type: application/json\r\nX-Cypht-Gateway-Key: ".$bridge_key."\r\n",
+                    'content' => $payload,
+                    'timeout' => 2,
+                    'ignore_errors' => true
+                )
+            );
+            $context = @stream_context_create($opts);
+            $res = @file_get_contents('http://127.0.0.1:18080/api/v1/auth/sso', false, $context);
+            if ($res) {
+                $data = @json_decode($res, true);
+                if (!empty($data['access_token'])) {
+                    $token = $data['access_token'];
+                }
+            }
+        }
+        $this->out('gateway_sso_token', $token);
+    }
+}
+
 class Hm_Handler_gateway_guard extends Hm_Handler_Module {
     public function process() {
-        $configured = env('GATEWAY_BRIDGE_KEY', '');
+        $configured = function_exists('gateway_bridge_key') ? gateway_bridge_key() : env('GATEWAY_BRIDGE_KEY', '');
+        if (!$configured && file_exists('/var/lib/hm3/app_data/gateway/bridge.key')) {
+            $configured = trim((string)@file_get_contents('/var/lib/hm3/app_data/gateway/bridge.key'));
+        }
         $provided = isset($this->request->server['HTTP_X_CYPHT_GATEWAY_KEY'])
             ? $this->request->server['HTTP_X_CYPHT_GATEWAY_KEY'] : '';
         if (!$configured || !$provided || !hash_equals((string)$configured, (string)$provided)) {
