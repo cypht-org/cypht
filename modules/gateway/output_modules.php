@@ -5,7 +5,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 if (class_exists('Hm_Output_Module')) {
     class Hm_Output_gateway_settings_link extends Hm_Output_Module {
         protected function output() {
-            $res = '<li class="menu_gateway"><a class="unread_link" href="'.$this->build_page_url('gateway').'">';
+            $res = '<li class="menu_gateway"><a class="unread_link" data-external="1" href="'.$this->build_page_url('gateway').'">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-cpu-fill menu-icon"></i>';
             }
@@ -37,6 +37,31 @@ if (class_exists('Hm_Output_Module')) {
                 . '<iframe src="' . $iframe_url . '" title="Cypht Gateway Console" '
                 . 'style="width:100%;min-height:78vh;border:1px solid rgba(0,0,0,.125);border-radius:0.375rem;background:#fff;"></iframe>'
                 . '</div>'
+                . '<script type="text/javascript">
+(function() {
+    function hydrate() {
+        if (typeof applyCommonWrappedPageHandlers === "function") {
+            applyCommonWrappedPageHandlers();
+        }
+        if (typeof Hm_Folders !== "undefined") {
+            if (!Hm_Folders.folder_list_loaded()) {
+                if (!Hm_Folders.load_from_local_storage()) {
+                    Hm_Folders.update_folder_list();
+                }
+            }
+            if (typeof Hm_Folders.hl_selected_menu === "function") {
+                Hm_Folders.hl_selected_menu();
+            }
+        }
+    }
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+        setTimeout(hydrate, 10);
+    } else {
+        window.addEventListener("DOMContentLoaded", hydrate);
+        window.addEventListener("load", hydrate);
+    }
+})();
+</script>'
                 . '</div>';
         }
     }
