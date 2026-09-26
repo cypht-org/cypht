@@ -63,7 +63,41 @@ return [
     |
     | Database type. can be any supported PDO driver ; (http://php.net/manual/en/pdo.drivers.php)
     */
-    'db_driver' => env('DB_DRIVER','mysql')
+    'db_driver' => env('DB_DRIVER','mysql'),
+
+    /*
+    | ----------------
+    | TLS / SSL (MySQL and MariaDB only)
+    | ----------------
+    |
+    | Path to the Certificate Authority file used to verify the server
+    | certificate. Setting this is what enables an encrypted connection: it is
+    | required if the server runs with require_secure_transport=ON. On most
+    | distributions the system bundle is a sensible default, for example
+    | /etc/ssl/certs/ca-certificates.crt on Debian and Ubuntu.
+    */
+    'db_ssl_ca' => env('DB_SSL_CA', ''),
+
+    /*
+    |
+    | Path to the client certificate, only needed when the server requires
+    | client certificate authentication (REQUIRE X509).
+    */
+    'db_ssl_cert' => env('DB_SSL_CERT', ''),
+
+    /*
+    |
+    | Path to the client private key, used together with db_ssl_cert.
+    */
+    'db_ssl_key' => env('DB_SSL_KEY', ''),
+
+    /*
+    |
+    | Whether the server certificate is validated against the CA above. Leave
+    | this enabled unless the server uses a self-signed certificate, which is
+    | common for MySQL and MariaDB instances that auto-generate their own.
+    */
+    'db_ssl_verify_server_cert' => env('DB_SSL_VERIFY_SERVER_CERT', true)
 
     /*
     | DB Sessions
