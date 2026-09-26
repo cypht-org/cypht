@@ -42,7 +42,7 @@ var Hm_Gateway = {
                     html += '<td><code>' + safePrefix + '</code></td>';
                     html += '<td class="small text-muted">' + safeScopes + '</td>';
                     html += '<td class="small text-muted">' + date + '</td>';
-                    var actionCell = t.revoked_at ? '<span class="badge bg-secondary">已撤销 / Revoked</span>' : '<button type="button" class="btn btn-sm btn-outline-danger btn-revoke-token" data-id="' + t.id + '"><i class="bi bi-trash me-1"></i>撤销 / Revoke</button>';
+                    var actionCell = t.revoked_at ? '<span class="badge bg-secondary">Revoked</span>' : '<button type="button" class="btn btn-sm btn-outline-danger btn-revoke-token" data-id="' + t.id + '"><i class="bi bi-trash me-1"></i>Revoke</button>';
                     html += '<td class="text-end">' + actionCell + '</td>';
                     html += '</tr>';
                 });
