@@ -134,6 +134,41 @@ class Hm_Test_Web_Installer extends TestCase {
         $this->assertArrayNotHasKey('unexpected', $values);
     }
 
+    public function test_collect_form_values_reads_imap_fields_when_imap_selected() {
+        $values = Hm_Web_Installer::collectFormValues([
+            'AUTH_TYPE' => 'IMAP', 'IMAP_AUTH_SERVER' => 'imap.example.com',
+            'IMAP_AUTH_PORT' => '993', 'IMAP_AUTH_TLS' => 'on',
+        ]);
+        $this->assertSame('IMAP', $values['AUTH_TYPE']);
+        $this->assertSame('imap.example.com', $values['IMAP_AUTH_SERVER']);
+        $this->assertSame('993', $values['IMAP_AUTH_PORT']);
+        $this->assertSame('true', $values['IMAP_AUTH_TLS']);
+    }
+
+    public function test_collect_form_values_ignores_imap_fields_when_db_selected() {
+        $values = Hm_Web_Installer::collectFormValues([
+            'AUTH_TYPE' => 'DB', 'IMAP_AUTH_SERVER' => 'imap.example.com', 'IMAP_AUTH_TLS' => 'on',
+        ]);
+        $this->assertSame('localhost', $values['IMAP_AUTH_SERVER']);
+        $this->assertSame('false', $values['IMAP_AUTH_TLS']);
+    }
+
+    public function test_collect_form_values_reads_ldap_fields_when_ldap_selected() {
+        $values = Hm_Web_Installer::collectFormValues([
+            'AUTH_TYPE' => 'LDAP', 'LDAP_AUTH_SERVER' => 'ldap.example.com',
+            'LDAP_AUTH_BASE_DN' => 'dc=corp,dc=com', 'LDAP_AUTH_UID_ATTR' => 'sAMAccountName',
+        ]);
+        $this->assertSame('LDAP', $values['AUTH_TYPE']);
+        $this->assertSame('ldap.example.com', $values['LDAP_AUTH_SERVER']);
+        $this->assertSame('dc=corp,dc=com', $values['LDAP_AUTH_BASE_DN']);
+        $this->assertSame('sAMAccountName', $values['LDAP_AUTH_UID_ATTR']);
+    }
+
+    public function test_collect_form_values_falls_back_to_db_for_an_unknown_auth_type() {
+        $values = Hm_Web_Installer::collectFormValues(['AUTH_TYPE' => 'kerberos']);
+        $this->assertSame('DB', $values['AUTH_TYPE']);
+    }
+
     public function test_is_under_path_true_for_a_direct_subdirectory() {
         $this->assertTrue(Hm_Web_Installer::isUnderPath($this->tmp_dir.'data', $this->tmp_dir));
     }
@@ -183,6 +218,70 @@ class Hm_Test_Web_Installer extends TestCase {
         $values['ATTACHMENT_DIR'] = '';
         $errors = Hm_Web_Installer::validate($values, $this->tmp_dir);
         $this->assertNotEmpty($errors);
+    }
+
+    public function test_validate_accepts_valid_imap_settings() {
+        $values = Hm_Web_Installer::collectFormValues([
+            'AUTH_TYPE' => 'IMAP', 'IMAP_AUTH_SERVER' => 'imap.example.com', 'IMAP_AUTH_PORT' => '993',
+        ]);
+        $errors = Hm_Web_Installer::validate($values, $this->tmp_dir, ['AUTH']);
+        $this->assertSame([], $errors);
+    }
+
+    public function test_validate_rejects_imap_settings_missing_a_server() {
+        $values = Hm_Web_Installer::collectFormValues(['AUTH_TYPE' => 'IMAP', 'IMAP_AUTH_SERVER' => '']);
+        $errors = Hm_Web_Installer::validate($values, $this->tmp_dir, ['AUTH']);
+        $this->assertNotEmpty($errors);
+        $this->assertStringContainsString('IMAP server', $errors[0]);
+    }
+
+    public function test_validate_rejects_an_out_of_range_imap_port() {
+        $values = Hm_Web_Installer::collectFormValues(['AUTH_TYPE' => 'IMAP', 'IMAP_AUTH_PORT' => '99999']);
+        $errors = Hm_Web_Installer::validate($values, $this->tmp_dir, ['AUTH']);
+        $this->assertNotEmpty($errors);
+    }
+
+    public function test_validate_accepts_valid_ldap_settings() {
+        $values = Hm_Web_Installer::collectFormValues([
+            'AUTH_TYPE' => 'LDAP', 'LDAP_AUTH_SERVER' => 'ldap.example.com', 'LDAP_AUTH_PORT' => '389',
+            'LDAP_AUTH_BASE_DN' => 'dc=example,dc=com', 'LDAP_AUTH_UID_ATTR' => 'uid',
+        ]);
+        $errors = Hm_Web_Installer::validate($values, $this->tmp_dir, ['AUTH']);
+        $this->assertSame([], $errors);
+    }
+
+    public function test_validate_rejects_ldap_settings_missing_a_base_dn() {
+        $values = Hm_Web_Installer::collectFormValues(['AUTH_TYPE' => 'LDAP', 'LDAP_AUTH_BASE_DN' => '']);
+        $errors = Hm_Web_Installer::validate($values, $this->tmp_dir, ['AUTH']);
+        $this->assertNotEmpty($errors);
+        $this->assertStringContainsString('base DN', implode(' ', $errors));
+    }
+
+    public function test_test_auth_connection_checks_tcp_reachability_for_imap() {
+        $server = @stream_socket_server('tcp://127.0.0.1:0', $errno, $errstr);
+        if (!$server) {
+            $this->markTestSkipped('Could not bind a local TCP port to test against: '.$errstr);
+        }
+        $addr = stream_socket_get_name($server, false);
+        $port = (int) substr($addr, strrpos($addr, ':') + 1);
+
+        $web_installer = $this->webInstaller();
+        $values = Hm_Web_Installer::collectFormValues([
+            'AUTH_TYPE' => 'IMAP', 'IMAP_AUTH_SERVER' => '127.0.0.1', 'IMAP_AUTH_PORT' => (string) $port,
+        ]);
+        $result = $web_installer->testAuthConnection($values);
+
+        fclose($server);
+        $this->assertTrue($result['success']);
+    }
+
+    public function test_test_auth_connection_fails_for_an_unreachable_imap_server() {
+        $web_installer = $this->webInstaller();
+        $values = Hm_Web_Installer::collectFormValues([
+            'AUTH_TYPE' => 'IMAP', 'IMAP_AUTH_SERVER' => '127.0.0.1', 'IMAP_AUTH_PORT' => '1',
+        ]);
+        $result = $web_installer->testAuthConnection($values);
+        $this->assertFalse($result['success']);
     }
 
     public function test_check_storage_writable_succeeds_for_an_existing_writable_directory() {
@@ -289,6 +388,31 @@ class Hm_Test_Web_Installer extends TestCase {
 
         $this->assertTrue($result['success']);
         $this->assertSame(['testDatabaseConnection', 'setupDatabase', 'createAdminAccount', 'buildConfig'], $stub->calls);
+    }
+
+    public function test_install_skips_db_setup_and_admin_account_for_imap_auth() {
+        $server = @stream_socket_server('tcp://127.0.0.1:0', $errno, $errstr);
+        if (!$server) {
+            $this->markTestSkipped('Could not bind a local TCP port to test against: '.$errstr);
+        }
+        $addr = stream_socket_get_name($server, false);
+        $port = (int) substr($addr, strrpos($addr, ':') + 1);
+
+        $stub = new Hm_Installer_Test_Double($this->tmp_dir, [
+            'buildConfig' => ['success' => true, 'output' => 'built', 'error' => ''],
+        ]);
+        $web_installer = new Hm_Web_Installer($stub, $this->token_file);
+        $values = $this->formValues();
+        $values['AUTH_TYPE'] = 'IMAP';
+        $values['IMAP_AUTH_SERVER'] = '127.0.0.1';
+        $values['IMAP_AUTH_PORT'] = (string) $port;
+
+        $result = $web_installer->install($values, 'alice', 'secret');
+
+        fclose($server);
+        $this->assertTrue($result['success']);
+        $this->assertSame(['buildConfig'], $stub->calls);
+        $this->assertFileExists($this->tmp_dir.'.env');
     }
 }
 

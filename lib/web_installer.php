@@ -8,6 +8,16 @@
 class Hm_Web_Installer {
 
     private const ALLOWED_DB_DRIVERS = ['mysql', 'pgsql', 'sqlite'];
+    private const ALLOWED_AUTH_TYPES = ['DB', 'IMAP', 'LDAP'];
+
+    private const FIELD_GROUPS = [
+        'DB' => ['DB_DRIVER' => 'mysql', 'DB_HOST' => '127.0.0.1', 'DB_NAME' => 'cypht_db',
+            'DB_USER' => 'cypht', 'DB_PASS' => ''],
+        'IMAP' => ['IMAP_AUTH_SERVER' => 'localhost', 'IMAP_AUTH_PORT' => '143'],
+        'LDAP' => ['LDAP_AUTH_SERVER' => 'localhost', 'LDAP_AUTH_PORT' => '389',
+            'LDAP_AUTH_BASE_DN' => 'dc=example,dc=com', 'LDAP_AUTH_UID_ATTR' => 'uid'],
+    ];
+    private const TLS_FIELDS = ['IMAP' => 'IMAP_AUTH_TLS', 'LDAP' => 'LDAP_AUTH_TLS'];
 
     private $installer;
     private $token_file;
@@ -59,10 +69,10 @@ class Hm_Web_Installer {
      *
      * $only lets a single wizard step validate just its own fields.
      */
-    public static function validate(array $values, $app_path, array $only = ['DB_DRIVER', 'DIRS']) {
+    public static function validate(array $values, $app_path, array $only = ['AUTH', 'DIRS']) {
         $errors = [];
-        if (in_array('DB_DRIVER', $only, true) && !in_array($values['DB_DRIVER'], self::ALLOWED_DB_DRIVERS, true)) {
-            $errors[] = 'Database driver must be one of: '.implode(', ', self::ALLOWED_DB_DRIVERS);
+        if (in_array('AUTH', $only, true)) {
+            $errors = array_merge($errors, self::validateAuth($values));
         }
         if (in_array('DIRS', $only, true)) {
             foreach (['USER_SETTINGS_DIR' => 'User settings directory', 'ATTACHMENT_DIR' => 'Attachment directory'] as $key => $label) {
@@ -75,6 +85,49 @@ class Hm_Web_Installer {
             }
         }
         return $errors;
+    }
+
+    private static function validateAuth(array $values) {
+        switch ($values['AUTH_TYPE'] ?? '') {
+            case 'DB':
+                if (!in_array($values['DB_DRIVER'], self::ALLOWED_DB_DRIVERS, true)) {
+                    return ['Database driver must be one of: '.implode(', ', self::ALLOWED_DB_DRIVERS)];
+                }
+                return [];
+
+            case 'IMAP':
+                $errors = [];
+                if ($values['IMAP_AUTH_SERVER'] === '') {
+                    $errors[] = 'IMAP server is required';
+                }
+                if (!self::isValidPort($values['IMAP_AUTH_PORT'])) {
+                    $errors[] = 'IMAP port must be a valid port number';
+                }
+                return $errors;
+
+            case 'LDAP':
+                $errors = [];
+                if ($values['LDAP_AUTH_SERVER'] === '') {
+                    $errors[] = 'LDAP server is required';
+                }
+                if (!self::isValidPort($values['LDAP_AUTH_PORT'])) {
+                    $errors[] = 'LDAP port must be a valid port number';
+                }
+                if ($values['LDAP_AUTH_BASE_DN'] === '') {
+                    $errors[] = 'LDAP base DN is required';
+                }
+                if ($values['LDAP_AUTH_UID_ATTR'] === '') {
+                    $errors[] = 'LDAP UID attribute is required';
+                }
+                return $errors;
+
+            default:
+                return ['Auth type must be one of: '.implode(', ', self::ALLOWED_AUTH_TYPES)];
+        }
+    }
+
+    private static function isValidPort($value) {
+        return ctype_digit((string) $value) && (int) $value > 0 && (int) $value <= 65535;
     }
 
     // Walks up to the nearest existing ancestor (mkdir() elsewhere is
@@ -111,29 +164,65 @@ class Hm_Web_Installer {
     }
 
     public static function collectFormValues(array $post) {
-        $fields = [
-            'DB_DRIVER' => 'mysql',
-            'DB_HOST' => '127.0.0.1',
-            'DB_NAME' => 'cypht_db',
-            'DB_USER' => 'cypht',
-            'DB_PASS' => '',
-            'USER_SETTINGS_DIR' => '/var/lib/hm3/users',
-            'ATTACHMENT_DIR' => '/var/lib/hm3/attachments',
-        ];
-        $values = [];
-        foreach ($fields as $key => $default) {
-            $values[$key] = trim((string) ($post[$key] ?? $default));
+        $auth_type = strtoupper(trim((string) ($post['AUTH_TYPE'] ?? 'DB')));
+        if (!in_array($auth_type, self::ALLOWED_AUTH_TYPES, true)) {
+            $auth_type = 'DB';
         }
-        $values['AUTH_TYPE'] = 'DB';
-        $values['USER_CONFIG_TYPE'] = 'file';
+
+        $values = [
+            'USER_SETTINGS_DIR' => trim((string) ($post['USER_SETTINGS_DIR'] ?? '/var/lib/hm3/users')),
+            'ATTACHMENT_DIR' => trim((string) ($post['ATTACHMENT_DIR'] ?? '/var/lib/hm3/attachments')),
+            'AUTH_TYPE' => $auth_type,
+            'USER_CONFIG_TYPE' => 'file',
+        ];
+
+        foreach (self::FIELD_GROUPS as $group => $fields) {
+            foreach ($fields as $key => $default) {
+                $values[$key] = $group === $auth_type ? trim((string) ($post[$key] ?? $default)) : $default;
+            }
+        }
+        foreach (self::TLS_FIELDS as $group => $key) {
+            $values[$key] = $group === $auth_type && !empty($post[$key]) ? 'true' : 'false';
+        }
+
         return $values;
     }
 
+    /**
+     * Confirms the auth backend is actually reachable before .env is
+     * written. DB gets a real PDO connection attempt (Hm_Installer already
+     * has it); IMAP/LDAP only get a TCP reachability check, since a full
+     * protocol handshake needs credentials the wizard doesn't collect.
+     */
+    public function testAuthConnection(array $values) {
+        switch ($values['AUTH_TYPE'] ?? '') {
+            case 'DB':
+                return $this->installer->testDatabaseConnection($values);
+            case 'IMAP':
+                return self::checkTcpReachable($values['IMAP_AUTH_SERVER'], $values['IMAP_AUTH_PORT']);
+            case 'LDAP':
+                return self::checkTcpReachable($values['LDAP_AUTH_SERVER'], $values['LDAP_AUTH_PORT']);
+            default:
+                return ['success' => false, 'error' => 'Unknown auth type.'];
+        }
+    }
+
+    private static function checkTcpReachable($host, $port, $timeout = 5) {
+        $errno = 0;
+        $errstr = '';
+        $conn = @fsockopen($host, (int) $port, $errno, $errstr, $timeout);
+        if ($conn) {
+            fclose($conn);
+            return ['success' => true, 'error' => ''];
+        }
+        return ['success' => false, 'error' => $errstr !== '' ? $errstr : 'Could not reach '.$host.':'.$port];
+    }
+
     public function install(array $values, $admin_user, $admin_pass) {
-        $connection_check = $this->installer->testDatabaseConnection($values);
+        $connection_check = $this->testAuthConnection($values);
         if (!$connection_check['success']) {
             return ['success' => false, 'env_written' => false,
-                'output' => 'Could not connect to the database: '.$connection_check['error']];
+                'output' => 'Could not verify the '.$values['AUTH_TYPE'].' auth settings: '.$connection_check['error']];
         }
 
         $this->installer->writeEnv($values);
@@ -141,17 +230,19 @@ class Hm_Web_Installer {
 
         $output = '';
 
-        $db_result = $this->installer->setupDatabase();
-        $output .= $db_result['output'].$db_result['error'];
-        if (!$db_result['success']) {
-            return ['success' => false, 'env_written' => true, 'output' => $output];
-        }
-
-        if (trim((string) $admin_user) !== '') {
-            $admin_result = $this->installer->createAdminAccount(trim($admin_user), (string) $admin_pass);
-            $output .= "\n".$admin_result['output'].$admin_result['error'];
-            if (!$admin_result['success']) {
+        if ($values['AUTH_TYPE'] === 'DB') {
+            $db_result = $this->installer->setupDatabase();
+            $output .= $db_result['output'].$db_result['error'];
+            if (!$db_result['success']) {
                 return ['success' => false, 'env_written' => true, 'output' => $output];
+            }
+
+            if (trim((string) $admin_user) !== '') {
+                $admin_result = $this->installer->createAdminAccount(trim($admin_user), (string) $admin_pass);
+                $output .= "\n".$admin_result['output'].$admin_result['error'];
+                if (!$admin_result['success']) {
+                    return ['success' => false, 'env_written' => true, 'output' => $output];
+                }
             }
         }
 
