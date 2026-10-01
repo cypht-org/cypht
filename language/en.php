@@ -1018,4 +1018,11 @@ return array(
     'Create runner token' => false,
     'New runner token' => false,
     'Use it in the scheduled task:' => false,
+    'Create a folder' => false,
+    'Rename a folder' => false,
+    'Delete a folder' => false,
+    'Tag messages' => false,
+    'Save a contact' => false,
+    'Tags created' => false,
+    'New contact' => false,
 );

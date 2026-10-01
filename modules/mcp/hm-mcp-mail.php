@@ -17,6 +17,7 @@ class Hm_MCP_Mail {
     use Hm_MCP_Organize;
     use Hm_MCP_Drafts;
     use Hm_MCP_Send;
+    use Hm_MCP_Manage;
 
     /* maximum folders to count when include_counts is set */
     const MAX_FOLDER_COUNTS = 60;
@@ -109,7 +110,7 @@ class Hm_MCP_Mail {
         $ctx = $this->context();
         $account = $ctx->account($args['account_id']);
         $mailbox = $ctx->mailbox($account['id']);
-        $folders = $mailbox->get_folders(false);
+        $folders = $mailbox->is_imap() ? Hm_MCP_Imap::all_folders($mailbox) : $mailbox->get_folders(false);
         if (!is_array($folders)) {
             throw new Hm_MCP_Error('upstream_error', 'Could not list the folders of this account.', ['account_id' => $account['id']]);
         }
@@ -119,10 +120,15 @@ class Hm_MCP_Mail {
                 $roles[$folder] = $role;
             }
         }
+        $names = array_map(function ($key, $folder) { return (string) ($folder['id'] ?? $key); }, array_keys($folders), $folders);
         $res = [];
         $counted = 0;
         foreach ($folders as $key => $folder) {
             $id = (string) ($folder['id'] ?? $key);
+            $delim = isset($folder['delim']) && is_string($folder['delim']) && $folder['delim'] !== '' ? $folder['delim'] : false;
+            $children = !empty($folder['has_kids']) || ($delim !== false && (bool) array_filter($names, function ($name) use ($id, $delim) {
+                return strpos($name, $id.$delim) === 0;
+            }));
             $entry = [
                 'folder' => $id,
                 'name' => Hm_MCP_Format::text($folder['basename'] ?? $folder['name'] ?? $id),
@@ -130,7 +136,7 @@ class Hm_MCP_Mail {
                 'parent' => Hm_MCP_Format::text($folder['parent'] ?? ''),
                 'role' => $roles[$id] ?? (strcasecmp($id, 'INBOX') === 0 ? 'inbox' : null),
                 'selectable' => empty($folder['noselect']),
-                'has_children' => !empty($folder['has_kids']),
+                'has_children' => $children,
             ];
             if (!empty($args['include_counts']) && $entry['selectable'] && $counted < self::MAX_FOLDER_COUNTS && $ctx->time_left() > self::RESERVE_SECONDS) {
                 $status = $mailbox->get_folder_status($id, false);

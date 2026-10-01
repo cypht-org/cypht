@@ -361,6 +361,114 @@ class Hm_MCP_Imap {
         return $uids;
     }
 
+    /* ------------------------------------------------------------ folders */
+
+    /**
+     * Folders of an account at every level. Hm_Mailbox::get_folders() lists only the
+     * top level when the server lacks the CHILDREN extension, so IMAP servers are asked
+     * for the whole tree with LIST "" "*".
+     * @param object $mailbox Hm_Mailbox
+     * @return array|null folder name => folder entry as Cypht parses it, null on failure
+     */
+    public static function all_folders($mailbox) {
+        $connection = self::connection($mailbox);
+        $folders = self::quietly(function () use ($mailbox, $connection) {
+            if ($connection && method_exists($connection, 'get_mailbox_list')) {
+                return $connection->get_mailbox_list(false, '', '*', true);
+            }
+            return $mailbox->get_folders(false);
+        });
+        return is_array($folders) ? $folders : null;
+    }
+
+    /**
+     * Every folder of an account
+     * @param object $mailbox Hm_Mailbox
+     * @return array folder name => ['delim' => string|false, 'noselect' => bool, 'has_kids' => bool]
+     * @throws Hm_MCP_Error
+     */
+    public static function folder_list($mailbox) {
+        $folders = self::all_folders($mailbox);
+        if ($folders === null) {
+            throw new Hm_MCP_Error('upstream_error', 'Could not list the folders of this account.');
+        }
+        $res = [];
+        foreach ($folders as $key => $folder) {
+            $name = (string) ($folder['id'] ?? $folder['name'] ?? $key);
+            $res[$name] = [
+                'delim' => isset($folder['delim']) && is_string($folder['delim']) && $folder['delim'] !== '' ? $folder['delim'] : false,
+                'noselect' => !empty($folder['noselect']),
+                'has_kids' => !empty($folder['has_kids']),
+            ];
+        }
+        return $res;
+    }
+
+    /**
+     * Hierarchy delimiter, as reported by LIST. The NAMESPACE answer is only a fallback:
+     * without the NAMESPACE extension Cypht assumes "/", which is often wrong.
+     * @param object $mailbox Hm_Mailbox
+     * @param array $folders value of folder_list()
+     * @param string $near folder whose delimiter is preferred
+     * @return string|false
+     */
+    public static function delimiter($mailbox, $folders, $near = '') {
+        if ($near !== '' && !empty($folders[$near]['delim'])) {
+            return $folders[$near]['delim'];
+        }
+        foreach ($folders as $folder) {
+            if (!empty($folder['delim'])) {
+                return $folder['delim'];
+            }
+        }
+        return self::personal_namespace($mailbox)['delim'];
+    }
+
+    /**
+     * @param object $mailbox Hm_Mailbox
+     * @return array ['prefix' => string, 'delim' => string|false] of the personal namespace
+     */
+    public static function personal_namespace($mailbox) {
+        $connection = self::connection($mailbox);
+        $namespaces = $connection && method_exists($connection, 'get_namespaces')
+            ? self::quietly(function () use ($connection) { return $connection->get_namespaces(); }) : [];
+        foreach ((is_array($namespaces) ? $namespaces : []) as $namespace) {
+            if (($namespace['class'] ?? '') === 'personal') {
+                return ['prefix' => (string) ($namespace['prefix'] ?: ''),
+                    'delim' => !empty($namespace['delim']) ? (string) $namespace['delim'] : false];
+            }
+        }
+        return ['prefix' => '', 'delim' => false];
+    }
+
+    /**
+     * Folders below a folder
+     * @param array $folders value of folder_list()
+     * @param string $folder folder name
+     * @param string|false $delim hierarchy delimiter
+     * @return array names of the folders inside it, at any depth
+     */
+    public static function descendants($folders, $folder, $delim) {
+        if ($delim === false) {
+            return [];
+        }
+        return array_values(array_filter(array_map('strval', array_keys($folders)), function ($name) use ($folder, $delim) {
+            return strpos($name, $folder.$delim) === 0;
+        }));
+    }
+
+    /**
+     * Forget cached folder lists after a change
+     * @param object $mailbox Hm_Mailbox
+     * @return void
+     */
+    public static function forget_folders($mailbox) {
+        $connection = self::connection($mailbox);
+        if ($connection && method_exists($connection, 'bust_cache')) {
+            self::quietly(function () use ($connection) { $connection->bust_cache('ALL'); });
+        }
+    }
+
     /* ---------------------------------------------------------- scheduled */
 
     /**
@@ -670,6 +778,58 @@ class Hm_MCP_Tag_Refs {
                 $tags[$id]['server'][$account][$dest] = array_values(array_unique(array_merge(is_array($existing) ? $existing : [], $added)));
             }
             $changed = true;
+        }
+        return [$tags, $changed];
+    }
+
+    /**
+     * Follow a renamed folder, including the folders inside it
+     * @param array $tags tags
+     * @param string $account account id
+     * @param string $old old folder name
+     * @param string $new new folder name
+     * @param string|false $delim hierarchy delimiter
+     * @return array [tags, changed]
+     */
+    public static function rename_folder($tags, $account, $old, $new, $delim) {
+        $changed = false;
+        foreach ((is_array($tags) ? $tags : []) as $id => $tag) {
+            $folders = $tag['server'][$account] ?? null;
+            if (!is_array($folders)) {
+                continue;
+            }
+            $renamed = [];
+            foreach ($folders as $folder => $uids) {
+                $folder = (string) $folder;
+                if ($folder === $old) {
+                    $folder = $new;
+                } elseif ($delim !== false && strpos($folder, $old.$delim) === 0) {
+                    $folder = $new.substr($folder, strlen($old));
+                }
+                $renamed[$folder] = $uids;
+            }
+            if ($renamed !== $folders) {
+                $tags[$id]['server'][$account] = $renamed;
+                $changed = true;
+            }
+        }
+        return [$tags, $changed];
+    }
+
+    /**
+     * Forget a deleted folder
+     * @param array $tags tags
+     * @param string $account account id
+     * @param string $folder folder name
+     * @return array [tags, changed]
+     */
+    public static function drop_folder($tags, $account, $folder) {
+        $changed = false;
+        foreach ((is_array($tags) ? $tags : []) as $id => $tag) {
+            if (is_array($tag['server'][$account] ?? null) && array_key_exists($folder, $tag['server'][$account])) {
+                unset($tags[$id]['server'][$account][$folder]);
+                $changed = true;
+            }
         }
         return [$tags, $changed];
     }

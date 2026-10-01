@@ -393,9 +393,10 @@ trait Hm_MCP_Organize {
      * @param array $ids message ids
      * @param callable $action function($mailbox, $account, $folder, $uids) with
      *                         $uids uid => message id, returning message id => result
+     * @param bool $read_only open the folders read only
      * @return array results in the order of the ids
      */
-    protected function each_folder($ids, $action) {
+    protected function each_folder($ids, $action, $read_only = false) {
         $ctx = $this->context();
         $ids = array_values(array_unique(array_map('strval', $ids)));
         $groups = [];
@@ -411,7 +412,7 @@ trait Hm_MCP_Organize {
         foreach ($groups as $account_id => $folders) {
             $account = $ctx->account($account_id);
             try {
-                $mailbox = $ctx->mailbox($account_id, false);
+                $mailbox = $ctx->mailbox($account_id, $read_only);
             } catch (Hm_MCP_Error $e) {
                 if (count($groups) === 1) {
                     throw $e;
@@ -426,7 +427,7 @@ trait Hm_MCP_Organize {
                     $results += self::fail_all($uids, 'Skipped to answer in time. Run the operation again for these messages.');
                     continue;
                 }
-                $results += $action($ctx->mailbox($account_id, false), $account, (string) $folder, $uids);
+                $results += $action($ctx->mailbox($account_id, $read_only), $account, (string) $folder, $uids);
             }
         }
         $ordered = [];

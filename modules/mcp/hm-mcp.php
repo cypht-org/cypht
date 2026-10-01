@@ -24,6 +24,7 @@ require_once APP_PATH.'modules/mcp/hm-mcp-mime.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-uploads.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-drafts.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-send.php';
+require_once APP_PATH.'modules/mcp/hm-mcp-manage.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-mail.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-executor.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-files.php';

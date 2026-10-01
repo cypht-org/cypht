@@ -598,6 +598,16 @@ class Hm_MCP_Context {
     }
 
     /**
+     * Look up the special folders again on the next call, after folders changed
+     * @param string $id account id
+     * @return void
+     */
+    public function forget_special_folders($id) {
+        unset($this->specials[$id]);
+        $this->cache_dirty = true;
+    }
+
+    /**
      * Special folders configured by the user in Cypht, with the same matching rules
      * as get_special_folders(): by server and user, then by account id
      * @param string $id account id

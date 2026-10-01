@@ -408,7 +408,7 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         'enabled' => 'Enabled', 'permissions' => 'Permissions', 'expires_days' => 'Expires in days', 'kind' => 'Type',
         'recipients' => 'Recipients', 'domains' => 'Domains', 'client' => 'Client', 'reason' => 'Reason',
         'destination' => 'Destination', 'failed' => 'Failed messages', 'tags_updated' => 'Tags updated', 'folder' => 'Folder',
-        'mode' => 'Draft', 'attachments' => 'Attachments', 'scheduled' => 'Scheduled'];
+        'mode' => 'Draft', 'attachments' => 'Attachments', 'scheduled' => 'Scheduled', 'tags_created' => 'Tags created', 'new_contact' => 'New contact'];
 
     /* kinds of drafts */
     const MODES = ['new' => 'New message', 'reply' => 'Reply', 'reply_all' => 'Reply to all', 'forward' => 'Forwarded message'];

@@ -200,6 +200,7 @@
       <file>./modules/mcp/drafts.php</file>
       <file>./modules/mcp/send.php</file>
       <file>./modules/mcp/runner.php</file>
+      <file>./modules/mcp/manage.php</file>
     </testsuite>
   </testsuites>
   <source>

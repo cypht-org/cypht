@@ -865,4 +865,11 @@ return array(
     'Create runner token' => 'Crear token del ejecutor',
     'New runner token' => 'Nuevo token del ejecutor',
     'Use it in the scheduled task:' => 'Úsalo en la tarea programada:',
+    'Create a folder' => 'Crear una carpeta',
+    'Rename a folder' => 'Renombrar una carpeta',
+    'Delete a folder' => 'Eliminar una carpeta',
+    'Tag messages' => 'Etiquetar mensajes',
+    'Save a contact' => 'Guardar un contacto',
+    'Tags created' => 'Etiquetas creadas',
+    'New contact' => 'Contacto nuevo',
 );

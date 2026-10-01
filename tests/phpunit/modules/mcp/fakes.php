@@ -46,6 +46,27 @@ class Hm_MCP_Fake_Connection {
 
     public function bust_cache($folder, $full = true) {}
 
+    public function get_mailbox_list($lsub = false, $mailbox = '', $keyword = '*', $children_capability = true) {
+        $this->mailbox->list_calls[] = [$lsub, $mailbox, $keyword, $children_capability];
+        return $this->mailbox->folder_entries(true);
+    }
+
+    public function get_namespaces() {
+        return [['prefix' => $this->mailbox->ns_prefix, 'delim' => $this->mailbox->delim, 'class' => 'personal']];
+    }
+
+    public function create_mailbox($name) {
+        return $this->mailbox->folder_command('CREATE', $name);
+    }
+
+    public function rename_mailbox($name, $new_name) {
+        return $this->mailbox->folder_command('RENAME', $name, $new_name);
+    }
+
+    public function delete_mailbox($name) {
+        return $this->mailbox->folder_command('DELETE', $name);
+    }
+
     public function show_debug($full = false, $return = false, $list = false) {
         return ['debug' => [], 'commands' => [], 'responses' => $this->mailbox->raw_responses];
     }
@@ -69,6 +90,15 @@ class Hm_MCP_Fake_Mailbox {
     public $failing_actions = [];
     /* folder => next uid */
     public $uidnext = [];
+    /* hierarchy delimiter, personal namespace prefix and folders that cannot hold messages */
+    public $delim = '/';
+    public $ns_prefix = '';
+    public $noselect = [];
+    /* CREATE, RENAME and DELETE commands received */
+    public $folder_commands = [];
+    /* get_folders() lists only the top level, like Cypht on servers without CHILDREN */
+    public $top_level_only = false;
+    public $list_calls = [];
     /* answer COPYUID only in the raw server response, like Cypht sees it for several messages */
     public $raw_copyuid = false;
     public $raw_responses = [];
@@ -102,13 +132,68 @@ class Hm_MCP_Fake_Mailbox {
     }
 
     public function get_folders($only_subscribed = false) {
+        return $this->folder_entries(!$this->top_level_only);
+    }
+
+    public function folder_entries($all) {
         $res = [];
-        foreach (array_keys($this->folders) as $name) {
-            $parts = explode('/', $name);
-            $res[$name] = ['name' => $name, 'basename' => end($parts), 'parent' => count($parts) > 1 ? $parts[0] : '',
-                'noselect' => false, 'has_kids' => false, 'special' => $name === 'INBOX'];
+        $names = array_map('strval', array_keys($this->folders));
+        foreach ($names as $name) {
+            if (!$all && strpos($name, $this->delim) !== false) {
+                continue;
+            }
+            $pos = strrpos($name, $this->delim);
+            $kids = false;
+            foreach ($names as $other) {
+                if (strpos($other, $name.$this->delim) === 0) {
+                    $kids = true;
+                    break;
+                }
+            }
+            $res[$name] = ['name' => $name, 'basename' => $pos === false ? $name : substr($name, $pos + strlen($this->delim)),
+                'parent' => $pos === false ? '' : substr($name, 0, $pos), 'delim' => $this->delim,
+                'noselect' => in_array($name, $this->noselect, true), 'has_kids' => $kids, 'special' => $name === 'INBOX'];
         }
         return $res;
+    }
+
+    /**
+     * CREATE, RENAME and DELETE of folders, as the IMAP connection does them
+     */
+    public function folder_command($command, $name, $new_name = null) {
+        $this->folder_commands[] = trim($command.' '.$name.($new_name !== null ? ' > '.$new_name : ''));
+        if (in_array($command, $this->failing_actions, true)) {
+            return false;
+        }
+        if ($command === 'CREATE') {
+            if (array_key_exists($name, $this->folders)) {
+                return false;
+            }
+            $this->folders[$name] = [];
+            return true;
+        }
+        if ($command === 'RENAME') {
+            if (!array_key_exists($name, $this->folders) || array_key_exists($new_name, $this->folders)) {
+                return false;
+            }
+            $renamed = [];
+            foreach ($this->folders as $folder => $messages) {
+                $folder = (string) $folder;
+                if ($folder === $name) {
+                    $folder = $new_name;
+                } elseif (strpos($folder, $name.$this->delim) === 0) {
+                    $folder = $new_name.substr($folder, strlen($name));
+                }
+                $renamed[$folder] = $messages;
+            }
+            $this->folders = $renamed;
+            return true;
+        }
+        if ($command === 'DELETE' && array_key_exists($name, $this->folders)) {
+            unset($this->folders[$name]);
+            return true;
+        }
+        return false;
     }
 
     public function get_special_use_mailboxes($folder = false) {
