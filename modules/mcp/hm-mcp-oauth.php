@@ -151,6 +151,12 @@ class Hm_MCP_OAuth {
     const REGISTER_ATTEMPTS = 30;
     const REGISTER_WINDOW = 3600;
 
+    /* totals for every client address together. They bound the work and the stored rows when
+       the client address comes from a header that a client could forge. */
+    const REGISTER_TOTAL = 300;
+    const LOGIN_TOTAL = 300;
+    const CIMD_TOTAL = 120;
+
     /* client metadata documents (CIMD): seconds a fetched copy is used, oldest copy used when
        the document cannot be fetched again, size and time limits, fetches per client address */
     const CIMD_TTL = 3600;
@@ -257,7 +263,8 @@ class Hm_MCP_OAuth {
         if (!$store->available()) {
             return Hm_MCP_Http_Response::oauth_error(503, 'temporarily_unavailable', 'The authorization server storage is not available.');
         }
-        if (!$store->rate_limit('register:'.$this->client_ip($request), self::REGISTER_ATTEMPTS, self::REGISTER_WINDOW)) {
+        if (!$store->rate_limit('register:*', self::REGISTER_TOTAL, self::REGISTER_WINDOW)
+            || !$store->rate_limit('register:'.$this->client_ip($request), self::REGISTER_ATTEMPTS, self::REGISTER_WINDOW)) {
             return Hm_MCP_Http_Response::oauth_error(429, 'too_many_requests', 'Too many client registrations. Try again later.',
                 ['Retry-After' => (string) self::REGISTER_WINDOW]);
         }
@@ -541,7 +548,8 @@ class Hm_MCP_OAuth {
         }
         $store = $this->store();
         $rate_key = 'password:'.$username;
-        if (!$store->rate_limit('login_ip:'.$this->client_ip($request), self::LOGIN_IP_ATTEMPTS, self::LOGIN_WINDOW)
+        if (!$store->rate_limit('login:*', self::LOGIN_TOTAL, self::LOGIN_WINDOW)
+            || !$store->rate_limit('login_ip:'.$this->client_ip($request), self::LOGIN_IP_ATTEMPTS, self::LOGIN_WINDOW)
             || !$store->rate_limit($rate_key, self::LOGIN_ATTEMPTS, self::LOGIN_WINDOW)) {
             return $this->login_page($req, 'rate_limited', $username, 429);
         }
@@ -1002,7 +1010,8 @@ class Hm_MCP_OAuth {
      */
     private function fetch_cimd($client_id, $request) {
         $store = $this->store();
-        if (!$store->rate_limit('cimd:'.$this->client_ip($request), self::CIMD_FETCHES, self::CIMD_WINDOW)) {
+        if (!$store->rate_limit('cimd:*', self::CIMD_TOTAL, self::CIMD_WINDOW)
+            || !$store->rate_limit('cimd:'.$this->client_ip($request), self::CIMD_FETCHES, self::CIMD_WINDOW)) {
             return false;
         }
         try {

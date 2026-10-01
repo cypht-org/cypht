@@ -281,6 +281,37 @@ class Hm_Test_MCP_OAuth extends TestCase {
         $this->assertNotNull($res->header('Retry-After'));
     }
 
+    /* fill a rate limit window */
+    private function exhaust($key) {
+        $this->store->rate_limit($key, 1, 3600);
+        Hm_DB::execute(Hm_DB::connect($this->config), 'update hm_mcp_rate_limits set hits=? where rate_key=?', [100000, 'mcp:'.hash('sha256', $key)]);
+    }
+
+    public function test_totals_bound_forged_client_addresses() {
+        /* every request claims another address */
+        $this->config->set('mcp_client_ip_header', 'CF-Connecting-IP');
+        $register = function ($ip) {
+            return $this->router->handle($this->request('POST', '/oauth/register', [], [], ['Content-Type' => 'application/json',
+                'CF-Connecting-IP' => $ip], json_encode(['client_name' => 'x', 'redirect_uris' => [self::REDIRECT]])));
+        };
+        $this->assertSame(201, $register('198.51.100.1')->status);
+        $this->exhaust('register:*');
+        $this->assertSame(429, $register('198.51.100.2')->status);
+
+        $client_id = $this->client_id_from_store();
+        $this->exhaust('login:*');
+        $res = $this->authorize_post(array_merge($this->params($client_id), ['step' => 'login', 'decision' => 'allow',
+            'username' => 'alice', 'password' => self::PASSWORD]), ['Origin' => 'https://mail.example.com', 'CF-Connecting-IP' => '198.51.100.3']);
+        $this->assertSame(429, $res->status);
+        $this->assertStringContainsString('Too many attempts', $res->body);
+    }
+
+    private function client_id_from_store() {
+        $client = ['client_id' => 'cl_total', 'kind' => 'dcr', 'client_name' => 'Total', 'redirect_uris' => [self::REDIRECT]];
+        $this->store->save_client($client);
+        return 'cl_total';
+    }
+
     /* -------------------------------------------------------- authorization */
 
     public function test_unknown_client_or_redirect_is_never_redirected() {
@@ -854,6 +885,14 @@ class Hm_Test_MCP_OAuth extends TestCase {
         $this->enable_cimd(null, 404);
         $this->assertStringContainsString('could not be loaded', $this->authorize_get($this->params(self::CHATGPT_ID))->body);
         $this->assertCount(2, $this->fetches);
+    }
+
+    public function test_metadata_fetches_have_a_total_limit() {
+        $this->enable_cimd();
+        $this->exhaust('cimd:*');
+        $res = $this->authorize_get($this->params(self::CHATGPT_ID));
+        $this->assertStringContainsString('could not be loaded', $res->body);
+        $this->assertSame([], $this->fetches);
     }
 
     public function test_metadata_fetches_are_rate_limited() {
