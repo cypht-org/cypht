@@ -69,6 +69,20 @@ class Hm_Test_MCP_Router extends TestCase {
         $this->assertSame(405, $res->status);
     }
 
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_openid_discovery_is_not_supported() {
+        $router = new Hm_MCP_Router($this->config());
+        $res = $router->handle($this->request('GET', '/.well-known/openid-configuration'));
+        $this->assertSame(404, $res->status);
+        $this->assertSame('application/json', $res->header('Content-Type'));
+        $this->assertSame('*', $res->header('Access-Control-Allow-Origin'));
+        $routes = (require APP_PATH.'modules/mcp/setup.php')['allowed_routes'];
+        $this->assertSame('mcp', Hm_Path_Router::match($routes, '/.well-known/openid-configuration'));
+    }
+
     public function test_mcp_requires_a_bearer_token() {
         $router = new Hm_MCP_Router($this->config());
         $res = $router->handle($this->request('POST', '/mcp', ['Content-Type' => 'application/json'], '{}'));

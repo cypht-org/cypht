@@ -14,7 +14,7 @@
     # URL paths served by module sets (MCP server, OAuth and REST API)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(mcp/?$|oauth/|api/v1(/|$)|\.well-known/oauth-) index.php [L,QSA]
+    RewriteRule ^(mcp/?$|oauth/|api/v1(/|$)|\.well-known/(oauth-|openid-configuration)) index.php [L,QSA]
 
     # Force HTTPS (uncomment to enable)
     # RewriteCond %{HTTPS} !=on

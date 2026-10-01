@@ -33,6 +33,8 @@ return array(
         '/mcp' => 'mcp',
         '/.well-known/oauth-protected-resource*' => 'mcp',
         '/.well-known/oauth-authorization-server*' => 'mcp',
+        /* answered with 404: clients that try OpenID Connect discovery first get a clear answer */
+        '/.well-known/openid-configuration*' => 'mcp',
         '/oauth/*' => 'mcp',
         '/api/v1' => 'mcp',
         '/api/v1/*' => 'mcp',
