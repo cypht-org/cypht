@@ -365,7 +365,15 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         'results' => 'Results', 'error' => 'Error', 'content_type' => 'Type', 'view' => 'View', 'field' => 'Field',
         'readable' => 'Readable', 'marked_read' => 'Marked as read', 'contacts' => 'Contacts', 'tags' => 'Tags',
         'enabled' => 'Enabled', 'permissions' => 'Permissions', 'expires_days' => 'Expires in days', 'kind' => 'Type',
-        'recipients' => 'Recipients', 'domains' => 'Domains', 'client' => 'Client'];
+        'recipients' => 'Recipients', 'domains' => 'Domains', 'client' => 'Client', 'reason' => 'Reason'];
+
+    /* why an OAuth connection ended */
+    const REASONS = [
+        'client' => 'Disconnected by the app',
+        'code_reuse' => 'An authorization code was used twice',
+        'refresh_reuse' => 'An old refresh token was used again',
+        'password_changed' => 'The Cypht password changed',
+    ];
 
     /**
      * Activity log with a connection filter and paging
@@ -454,6 +462,8 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         foreach ($summary as $key => $value) {
             if ($key === 'account_id' && isset($names[$value])) {
                 $value = $names[$value];
+            } elseif ($key === 'reason' && is_string($value) && isset(self::REASONS[$value])) {
+                $value = $this->trans(self::REASONS[$value]);
             } elseif (is_bool($value)) {
                 $value = $this->trans($value ? 'Yes' : 'No');
             } elseif ($value === 'all') {

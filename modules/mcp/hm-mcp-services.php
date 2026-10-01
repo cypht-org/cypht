@@ -27,6 +27,7 @@ class Hm_MCP_Services {
     private $catalog = null;
     private $validator = null;
     private $auth = null;
+    private $oauth = null;
 
     /**
      * @param object $site_config site configuration
@@ -133,5 +134,16 @@ class Hm_MCP_Services {
      */
     public function files() {
         return new Hm_MCP_Files($this);
+    }
+
+    /**
+     * Authorization server, shared so tests can replace the credential check
+     * @return Hm_MCP_OAuth
+     */
+    public function oauth() {
+        if ($this->oauth === null) {
+            $this->oauth = new Hm_MCP_OAuth($this);
+        }
+        return $this->oauth;
     }
 }

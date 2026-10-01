@@ -96,6 +96,17 @@ class Hm_MCP_Router {
             case '/.well-known/oauth-protected-resource':
             case '/.well-known/oauth-protected-resource/mcp':
                 return $this->only_get($request, function () { return $this->protected_resource_metadata(); });
+            case '/.well-known/oauth-authorization-server':
+            case '/.well-known/oauth-authorization-server/mcp':
+                return $this->only_get($request, function () { return $this->services()->oauth()->metadata(); });
+            case '/oauth/register':
+                return $this->only_post($request, function () use ($request) { return $this->services()->oauth()->register($request); });
+            case '/oauth/authorize':
+                return $this->services()->oauth()->authorize($request);
+            case '/oauth/token':
+                return $this->only_post($request, function () use ($request) { return $this->services()->oauth()->token($request); });
+            case '/oauth/revoke':
+                return $this->only_post($request, function () use ($request) { return $this->services()->oauth()->revoke($request); });
             case '/mcp':
                 return $this->mcp($request);
         }
@@ -103,6 +114,19 @@ class Hm_MCP_Router {
             return $this->services()->rest()->handle($request, substr($path, strlen('/api/v1')));
         }
         return Hm_MCP_Http_Response::error(404, 'not_found', 'Not found');
+    }
+
+    /**
+     * Restrict an endpoint to POST
+     * @param Hm_MCP_Http_Request $request request details
+     * @param callable $handler endpoint handler
+     * @return Hm_MCP_Http_Response
+     */
+    protected function only_post($request, $handler) {
+        if ($request->method !== 'POST') {
+            return Hm_MCP_Http_Response::error(405, 'method_not_allowed', 'Method not allowed', ['Allow' => 'POST, OPTIONS']);
+        }
+        return $handler();
     }
 
     /**
@@ -147,7 +171,8 @@ class Hm_MCP_Router {
             }
         }
         $parts[] = sprintf('resource_metadata="%s"', $this->config->resource_metadata_url());
-        $parts[] = sprintf('scope="%s"', Hm_MCP_Permissions::scope('read'));
+        /* no scope parameter: clients then request every scope in scopes_supported, and the
+           user narrows them on the consent page and in the settings */
         return 'Bearer '.implode(', ', $parts);
     }
 

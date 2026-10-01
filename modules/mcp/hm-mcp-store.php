@@ -23,6 +23,7 @@ class Hm_MCP_Store {
         'runner' => 'cyp_run_',
         'file' => 'cyp_f_',
         'code' => 'cyp_ac_',
+        'consent' => 'cyp_ct_',
     ];
 
     /* connection kinds */

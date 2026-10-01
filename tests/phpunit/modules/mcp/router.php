@@ -77,6 +77,7 @@ class Hm_Test_MCP_Router extends TestCase {
         $this->assertStringStartsWith('Bearer ', $challenge);
         $this->assertStringContainsString('resource_metadata="https://mail.example.com/.well-known/oauth-protected-resource/mcp"', $challenge);
         $this->assertStringNotContainsString('error=', $challenge);
+        $this->assertStringNotContainsString('scope=', $challenge);
     }
 
     public function test_mcp_rejects_an_unknown_token() {

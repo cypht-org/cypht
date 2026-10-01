@@ -23,5 +23,6 @@ require_once APP_PATH.'modules/mcp/hm-mcp-executor.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-files.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-endpoint.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-rest.php';
+require_once APP_PATH.'modules/mcp/hm-mcp-oauth.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-services.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-router.php';

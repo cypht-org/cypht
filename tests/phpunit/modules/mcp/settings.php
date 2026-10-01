@@ -317,6 +317,9 @@ class Hm_Test_MCP_Settings extends TestCase {
         $strings = array_merge($strings, $matches[1]);
         preg_match_all("/hm_trans\\('((?:[^'\\\\]|\\\\.)*)'/", file_get_contents(APP_PATH.'modules/mcp/site.js'), $matches);
         $strings = array_merge($strings, $matches[1]);
+        preg_match_all("/(?:trans|text)\\('((?:[^'\\\\]|\\\\.)*)'/", file_get_contents(APP_PATH.'modules/mcp/hm-mcp-oauth.php'), $matches);
+        $strings = array_merge($strings, $matches[1], array_values(Hm_MCP_OAuth::MESSAGES),
+            array_values(Hm_Output_mcp_settings_content::REASONS));
         foreach (Hm_MCP_Permissions::keys() as $key) {
             $strings[] = Hm_MCP_Permissions::label($key);
             $strings[] = Hm_MCP_Permissions::description($key);
