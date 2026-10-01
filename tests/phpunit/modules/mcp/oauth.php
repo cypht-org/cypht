@@ -715,6 +715,155 @@ class Hm_Test_MCP_OAuth extends TestCase {
         $this->assertFalse(Hm_MCP_OAuth::redirect_matches('http://127.0.0.1/cb', 'http://user@127.0.0.1:4000/cb'));
     }
 
+    /* ------------------------------------------------- client metadata (CIMD) */
+
+    /* the document ChatGPT publishes */
+    const CHATGPT_CLIENT = '{"client_id":"https://chatgpt.com/oauth/client.json","client_uri":"https://chatgpt.com/","redirect_uris":["https://chatgpt.com/connector_platform_oauth_redirect"],"token_endpoint_auth_method":"private_key_jwt","token_endpoint_auth_methods_supported":["none","private_key_jwt"],"grant_types":["authorization_code","refresh_token"],"response_types":["code"],"client_name":"ChatGPT","logo_uri":"https://persistent.oaistatic.com/sonic/misc/openai-logo.png","token_endpoint_auth_signing_alg":"RS256","jwks_uri":"https://chatgpt.com/oauth/jwks.json"}';
+    const CHATGPT_ID = 'https://chatgpt.com/oauth/client.json';
+
+    private $fetches = [];
+
+    private function enable_cimd($document = null, $status = 200, $ips = ['104.18.32.47']) {
+        $this->config->set('mcp_cimd_allowed_hosts', 'chatgpt.com');
+        $this->services->upload_resolver = function ($host) use ($ips) { return $ips; };
+        $this->services->upload_fetcher = function ($url, $host, $ip, $max, $timeout) use (&$document, $status) {
+            $this->fetches[] = $url;
+            return [$status, ['content-type' => 'application/json; charset=utf-8'], $document ?? self::CHATGPT_CLIENT];
+        };
+    }
+
+    private function failing_fetches() {
+        $this->services->upload_fetcher = function ($url, $host, $ip, $max, $timeout) {
+            $this->fetches[] = $url;
+            throw new Hm_MCP_Error('upstream_error', 'down');
+        };
+    }
+
+    public function test_cimd_is_advertised_only_when_hosts_are_allowed() {
+        $data = $this->router->handle($this->request('GET', '/.well-known/oauth-authorization-server'))->decoded();
+        $this->assertArrayNotHasKey('client_id_metadata_document_supported', $data);
+        $this->config->set('mcp_cimd_allowed_hosts', 'chatgpt.com');
+        $data = $this->router->handle($this->request('GET', '/.well-known/oauth-authorization-server'))->decoded();
+        $this->assertTrue($data['client_id_metadata_document_supported']);
+        $this->assertSame('https://mail.example.com/oauth/register', $data['registration_endpoint']);
+    }
+
+    public function test_cimd_client_ids() {
+        $this->assertTrue(Hm_MCP_OAuth::is_cimd_id(self::CHATGPT_ID));
+        $this->assertTrue(Hm_MCP_OAuth::is_cimd_id('https://chatgpt.com/oauth/abc123/client.json'));
+        foreach (['http://chatgpt.com/oauth/client.json', 'https://chatgpt.com', 'https://chatgpt.com/', 'https://chatgpt.com/a/../client.json',
+            'https://chatgpt.com/./client.json', 'https://user@chatgpt.com/client.json', 'https://chatgpt.com/client.json#x',
+            'https://chatgpt.com/'.str_repeat('a', 250), 'https://chatgpt.com/a b', 'cl_0123', ''] as $id) {
+            $this->assertFalse(Hm_MCP_OAuth::is_cimd_id($id), $id);
+        }
+    }
+
+    public function test_chatgpt_connects_with_its_metadata_document() {
+        $this->enable_cimd();
+        $res = $this->authorize_get($this->params(self::CHATGPT_ID));
+        $this->assertSame(200, $res->status, $res->body);
+        $this->assertStringContainsString('<strong>ChatGPT</strong> wants to use your mail.', $res->body);
+        $this->assertSame([self::CHATGPT_ID], $this->fetches);
+        $client = $this->store->client(self::CHATGPT_ID);
+        $this->assertSame(['cimd', 'ChatGPT', ['https://chatgpt.com/connector_platform_oauth_redirect']],
+            [$client['kind'], $client['client_name'], $client['redirect_uris']]);
+        $this->assertSame($this->now, $client['metadata']['fetched_at']);
+
+        /* ChatGPT authenticates as a public client: "none" is in its supported methods */
+        $data = $this->tokens(self::CHATGPT_ID);
+        $this->assertStringStartsWith('cyp_at_', $data['access_token']);
+        $this->assertCount(1, $this->fetches);
+        $connection = $this->store->connections('alice')[0];
+        $this->assertSame([self::CHATGPT_ID, 'ChatGPT'], [$connection['client_id'], $connection['name']]);
+
+        /* the stored copy is used, then fetched again when it is old */
+        $this->assertSame(200, $this->authorize_get($this->params(self::CHATGPT_ID))->status);
+        $this->assertCount(1, $this->fetches);
+        $this->now += Hm_MCP_OAuth::CIMD_TTL + 1;
+        $this->assertSame(200, $this->authorize_get($this->params(self::CHATGPT_ID))->status);
+        $this->assertCount(2, $this->fetches);
+
+        /* an outage of the publisher: the old copy is kept for a while */
+        $this->failing_fetches();
+        $this->now += Hm_MCP_OAuth::CIMD_TTL + 1;
+        $this->assertSame(200, $this->authorize_get($this->params(self::CHATGPT_ID))->status);
+        $this->assertSame(200, $this->refresh(self::CHATGPT_ID, $data['refresh_token'])->status);
+        $this->now += Hm_MCP_OAuth::CIMD_MAX_STALE;
+        $res = $this->authorize_get($this->params(self::CHATGPT_ID));
+        $this->assertSame(400, $res->status);
+        $this->assertStringContainsString('could not be loaded', $res->body);
+        $this->assertNull($res->header('Location'));
+    }
+
+    public static function rejected_documents() {
+        $doc = json_decode(self::CHATGPT_CLIENT, true);
+        return [
+            'other client id' => [array_merge($doc, ['client_id' => 'https://chatgpt.com/other.json'])],
+            'only private_key_jwt' => [array_merge($doc, ['token_endpoint_auth_methods_supported' => ['private_key_jwt']])],
+            'singular private_key_jwt' => [array_diff_key($doc, ['token_endpoint_auth_methods_supported' => 1])],
+            'no redirect uris' => [array_diff_key($doc, ['redirect_uris' => 1])],
+            'unsafe redirect uri' => [array_merge($doc, ['redirect_uris' => ['javascript:alert(1)']])],
+            'no code grant' => [array_merge($doc, ['grant_types' => ['client_credentials']])],
+            'list' => [[$doc]],
+            'not json' => ['<html>'],
+        ];
+    }
+
+    /**
+     * @dataProvider rejected_documents
+     */
+    public function test_invalid_metadata_documents_are_rejected($document) {
+        $this->enable_cimd(is_string($document) ? $document : json_encode($document));
+        $res = $this->authorize_get($this->params(self::CHATGPT_ID));
+        $this->assertSame(400, $res->status);
+        $this->assertStringContainsString('could not be loaded', $res->body);
+        $this->assertNull($res->header('Location'));
+        $this->assertFalse($this->store->client(self::CHATGPT_ID));
+    }
+
+    public function test_metadata_documents_are_only_fetched_safely() {
+        /* CIMD off: nothing is fetched */
+        $this->services->upload_fetcher = function () { $this->fetches[] = 'called'; return [200, [], self::CHATGPT_CLIENT]; };
+        $res = $this->authorize_get($this->params(self::CHATGPT_ID));
+        $this->assertStringContainsString('not registered', $res->body);
+        $this->assertSame([], $this->fetches);
+
+        $this->enable_cimd();
+        foreach (['https://evil.example.com/client.json', 'https://chatgpt.com.evil.example/client.json', 'http://chatgpt.com/oauth/client.json'] as $id) {
+            $res = $this->authorize_get($this->params($id));
+            $this->assertSame(400, $res->status, $id);
+            $this->assertStringContainsString('not registered', $res->body, $id);
+        }
+        $this->assertSame([], $this->fetches);
+        /* the redirect must be one the document lists */
+        $res = $this->authorize_get($this->params(self::CHATGPT_ID, ['redirect_uri' => 'https://chatgpt.com/other']));
+        $this->assertSame(400, $res->status);
+        $this->assertStringContainsString('does not match its registration', $res->body);
+        /* the token endpoint never fetches a client it has not seen */
+        $res = $this->exchange('https://chatgpt.com/oauth/new/client.json', 'cyp_ac_'.str_repeat('A', 43));
+        $this->assertSame('invalid_client', $res->decoded()['error']);
+        $this->assertCount(1, $this->fetches);
+    }
+
+    public function test_private_addresses_and_errors_are_refused() {
+        $this->enable_cimd(null, 200, ['10.0.0.5']);
+        $this->assertStringContainsString('could not be loaded', $this->authorize_get($this->params(self::CHATGPT_ID))->body);
+        $this->assertSame([], $this->fetches);
+        $this->enable_cimd(null, 302);
+        $this->assertStringContainsString('could not be loaded', $this->authorize_get($this->params(self::CHATGPT_ID))->body);
+        $this->enable_cimd(null, 404);
+        $this->assertStringContainsString('could not be loaded', $this->authorize_get($this->params(self::CHATGPT_ID))->body);
+        $this->assertCount(2, $this->fetches);
+    }
+
+    public function test_metadata_fetches_are_rate_limited() {
+        $this->enable_cimd(null, 404);
+        for ($i = 0; $i < Hm_MCP_OAuth::CIMD_FETCHES + 5; $i++) {
+            $this->authorize_get($this->params('https://chatgpt.com/oauth/'.$i.'/client.json'));
+        }
+        $this->assertCount(Hm_MCP_OAuth::CIMD_FETCHES, $this->fetches);
+    }
+
     /* ------------------------------------------------------- two-factor auth */
 
     public function test_two_factor_code_is_required_when_turned_on() {

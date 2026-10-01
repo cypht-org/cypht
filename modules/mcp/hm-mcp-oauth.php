@@ -151,6 +151,15 @@ class Hm_MCP_OAuth {
     const REGISTER_ATTEMPTS = 30;
     const REGISTER_WINDOW = 3600;
 
+    /* client metadata documents (CIMD): seconds a fetched copy is used, oldest copy used when
+       the document cannot be fetched again, size and time limits, fetches per client address */
+    const CIMD_TTL = 3600;
+    const CIMD_MAX_STALE = 604800;
+    const CIMD_MAX_BYTES = 16384;
+    const CIMD_TIMEOUT = 5;
+    const CIMD_FETCHES = 30;
+    const CIMD_WINDOW = 600;
+
     /* registration and request limits */
     const MAX_REDIRECT_URIS = 10;
     const MAX_REGISTRATION_BYTES = 16384;
@@ -172,6 +181,7 @@ class Hm_MCP_OAuth {
         'no_permission' => 'Select at least one permission',
         'no_account' => 'Select at least one account',
         'unknown_client' => 'This app is not registered with this server. Remove it in the app and add it again.',
+        'client_unavailable' => 'The information of this app could not be loaded. Try again in a few minutes.',
         'no_redirect' => 'The app did not say where to return after signing in.',
         'bad_redirect' => 'The return address of this app does not match its registration.',
         'expired' => 'This sign in has expired. Go back to the app and connect again.',
@@ -232,7 +242,7 @@ class Hm_MCP_OAuth {
             'revocation_endpoint_auth_methods_supported' => ['none'],
             'scopes_supported' => Hm_MCP_Permissions::scopes(),
             'authorization_response_iss_parameter_supported' => true,
-        ], 200, ['Cache-Control' => 'public, max-age=300']);
+        ] + ($this->cimd_hosts() ? ['client_id_metadata_document_supported' => true] : []), 200, ['Cache-Control' => 'public, max-age=300']);
     }
 
     /* --------------------------------------------------------- registration */
@@ -383,7 +393,7 @@ class Hm_MCP_OAuth {
             return $this->error_page('unavailable', 503);
         }
         if ($request->method === 'GET') {
-            $req = $this->check_request($request->query);
+            $req = $this->check_request($request->query, $request);
             if (isset($req['page'])) {
                 return $req['page'];
             }
@@ -405,15 +415,16 @@ class Hm_MCP_OAuth {
     /**
      * Validate an authorization request (RFC 6749 section 4.1.1, RFC 7636, RFC 8707)
      * @param array $params request parameters
+     * @param Hm_MCP_Http_Request $request request details
      * @return array the request, ['page' => response] when the user cannot be sent
      *               back to the client, or ['error', 'description', 'redirect_uri', 'state']
      */
-    private function check_request($params) {
-        $store = $this->store();
+    private function check_request($params, $request) {
         $client_id = self::param($params, 'client_id', 255);
-        $client = $client_id ? $store->client($client_id) : false;
+        $client = $client_id ? $this->find_client($client_id, $request, true) : false;
         if (!$client) {
-            return ['page' => $this->error_page('unknown_client', 400)];
+            $unavailable = $client_id && self::is_cimd_id($client_id) && $this->cimd_host_allowed($client_id);
+            return ['page' => $this->error_page($unavailable ? 'client_unavailable' : 'unknown_client', 400)];
         }
         $redirect_param = self::param($params, 'redirect_uri', 2000);
         if ($redirect_param === null) {
@@ -513,7 +524,7 @@ class Hm_MCP_OAuth {
      * @return Hm_MCP_Http_Response
      */
     private function login($request, $form) {
-        $req = $this->check_request($form);
+        $req = $this->check_request($form, $request);
         if (isset($req['page'])) {
             return $req['page'];
         }
@@ -581,7 +592,7 @@ class Hm_MCP_OAuth {
             return $this->error_page('expired', 400);
         }
         $req = (array) $found['data'];
-        $client = $store->client((string) ($req['client_id'] ?? ''));
+        $client = $this->find_client((string) ($req['client_id'] ?? ''), null, false);
         if (!$client) {
             $store->delete_connection($connection['id']);
             return $this->error_page('unknown_client', 400);
@@ -911,6 +922,152 @@ class Hm_MCP_OAuth {
         return $page->render($page->trans('Connect an app to your mail'), $body, [self::form_target($req['redirect_uri'])]);
     }
 
+    /* ------------------------------------------------- client metadata (CIMD) */
+
+    /**
+     * @return array hosts allowed to publish client metadata documents, empty when CIMD is off
+     */
+    private function cimd_hosts() {
+        return $this->config->list_setting('cimd_allowed_hosts');
+    }
+
+    /**
+     * A client id that is the URL of a client metadata document: HTTPS, with a path,
+     * without credentials, fragment or dot segments
+     * @param mixed $client_id client id
+     * @return bool
+     */
+    public static function is_cimd_id($client_id) {
+        if (!is_string($client_id) || strlen($client_id) > 255 || strpos($client_id, 'https://') !== 0) {
+            return false;
+        }
+        $parts = parse_url($client_id);
+        if (!is_array($parts) || empty($parts['host']) || isset($parts['user']) || isset($parts['pass']) || isset($parts['fragment'])) {
+            return false;
+        }
+        $path = (string) ($parts['path'] ?? '');
+        if ($path === '' || $path === '/' || preg_match('#(^|/)\.\.?(/|$)#', $path) || preg_match('/[\x00-\x20\x7F"<>\\^`{|}]/', $client_id)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @param string $client_id client metadata URL
+     * @return bool the host may publish client metadata documents
+     */
+    private function cimd_host_allowed($client_id) {
+        $host = strtolower(rtrim((string) parse_url($client_id, PHP_URL_HOST), '.'));
+        return $host !== '' && Hm_MCP_Config::host_in_list($host, $this->cimd_hosts());
+    }
+
+    /**
+     * A registered client, or a client described by a metadata document
+     * @param string $client_id client id
+     * @param Hm_MCP_Http_Request|null $request request, for the fetch rate limit
+     * @param bool $refresh fetch the document again when the stored copy is old
+     * @return array|false
+     */
+    private function find_client($client_id, $request, $refresh) {
+        $store = $this->store();
+        if (!self::is_cimd_id($client_id)) {
+            $client = $store->client($client_id);
+            return $client && $client['kind'] !== 'cimd' ? $client : false;
+        }
+        if (!$this->cimd_host_allowed($client_id)) {
+            return false;
+        }
+        $client = $store->client($client_id);
+        $client = $client && $client['kind'] === 'cimd' ? $client : false;
+        $age = $client ? $store->now() - (int) ($client['metadata']['fetched_at'] ?? 0) : null;
+        if ($client && (!$refresh || $age < self::CIMD_TTL)) {
+            return $client;
+        }
+        if (!$refresh || !$request) {
+            return false;
+        }
+        $fresh = $this->fetch_cimd($client_id, $request);
+        if ($fresh) {
+            return $fresh;
+        }
+        /* a short outage of the publisher does not break existing apps */
+        return $client && $age < self::CIMD_MAX_STALE ? $client : false;
+    }
+
+    /**
+     * Fetch, check and store a client metadata document
+     * @param string $client_id document URL
+     * @param Hm_MCP_Http_Request $request request details
+     * @return array|false client
+     */
+    private function fetch_cimd($client_id, $request) {
+        $store = $this->store();
+        if (!$store->rate_limit('cimd:'.$this->client_ip($request), self::CIMD_FETCHES, self::CIMD_WINDOW)) {
+            return false;
+        }
+        try {
+            list($status, $headers, $body) = $this->services->uploads()->get_document($client_id, $this->cimd_hosts(),
+                self::CIMD_MAX_BYTES, self::CIMD_TIMEOUT);
+        } catch (Hm_MCP_Error $e) {
+            Hm_Debug::add('MCP client metadata fetch failed: '.$e->getMessage(), 'warning');
+            return false;
+        }
+        if ($status !== 200) {
+            Hm_Debug::add(sprintf('MCP client metadata fetch returned HTTP %d', $status), 'warning');
+            return false;
+        }
+        $document = json_decode((string) $body, true);
+        $client = self::cimd_client($client_id, $document, $store->now());
+        if (!$client || !$store->save_client($client)) {
+            Hm_Debug::add('MCP client metadata document rejected', 'warning');
+            return false;
+        }
+        return $store->client($client_id);
+    }
+
+    /**
+     * Check a client metadata document (draft-ietf-oauth-client-id-metadata-document)
+     * @param string $client_id URL the document was fetched from
+     * @param mixed $document decoded JSON
+     * @param int $now current time
+     * @return array|false client to store
+     */
+    public static function cimd_client($client_id, $document, $now) {
+        if (!is_array($document) || !$document || array_is_list($document) || ($document['client_id'] ?? null) !== $client_id) {
+            return false;
+        }
+        $uris = $document['redirect_uris'] ?? null;
+        if (!is_array($uris) || !$uris || count($uris) > self::MAX_REDIRECT_URIS) {
+            return false;
+        }
+        foreach ($uris as $uri) {
+            if (!self::valid_redirect_uri($uri)) {
+                return false;
+            }
+        }
+        foreach (['grant_types' => 'authorization_code', 'response_types' => 'code'] as $field => $needed) {
+            if (array_key_exists($field, $document) && (!is_array($document[$field]) || !in_array($needed, $document[$field], true))) {
+                return false;
+            }
+        }
+        /* public clients only: the document must allow "none" */
+        $methods = $document['token_endpoint_auth_methods_supported'] ?? null;
+        $method = $document['token_endpoint_auth_method'] ?? 'none';
+        if (is_array($methods) ? !in_array('none', $methods, true) : $method !== 'none') {
+            return false;
+        }
+        $name = self::clean_text($document['client_name'] ?? '', 100);
+        $client_uri = is_string($document['client_uri'] ?? null) && strpos($document['client_uri'], 'https://') === 0
+            && Hm_MCP_Config::valid_public_url(rtrim($document['client_uri'], '/')) ? $document['client_uri'] : '';
+        return [
+            'client_id' => $client_id,
+            'kind' => 'cimd',
+            'client_name' => $name !== '' ? $name : strtolower((string) parse_url($client_id, PHP_URL_HOST)),
+            'redirect_uris' => array_values(array_unique($uris)),
+            'metadata' => array_filter(['fetched_at' => (int) $now, 'client_uri' => $client_uri]),
+        ];
+    }
+
     /* ---------------------------------------------------------------- tokens */
 
     /**
@@ -932,7 +1089,7 @@ class Hm_MCP_OAuth {
             }
             $client_id = $basic;
         }
-        $client = $client_id ? $store->client($client_id) : false;
+        $client = $client_id ? $this->find_client($client_id, $request, false) : false;
         if (!$client) {
             return self::token_error(401, 'invalid_client', 'The client is not registered with this server.');
         }

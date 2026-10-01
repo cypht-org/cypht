@@ -1025,4 +1025,5 @@ return array(
     'Save a contact' => false,
     'Tags created' => false,
     'New contact' => false,
+    'The information of this app could not be loaded. Try again in a few minutes.' => false,
 );

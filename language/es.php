@@ -872,4 +872,5 @@ return array(
     'Save a contact' => 'Guardar un contacto',
     'Tags created' => 'Etiquetas creadas',
     'New contact' => 'Contacto nuevo',
+    'The information of this app could not be loaded. Try again in a few minutes.' => 'No se pudo cargar la información de esta aplicación. Vuelve a intentarlo en unos minutos.',
 );

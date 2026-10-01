@@ -11,7 +11,8 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * Reads attachments passed by clients: file links from ChatGPT (openai/fileParams)
  * or base64 content. Links are only downloaded over HTTPS from the hosts in
- * MCP_UPLOAD_ALLOWED_HOSTS, from public addresses, with a size limit.
+ * MCP_UPLOAD_ALLOWED_HOSTS, from public addresses, with a size limit. The same
+ * checks are used to fetch OAuth client metadata documents.
  * @subpackage mcp/lib
  */
 class Hm_MCP_Uploads {
@@ -138,14 +139,45 @@ class Hm_MCP_Uploads {
      * @throws Hm_MCP_Error
      */
     public function check_url($url) {
+        return $this->check_https_url($url, $this->config->list_setting('upload_allowed_hosts'),
+            'File links must be HTTPS links on the default port.',
+            'Files cannot be downloaded from %s. The server administrator can allow the host in MCP_UPLOAD_ALLOWED_HOSTS.');
+    }
+
+    /**
+     * Fetch a small document, such as OAuth client metadata, without following redirects
+     * @param string $url document URL
+     * @param array $allowed allowed host patterns
+     * @param int $max_bytes largest body accepted
+     * @param int $timeout seconds
+     * @return array [status, lower case headers, body]
+     * @throws Hm_MCP_Error
+     */
+    public function get_document($url, $allowed, $max_bytes, $timeout) {
+        list($host, $ip) = $this->check_https_url($url, $allowed, 'Document URLs must be HTTPS links on the default port.',
+            'Documents cannot be fetched from %s.');
+        return $this->fetch($url, $host, $ip, $max_bytes, $timeout, ['Accept: application/json']);
+    }
+
+    /**
+     * Check that a URL is HTTPS on the default port, on an allowed host that only
+     * resolves to public addresses
+     * @param string $url URL
+     * @param array $allowed allowed host patterns
+     * @param string $scheme_error message when the URL is not a plain HTTPS URL
+     * @param string $host_error message when the host is not allowed, %s is the host
+     * @return array [host, IP address to connect to]
+     * @throws Hm_MCP_Error
+     */
+    public function check_https_url($url, $allowed, $scheme_error, $host_error) {
         $parts = parse_url((string) $url);
         if (!is_array($parts) || strtolower($parts['scheme'] ?? '') !== 'https' || empty($parts['host'])
             || isset($parts['user']) || isset($parts['pass']) || (isset($parts['port']) && (int) $parts['port'] !== 443)) {
-            throw new Hm_MCP_Error('invalid_argument', 'File links must be HTTPS links on the default port.');
+            throw new Hm_MCP_Error('invalid_argument', $scheme_error);
         }
         $host = strtolower(rtrim($parts['host'], '.'));
-        if (!Hm_MCP_Config::host_in_list($host, $this->config->list_setting('upload_allowed_hosts'))) {
-            throw new Hm_MCP_Error('invalid_argument', sprintf('Files cannot be downloaded from %s. The server administrator can allow the host in MCP_UPLOAD_ALLOWED_HOSTS.', $host));
+        if (!Hm_MCP_Config::host_in_list($host, $allowed)) {
+            throw new Hm_MCP_Error('invalid_argument', sprintf($host_error, $host));
         }
         $ips = $this->resolve($host);
         if (!$ips) {
@@ -220,10 +252,11 @@ class Hm_MCP_Uploads {
 
     /**
      * Download with the connection pinned to a checked address
+     * @param array $request_headers extra request headers
      * @return array [status, lower case headers, body]
      * @throws Hm_MCP_Error
      */
-    protected function fetch($url, $host, $ip, $max_bytes, $timeout) {
+    protected function fetch($url, $host, $ip, $max_bytes, $timeout, $request_headers = []) {
         if ($this->fetcher) {
             return ($this->fetcher)($url, $host, $ip, $max_bytes, $timeout);
         }
@@ -242,6 +275,7 @@ class Hm_MCP_Uploads {
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_USERAGENT => 'Cypht',
+            CURLOPT_HTTPHEADER => $request_headers,
             CURLOPT_HEADERFUNCTION => function ($handle, $line) use (&$headers, &$too_large, $max_bytes) {
                 if (preg_match('/^HTTP\//i', $line)) {
                     $headers = [];
