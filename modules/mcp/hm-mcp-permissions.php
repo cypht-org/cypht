@@ -158,6 +158,46 @@ class Hm_MCP_Permissions {
     }
 
     /**
+     * Build a permission map from a list of enabled keys
+     * @param mixed $keys submitted permission keys
+     * @param array|null $cap permission => bool limit, nothing above it is enabled
+     * @return array permission => bool for every known permission
+     */
+    public static function from_keys($keys, $cap = null) {
+        $keys = is_array($keys) ? array_map('strval', $keys) : [];
+        $res = [];
+        foreach (self::keys() as $key) {
+            $res[$key] = in_array($key, $keys, true) && ($cap === null || !empty($cap[$key]));
+        }
+        return $res;
+    }
+
+    /**
+     * Mail accounts from the IMAP server list of a user configuration
+     * @param array $servers value of the imap_servers user setting
+     * @return array list of ['id', 'name', 'user', 'type', 'hidden']
+     */
+    public static function account_list($servers) {
+        $res = [];
+        if (!is_array($servers)) {
+            return $res;
+        }
+        foreach ($servers as $id => $server) {
+            if (!is_array($server)) {
+                continue;
+            }
+            $res[] = [
+                'id' => (string) ($server['id'] ?? $id),
+                'name' => (string) ($server['name'] ?? ''),
+                'user' => (string) ($server['user'] ?? ''),
+                'type' => (string) ($server['type'] ?? 'imap'),
+                'hidden' => !empty($server['hide']),
+            ];
+        }
+        return $res;
+    }
+
+    /**
      * Combine global and connection account restrictions
      * @param array $global ['mode' => 'all'|'selected', 'ids' => []]
      * @param array|null $connection list of account ids, null to inherit

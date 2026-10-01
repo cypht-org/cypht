@@ -540,6 +540,22 @@ class Hm_MCP_Store {
         return $row ? (int) $row['total'] : 0;
     }
 
+    /**
+     * Expiration of the live tokens of a connection
+     * @param string $connection_id connection id
+     * @param string $kind token kind
+     * @return int|null unix time, 0 for no expiration, null when there is no live token
+     */
+    public function token_expiry($connection_id, $kind) {
+        $rows = $this->rows('select expires_at from hm_mcp_tokens where connection_id=? and kind=? and used_at=0 and (expires_at=0 or expires_at>=?)',
+            [$connection_id, $kind, $this->now()]);
+        if (!$rows) {
+            return null;
+        }
+        $values = array_map('intval', array_column($rows, 'expires_at'));
+        return in_array(0, $values, true) ? 0 : max($values);
+    }
+
     /* ----------------------------------------------------------- oauth clients */
 
     /**

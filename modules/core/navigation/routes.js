@@ -97,6 +97,10 @@ const routes = [
         handler: 'applyHighlightsPageHandlers'
     },
     {
+        page: 'mcp',
+        handler: 'applyMcpPageHandlers'
+    },
+    {
         page: 'logout',
         handler: 'applyLogoutPageHandlers',
         useLayout: false
