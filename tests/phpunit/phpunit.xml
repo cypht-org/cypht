@@ -198,6 +198,8 @@
       <file>./modules/mcp/oauth.php</file>
       <file>./modules/mcp/organize.php</file>
       <file>./modules/mcp/drafts.php</file>
+      <file>./modules/mcp/send.php</file>
+      <file>./modules/mcp/runner.php</file>
     </testsuite>
   </testsuites>
   <source>

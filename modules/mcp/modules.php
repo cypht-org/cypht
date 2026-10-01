@@ -120,6 +120,9 @@ class Hm_Handler_mcp_settings_page extends Hm_Handler_Module {
             case 'create_token':
                 $this->create_token($store, $username, $settings, $account_ids);
                 break;
+            case 'create_runner':
+                $this->create_runner($store, $username);
+                break;
             case 'update_connection':
                 $this->update_connection($store, $username, $settings, $account_ids);
                 break;
@@ -214,6 +217,40 @@ class Hm_Handler_mcp_settings_page extends Hm_Handler_Module {
             'permissions' => $permissions === null ? 'global' : implode(', ', array_keys(array_filter($permissions))),
             'accounts' => $accounts === null ? 'global' : count($accounts)]);
         Hm_Msgs::add('Token created');
+    }
+
+    /**
+     * Create a token for the scheduled sends runner after confirming the password
+     * @return void
+     */
+    private function create_runner($store, $username) {
+        $password = (string) ($this->request->post['mcp_password'] ?? '');
+        if ($password === '') {
+            Hm_Msgs::add('Your password is required', 'warning');
+            return;
+        }
+        $rate_key = 'password:'.$username;
+        if (!$store->rate_limit($rate_key, self::PASSWORD_ATTEMPTS, self::PASSWORD_WINDOW)) {
+            Hm_Msgs::add('Too many attempts. Try again later.', 'warning');
+            return;
+        }
+        if (!$this->session->auth($username, $password)) {
+            Hm_Msgs::add('Incorrect password', 'warning');
+            return;
+        }
+        $store->rate_reset($rate_key);
+        $name = self::clean_name($this->request->post['mcp_name'] ?? '', 'Scheduled sends');
+        try {
+            list($id, $key) = $store->create_connection($username, 'runner', $name, $password);
+            $token = $store->issue_token($id, 'runner', $key, 0);
+        } catch (Exception $e) {
+            Hm_Msgs::add('Could not create the token', 'danger');
+            return;
+        }
+        $this->out('mcp_new_token', ['name' => $name, 'token' => $token, 'kind' => 'runner']);
+        $this->out('no_redirect', true);
+        $this->log($store, $username, 'create_runner', ['id' => $id, 'name' => $name]);
+        Hm_Msgs::add('Runner token created');
     }
 
     /**
@@ -340,6 +377,7 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         $res .= $this->settings_form($settings);
         $res .= $this->connections($settings);
         $res .= $this->token_form($settings);
+        $res .= $this->runner_form();
         $res .= $this->activity_section();
         $res .= $this->connect_help();
         return $res.'</div>';
@@ -352,12 +390,15 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         'revoke_connection' => 'Connection revoked',
         'update_connection' => 'Connection updated',
         'save_settings' => 'API and MCP settings saved',
+        'create_runner' => 'Runner token created',
+        'send_scheduled' => 'Sent a scheduled message',
         'authorize' => 'Connected with OAuth',
         'revoke' => 'Connection revoked',
         'unknown' => 'Unknown operation',
     ];
 
-    const CHANNELS = ['mcp' => 'MCP', 'rest' => 'REST API', 'link' => 'Download link', 'settings' => 'Settings', 'oauth' => 'OAuth'];
+    const CHANNELS = ['mcp' => 'MCP', 'rest' => 'REST API', 'link' => 'Download link', 'settings' => 'Settings', 'oauth' => 'OAuth',
+        'runner' => 'Scheduled sends runner'];
 
     const OUTCOMES = ['ok' => ['Completed', 'success'], 'denied' => ['Denied', 'warning'], 'error' => ['Failed', 'danger']];
 
@@ -367,7 +408,7 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         'enabled' => 'Enabled', 'permissions' => 'Permissions', 'expires_days' => 'Expires in days', 'kind' => 'Type',
         'recipients' => 'Recipients', 'domains' => 'Domains', 'client' => 'Client', 'reason' => 'Reason',
         'destination' => 'Destination', 'failed' => 'Failed messages', 'tags_updated' => 'Tags updated', 'folder' => 'Folder',
-        'mode' => 'Draft', 'attachments' => 'Attachments'];
+        'mode' => 'Draft', 'attachments' => 'Attachments', 'scheduled' => 'Scheduled'];
 
     /* kinds of drafts */
     const MODES = ['new' => 'New message', 'reply' => 'Reply', 'reply_all' => 'Reply to all', 'forward' => 'Forwarded message'];
@@ -515,14 +556,21 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         if (!is_array($new) || empty($new['token'])) {
             return '';
         }
+        $runner = ($new['kind'] ?? '') === 'runner';
+        $usage = '';
+        if ($runner && $this->get('mcp_public_url', '')) {
+            $usage = '<div class="mt-2">'.$this->trans('Use it in the scheduled task:').'</div><pre class="mcp_code mb-0"><code>'.
+                $this->html_safe('curl -fsS -X POST -H "Authorization: Bearer RUNNER_TOKEN" '.$this->get('mcp_public_url').'/api/v1/scheduled/run').
+                '</code></pre>';
+        }
         return '<div class="alert alert-success mx-3 mt-3 mb-0 mcp_new_token" role="status">'.
-            '<div class="fw-semibold mb-1">'.$this->trans('New personal access token').': '.$this->html_safe($new['name']).'</div>'.
+            '<div class="fw-semibold mb-1">'.$this->trans($runner ? 'New runner token' : 'New personal access token').': '.$this->html_safe($new['name']).'</div>'.
             '<div class="mb-2">'.$this->trans('Copy this token now. It will not be shown again.').'</div>'.
             '<div class="input-group">'.
             '<input type="text" class="form-control font-monospace" readonly id="mcp_new_token_value" value="'.$this->html_safe($new['token']).'" aria-label="'.$this->trans('New personal access token').'" />'.
             '<button type="button" class="btn btn-outline-secondary mcp_copy" data-target="mcp_new_token_value" data-copied="'.$this->trans('Copied').'">'.
             '<i class="bi bi-clipboard me-1"></i>'.$this->trans('Copy').'</button>'.
-            '</div></div>';
+            '</div>'.$usage.'</div>';
     }
 
     /**
@@ -786,6 +834,32 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
             '<div class="form-text">'.$this->trans('Your password lets this token decrypt your account settings. It is stored encrypted and can only be used together with the token.').'</div>'.
             '</div></div>';
         $res .= '<button type="submit" class="btn btn-primary mt-3">'.$this->trans('Create token').'</button></form></div>';
+        return $res;
+    }
+
+    /**
+     * Form to create a runner token for scheduled sends
+     * @return string
+     */
+    private function runner_form() {
+        $res = $this->section('Scheduled sends', 'send-check');
+        $res .= '<div class="px-3 mt-3"><p class="text-secondary">'.
+            $this->trans('Cypht sends scheduled messages only while it is open in a browser. With a runner token, a scheduled task on a server can send them on time even when Cypht is closed.').'</p>';
+        $base = $this->get('mcp_public_url', '');
+        if ($base) {
+            $res .= '<p class="text-secondary mb-2">'.$this->trans('The task must call this address every minute, with the token in the Authorization header:').'</p>'.
+                '<pre class="mcp_code"><code>POST '.$this->html_safe($base.'/api/v1/scheduled/run').'</code></pre>';
+        }
+        $res .= $this->form_start('create_runner', 'mcp_runner_form').
+            '<div class="row g-3"><div class="col-md-6">'.
+            '<label class="form-label" for="mcp_runner_name">'.$this->trans('Token name').'</label>'.
+            '<input class="form-control" type="text" maxlength="100" name="mcp_name" id="mcp_runner_name" placeholder="'.$this->trans('Scheduled sends').'" />'.
+            '</div><div class="col-md-6">'.
+            '<label class="form-label" for="mcp_runner_password">'.$this->trans('Your Cypht password').'</label>'.
+            '<input class="form-control" type="password" required name="mcp_password" id="mcp_runner_password" autocomplete="current-password" />'.
+            '</div></div>'.
+            '<div class="form-text">'.$this->trans('A runner token can only send the messages you scheduled. It does not expire: revoke it in Connections when it is no longer needed.').'</div>'.
+            '<button type="submit" class="btn btn-primary mt-3">'.$this->trans('Create runner token').'</button></form></div>';
         return $res;
     }
 

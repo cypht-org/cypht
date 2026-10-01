@@ -349,7 +349,7 @@ class Hm_MCP_Context {
      * Addresses an account sends as: its Cypht profiles, default profile first, then
      * the address of the account itself
      * @param string $id account id
-     * @return array list of ['email', 'name', 'reply_to', 'signature', 'smtp_id', 'default']
+     * @return array list of ['profile_id', 'email', 'name', 'reply_to', 'signature', 'smtp_id', 'default']
      */
     public function senders($id) {
         $server = $this->servers[$id] ?? [];
@@ -366,6 +366,7 @@ class Hm_MCP_Context {
             }
             $reply_to = trim((string) ($profile['replyto'] ?? ''));
             $profiles[] = [
+                'profile_id' => (string) ($profile['id'] ?? ''),
                 'email' => $email,
                 'name' => Hm_MCP_Mime::header_text($profile['name'] ?? ''),
                 'reply_to' => Hm_MCP_Mime::valid_email($reply_to) && strcasecmp($reply_to, $email) !== 0 ? $reply_to : '',
@@ -377,7 +378,7 @@ class Hm_MCP_Context {
         usort($profiles, function ($a, $b) { return (int) $b['default'] <=> (int) $a['default']; });
         $user = trim((string) ($server['user'] ?? ''));
         if (Hm_MCP_Mime::valid_email($user)) {
-            $profiles[] = ['email' => $user, 'name' => '', 'reply_to' => '', 'signature' => '', 'smtp_id' => '', 'default' => false];
+            $profiles[] = ['profile_id' => '', 'email' => $user, 'name' => '', 'reply_to' => '', 'signature' => '', 'smtp_id' => '', 'default' => false];
         }
         $res = [];
         foreach ($profiles as $sender) {
@@ -460,6 +461,48 @@ class Hm_MCP_Context {
             }
         }
         return Hm_IMAP_List::connect($id);
+    }
+
+    /**
+     * @param string $smtp_id SMTP server id
+     * @return bool the SMTP server is configured
+     */
+    public function smtp_exists($smtp_id) {
+        return class_exists('Hm_SMTP_List') && (bool) Hm_SMTP_List::dump($smtp_id);
+    }
+
+    /**
+     * Connected SMTP server, refreshing OAuth tokens first
+     * @param string $smtp_id SMTP server id
+     * @return object Hm_Mailbox for SMTP
+     * @throws Hm_MCP_Error
+     */
+    public function smtp($smtp_id) {
+        if (!$this->smtp_exists($smtp_id)) {
+            throw new Hm_MCP_Error('not_supported', 'This account has no SMTP server to send with. Add one in Cypht under Settings, Servers.');
+        }
+        $mailbox = $this->connect_smtp((string) $smtp_id);
+        if (!$mailbox || !$mailbox->authed()) {
+            throw new Hm_MCP_Error('upstream_error', 'Could not connect to the SMTP server of this account.');
+        }
+        return $mailbox;
+    }
+
+    /**
+     * @param string $smtp_id SMTP server id
+     * @return object|false Hm_Mailbox
+     */
+    protected function connect_smtp($smtp_id) {
+        $server = Hm_SMTP_List::dump($smtp_id, true);
+        if (($server['auth'] ?? '') === 'xoauth2' && function_exists('smtp_refresh_oauth2_token')) {
+            $server['expiration'] = $server['expiration'] ?? 0;
+            $result = smtp_refresh_oauth2_token($server, $this->site_config);
+            if (!empty($result)) {
+                Hm_SMTP_List::update_oauth2_token($smtp_id, $result[1], $result[0]);
+                $this->remember_token('smtp', $smtp_id, $server, $result[1], $result[0]);
+            }
+        }
+        return Hm_MCP_Imap::quietly(function () use ($smtp_id) { return Hm_SMTP_List::connect($smtp_id, false); });
     }
 
     /**

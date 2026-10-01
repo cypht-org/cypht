@@ -33,6 +33,9 @@ class Hm_MCP_Imap {
     /* folder Cypht keeps snoozed messages in */
     const SNOOZED_FOLDER = 'Snoozed';
 
+    /* folder Cypht keeps scheduled messages in */
+    const SCHEDULED_FOLDER = 'Scheduled';
+
     /**
      * Run Cypht library code that may raise PHP warnings on unexpected server answers
      * @param callable $callback code to run
@@ -101,7 +104,9 @@ class Hm_MCP_Imap {
             }
             if (in_array($uid, $wanted, true)) {
                 $res[$uid] = ['flags' => (string) ($message['flags'] ?? ''), 'size' => (int) ($message['size'] ?? 0),
-                    'message_id' => trim((string) ($message['message_id'] ?? ''))];
+                    'message_id' => trim((string) ($message['message_id'] ?? '')),
+                    'subject' => (string) ($message['subject'] ?? ''), 'from' => (string) ($message['from'] ?? ''),
+                    'to' => (string) ($message['to'] ?? ''), 'x_schedule' => trim((string) ($message['x_schedule'] ?? ''))];
             }
         }
         return $res;
@@ -354,6 +359,126 @@ class Hm_MCP_Imap {
         $uids = array_values(array_filter(array_map('strval', is_array($uids) ? $uids : []), 'ctype_digit'));
         usort($uids, function ($a, $b) { return (int) $a <=> (int) $b; });
         return $uids;
+    }
+
+    /* ---------------------------------------------------------- scheduled */
+
+    /**
+     * Name of the Scheduled folder, created when asked
+     * @param object $mailbox Hm_Mailbox
+     * @param bool $create create the folder when it is missing
+     * @return string|false
+     */
+    public static function scheduled_folder($mailbox, $create) {
+        if (self::folder_exists($mailbox, self::SCHEDULED_FOLDER)) {
+            return self::SCHEDULED_FOLDER;
+        }
+        if (!$create) {
+            return false;
+        }
+        $created = self::quietly(function () use ($mailbox) {
+            return $mailbox->create_folder(self::SCHEDULED_FOLDER);
+        });
+        return is_string($created) && $created !== '' ? $created : false;
+    }
+
+    /**
+     * Scheduled messages of a folder: messages with an X-Schedule header
+     * @param object $mailbox Hm_Mailbox
+     * @param string $folder scheduled folder
+     * @param int $max most messages returned, the newest ones are dropped
+     * @return array uid => details from existing()
+     */
+    public static function scheduled($mailbox, $folder, $max) {
+        $uids = array_slice(self::all_uids($mailbox, $folder), 0, $max);
+        $res = [];
+        foreach (self::existing($mailbox, $folder, $uids) as $uid => $entry) {
+            if ($entry['x_schedule'] !== '' && stripos($entry['flags'], '\\Deleted') === false) {
+                $res[$uid] = $entry;
+            }
+        }
+        return $res;
+    }
+
+    /* -------------------------------------------------------------- headers */
+
+    /**
+     * @param string $raw message source
+     * @return array [header block with CRLF line endings, rest starting with the blank line]
+     */
+    protected static function head_and_body($raw) {
+        $raw = str_replace("\n", "\r\n", str_replace(["\r\n", "\r"], "\n", (string) $raw));
+        $pos = strpos($raw, "\r\n\r\n");
+        if ($pos === false) {
+            return [rtrim($raw, "\r\n"), "\r\n\r\n"];
+        }
+        return [substr($raw, 0, $pos), substr($raw, $pos)];
+    }
+
+    /**
+     * Remove headers, including their folded lines
+     * @param string $raw message source
+     * @param array $names header names
+     * @return string message source with CRLF line endings
+     */
+    public static function strip_headers($raw, $names) {
+        list($head, $body) = self::head_and_body($raw);
+        $names = array_map('strtolower', $names);
+        $kept = [];
+        $skip = false;
+        foreach (explode("\r\n", $head) as $line) {
+            if ($line !== '' && ($line[0] === ' ' || $line[0] === "\t")) {
+                if (!$skip) {
+                    $kept[] = $line;
+                }
+                continue;
+            }
+            $name = strtolower(trim((string) strstr($line, ':', true)));
+            $skip = in_array($name, $names, true);
+            if (!$skip) {
+                $kept[] = $line;
+            }
+        }
+        return implode("\r\n", $kept).$body;
+    }
+
+    /**
+     * Replace a header, or add it at the top
+     * @param string $raw message source
+     * @param string $name header name
+     * @param string $value header value, single line
+     * @return string
+     */
+    public static function set_header($raw, $name, $value) {
+        $value = preg_replace('/[\r\n]+/', ' ', (string) $value);
+        return $name.': '.$value."\r\n".self::strip_headers($raw, [$name]);
+    }
+
+    /**
+     * Unfolded value of the first header with this name
+     * @param string $raw message source
+     * @param string $name header name
+     * @return string|null
+     */
+    public static function header_value($raw, $name) {
+        list($head) = self::head_and_body($raw);
+        if (preg_match('/^'.preg_quote($name, '/').':[ \t]*([^\r\n]*(?:\r\n[ \t][^\r\n]*)*)/im', $head, $matches)) {
+            return trim(preg_replace('/\r\n[ \t]+/', ' ', $matches[1]));
+        }
+        return null;
+    }
+
+    /**
+     * Message as sent over SMTP: without Bcc and Cypht scheduling headers, dated now,
+     * with lines starting with a dot escaped (RFC 5321 section 4.5.2)
+     * @param string $raw message source
+     * @param int $now send time
+     * @return string
+     */
+    public static function outgoing($raw, $now) {
+        $raw = self::strip_headers($raw, ['Bcc', 'X-Original-Bcc', 'X-Schedule', 'X-Profile-ID', 'X-Auto-Bcc', 'Date']);
+        $raw = 'Date: '.date('r', $now)."\r\n".$raw;
+        return preg_replace('/(?<=\r\n)\./', '..', $raw);
     }
 
     /* --------------------------------------------------------------- snooze */

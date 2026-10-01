@@ -23,6 +23,22 @@ trait Hm_MCP_Drafts {
     protected static $max_quote_chars = 100000;
 
     public function create_draft($args) {
+        list($account, $sender, $spec, $original, $mode) = $this->compose($args);
+        list($folder, $uid) = $this->store_draft($account['id'], Hm_MCP_Mime::build($spec), $spec['message_id']);
+        $this->audit = ['account_id' => $account['id'], 'mode' => $mode, 'recipients' => self::recipient_count($spec),
+            'attachments' => count($spec['attachments'])];
+        $message = $uid === null ? 'Draft saved. Its id is not known yet: list the drafts folder to find it.'
+            : sprintf('Draft "%s" saved in %s. Nothing was sent.', mb_substr($spec['subject'], 0, 80), $folder);
+        return $this->ok($message, $this->draft_data($account['id'], $folder, $uid, $spec));
+    }
+
+    /**
+     * Build a new message, reply or forward from the operation arguments
+     * @param array $args arguments of create_draft or send_message
+     * @return array [account, sender, message spec for Hm_MCP_Mime::build() with draft set, original message or null, mode]
+     * @throws Hm_MCP_Error
+     */
+    protected function compose($args) {
         $mode = (string) ($args['mode'] ?? 'new');
         $original = null;
         if ($mode === 'new') {
@@ -57,12 +73,7 @@ trait Hm_MCP_Drafts {
         $forwarded = $original && $mode === 'forward' && !empty($args['include_attachments'])
             ? $this->original_attachments($original, $limit) : [];
         $spec['attachments'] = array_merge($forwarded, $this->new_attachments($args, $limit - self::attachments_size($forwarded)));
-        list($folder, $uid) = $this->store_draft($account['id'], Hm_MCP_Mime::build($spec), $spec['message_id']);
-        $this->audit = ['account_id' => $account['id'], 'mode' => $mode, 'recipients' => self::recipient_count($spec),
-            'attachments' => count($spec['attachments'])];
-        $message = $uid === null ? 'Draft saved. Its id is not known yet: list the drafts folder to find it.'
-            : sprintf('Draft "%s" saved in %s. Nothing was sent.', mb_substr($spec['subject'], 0, 80), $folder);
-        return $this->ok($message, $this->draft_data($account['id'], $folder, $uid, $spec));
+        return [$account, $sender, $spec, $original, $mode];
     }
 
     public function update_draft($args) {

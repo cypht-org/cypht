@@ -172,7 +172,8 @@ class Hm_MCP_Fake_Mailbox {
                 $m = $this->folders[$folder][(string) $uid];
                 $res[(string) $uid] = ['uid' => (string) $uid, 'flags' => $m['flags'], 'internal_date' => $m['date'],
                     'size' => '1200', 'date' => $m['date'], 'from' => $m['from'], 'to' => $m['to'], 'subject' => $m['subject'],
-                    'content-type' => $m['content_type'], 'message_id' => $m['message_id'], 'preview_msg' => ''];
+                    'content-type' => $m['content_type'], 'message_id' => $m['message_id'], 'preview_msg' => '',
+                    'x_schedule' => $m['headers']['X-Schedule'] ?? ''];
             }
         }
         return $res;
@@ -204,7 +205,8 @@ class Hm_MCP_Fake_Mailbox {
         }
         $uids = array_map('strval', (array) $uids);
         $flags = ['READ' => ['+', '\\Seen'], 'UNREAD' => ['-', '\\Seen'], 'FLAG' => ['+', '\\Flagged'],
-            'UNFLAG' => ['-', '\\Flagged'], 'DELETE' => ['+', '\\Deleted'], 'UNDELETE' => ['-', '\\Deleted']];
+            'UNFLAG' => ['-', '\\Flagged'], 'DELETE' => ['+', '\\Deleted'], 'UNDELETE' => ['-', '\\Deleted'],
+            'ANSWERED' => ['+', '\\Answered']];
         if (isset($flags[$action])) {
             list($op, $flag) = $flags[$action];
             foreach ($uids as $uid) {
@@ -330,6 +332,23 @@ class Hm_MCP_Fake_Mailbox {
 }
 
 /**
+ * SMTP server that records the messages it is given
+ */
+class Hm_MCP_Fake_Smtp {
+    public $sent = [];
+    /* error message returned instead of sending */
+    public $error = false;
+    public function authed() { return true; }
+    public function send_message($from, $recipients, $message, $delivery_receipt = false) {
+        if ($this->error) {
+            return $this->error;
+        }
+        $this->sent[] = ['from' => $from, 'recipients' => $recipients, 'message' => $message];
+        return false;
+    }
+}
+
+/**
  * Context with fake mailboxes instead of IMAP connections
  */
 class Hm_MCP_Fake_Context extends Hm_MCP_Context {
@@ -337,6 +356,21 @@ class Hm_MCP_Fake_Context extends Hm_MCP_Context {
     public $failing = [];
     /* lists of setting names saved by update_user_settings() */
     public $saved_settings = [];
+    /* SMTP server id => Hm_MCP_Fake_Smtp, account id => SMTP server id */
+    public $smtp_objects = [];
+    public $smtp_accounts = [];
+
+    public function smtp_exists($smtp_id) {
+        return array_key_exists((string) $smtp_id, $this->smtp_objects);
+    }
+
+    public function smtp_for($id) {
+        return $this->smtp_accounts[$id] ?? false;
+    }
+
+    protected function connect_smtp($smtp_id) {
+        return $this->smtp_objects[$smtp_id] ?? false;
+    }
 
     protected function connect($id) {
         if (in_array($id, $this->failing, true)) {
@@ -368,8 +402,28 @@ class Hm_MCP_Fake_Store {
         return array_merge(Hm_MCP_Store::default_settings(), ['enabled' => true, 'profile_id' => $this->profile]);
     }
     public $issued = [];
+    /* rate limit key prefixes that are exceeded */
+    public $limited = [];
+    public $claims = [];
     public function log_activity($entry) { $this->logged[] = $entry; return true; }
-    public function rate_limit($key, $max, $window) { return true; }
+    public function rate_limit($key, $max, $window) {
+        foreach ($this->limited as $prefix) {
+            if (strpos($key, $prefix) === 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public function claim($key, $ttl) {
+        if (isset($this->claims[$key])) {
+            return false;
+        }
+        $this->claims[$key] = $ttl;
+        return true;
+    }
+    public function release($key, $ttl, $after = 0) {
+        unset($this->claims[$key]);
+    }
     public function available() { return true; }
     public function now() { return time(); }
     public function issue_token($connection_id, $kind, $key, $ttl, $data = null) {
@@ -445,6 +499,8 @@ function hm_mcp_fake_services($mailboxes, $servers, $user_settings = []) {
     $holder = new stdClass();
     $holder->context = null;
     $holder->failing = [];
+    $holder->smtp = [];
+    $holder->smtp_accounts = [];
     $services->context_factory = function ($principal) use ($services, $mailboxes, $servers, $user_settings, $holder) {
         $user_config = new Hm_Mock_Config();
         foreach ($user_settings as $name => $value) {
@@ -454,6 +510,8 @@ function hm_mcp_fake_services($mailboxes, $servers, $user_settings = []) {
             $user_config, new Hm_MCP_Session(), $servers);
         $context->mailbox_objects = $mailboxes;
         $context->failing = $holder->failing;
+        $context->smtp_objects = $holder->smtp;
+        $context->smtp_accounts = $holder->smtp_accounts;
         $holder->context = $context;
         return $context;
     };

@@ -293,7 +293,7 @@ trait Hm_MCP_Organize {
         }
         $now = time();
         $wake = strtolower(trim((string) $args['until'])) === 'now';
-        $until = $wake ? null : self::snooze_time((string) $args['until'], $now);
+        $until = $wake ? null : self::future_time((string) $args['until'], $now, 'until');
         $results = $this->each_folder($args['message_ids'], function ($mailbox, $account, $folder, $uids) use ($ctx, $wake, $until, $now) {
             if (!$mailbox->is_imap()) {
                 return self::fail_all($uids, 'Snooze is only available for IMAP accounts.');
@@ -360,25 +360,28 @@ trait Hm_MCP_Organize {
     }
 
     /**
-     * @param string $value preset, date or ISO 8601 date-time
+     * A time in the next year
+     * @param string $value preset (later_today, tomorrow, next_weekend, next_week, next_month),
+     *                      date (8:00 that day) or ISO 8601 date-time
      * @param int $now current time
-     * @return int wake up time
+     * @param string $name argument name for errors
+     * @return int unix time
      * @throws Hm_MCP_Error
      */
-    protected static function snooze_time($value, $now) {
+    protected static function future_time($value, $now, $name) {
         $value = strtolower(trim($value));
         if (isset(self::$snooze_presets[$value])) {
             $time = strtotime(self::$snooze_presets[$value], $now);
         } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
             $time = strtotime($value.' 08:00');
         } else {
-            $time = Hm_MCP_Format::parse_date_arg($value, 'until');
+            $time = Hm_MCP_Format::parse_date_arg($value, $name);
         }
         if ($time === false || $time < $now + 60) {
-            throw new Hm_MCP_Error('invalid_argument', 'The snooze time must be in the future.');
+            throw new Hm_MCP_Error('invalid_argument', sprintf('%s must be in the future.', $name));
         }
         if ($time > $now + 366 * 86400) {
-            throw new Hm_MCP_Error('invalid_argument', 'Messages can be snoozed for one year at most.');
+            throw new Hm_MCP_Error('invalid_argument', sprintf('%s can be at most one year from now.', $name));
         }
         return $time;
     }

@@ -775,6 +775,32 @@ class Hm_MCP_Store {
     }
 
     /**
+     * Take a lock that only one caller can hold until it expires
+     * @param string $key lock name, hashed before storage
+     * @param int $ttl seconds the lock is held
+     * @return bool true if this call took the lock
+     */
+    public function claim($key, $ttl) {
+        $key = 'mcp:'.hash('sha256', 'claim|'.$key);
+        $now = $this->now();
+        $this->exec('delete from hm_mcp_rate_limits where rate_key=? and window_start<?', [$key, $now - $ttl]);
+        /* the primary key lets only one insert succeed */
+        return $this->exec('insert into hm_mcp_rate_limits (rate_key, hits, window_start) values (?, ?, ?)', [$key, 1, $now]) === 1;
+    }
+
+    /**
+     * Let a lock taken with claim() expire
+     * @param string $key lock name
+     * @param int $ttl lifetime used with claim()
+     * @param int $after seconds until the lock can be taken again
+     * @return void
+     */
+    public function release($key, $ttl, $after = 0) {
+        $this->exec('update hm_mcp_rate_limits set window_start=? where rate_key=?',
+            [$this->now() - $ttl + max(0, (int) $after) - 1, 'mcp:'.hash('sha256', 'claim|'.$key)]);
+    }
+
+    /**
      * Reset a rate limit counter
      * @param string $key limit key
      * @return void

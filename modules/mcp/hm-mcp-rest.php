@@ -46,6 +46,10 @@ class Hm_MCP_Rest {
             /* capability links authenticate with the token in the URL */
             return $this->services->files()->download($request, $matches[1]);
         }
+        if ($path === '/scheduled/run') {
+            /* runner tokens only work here */
+            return $this->services->scheduler()->run($request);
+        }
         list($name, $params, $allowed) = $this->match($method, $path);
         if ($name === false) {
             if ($allowed) {
@@ -249,6 +253,22 @@ class Hm_MCP_Rest {
                 'summary' => $op['title'].' (tool call)',
             ]), $op['input'], 'POST', '/tools/'.$name);
         }
+        $paths['/scheduled/run']['post'] = [
+            'operationId' => 'run_scheduled',
+            'summary' => 'Send due scheduled messages',
+            'description' => 'Sends the scheduled messages of the user that are due. Call it every minute from a scheduled task, with a runner token created in Cypht under Settings, API and MCP.',
+            'security' => [['runnerAuth' => []]],
+            'responses' => [
+                '200' => ['description' => 'Run report', 'content' => ['application/json' => ['schema' => Hm_MCP_Catalog::normalize(Hm_MCP_Catalog::obj([
+                    'sent' => ['type' => 'integer'],
+                    'failed' => ['type' => 'integer'],
+                    'waiting' => ['type' => 'integer', 'description' => 'Scheduled messages that are not due yet'],
+                    'failures' => ['type' => 'array', 'items' => ['type' => 'object']],
+                    'errors' => ['type' => 'array', 'items' => ['type' => 'object']],
+                ], ['sent', 'failed', 'waiting']))]]],
+                'default' => ['description' => 'Error', 'content' => ['application/json' => ['schema' => $error]]],
+            ],
+        ];
         $paths['/files/{token}']['get'] = [
             'operationId' => 'download_attachment',
             'summary' => 'Download an attachment',
@@ -269,8 +289,12 @@ class Hm_MCP_Rest {
                 'description' => 'Read, search, organize, draft and send email in Cypht. Operations not allowed by the permissions of the token return 403.',
             ],
             'servers' => [['url' => $config->api_url()]],
-            'components' => ['securitySchemes' => ['bearerAuth' => ['type' => 'http', 'scheme' => 'bearer',
-                'description' => 'Personal access token created in Cypht under Settings, API and MCP']]],
+            'components' => ['securitySchemes' => [
+                'bearerAuth' => ['type' => 'http', 'scheme' => 'bearer',
+                    'description' => 'Personal access token created in Cypht under Settings, API and MCP'],
+                'runnerAuth' => ['type' => 'http', 'scheme' => 'bearer',
+                    'description' => 'Runner token created in Cypht under Settings, API and MCP, only for /scheduled/run'],
+            ]],
             'security' => [['bearerAuth' => []]],
             'paths' => $paths,
         ];

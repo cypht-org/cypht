@@ -16,6 +16,7 @@ class Hm_MCP_Mail {
 
     use Hm_MCP_Organize;
     use Hm_MCP_Drafts;
+    use Hm_MCP_Send;
 
     /* maximum folders to count when include_counts is set */
     const MAX_FOLDER_COUNTS = 60;

@@ -39,8 +39,23 @@ return [
     */
     'mcp_upload_allowed_hosts' => env('MCP_UPLOAD_ALLOWED_HOSTS', 'files.oaiusercontent.com,*.oaiusercontent.com,files.openaiusercontent.com,*.blob.core.windows.net'),
 
-    /* Maximum size in bytes of one attachment added through MCP or the API */
+    /* Maximum total size in bytes of the attachments of one message written through MCP or the API */
     'mcp_max_upload_bytes' => env('MCP_MAX_UPLOAD_BYTES', 26214400),
+
+    /*
+    | Messages that can be sent through MCP or the API: per connection and hour,
+    | and per user and day. Scheduled messages count when they are scheduled.
+    */
+    'mcp_send_per_hour' => env('MCP_SEND_PER_HOUR', 30),
+    'mcp_send_per_day' => env('MCP_SEND_PER_DAY', 200),
+
+    /*
+    | Seconds a scheduled message must be overdue before the runner endpoint
+    | (/api/v1/scheduled/run) sends it. Cypht also sends scheduled messages while
+    | it is open in a browser, every minute; the delay lets it go first so a
+    | message is not sent twice.
+    */
+    'mcp_scheduled_grace' => env('MCP_SCHEDULED_GRACE', 120),
 
     /*
     | Request header holding the client IP when Cypht runs behind a trusted

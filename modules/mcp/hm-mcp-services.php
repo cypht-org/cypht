@@ -136,6 +136,13 @@ class Hm_MCP_Services {
         return new Hm_MCP_Files($this);
     }
 
+    /**
+     * @return Hm_MCP_Scheduler
+     */
+    public function scheduler() {
+        return new Hm_MCP_Scheduler($this);
+    }
+
     /* optional callables for Hm_MCP_Uploads (fetcher, resolver), used by tests */
     public $upload_fetcher = null;
     public $upload_resolver = null;
