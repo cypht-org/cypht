@@ -71,7 +71,7 @@ if (empty($_SESSION['csrf_token'])) {
 $csrf_token = $_SESSION['csrf_token'];
 
 $ajax_action = $_POST['ajax_action'] ?? '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($ajax_action, ['test_db_connection', 'test_storage_dirs'], true)) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($ajax_action, ['test_auth_connection', 'test_storage_dirs'], true)) {
     header('Content-Type: application/json');
     if (!Hm_Web_Installer::secretMatches($csrf_token, $_POST['csrf_token'] ?? '')) {
         echo json_encode(['success' => false, 'error' => 'Invalid session, reload the form and try again.']);
@@ -79,13 +79,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($ajax_action, ['test_db_co
     }
     $values = Hm_Web_Installer::collectFormValues($_POST);
 
-    if ($ajax_action === 'test_db_connection') {
-        $errors = Hm_Web_Installer::validate($values, APP_PATH, ['DB_DRIVER']);
+    if ($ajax_action === 'test_auth_connection') {
+        $errors = Hm_Web_Installer::validate($values, APP_PATH, ['AUTH']);
         if (!empty($errors)) {
             echo json_encode(['success' => false, 'error' => implode(' ', $errors)]);
             exit;
         }
-        $result = $installer->testDatabaseConnection($values);
+        $result = $web_installer->testAuthConnection($values);
         echo json_encode(['success' => $result['success'], 'error' => $result['error']]);
         exit;
     }
@@ -139,9 +139,12 @@ render_form($csrf_token, $given_token);
 
 function field($name, $label, $type = 'text', $hint = '', $required = false) {
     $hint_html = $hint ? '<span class="hint">'.htmlspecialchars($hint).'</span>' : '';
-    return '<label>'.htmlspecialchars($label).$hint_html.
-        '<input type="'.$type.'" name="'.htmlspecialchars($name).'" autocomplete="off"'.
-        ($required ? ' data-required' : '').'></label>';
+    $input = '<input type="'.$type.'" name="'.htmlspecialchars($name).'" autocomplete="off"'.
+        ($required ? ' data-required' : '').'>';
+    if ($type === 'checkbox') {
+        return '<label class="checkbox">'.$input.htmlspecialchars($label).$hint_html.'</label>';
+    }
+    return '<label>'.htmlspecialchars($label).$hint_html.$input.'</label>';
 }
 
 function driver_select() {
@@ -152,30 +155,60 @@ function driver_select() {
     return '<label>Driver<select name="DB_DRIVER" data-required>'.$opts.'</select></label>';
 }
 
+/**
+ * Selecting a different auth type here toggles which of the DB/IMAP/LDAP
+ * fieldsets below are visible and required (step_script() JS), matching
+ * Hm_Web_Installer's FIELD_GROUPS: only the active group's fields are read
+ * on submit, the others stay at their .env.example default.
+ */
+function auth_type_select() {
+    $opts = '';
+    foreach (['DB' => 'Database', 'IMAP' => 'IMAP server', 'LDAP' => 'LDAP server'] as $value => $label) {
+        $opts .= '<option value="'.$value.'">'.htmlspecialchars($label).'</option>';
+    }
+    return '<label>Authentication method<select name="AUTH_TYPE" id="auth-type" data-required>'.$opts.'</select></label>';
+}
+
+function auth_fields_group($auth_type, $fields, $visible_by_default = false) {
+    return '<div class="auth-fields" data-auth="'.htmlspecialchars($auth_type).'"'.($visible_by_default ? '' : ' hidden').'>'.$fields.'</div>';
+}
+
 function render_form($csrf_token, $token) {
     $steps = [
-        ['title' => 'Database', 'validate' => 'db', 'fields' =>
-            driver_select().
-            field('DB_HOST', 'Host', 'text', '', true).
-            field('DB_NAME', 'Name', 'text', '', true).
-            field('DB_USER', 'User', 'text', '', true).
-            field('DB_PASS', 'Password', 'password')],
-        ['title' => 'Storage', 'validate' => 'dirs', 'fields' =>
+        ['title' => 'Authentication', 'validate' => 'auth', 'only_for' => '', 'fields' =>
+            auth_type_select().
+            auth_fields_group('DB',
+                driver_select().
+                field('DB_HOST', 'Host', 'text', '', true).
+                field('DB_NAME', 'Name', 'text', '', true).
+                field('DB_USER', 'User', 'text', '', true).
+                field('DB_PASS', 'Password', 'password'), true).
+            auth_fields_group('IMAP',
+                field('IMAP_AUTH_SERVER', 'Server', 'text', '', true).
+                field('IMAP_AUTH_PORT', 'Port', 'text', '', true).
+                field('IMAP_AUTH_TLS', 'Use TLS', 'checkbox')).
+            auth_fields_group('LDAP',
+                field('LDAP_AUTH_SERVER', 'Server', 'text', '', true).
+                field('LDAP_AUTH_PORT', 'Port', 'text', '', true).
+                field('LDAP_AUTH_BASE_DN', 'Base DN', 'text', '', true).
+                field('LDAP_AUTH_UID_ATTR', 'UID attribute', 'text', '', true).
+                field('LDAP_AUTH_TLS', 'Use TLS', 'checkbox'))],
+        ['title' => 'Storage', 'validate' => 'dirs', 'only_for' => '', 'fields' =>
             field('USER_SETTINGS_DIR', 'User settings directory', 'text', 'outside the web root', true).
             field('ATTACHMENT_DIR', 'Attachment directory', 'text', 'outside the web root', true)],
-        ['title' => 'Admin account (optional)', 'validate' => '', 'fields' =>
+        ['title' => 'Admin account (optional)', 'validate' => '', 'only_for' => 'DB', 'fields' =>
             field('admin_user', 'Username').
             field('admin_pass', 'Password', 'password')],
     ];
 
-    $step_count = count($steps);
     $panels = '';
     $dots = '';
     $i = 0;
     foreach ($steps as $step) {
         $i++;
         $panels .= '<section class="step" data-step="'.$i.'"'.($i === 1 ? '' : ' hidden').
-            ($step['validate'] !== '' ? ' data-validate="'.htmlspecialchars($step['validate']).'"' : '').'>'.
+            ($step['validate'] !== '' ? ' data-validate="'.htmlspecialchars($step['validate']).'"' : '').
+            ($step['only_for'] !== '' ? ' data-only-for="'.htmlspecialchars($step['only_for']).'"' : '').'>'.
             '<h2>'.htmlspecialchars($step['title']).'</h2>'.
             '<p class="step-error" hidden></p>'.
             $step['fields'].'</section>';
@@ -193,47 +226,62 @@ function render_form($csrf_token, $token) {
         '<button type="submit" id="submit-btn" hidden>Install</button>'.
         '</div>'.
         '</form>'.
-        step_script($step_count);
+        step_script();
     render_page('Cypht installer', $body);
 }
 
-function step_script($step_count) {
-    return <<<HTML
+function step_script() {
+    return <<<'HTML'
         <script>
         (function () {
-            var current = 1;
-            var total = {$step_count};
             var form = document.getElementById('install-form');
-            var steps = document.querySelectorAll('.step');
+            var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
             var dots = document.querySelectorAll('.steps li');
             var backBtn = document.getElementById('back-btn');
             var nextBtn = document.getElementById('next-btn');
             var submitBtn = document.getElementById('submit-btn');
+            var authSelect = document.getElementById('auth-type');
+            var current = steps[0];
 
-            function show(n) {
+            // A step with data-only-for is skipped unless it matches the
+            // currently selected auth type (e.g. the Admin step only applies
+            // to AUTH_TYPE=DB), so navigation always walks this list instead
+            // of the raw step array.
+            function activeSteps() {
+                return steps.filter(function (el) {
+                    return !el.dataset.onlyFor || el.dataset.onlyFor === authSelect.value;
+                });
+            }
+
+            function show(stepEl) {
+                document.querySelectorAll('.auth-fields').forEach(function (group) {
+                    group.hidden = group.dataset.auth !== authSelect.value;
+                });
                 steps.forEach(function (el) {
-                    var isCurrent = Number(el.dataset.step) === n;
+                    var isCurrent = el === stepEl;
                     el.hidden = !isCurrent;
                     // A hidden step's required fields are still counted by
                     // the browser's constraint validation and, being
                     // unfocusable, break reportValidity() with a console
-                    // error. Only the visible step's fields carry `required`.
+                    // error. Only the visible step's fields carry `required`,
+                    // and only within the currently selected auth-fields group.
                     el.querySelectorAll('[data-required]').forEach(function (input) {
-                        input.required = isCurrent;
+                        var group = input.closest('.auth-fields');
+                        input.required = isCurrent && (!group || group.dataset.auth === authSelect.value);
                     });
                 });
+                var active = activeSteps();
+                var idx = active.indexOf(stepEl);
                 dots.forEach(function (el, i) {
-                    el.classList.toggle('active', i === n - 1);
-                    el.classList.toggle('done', i < n - 1);
+                    var activeIdx = active.indexOf(steps[i]);
+                    el.hidden = activeIdx === -1;
+                    el.classList.toggle('active', steps[i] === stepEl);
+                    el.classList.toggle('done', activeIdx !== -1 && activeIdx < idx);
                 });
-                backBtn.hidden = n === 1;
-                nextBtn.hidden = n === total;
-                submitBtn.hidden = n !== total;
-                current = n;
-            }
-
-            function currentStepEl() {
-                return document.querySelector('.step[data-step="' + current + '"]');
+                backBtn.hidden = idx === 0;
+                nextBtn.hidden = idx === active.length - 1;
+                submitBtn.hidden = idx !== active.length - 1;
+                current = stepEl;
             }
 
             function showStepError(stepEl, message) {
@@ -243,11 +291,11 @@ function step_script($step_count) {
             }
 
             var AJAX_ACTIONS = {
-                db: 'test_db_connection',
+                auth: 'test_auth_connection',
                 dirs: 'test_storage_dirs'
             };
             var DEFAULT_ERRORS = {
-                db: 'Could not connect to the database.',
+                auth: 'Could not verify the auth settings.',
                 dirs: 'Storage directories are not usable.'
             };
 
@@ -267,27 +315,39 @@ function step_script($step_count) {
                     });
             }
 
+            function advance() {
+                var active = activeSteps();
+                var idx = active.indexOf(current);
+                show(active[Math.min(idx + 1, active.length - 1)]);
+            }
+
             nextBtn.addEventListener('click', function () {
                 if (!form.reportValidity()) return;
-                var stepEl = currentStepEl();
-                showStepError(stepEl, '');
-                var validate = stepEl.dataset.validate;
+                showStepError(current, '');
+                var validate = current.dataset.validate;
                 if (validate && AJAX_ACTIONS[validate]) {
                     validateStep(validate).then(function (result) {
                         if (result.success) {
-                            show(Math.min(current + 1, total));
+                            advance();
                         }
                         else {
-                            showStepError(stepEl, result.error || DEFAULT_ERRORS[validate]);
+                            showStepError(current, result.error || DEFAULT_ERRORS[validate]);
                         }
                     });
                     return;
                 }
-                show(Math.min(current + 1, total));
+                advance();
             });
-            backBtn.addEventListener('click', function () { show(Math.max(current - 1, 1)); });
+            backBtn.addEventListener('click', function () {
+                var active = activeSteps();
+                var idx = active.indexOf(current);
+                show(active[Math.max(idx - 1, 0)]);
+            });
+            if (authSelect) {
+                authSelect.addEventListener('change', function () { show(current); });
+            }
 
-            show(1);
+            show(steps[0]);
         })();
         </script>
         HTML;
@@ -442,6 +502,17 @@ function page_style() {
                 background: var(--card-bg);
                 border: 1px solid var(--border);
                 border-radius: 5px;
+            }
+            label.checkbox {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            label.checkbox input {
+                display: inline-block;
+                width: auto;
+                margin-top: 0;
+                order: -1;
             }
             input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
             input:invalid:not(:placeholder-shown) { border-color: var(--error-border); }
