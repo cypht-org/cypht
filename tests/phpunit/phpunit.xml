@@ -187,6 +187,8 @@
     </testsuite>
     <testsuite name="modules_mcp">
       <file>./modules/mcp/router.php</file>
+      <file>./modules/mcp/crypto.php</file>
+      <file>./modules/mcp/store.php</file>
     </testsuite>
   </testsuites>
   <source>
