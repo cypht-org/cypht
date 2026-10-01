@@ -132,7 +132,9 @@ class Hm_Test_MCP_Endpoint extends TestCase {
         $permissions = array_merge(Hm_MCP_Permissions::defaults(), ['read' => false]);
         $this->store->save_settings('alice', ['permissions' => $permissions]);
         list($res, $data) = $this->rpc($this->personal, 'tools/list', new stdClass(), $session, 2);
-        $this->assertSame([], $data['result']['tools']);
+        $names = array_column($data['result']['tools'], 'name');
+        $this->assertNotContains('list_messages', $names);
+        $this->assertContains('archive_messages', $names);
         /* a client that still knows the tool gets a clear error, and the attempt is recorded */
         list($res, $data) = $this->rpc($this->personal, 'tools/call', ['name' => 'list_messages', 'arguments' => []], $session, 3);
         $this->assertTrue($data['result']['isError']);

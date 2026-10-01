@@ -196,6 +196,7 @@
       <file>./modules/mcp/endpoint.php</file>
       <file>./modules/mcp/attachments.php</file>
       <file>./modules/mcp/oauth.php</file>
+      <file>./modules/mcp/organize.php</file>
     </testsuite>
   </testsuites>
   <source>

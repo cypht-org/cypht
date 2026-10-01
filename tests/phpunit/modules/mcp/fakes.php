@@ -28,7 +28,26 @@ class Hm_MCP_Fake_Connection {
     }
 
     public function is_supported($extension) {
-        return false;
+        return in_array(strtoupper($extension), $this->mailbox->capabilities, true);
+    }
+
+    /* raw commands sent by the API, and the answer to the last one */
+    public $commands = [];
+    private $answer = [];
+
+    public function send_command($command, $no_prefix = false) {
+        $this->commands[] = trim($command);
+        $this->answer = $this->mailbox->raw_command(trim($command));
+    }
+
+    public function get_response($max = false, $chunked = false) {
+        return $this->answer;
+    }
+
+    public function bust_cache($folder, $full = true) {}
+
+    public function show_debug($full = false, $return = false, $list = false) {
+        return ['debug' => [], 'commands' => [], 'responses' => $this->mailbox->raw_responses];
     }
 }
 
@@ -44,6 +63,15 @@ class Hm_MCP_Fake_Mailbox {
     public $actions = [];
     public $searches = [];
     public $content_reads = [];
+    /* IMAP extensions the fake server supports, like MOVE, UIDPLUS or X-GM-EXT-1 */
+    public $capabilities = [];
+    /* message actions that fail */
+    public $failing_actions = [];
+    /* folder => next uid */
+    public $uidnext = [];
+    /* answer COPYUID only in the raw server response, like Cypht sees it for several messages */
+    public $raw_copyuid = false;
+    public $raw_responses = [];
     private $connection;
 
     /**
@@ -88,16 +116,26 @@ class Hm_MCP_Fake_Mailbox {
     }
 
     public function get_folder_status($folder, $report_error = true) {
-        $messages = $this->folders[$folder] ?? [];
+        if (!array_key_exists($folder, $this->folders)) {
+            return [];
+        }
+        $messages = $this->folders[$folder];
         $unseen = count(array_filter($messages, function ($m) { return stripos($m['flags'], '\\Seen') === false; }));
         return ['messages' => count($messages), 'unseen' => $unseen];
     }
 
-    public function search($folder, $target = 'ALL', $terms = [], $sort = null, $reverse = null) {
+    public function search($folder, $target = 'ALL', $terms = [], $sort = null, $reverse = null, $exclude_deleted = true) {
         $this->searches[] = [$folder, $target, $terms];
         $res = [];
         foreach ($this->folders[$folder] ?? [] as $uid => $m) {
+            $deleted = stripos($m['flags'], '\\Deleted') !== false;
+            if ($exclude_deleted && $deleted) {
+                continue;
+            }
             foreach ((array) $target as $key) {
+                if ($key === 'DELETED' && !$deleted) {
+                    continue 2;
+                }
                 if ($key === 'UNSEEN' && stripos($m['flags'], '\\Seen') !== false) {
                     continue 2;
                 }
@@ -157,12 +195,133 @@ class Hm_MCP_Fake_Mailbox {
 
     public function message_action($folder, $action, $uids, $mailbox = false, $keyword = false) {
         $this->actions[] = [$folder, $action, $uids, $this->read_only];
-        if ($action === 'READ') {
+        if (!$this->select_folder($folder) || in_array($action, $this->failing_actions, true)) {
+            return ['status' => false, 'responses' => []];
+        }
+        $uids = array_map('strval', (array) $uids);
+        $flags = ['READ' => ['+', '\\Seen'], 'UNREAD' => ['-', '\\Seen'], 'FLAG' => ['+', '\\Flagged'],
+            'UNFLAG' => ['-', '\\Flagged'], 'DELETE' => ['+', '\\Deleted'], 'UNDELETE' => ['-', '\\Deleted']];
+        if (isset($flags[$action])) {
+            list($op, $flag) = $flags[$action];
             foreach ($uids as $uid) {
-                $this->folders[$folder][(string) $uid]['flags'] .= ' \\Seen';
+                if (isset($this->folders[$folder][$uid])) {
+                    $current = $this->folders[$folder][$uid]['flags'];
+                    $current = trim(str_ireplace($flag, '', $current));
+                    $this->folders[$folder][$uid]['flags'] = $op === '+' ? trim($current.' '.$flag) : $current;
+                }
+            }
+            return ['status' => true, 'responses' => []];
+        }
+        if ($action === 'EXPUNGE') {
+            foreach ($this->folders[$folder] as $uid => $m) {
+                if (stripos($m['flags'], '\\Deleted') !== false) {
+                    unset($this->folders[$folder][$uid]);
+                }
+            }
+            return ['status' => true, 'responses' => []];
+        }
+        if ($action === 'MOVE' || $action === 'COPY') {
+            if (!array_key_exists($mailbox, $this->folders)) {
+                return ['status' => false, 'responses' => []];
+            }
+            $responses = [];
+            $pairs = [];
+            foreach ($uids as $uid) {
+                if (!isset($this->folders[$folder][$uid])) {
+                    continue;
+                }
+                $new = $this->next_uid($mailbox);
+                $this->folders[$mailbox][$new] = $this->folders[$folder][$uid];
+                if ($action === 'MOVE') {
+                    unset($this->folders[$folder][$uid]);
+                }
+                $pairs[$uid] = $new;
+                $responses[] = ['oldUid' => $uid, 'newUid' => in_array('UIDPLUS', $this->capabilities, true) ? $new : null];
+            }
+            $this->raw_responses[] = $this->raw_copyuid && $pairs
+                ? [sprintf("* OK [COPYUID 7 %s %s] Moved\r\n", implode(',', array_keys($pairs)), implode(',', $pairs)), "A9 OK Done\r\n"]
+                : ["A9 OK Done\r\n"];
+            if ($this->raw_copyuid) {
+                $responses = [];
+            }
+            return ['status' => true, 'responses' => $action === 'MOVE' ? $responses : []];
+        }
+        return ['status' => false, 'responses' => []];
+    }
+
+    /**
+     * Raw commands of the fake IMAP connection
+     */
+    public function raw_command($command) {
+        if (preg_match('/^UID EXPUNGE ([0-9,]+)$/', $command, $matches) && in_array('UIDPLUS', $this->capabilities, true)) {
+            foreach (explode(',', $matches[1]) as $uid) {
+                if (isset($this->folders[$this->selected][$uid]) && stripos($this->folders[$this->selected][$uid]['flags'], '\\Deleted') !== false) {
+                    unset($this->folders[$this->selected][$uid]);
+                }
+            }
+            return ['* 1 EXPUNGE', 'A7 OK UID EXPUNGE completed'];
+        }
+        return ['A7 BAD Unknown command'];
+    }
+
+    private function next_uid($folder) {
+        $keys = array_map('intval', array_keys($this->folders[$folder] ?? []));
+        $next = max($this->uidnext[$folder] ?? 1, $keys ? max($keys) + 1 : 1);
+        $this->uidnext[$folder] = $next + 1;
+        return (string) $next;
+    }
+
+    public function create_folder($folder, $parent = null) {
+        if (array_key_exists($folder, $this->folders) || in_array('CREATE', $this->failing_actions, true)) {
+            return false;
+        }
+        $this->folders[$folder] = [];
+        return $folder;
+    }
+
+    /**
+     * Full message source, built from the fake fields when the message has none
+     */
+    public function get_message_content($folder, $uid, $part = 0) {
+        if (!$this->select_folder($folder) || !isset($this->folders[$folder][(string) $uid])) {
+            return null;
+        }
+        $this->content_reads[] = [(string) $uid, 'full', $this->read_only];
+        $m = $this->folders[$folder][(string) $uid];
+        if (isset($m['raw'])) {
+            return $m['raw'];
+        }
+        $head = sprintf("Subject: %s\r\nFrom: %s\r\nTo: %s\r\nDate: %s\r\nMessage-ID: %s\r\n", $m['subject'], $m['from'], $m['to'],
+            $m['date'], $m['message_id']);
+        foreach ($m['headers'] as $name => $value) {
+            $head .= $name.': '.$value."\r\n";
+        }
+        return $head."\r\n".($m['parts']['1'] ?? '')."\r\n";
+    }
+
+    /**
+     * Save a raw message (IMAP APPEND)
+     */
+    public function store_message($folder, $msg, $seen = true, $draft = false) {
+        if (!array_key_exists($folder, $this->folders) || in_array('APPEND', $this->failing_actions, true)) {
+            return false;
+        }
+        $this->actions[] = [$folder, 'APPEND', [], $this->read_only];
+        list($head, $body) = array_pad(explode("\r\n\r\n", $msg, 2), 2, '');
+        $headers = [];
+        foreach (explode("\r\n", preg_replace("/\r\n[ \t]+/", ' ', $head)) as $line) {
+            if (strpos($line, ':') !== false) {
+                list($name, $value) = explode(':', $line, 2);
+                $headers[trim($name)] = trim($value);
             }
         }
-        return ['status' => true, 'responses' => []];
+        $uid = $this->next_uid($folder);
+        $known = ['Subject', 'From', 'To', 'Date', 'Message-ID'];
+        $this->folders[$folder][$uid] = array_merge(hm_mcp_fake_message($headers['Subject'] ?? '', $headers['From'] ?? '',
+            $headers['Date'] ?? '', ['text' => rtrim($body), 'message_id' => $headers['Message-ID'] ?? '',
+            'flags' => trim(($seen ? '\\Seen' : '').($draft ? ' \\Draft' : '')),
+            'headers' => array_diff_key($headers, array_flip($known))]), ['raw' => $msg]);
+        return in_array('UIDPLUS', $this->capabilities, true) ? $uid : true;
     }
 }
 
@@ -172,12 +331,22 @@ class Hm_MCP_Fake_Mailbox {
 class Hm_MCP_Fake_Context extends Hm_MCP_Context {
     public $mailbox_objects = [];
     public $failing = [];
+    /* lists of setting names saved by update_user_settings() */
+    public $saved_settings = [];
 
     protected function connect($id) {
         if (in_array($id, $this->failing, true)) {
             return false;
         }
         return $this->mailbox_objects[$id];
+    }
+
+    public function update_user_settings($change) {
+        $changed = $change($this->user_config);
+        if ($changed) {
+            $this->saved_settings[] = $changed;
+        }
+        return (bool) $changed;
     }
 
     public function finish() {

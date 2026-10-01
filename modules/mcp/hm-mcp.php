@@ -18,6 +18,8 @@ require_once APP_PATH.'modules/mcp/hm-mcp-auth.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-format.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-context.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-catalog.php';
+require_once APP_PATH.'modules/mcp/hm-mcp-imap.php';
+require_once APP_PATH.'modules/mcp/hm-mcp-organize.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-mail.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-executor.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-files.php';

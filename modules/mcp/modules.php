@@ -365,7 +365,8 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         'results' => 'Results', 'error' => 'Error', 'content_type' => 'Type', 'view' => 'View', 'field' => 'Field',
         'readable' => 'Readable', 'marked_read' => 'Marked as read', 'contacts' => 'Contacts', 'tags' => 'Tags',
         'enabled' => 'Enabled', 'permissions' => 'Permissions', 'expires_days' => 'Expires in days', 'kind' => 'Type',
-        'recipients' => 'Recipients', 'domains' => 'Domains', 'client' => 'Client', 'reason' => 'Reason'];
+        'recipients' => 'Recipients', 'domains' => 'Domains', 'client' => 'Client', 'reason' => 'Reason',
+        'destination' => 'Destination', 'failed' => 'Failed messages', 'tags_updated' => 'Tags updated', 'folder' => 'Folder'];
 
     /* why an OAuth connection ended */
     const REASONS = [

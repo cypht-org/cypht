@@ -204,8 +204,47 @@ class Hm_MCP_Context {
         $cache = $store->open_cache($principal->connection, $principal->key);
         $context = new static($site_config, $config, $store, $principal, $user_config, $session,
             Hm_IMAP_List::dump(), $cache);
+        $context->password = $password;
         $context->apply_oauth_cache();
         return $context;
+    }
+
+    /* login password, kept for this request only to save changes to the user settings */
+    private $password = null;
+
+    /**
+     * Change the stored user settings. The latest stored copy is loaded first, so only
+     * the requested change is written, never values that only live in this request.
+     * Note that a browser session with unsaved changes can still overwrite it later.
+     * @param callable $change function(object $user_config): array of changed setting names
+     * @return bool true when the settings were saved
+     * @throws Hm_MCP_Error
+     */
+    public function update_user_settings($change) {
+        if ($this->password === null) {
+            throw new Hm_MCP_Error('unavailable', 'The user settings cannot be changed by this connection.');
+        }
+        $fresh = load_user_config_object($this->site_config);
+        $fresh->load($this->username, $this->password);
+        if (!empty($fresh->decrypt_failed)) {
+            $this->store->update_connection($this->principal->connection_id(), ['status' => 'reauth']);
+            throw new Hm_MCP_Error('reauth_required', 'The Cypht password changed. Connect again to restore access.');
+        }
+        $changed = $change($fresh);
+        if (!$changed) {
+            return false;
+        }
+        if ($fresh->save($this->username, $this->password) === false) {
+            throw new Hm_MCP_Error('upstream_error', 'The settings could not be saved.');
+        }
+        /* keep the copy of this request in sync without saving it */
+        $data = $this->user_config->dump();
+        foreach ((array) $changed as $name) {
+            $data[$name] = $fresh->get($name);
+        }
+        $this->user_config->reload($data, $this->username);
+        $this->session->set('user_data', $data);
+        return true;
     }
 
     /**
@@ -432,7 +471,8 @@ class Hm_MCP_Context {
      */
     public function special_folders($id, $mailbox = null, $needed = null) {
         $id = $this->account($id)['id'];
-        $mailbox = $mailbox ?: $this->mailbox($id);
+        /* folder lookups work in any access mode: keep the mode of an open mailbox */
+        $mailbox = $mailbox ?: (isset($this->mailboxes[$id]) ? $this->mailboxes[$id]['mailbox'] : $this->mailbox($id));
         if (!array_key_exists($id, $this->specials)) {
             $res = ['inbox' => 'INBOX'];
             $exposed = $mailbox->get_special_use_mailboxes();

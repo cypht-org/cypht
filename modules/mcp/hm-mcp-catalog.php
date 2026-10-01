@@ -250,6 +250,31 @@ class Hm_MCP_Catalog {
         return self::str($description.' Date as YYYY-MM-DD or an ISO 8601 date-time.', 40);
     }
 
+    public static function message_ids_arg() {
+        return ['type' => 'array', 'description' => 'Message ids returned by list_messages, search_messages or get_thread.',
+            'items' => self::message_arg(), 'minItems' => 1, 'maxItems' => Hm_MCP_Imap::MAX_BATCH, 'uniqueItems' => true];
+    }
+
+    /**
+     * Output of operations on several messages: one result per message id
+     * @param array $extra extra data properties
+     * @return array
+     */
+    public static function batch_output($extra = []) {
+        return self::envelope(array_merge([
+            'results' => self::arr(self::obj([
+                'message_id' => ['type' => 'string'],
+                'status' => ['type' => 'string', 'enum' => ['ok', 'unchanged', 'not_found', 'failed']],
+                'folder' => ['type' => 'string', 'description' => 'Folder the message is in now'],
+                'new_message_id' => ['type' => ['string', 'null'],
+                    'description' => 'Id of the message in its new folder. Message ids change when a message moves; null when the server did not report the new id.'],
+                'reason' => ['type' => 'string'],
+            ], ['message_id', 'status'])),
+            'succeeded' => ['type' => 'integer'],
+            'failed' => ['type' => 'integer', 'description' => 'Messages that failed or were not found'],
+        ], $extra), ['results', 'succeeded', 'failed']);
+    }
+
     /* -------------------------------------------------------- definitions */
 
     /**
@@ -573,6 +598,138 @@ class Hm_MCP_Catalog {
                 ], ['tags']),
                 'invoking' => 'Listing tags',
                 'invoked' => 'Tags listed',
+            ],
+            'update_messages' => [
+                'title' => 'Mark messages',
+                'permission' => 'organize',
+                'kind' => 'update',
+                'handler' => 'update_messages',
+                'rest' => ['POST', '/messages/mark'],
+                'description' => 'Mark messages as read or unread, and flag (star) or unflag them. Set read, flagged or both.',
+                'input' => self::input([
+                    'message_ids' => self::message_ids_arg(),
+                    'read' => ['type' => 'boolean', 'description' => 'true marks as read, false as unread'],
+                    'flagged' => ['type' => 'boolean', 'description' => 'true flags (stars) the messages, false removes the flag'],
+                ], ['message_ids']),
+                'output' => self::batch_output(),
+                'invoking' => 'Updating messages',
+                'invoked' => 'Messages updated',
+            ],
+            'move_messages' => [
+                'title' => 'Move messages',
+                'permission' => 'organize',
+                'kind' => 'write',
+                'handler' => 'move_messages',
+                'rest' => ['POST', '/messages/move'],
+                'description' => 'Move messages to another folder of the same account. Message ids change when messages move: use new_message_id from the results for later calls. Moving to the trash also needs the trash permission; prefer trash_messages for that.',
+                'input' => self::input([
+                    'message_ids' => self::message_ids_arg(),
+                    'folder' => self::folder_arg(),
+                ], ['message_ids', 'folder']),
+                'output' => self::batch_output(),
+                'invoking' => 'Moving messages',
+                'invoked' => 'Messages moved',
+            ],
+            'archive_messages' => [
+                'title' => 'Archive messages',
+                'permission' => 'organize',
+                'kind' => 'write',
+                'handler' => 'archive_messages',
+                'rest' => ['POST', '/messages/archive'],
+                'description' => 'Archive messages: move them to the archive folder of their account. On Gmail this removes them from the inbox and keeps them in All Mail.',
+                'input' => self::input(['message_ids' => self::message_ids_arg()], ['message_ids']),
+                'output' => self::batch_output(),
+                'invoking' => 'Archiving messages',
+                'invoked' => 'Messages archived',
+            ],
+            'mark_junk' => [
+                'title' => 'Mark as junk',
+                'permission' => 'organize',
+                'kind' => 'write',
+                'handler' => 'mark_junk',
+                'rest' => ['POST', '/messages/junk'],
+                'description' => 'Move messages to the junk (spam) folder, or with junk set to false, move messages from the junk folder back to the inbox.',
+                'input' => self::input([
+                    'message_ids' => self::message_ids_arg(),
+                    'junk' => self::bool('false moves messages out of the junk folder to the inbox.', true),
+                ], ['message_ids']),
+                'output' => self::batch_output(),
+                'invoking' => 'Updating junk',
+                'invoked' => 'Junk updated',
+            ],
+            'snooze_messages' => [
+                'title' => 'Snooze messages',
+                'permission' => 'organize',
+                'kind' => 'write',
+                'handler' => 'snooze_messages',
+                'rest' => ['POST', '/messages/snooze'],
+                'description' => 'Snooze messages until a time: they move to the Snoozed folder and Cypht moves them back to their folder as unread when the time comes. until is later_today, tomorrow, next_weekend, next_week, next_month, a date (8:00 that day) or an ISO 8601 date-time in the user\'s time zone. until "now" returns snoozed messages right away. Needs snooze to be turned on in the Cypht settings.',
+                'input' => self::input([
+                    'message_ids' => self::message_ids_arg(),
+                    'until' => self::str('When the messages come back, or "now" to return snoozed messages.', 40, ['minLength' => 3]),
+                ], ['message_ids', 'until']),
+                'output' => self::batch_output(['until' => ['type' => 'string', 'description' => 'ISO 8601 time the messages come back']]),
+                'invoking' => 'Snoozing messages',
+                'invoked' => 'Messages snoozed',
+            ],
+            'trash_messages' => [
+                'title' => 'Move to trash',
+                'permission' => 'trash',
+                'kind' => 'destructive',
+                'handler' => 'trash_messages',
+                'rest' => ['POST', '/messages/trash'],
+                'description' => 'Move messages to the trash folder of their account. They can be restored with restore_messages. Nothing is deleted when an account has no trash folder.',
+                'input' => self::input(['message_ids' => self::message_ids_arg()], ['message_ids']),
+                'output' => self::batch_output(),
+                'invoking' => 'Moving to trash',
+                'invoked' => 'Moved to trash',
+            ],
+            'restore_messages' => [
+                'title' => 'Restore from trash',
+                'permission' => 'trash',
+                'kind' => 'write',
+                'handler' => 'restore_messages',
+                'rest' => ['POST', '/messages/restore'],
+                'description' => 'Move messages from the trash back to the inbox, or to another folder.',
+                'input' => self::input([
+                    'message_ids' => self::message_ids_arg(),
+                    'folder' => self::str('Folder to restore to. Defaults to the inbox.', 500),
+                ], ['message_ids']),
+                'output' => self::batch_output(),
+                'invoking' => 'Restoring messages',
+                'invoked' => 'Messages restored',
+            ],
+            'delete_messages_permanently' => [
+                'title' => 'Delete permanently',
+                'permission' => 'delete_permanent',
+                'kind' => 'destructive',
+                'handler' => 'delete_messages_permanently',
+                'rest' => ['POST', '/messages/delete'],
+                'description' => 'Delete messages permanently. This cannot be undone: prefer trash_messages unless the user asked to delete for good. On Gmail, messages are moved to the trash and deleted from there.',
+                'input' => self::input(['message_ids' => self::message_ids_arg()], ['message_ids']),
+                'output' => self::batch_output(),
+                'invoking' => 'Deleting messages',
+                'invoked' => 'Messages deleted',
+            ],
+            'empty_folder' => [
+                'title' => 'Empty trash or junk',
+                'permission' => 'delete_permanent',
+                'kind' => 'destructive',
+                'handler' => 'empty_folder',
+                'rest' => ['POST', '/accounts/{account_id}/empty'],
+                'description' => 'Permanently delete every message in the trash or junk folder of an account. This cannot be undone.',
+                'input' => self::input([
+                    'account_id' => self::account_arg(true),
+                    'folder' => self::enum('Folder to empty.', ['trash', 'junk']),
+                ], ['account_id', 'folder']),
+                'output' => self::envelope([
+                    'account_id' => ['type' => 'string'],
+                    'folder' => ['type' => 'string'],
+                    'deleted' => ['type' => 'integer'],
+                    'remaining' => ['type' => 'integer', 'description' => 'Messages left because of the limit per call; run again to continue'],
+                ], ['account_id', 'folder', 'deleted', 'remaining']),
+                'invoking' => 'Emptying folder',
+                'invoked' => 'Folder emptied',
             ],
         ];
     }
