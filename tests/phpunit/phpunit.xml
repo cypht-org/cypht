@@ -140,6 +140,7 @@
       <file>./lib/version.php</file>
       <file>./lib/logging.php</file>
       <file>./lib/output_debug.php</file>
+      <file>./lib/path_router.php</file>
     </testsuite>
     <!--<testsuite name="modules_imap">
             <file>./modules/imap/hm-imap.php</file>
@@ -183,6 +184,9 @@
     </testsuite>
     <testsuite name="mta_sts">
       <file>./mta_sts.php</file>
+    </testsuite>
+    <testsuite name="modules_mcp">
+      <file>./modules/mcp/router.php</file>
     </testsuite>
   </testsuites>
   <source>

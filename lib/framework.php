@@ -24,6 +24,7 @@ require APP_PATH.'lib/session_memcached.php';
 require APP_PATH.'lib/session_redis.php';
 require APP_PATH.'lib/format.php';
 require APP_PATH.'lib/dispatch.php';
+require APP_PATH.'lib/path_router.php';
 require APP_PATH.'lib/request.php';
 require APP_PATH.'lib/cache.php';
 require APP_PATH.'lib/output.php';
