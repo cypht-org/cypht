@@ -42,6 +42,10 @@ class Hm_MCP_Rest {
             }
             return $path === '/' ? $this->index() : Hm_MCP_Http_Response::json($this->openapi(), 200, ['Cache-Control' => 'public, max-age=300']);
         }
+        if (preg_match('#^/files/([^/]+)$#', $path, $matches)) {
+            /* capability links authenticate with the token in the URL */
+            return $this->services->files()->download($request, $matches[1]);
+        }
         list($name, $params, $allowed) = $this->match($method, $path);
         if ($name === false) {
             if ($allowed) {
@@ -68,7 +72,7 @@ class Hm_MCP_Rest {
         }
         $res = $this->services->executor($auth['principal'], 'rest')->run($name, $args);
         if ($res['ok']) {
-            return Hm_MCP_Http_Response::json($res['result']);
+            return Hm_MCP_Http_Response::json(self::public_result($res['result']));
         }
         $error = $res['error'];
         $headers = [];
@@ -76,6 +80,20 @@ class Hm_MCP_Rest {
             $headers['WWW-Authenticate'] = 'Bearer realm="cypht", error="invalid_token"';
         }
         return Hm_MCP_Http_Response::json(['error' => $error->to_array()], $error->http_status(), $headers);
+    }
+
+    /**
+     * Remove internal top level keys (starting with "_") from a result
+     * @param array $result operation result
+     * @return array
+     */
+    public static function public_result($result) {
+        foreach (array_keys($result) as $key) {
+            if (is_string($key) && $key !== '' && $key[0] === '_') {
+                unset($result[$key]);
+            }
+        }
+        return $result;
     }
 
     /**
@@ -95,7 +113,7 @@ class Hm_MCP_Rest {
     private function routes() {
         $routes = [];
         foreach ($this->services->catalog()->all() as $name => $op) {
-            if (empty($op['rest'])) {
+            if (empty($op['rest']) || !Hm_MCP_Catalog::exposed($op)) {
                 continue;
             }
             list($method, $template) = $op['rest'];
@@ -127,7 +145,8 @@ class Hm_MCP_Rest {
             if ($name === null) {
                 $name = $params['name'];
                 unset($params['name']);
-                if (!$this->services->catalog()->get($name)) {
+                $op = $this->services->catalog()->get($name);
+                if (!$op || !Hm_MCP_Catalog::exposed($op)) {
                     continue;
                 }
             }
@@ -208,6 +227,9 @@ class Hm_MCP_Rest {
         ], ['code', 'message'])], ['error']));
         $paths = [];
         foreach ($this->services->catalog()->all() as $name => $op) {
+            if (!Hm_MCP_Catalog::exposed($op)) {
+                continue;
+            }
             $operation = [
                 'operationId' => $name,
                 'summary' => $op['title'],
@@ -227,6 +249,17 @@ class Hm_MCP_Rest {
                 'summary' => $op['title'].' (tool call)',
             ]), $op['input'], 'POST', '/tools/'.$name);
         }
+        $paths['/files/{token}']['get'] = [
+            'operationId' => 'download_attachment',
+            'summary' => 'Download an attachment',
+            'description' => 'Temporary link returned by get_attachment. The token in the URL is the credential: no Authorization header is needed.',
+            'security' => [],
+            'parameters' => [['name' => 'token', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'string']]],
+            'responses' => [
+                '200' => ['description' => 'File content', 'content' => ['application/octet-stream' => ['schema' => ['type' => 'string', 'format' => 'binary']]]],
+                '404' => ['description' => 'The link is not valid or expired'],
+            ],
+        ];
         ksort($paths);
         return [
             'openapi' => '3.1.0',

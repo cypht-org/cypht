@@ -10,12 +10,19 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\ServerRequest;
+use Mcp\Exception\ResourceNotFoundException;
+use Mcp\Exception\ResourceReadException;
+use Mcp\Schema\Content\BlobResourceContents;
+use Mcp\Schema\Content\ResourceLink;
 use Mcp\Schema\Content\TextContent;
+use Mcp\Schema\Content\TextResourceContents;
+use Mcp\Schema\ResourceTemplate;
 use Mcp\Schema\Result\CallToolResult;
 use Mcp\Schema\Tool;
 use Mcp\Schema\ToolAnnotations;
 use Mcp\Server;
 use Mcp\Server\ClientGateway;
+use Mcp\Server\Handler\ResourceTemplateHandlerInterface;
 use Mcp\Server\Handler\ToolHandlerInterface;
 use Mcp\Server\Session\SessionStoreInterface;
 use Mcp\Server\Transport\CallbackStream;
@@ -74,6 +81,26 @@ class Hm_MCP_Tool_Handler implements ToolHandlerInterface {
 
     public function execute(array $arguments, ClientGateway $gateway): mixed {
         return $this->endpoint->call($this->name, $arguments);
+    }
+}
+
+/**
+ * Reads attachments for resources/read on cypht://attachment/{message_id}/{part_id}
+ * @subpackage mcp/lib
+ */
+class Hm_MCP_Resource_Handler implements ResourceTemplateHandlerInterface {
+
+    private $endpoint;
+
+    /**
+     * @param Hm_MCP_Endpoint $endpoint endpoint
+     */
+    public function __construct($endpoint) {
+        $this->endpoint = $endpoint;
+    }
+
+    public function read(string $uri, array $variables, ClientGateway $gateway): mixed {
+        return $this->endpoint->read_attachment($variables);
     }
 }
 
@@ -157,6 +184,9 @@ class Hm_MCP_Endpoint {
     /* JSON-RPC requests larger than this are refused */
     const MAX_BODY_BYTES = 40000000;
 
+    /* resource template for attachments */
+    const ATTACHMENT_TEMPLATE = 'cypht://attachment/{message_id}/{part_id}';
+
     const INSTRUCTIONS = 'This server gives access to the user\'s email accounts in Cypht. '.
         'Start with list_accounts, then use list_messages (a view such as unread, or a folder), search_messages, get_message and get_thread. '.
         'Ids of accounts, folders and messages are opaque: pass them back exactly as returned. '.
@@ -196,6 +226,11 @@ class Hm_MCP_Endpoint {
         foreach ($this->services->catalog()->allowed($principal->permissions) as $name => $op) {
             $builder->add(self::tool($name, $op), new Hm_MCP_Tool_Handler($this, $name));
         }
+        if ($principal->can('read')) {
+            $builder->add(new ResourceTemplate(self::ATTACHMENT_TEMPLATE, 'attachment', 'Email attachment',
+                'Content of an email attachment: text for text files, base64 data for other files. Links to these resources are returned by get_attachment.'),
+                new Hm_MCP_Resource_Handler($this));
+        }
         $server = $builder->build();
 
         $factory = new HttpFactory();
@@ -228,8 +263,15 @@ class Hm_MCP_Endpoint {
     public function call($name, $arguments) {
         $res = $this->executor->run($name, $arguments);
         if ($res['ok']) {
-            $json = json_encode($res['result'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-            return new CallToolResult([new TextContent($json === false ? '{}' : $json)], false, $res['result']);
+            $links = $res['result']['_resource_links'] ?? [];
+            $result = Hm_MCP_Rest::public_result($res['result']);
+            $json = json_encode($result, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+            $content = [new TextContent($json === false ? '{}' : $json)];
+            foreach ($links as $link) {
+                $content[] = new ResourceLink($link['uri'], $link['name'], null, null, $link['mime_type'] ?? null, null,
+                    isset($link['size']) ? (int) $link['size'] : null);
+            }
+            return new CallToolResult($content, false, $result);
         }
         $error = $res['error'];
         $meta = null;
@@ -239,6 +281,29 @@ class Hm_MCP_Endpoint {
                 $this->services->config->resource_metadata_url(), str_replace(['"', '\\'], '', $error->getMessage()))]];
         }
         return new CallToolResult([new TextContent($error->error_code.': '.$error->getMessage())], true, null, $meta);
+    }
+
+    /**
+     * Read an attachment resource
+     * @param array $variables template variables
+     * @return TextResourceContents|BlobResourceContents
+     */
+    public function read_attachment($variables) {
+        $res = $this->executor->run('read_attachment', [
+            'message_id' => (string) ($variables['message_id'] ?? ''),
+            'part_id' => (string) ($variables['part_id'] ?? ''),
+        ]);
+        if (!$res['ok']) {
+            if ($res['error']->error_code === 'not_found') {
+                throw new ResourceNotFoundException($res['error']->getMessage());
+            }
+            throw new ResourceReadException($res['error']->error_code.': '.$res['error']->getMessage());
+        }
+        $result = $res['result'];
+        if (isset($result['text'])) {
+            return new TextResourceContents($result['uri'], $result['mime_type'], $result['text']);
+        }
+        return new BlobResourceContents($result['uri'], $result['mime_type'], $result['blob']);
     }
 
     /**

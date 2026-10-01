@@ -127,4 +127,11 @@ class Hm_MCP_Services {
     public function rest() {
         return new Hm_MCP_Rest($this);
     }
+
+    /**
+     * @return Hm_MCP_Files
+     */
+    public function files() {
+        return new Hm_MCP_Files($this);
+    }
 }

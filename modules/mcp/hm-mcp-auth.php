@@ -134,7 +134,8 @@ class Hm_MCP_Auth {
             $connection['last_used_at'] = $now;
         }
         return ['ok' => true, 'status' => 200, 'error' => '', 'message' => '',
-            'principal' => new Hm_MCP_Principal($connection, $found['key'], $found['kind'], $settings)];
+            'principal' => new Hm_MCP_Principal($connection, $found['key'], $found['kind'], $settings),
+            'token' => ['kind' => $found['kind'], 'data' => $found['data'], 'expires_at' => $found['expires_at']]];
     }
 
     /**

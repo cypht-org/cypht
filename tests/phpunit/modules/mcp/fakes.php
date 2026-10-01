@@ -70,7 +70,7 @@ class Hm_MCP_Fake_Mailbox {
     }
 
     public function message($uid) {
-        return $this->folders[$this->selected][(string) $uid];
+        return $this->folders[$this->selected][(string) $uid] ?? ['struct' => [], 'parts' => []];
     }
 
     public function get_folders($only_subscribed = false) {
@@ -149,6 +149,12 @@ class Hm_MCP_Fake_Mailbox {
             'Message-ID' => $m['message_id'], 'Flags' => $m['flags']], $m['headers']);
     }
 
+    public function stream_message_part($folder, $uid, $part_id, $start_cb) {
+        $this->select_folder($folder);
+        $start_cb('application/octet-stream', 'file');
+        echo $this->message($uid)['parts'][(string) $part_id] ?? '';
+    }
+
     public function message_action($folder, $action, $uids, $mailbox = false, $keyword = false) {
         $this->actions[] = [$folder, $action, $uids, $this->read_only];
         if ($action === 'READ') {
@@ -188,9 +194,16 @@ class Hm_MCP_Fake_Store {
     public function settings($username, $create = false) {
         return array_merge(Hm_MCP_Store::default_settings(), ['enabled' => true, 'profile_id' => $this->profile]);
     }
+    public $issued = [];
     public function log_activity($entry) { $this->logged[] = $entry; return true; }
     public function rate_limit($key, $max, $window) { return true; }
     public function available() { return true; }
+    public function now() { return time(); }
+    public function issue_token($connection_id, $kind, $key, $ttl, $data = null) {
+        $token = 'cyp_f_'.str_pad((string) count($this->issued), 43, 'a', STR_PAD_LEFT);
+        $this->issued[$token] = compact('connection_id', 'kind', 'ttl', 'data');
+        return $token;
+    }
 }
 
 /**
@@ -216,11 +229,12 @@ function hm_mcp_fake_message($subject, $from, $date, $options = []) {
             $subs['0.1']['subs'] = ['0.1.1' => $struct[0]['subs']['0.1'], '0.1.2' => $struct[0]['subs']['0.2']];
         }
         $n = 2;
-        foreach ($options['attachments'] as $name => $type) {
-            list($t, $s) = explode('/', $type);
-            $subs['0.'.$n] = ['type' => $t, 'subtype' => $s, 'attributes' => false, 'size' => '300',
-                'disposition' => ['attachment' => ['filename', $name]]];
-            $parts[(string) $n] = 'content of '.$name;
+        foreach ($options['attachments'] as $name => $spec) {
+            $spec = is_array($spec) ? $spec : ['type' => $spec];
+            list($t, $s) = explode('/', $spec['type']);
+            $subs['0.'.$n] = array_merge(['type' => $t, 'subtype' => $s, 'attributes' => false, 'size' => '300',
+                'disposition' => ['attachment' => ['filename', $name]]], $spec['struct'] ?? []);
+            $parts[(string) $n] = $spec['content'] ?? 'content of '.$name;
             $n++;
         }
         $struct = [0 => ['type' => 'multipart', 'subtype' => 'mixed', 'subs' => $subs]];

@@ -20,6 +20,7 @@ require_once APP_PATH.'modules/mcp/hm-mcp-context.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-catalog.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-mail.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-executor.php';
+require_once APP_PATH.'modules/mcp/hm-mcp-files.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-endpoint.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-rest.php';
 require_once APP_PATH.'modules/mcp/hm-mcp-services.php';

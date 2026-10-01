@@ -224,8 +224,8 @@ class Hm_Test_MCP_Mail extends TestCase {
         $data = $this->run_op('get_message', ['message_id' => $id, 'max_chars' => 500])['result']['data'];
         $this->assertSame('Plain body of Invoice', $data['body']['text']);
         $this->assertSame([
-            ['part_id' => '2', 'filename' => 'invoice.pdf', 'content_type' => 'application/pdf', 'size' => 300, 'disposition' => 'attachment'],
-            ['part_id' => '3', 'filename' => 'notes.txt', 'content_type' => 'text/plain', 'size' => 300, 'disposition' => 'attachment'],
+            ['part_id' => '2', 'filename' => 'invoice.pdf', 'content_type' => 'application/pdf', 'size' => 300, 'disposition' => 'attachment', 'readable' => false],
+            ['part_id' => '3', 'filename' => 'notes.txt', 'content_type' => 'text/plain', 'size' => 300, 'disposition' => 'attachment', 'readable' => true],
         ], $data['attachments']);
         $mailboxes = $this->mailboxes();
         $mailboxes['acc1']->folders['INBOX']['1']['parts']['1'] = str_repeat('x', 900);

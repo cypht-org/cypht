@@ -194,6 +194,7 @@
       <file>./modules/mcp/catalog.php</file>
       <file>./modules/mcp/mail.php</file>
       <file>./modules/mcp/endpoint.php</file>
+      <file>./modules/mcp/attachments.php</file>
     </testsuite>
   </testsuites>
   <source>

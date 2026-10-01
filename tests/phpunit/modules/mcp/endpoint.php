@@ -45,7 +45,11 @@ class Hm_Test_MCP_Endpoint extends TestCase {
             $context = new Hm_MCP_Fake_Context($services->site_config, $services->config, $services->store(), $principal,
                 new Hm_Mock_Config(), new Hm_MCP_Session(), $servers);
             $context->mailbox_objects = ['acc1' => new Hm_MCP_Fake_Mailbox(['INBOX' => [
-                '1' => hm_mcp_fake_message('Hello', 'Bob <bob@example.net>', 'Mon, 14 Sep 2026 10:00:00 +0000'),
+                '3' => hm_mcp_fake_message('Hello', 'Bob <bob@example.net>', 'Mon, 14 Sep 2026 10:00:00 +0000'),
+                '2' => hm_mcp_fake_message('Report', 'Bob <bob@example.net>', 'Sun, 13 Sep 2026 10:00:00 +0000', ['attachments' => [
+                    'report.pdf' => ['type' => 'application/pdf', 'content' => '%PDF-1.4 data'],
+                    'page.html' => ['type' => 'text/html', 'content' => '<p>Hi</p><script>x()</script>'],
+                ]]),
             ]])];
             return $context;
         };
@@ -236,5 +240,116 @@ class Hm_Test_MCP_Endpoint extends TestCase {
         $this->assertNull($res->header('Mcp-Session-Id'));
         $data = json_decode($res->body, true);
         $this->assertSame('acc1', $data['result']['structuredContent']['data']['accounts'][0]['id']);
+    }
+
+    private function link_for($part) {
+        $id = Hm_MCP_Format::message_id('acc1', 'INBOX', '2');
+        $res = $this->request('GET', '/api/v1/messages/'.$id.'/attachments/'.$part, $this->personal);
+        $this->assertSame(200, $res->status);
+        $data = $res->decoded();
+        $this->assertArrayNotHasKey('_resource_links', $data);
+        $url = $data['data']['download_url'];
+        $this->assertStringStartsWith('https://mail.example.com/api/v1/files/cyp_f_', $url);
+        return substr($url, strlen('https://mail.example.com'));
+    }
+
+    private function download($path, $method = 'GET') {
+        $res = $this->request($method, $path);
+        $body = '';
+        if ($res->stream) {
+            ob_start();
+            ($res->stream)();
+            $body = ob_get_clean();
+        }
+        return [$res, $body];
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_attachment_download_links() {
+        $path = $this->link_for('2');
+        list($res, $body) = $this->download($path);
+        $this->assertSame(200, $res->status);
+        $this->assertSame('application/pdf', $res->header('Content-Type'));
+        $this->assertSame('attachment; filename="report.pdf"; filename*=UTF-8\'\'report.pdf', $res->header('Content-Disposition'));
+        $this->assertSame('nosniff', $res->header('X-Content-Type-Options'));
+        $this->assertSame('%PDF-1.4 data', $body);
+        /* links can be opened again until they expire */
+        list($res, $body) = $this->download($path);
+        $this->assertSame('%PDF-1.4 data', $body);
+        list($res, $body) = $this->download($path, 'HEAD');
+        $this->assertSame(200, $res->status);
+        $this->assertNull($res->stream);
+        $this->assertSame(405, $this->request('POST', $path, null, '{}')->status);
+
+        list($res) = $this->download($this->link_for('3'));
+        $this->assertSame('application/octet-stream', $res->header('Content-Type'));
+
+        $this->assertSame(404, $this->request('GET', '/api/v1/files/cyp_f_'.str_repeat('x', 43))->status);
+        $this->assertSame(404, $this->request('GET', '/api/v1/files/nope')->status);
+        $activity = array_column($this->store->activity('alice'), 'channel', 'id');
+        $this->assertContains('link', $activity);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_download_links_follow_permissions_and_revocation() {
+        $path = $this->link_for('2');
+        $this->store->save_settings('alice', ['permissions' => array_merge(Hm_MCP_Permissions::defaults(), ['read' => false])]);
+        $this->assertSame(403, $this->request('GET', $path)->status);
+        $this->store->save_settings('alice', ['permissions' => Hm_MCP_Permissions::defaults()]);
+        $this->store->update_connection($this->personal_id, ['accounts' => ['other']]);
+        $this->assertSame(403, $this->request('GET', $path)->status);
+        $this->store->update_connection($this->personal_id, ['accounts' => null]);
+        $this->assertSame(200, $this->request('GET', $path)->status);
+        $this->store->delete_connection($this->personal_id, 'alice');
+        $res = $this->request('GET', $path);
+        $this->assertSame(404, $res->status);
+        $this->assertStringContainsString('expired', $res->body);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_download_links_expire() {
+        $path = $this->link_for('2');
+        $this->store->clock = function () { return time() + 901; };
+        $this->assertSame(404, $this->request('GET', $path)->status);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_attachment_resources_over_mcp() {
+        list($session) = $this->initialize($this->personal);
+        $id = Hm_MCP_Format::message_id('acc1', 'INBOX', '2');
+        list($res, $data) = $this->rpc($this->personal, 'tools/call', ['name' => 'get_attachment',
+            'arguments' => ['message_id' => $id, 'part_id' => '2']], $session, 2);
+        $link = $data['result']['content'][1];
+        $this->assertSame('resource_link', $link['type']);
+        $this->assertSame('cypht://attachment/'.$id.'/2', $link['uri']);
+        $this->assertArrayNotHasKey('_resource_links', $data['result']['structuredContent']);
+        list($res, $data) = $this->rpc($this->personal, 'resources/templates/list', new stdClass(), $session, 3);
+        $this->assertSame(['cypht://attachment/{message_id}/{part_id}'], array_column($data['result']['resourceTemplates'], 'uriTemplate'));
+        list($res, $data) = $this->rpc($this->personal, 'resources/read', ['uri' => $link['uri']], $session, 4);
+        $this->assertSame('%PDF-1.4 data', base64_decode($data['result']['contents'][0]['blob']));
+        list($res, $data) = $this->rpc($this->personal, 'resources/read', ['uri' => 'cypht://attachment/'.$id.'/3'], $session, 5);
+        $this->assertSame('Hi', $data['result']['contents'][0]['text']);
+        list($res, $data) = $this->rpc($this->personal, 'resources/read', ['uri' => 'cypht://attachment/'.$id.'/9'], $session, 6);
+        $this->assertArrayHasKey('error', $data);
+        $this->assertSame(404, $this->request('POST', '/api/v1/tools/read_attachment', $this->personal, '{}')->status);
+        $doc = $this->request('GET', '/api/v1/openapi.json')->decoded();
+        $this->assertArrayHasKey('/files/{token}', $doc['paths']);
+        $this->assertArrayNotHasKey('/tools/read_attachment', $doc['paths']);
+
+        $this->store->save_settings('alice', ['permissions' => array_merge(Hm_MCP_Permissions::defaults(), ['read' => false])]);
+        list($res, $data) = $this->rpc($this->personal, 'resources/templates/list', new stdClass(), $session, 7);
+        $this->assertSame([], $data['result']['resourceTemplates'] ?? []);
     }
 }

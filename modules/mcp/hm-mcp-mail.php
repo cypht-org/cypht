@@ -763,32 +763,254 @@ class Hm_MCP_Mail {
     protected function attachments($struct, $body_part, $uid) {
         $res = [];
         foreach (self::flatten($struct) as list($id, $part, $in_message)) {
-            if ($in_message || $id === (string) $body_part) {
+            if ($in_message || $id === (string) $body_part || !self::is_attachment($part)) {
                 continue;
             }
-            $type = strtolower((string) ($part['type'] ?? ''));
-            $subtype = strtolower((string) ($part['subtype'] ?? ''));
-            if (!self::is_attachment($part)) {
-                continue;
-            }
-            $filename = self::part_filename($part);
-            if ($filename === '') {
-                $filename = $type === 'message' ? 'attached-message.eml' : sprintf('part-%s.%s', $id, $subtype ?: 'bin');
-            }
-            $inline = is_array($part['disposition'] ?? null) && array_key_exists('inline', $part['disposition']);
-            $entry = [
-                'part_id' => $id,
-                'filename' => $filename,
-                'content_type' => $type.'/'.$subtype,
-                'size' => (int) ($part['size'] ?? 0),
-                'disposition' => $inline || (!empty($part['id']) && $type === 'image') ? 'inline' : 'attachment',
-            ];
-            if (!empty($part['id'])) {
-                $entry['content_id'] = trim((string) $part['id'], '<>');
-            }
-            $res[] = $entry;
+            $res[] = self::attachment_info($id, $part);
         }
         return $res;
+    }
+
+    /**
+     * Describe an attachment part
+     * @param string $id part id
+     * @param array $part structure part
+     * @return array part_id, filename, content_type, size, disposition, readable and content_id
+     */
+    public static function attachment_info($id, $part) {
+        $type = strtolower((string) ($part['type'] ?? 'application'));
+        $subtype = strtolower((string) ($part['subtype'] ?? 'octet-stream'));
+        $filename = self::part_filename($part);
+        if ($filename === '') {
+            $filename = $type === 'message' ? 'attached-message.eml' : sprintf('part-%s.%s', $id, preg_replace('/[^a-z0-9]+/', '', $subtype) ?: 'bin');
+        }
+        $inline = is_array($part['disposition'] ?? null) && array_key_exists('inline', $part['disposition']);
+        $entry = [
+            'part_id' => (string) $id,
+            'filename' => $filename,
+            'content_type' => $type.'/'.$subtype,
+            'size' => (int) ($part['size'] ?? 0),
+            'disposition' => $inline || (!empty($part['id']) && $type === 'image') ? 'inline' : 'attachment',
+            'readable' => self::text_kind($type.'/'.$subtype) !== null,
+        ];
+        if (!empty($part['id'])) {
+            $entry['content_id'] = trim((string) $part['id'], '<>');
+        }
+        return $entry;
+    }
+
+    /* -------------------------------------------------------- attachments */
+
+    /* largest attachment read as text, in bytes as reported by the body structure */
+    const MAX_TEXT_BYTES = 5000000;
+
+    /* largest attachment returned through MCP resources/read, in decoded bytes */
+    const MAX_RESOURCE_BYTES = 8388608;
+
+    /* most characters of attachment text returned at once */
+    const MAX_ATTACHMENT_CHARS = 200000;
+
+    /**
+     * How an attachment type can be read as text
+     * @param string $content_type type/subtype
+     * @return string|null text, html, message or null when it is not text
+     */
+    public static function text_kind($content_type) {
+        $content_type = strtolower(trim((string) $content_type));
+        if (in_array($content_type, ['text/html', 'application/xhtml+xml'], true)) {
+            return 'html';
+        }
+        if (in_array($content_type, ['message/rfc822', 'message/global'], true)) {
+            return 'message';
+        }
+        if (strpos($content_type, 'text/') === 0 || in_array($content_type, ['application/json', 'application/ld+json',
+            'application/xml', 'application/yaml', 'application/x-yaml', 'application/csv', 'message/delivery-status'], true)) {
+            return 'text';
+        }
+        return null;
+    }
+
+    /**
+     * Body structure of a message
+     * @return array structure, empty when the message does not exist
+     */
+    protected function message_structure($mailbox, $folder, $uid) {
+        if (!$mailbox->select_folder($folder)) {
+            throw new Hm_MCP_Error('not_found', 'Folder not found. It may have been renamed or deleted.');
+        }
+        if ($mailbox->is_imap()) {
+            $struct = $mailbox->get_connection()->get_message_structure($uid);
+        } else {
+            $res = $mailbox->get_structured_message($folder, $uid, false, false);
+            $struct = is_array($res) ? ($res[0] ?? []) : [];
+        }
+        return is_array($struct) ? $struct : [];
+    }
+
+    /**
+     * Find a part of a message
+     * @param object $mailbox connected mailbox
+     * @param string $folder folder id
+     * @param string $uid message uid
+     * @param string $part_id part id from get_message
+     * @return array [part id, structure part]
+     * @throws Hm_MCP_Error
+     */
+    public function find_part($mailbox, $folder, $uid, $part_id) {
+        $struct = $this->message_structure($mailbox, $folder, $uid);
+        if (!$struct) {
+            throw new Hm_MCP_Error('not_found', 'Message not found. It may have been moved or deleted.');
+        }
+        $part_id = preg_replace('/^0\./', '', trim((string) $part_id));
+        foreach (self::flatten($struct) as list($id, $part)) {
+            if ($id === $part_id) {
+                return [$id, $part];
+            }
+        }
+        throw new Hm_MCP_Error('not_found', 'Attachment not found. Use a part_id from the attachments of get_message.');
+    }
+
+    /**
+     * Decoded content of a part
+     * @return string
+     */
+    protected function read_part($mailbox, $folder, $uid, $part_id, $part) {
+        if ($mailbox->is_imap() && $mailbox->select_folder($folder)) {
+            return (string) $mailbox->get_connection()->get_message_content($uid, $part_id, false, $part);
+        }
+        return (string) $mailbox->get_message_content($folder, $uid, $part_id);
+    }
+
+    /**
+     * Convert attachment content to safe text
+     * @param string $raw decoded content
+     * @param string $kind value from text_kind()
+     * @return string
+     */
+    public static function attachment_text($raw, $kind, $part = []) {
+        if ($kind === 'html') {
+            return Hm_MCP_Format::html_to_text($raw);
+        }
+        if ($kind === 'message') {
+            $parser = new ZBateson\MailMimeParser\MailMimeParser();
+            $message = $parser->parse($raw, false);
+            $lines = [];
+            foreach (['Subject', 'From', 'To', 'Cc', 'Date'] as $name) {
+                $header = $message->getHeader($name);
+                if ($header) {
+                    $value = $name === 'Subject' || $name === 'Date' ? (string) $header->getValue() : decode_fld($header->getRawValue());
+                    if (trim($value) !== '') {
+                        $lines[] = $name.': '.Hm_MCP_Format::text($value);
+                    }
+                }
+            }
+            if (!$lines) {
+                /* some servers return the attached message without its headers: use the envelope */
+                $envelope = is_array($part['envelope'] ?? null) ? $part['envelope'] : [];
+                foreach (['subject' => 'Subject', 'from' => 'From', 'to' => 'To', 'cc' => 'Cc', 'date' => 'Date'] as $key => $name) {
+                    if (!empty($envelope[$key]) && is_string($envelope[$key])) {
+                        $lines[] = $name.': '.Hm_MCP_Format::text(decode_fld($envelope[$key]));
+                    }
+                }
+                return trim(implode("\n", $lines)."\n\n".Hm_MCP_Format::plain_text($raw));
+            }
+            $html = $message->getHtmlContent();
+            $body = $html !== null && trim($html) !== '' ? Hm_MCP_Format::html_to_text($html)
+                : Hm_MCP_Format::plain_text((string) $message->getTextContent());
+            return trim(implode("\n", $lines)."\n\n".$body);
+        }
+        return Hm_MCP_Format::plain_text($raw);
+    }
+
+    /**
+     * Estimated decoded size of a part
+     * @param array $part structure part
+     * @return int bytes
+     */
+    protected static function decoded_size($part) {
+        $size = (int) ($part['size'] ?? 0);
+        return strtolower((string) ($part['encoding'] ?? '')) === 'base64' ? (int) ($size * 3 / 4) : $size;
+    }
+
+    /**
+     * MCP resource URI of an attachment
+     * @param string $message_id message id
+     * @param string $part_id part id
+     * @return string
+     */
+    public static function attachment_uri($message_id, $part_id) {
+        return 'cypht://attachment/'.$message_id.'/'.$part_id;
+    }
+
+    public function get_attachment($args) {
+        $ctx = $this->context();
+        list($account_id, $folder, $uid) = Hm_MCP_Format::parse_message_id($args['message_id']);
+        $account = $ctx->account($account_id);
+        $mailbox = $ctx->mailbox($account['id']);
+        list($part_id, $part) = $this->find_part($mailbox, $folder, $uid, $args['part_id']);
+        $info = self::attachment_info($part_id, $part);
+        $message_id = Hm_MCP_Format::message_id($account['id'], $folder, $uid);
+        $kind = self::text_kind($info['content_type']);
+        $data = [
+            'message_id' => $message_id,
+            'part_id' => $part_id,
+            'filename' => $info['filename'],
+            'content_type' => $info['content_type'],
+            'size' => $info['size'],
+            'readable' => false,
+            'format' => null,
+            'text' => '',
+            'truncated' => false,
+            'total_chars' => 0,
+        ];
+        $note = '';
+        if ($kind !== null && $info['size'] <= self::MAX_TEXT_BYTES) {
+            $text = self::attachment_text($this->read_part($mailbox, $folder, $uid, $part_id, $part), $kind, $part);
+            $max = min(self::MAX_ATTACHMENT_CHARS, max(1000, (int) ($args['max_chars'] ?? 50000)));
+            list($text, $truncated, $total) = Hm_MCP_Format::truncate($text, $max);
+            $data = array_merge($data, ['readable' => true, 'format' => $kind, 'text' => $text,
+                'truncated' => $truncated, 'total_chars' => $total]);
+        } elseif ($kind !== null) {
+            $note = ' It is too large to show as text.';
+        } else {
+            $note = ' This file type cannot be shown as text; the user can open the download link.';
+        }
+        list($url, $expires) = $this->services->files()->issue($this->principal, $account['id'], $folder, $uid, $part_id);
+        $data['download_url'] = $url;
+        $data['expires_at'] = date('c', $expires);
+        $data['resource_uri'] = self::attachment_uri($message_id, $part_id);
+        $data['notice'] = self::NOTICE;
+        $res = $this->ok(sprintf('Attachment "%s" (%s).', mb_substr($info['filename'], 0, 80), $info['content_type']).$note, $data);
+        if (self::decoded_size($part) <= self::MAX_RESOURCE_BYTES) {
+            $res['_resource_links'] = [['uri' => $data['resource_uri'], 'name' => $info['filename'],
+                'mime_type' => $info['content_type'], 'size' => $info['size']]];
+        }
+        $this->audit = ['account_id' => $account['id'], 'content_type' => $info['content_type'], 'readable' => $data['readable']];
+        return $res;
+    }
+
+    /**
+     * Content of an attachment for MCP resources/read
+     */
+    public function read_attachment($args) {
+        $ctx = $this->context();
+        list($account_id, $folder, $uid) = Hm_MCP_Format::parse_message_id($args['message_id']);
+        $account = $ctx->account($account_id);
+        $mailbox = $ctx->mailbox($account['id']);
+        list($part_id, $part) = $this->find_part($mailbox, $folder, $uid, $args['part_id']);
+        $info = self::attachment_info($part_id, $part);
+        $uri = self::attachment_uri(Hm_MCP_Format::message_id($account['id'], $folder, $uid), $part_id);
+        $this->audit = ['account_id' => $account['id'], 'content_type' => $info['content_type']];
+        $kind = self::text_kind($info['content_type']);
+        if ($kind !== null && $info['size'] <= self::MAX_TEXT_BYTES) {
+            $text = self::attachment_text($this->read_part($mailbox, $folder, $uid, $part_id, $part), $kind, $part);
+            return ['uri' => $uri, 'mime_type' => 'text/plain', 'text' => mb_substr($text, 0, self::MAX_ATTACHMENT_CHARS)];
+        }
+        if (self::decoded_size($part) > self::MAX_RESOURCE_BYTES) {
+            throw new Hm_MCP_Error('payload_too_large', 'The attachment is too large to read through MCP. Use get_attachment to get a download link.');
+        }
+        $raw = $this->read_part($mailbox, $folder, $uid, $part_id, $part);
+        return ['uri' => $uri, 'mime_type' => $info['content_type'], 'blob' => base64_encode($raw)];
     }
 
     /* ------------------------------------------------------------- thread */
