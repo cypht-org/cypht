@@ -20,12 +20,27 @@ class Hm_MCP_Router {
     /* site configuration */
     public $site_config;
 
+    /* Hm_MCP_Services, created on demand */
+    protected $services;
+
     /**
      * @param object $site_config site configuration
+     * @param Hm_MCP_Services|null $services services, created on demand when null
      */
-    public function __construct($site_config) {
+    public function __construct($site_config, $services = null) {
         $this->site_config = $site_config;
-        $this->config = new Hm_MCP_Config($site_config);
+        $this->config = $services ? $services->config : new Hm_MCP_Config($site_config);
+        $this->services = $services;
+    }
+
+    /**
+     * @return Hm_MCP_Services
+     */
+    public function services() {
+        if ($this->services === null) {
+            $this->services = new Hm_MCP_Services($this->site_config, $this->config);
+        }
+        return $this->services;
     }
 
     /**
@@ -65,6 +80,9 @@ class Hm_MCP_Router {
                 return $this->only_get($request, function () { return $this->protected_resource_metadata(); });
             case '/mcp':
                 return $this->mcp($request);
+        }
+        if ($path === '/api/v1' || strpos($path, '/api/v1/') === 0) {
+            return $this->services()->rest()->handle($request, substr($path, strlen('/api/v1')));
         }
         return Hm_MCP_Http_Response::error(404, 'not_found', 'Not found');
     }
@@ -137,7 +155,17 @@ class Hm_MCP_Router {
         if ($token === false) {
             return $this->unauthorized();
         }
-        return $this->unauthorized('invalid_token', 'The access token is invalid or expired.');
+        $auth = $this->services()->auth()->authenticate($token, ['access', 'personal']);
+        if (!$auth['ok']) {
+            if ($auth['status'] === 401) {
+                return $this->unauthorized('invalid_token', $auth['message']);
+            }
+            return Hm_MCP_Http_Response::error($auth['status'], $auth['error'], $auth['message']);
+        }
+        if (!in_array($request->method, ['POST', 'DELETE'], true)) {
+            return Hm_MCP_Http_Response::error(405, 'method_not_allowed', 'Method not allowed', ['Allow' => 'POST, DELETE, OPTIONS']);
+        }
+        return $this->services()->mcp_endpoint()->handle($request, $auth['principal']);
     }
 
     /**

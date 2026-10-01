@@ -190,6 +190,10 @@
       <file>./modules/mcp/crypto.php</file>
       <file>./modules/mcp/store.php</file>
       <file>./modules/mcp/settings.php</file>
+      <file>./modules/mcp/format.php</file>
+      <file>./modules/mcp/catalog.php</file>
+      <file>./modules/mcp/mail.php</file>
+      <file>./modules/mcp/endpoint.php</file>
     </testsuite>
   </testsuites>
   <source>

@@ -80,10 +80,18 @@ class Hm_Test_MCP_Router extends TestCase {
     }
 
     public function test_mcp_rejects_an_unknown_token() {
-        $router = new Hm_MCP_Router($this->config());
-        $res = $router->handle($this->request('POST', '/mcp', ['Authorization' => 'Bearer cyp_at_unknown']));
+        $config = $this->config();
+        setup_db($config);
+        $router = new Hm_MCP_Router($config);
+        $res = $router->handle($this->request('POST', '/mcp', ['Authorization' => 'Bearer cyp_at_unknown_token_value_0123456789']));
         $this->assertSame(401, $res->status);
         $this->assertStringContainsString('error="invalid_token"', $res->header('WWW-Authenticate'));
+    }
+
+    public function test_mcp_without_storage_is_unavailable() {
+        $router = new Hm_MCP_Router($this->config());
+        $res = $router->handle($this->request('POST', '/mcp', ['Authorization' => 'Bearer cyp_at_unknown_token_value_0123456789']));
+        $this->assertSame(503, $res->status);
     }
 
     public function test_preflight_and_not_found() {
