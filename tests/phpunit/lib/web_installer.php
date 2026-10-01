@@ -145,6 +145,25 @@ class Hm_Test_Web_Installer extends TestCase {
         $this->assertSame('true', $values['IMAP_AUTH_TLS']);
     }
 
+    public function test_collect_form_values_defaults_imap_auth_name_to_the_server() {
+        $values = Hm_Web_Installer::collectFormValues([
+            'AUTH_TYPE' => 'IMAP', 'IMAP_AUTH_SERVER' => 'imap.example.com', 'IMAP_AUTH_NAME' => '',
+        ]);
+        $this->assertSame('imap.example.com', $values['IMAP_AUTH_NAME']);
+    }
+
+    public function test_collect_form_values_keeps_a_submitted_imap_auth_name() {
+        $values = Hm_Web_Installer::collectFormValues([
+            'AUTH_TYPE' => 'IMAP', 'IMAP_AUTH_SERVER' => 'imap.example.com', 'IMAP_AUTH_NAME' => 'My mail server',
+        ]);
+        $this->assertSame('My mail server', $values['IMAP_AUTH_NAME']);
+    }
+
+    public function test_collect_form_values_leaves_sieve_conf_host_optional() {
+        $values = Hm_Web_Installer::collectFormValues(['AUTH_TYPE' => 'IMAP']);
+        $this->assertSame('', $values['IMAP_AUTH_SIEVE_CONF_HOST']);
+    }
+
     public function test_collect_form_values_ignores_imap_fields_when_db_selected() {
         $values = Hm_Web_Installer::collectFormValues([
             'AUTH_TYPE' => 'DB', 'IMAP_AUTH_SERVER' => 'imap.example.com', 'IMAP_AUTH_TLS' => 'on',

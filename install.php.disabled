@@ -155,12 +155,6 @@ function driver_select() {
     return '<label>Driver<select name="DB_DRIVER" data-required>'.$opts.'</select></label>';
 }
 
-/**
- * Selecting a different auth type here toggles which of the DB/IMAP/LDAP
- * fieldsets below are visible and required (step_script() JS), matching
- * Hm_Web_Installer's FIELD_GROUPS: only the active group's fields are read
- * on submit, the others stay at their .env.example default.
- */
 function auth_type_select() {
     $opts = '';
     foreach (['DB' => 'Database', 'IMAP' => 'IMAP server', 'LDAP' => 'LDAP server'] as $value => $label) {
@@ -186,7 +180,9 @@ function render_form($csrf_token, $token) {
             auth_fields_group('IMAP',
                 field('IMAP_AUTH_SERVER', 'Server', 'text', '', true).
                 field('IMAP_AUTH_PORT', 'Port', 'text', '', true).
-                field('IMAP_AUTH_TLS', 'Use TLS', 'checkbox')).
+                field('IMAP_AUTH_TLS', 'Use TLS', 'checkbox').
+                field('IMAP_AUTH_NAME', 'Display name', 'text', 'optional, defaults to the server address').
+                field('IMAP_AUTH_SIEVE_CONF_HOST', 'Sieve filter server', 'text', 'optional')).
             auth_fields_group('LDAP',
                 field('LDAP_AUTH_SERVER', 'Server', 'text', '', true).
                 field('LDAP_AUTH_PORT', 'Port', 'text', '', true).
@@ -243,10 +239,7 @@ function step_script() {
             var authSelect = document.getElementById('auth-type');
             var current = steps[0];
 
-            // A step with data-only-for is skipped unless it matches the
-            // currently selected auth type (e.g. the Admin step only applies
-            // to AUTH_TYPE=DB), so navigation always walks this list instead
-            // of the raw step array.
+            // Steps with data-only-for are skipped unless it matches AUTH_TYPE.
             function activeSteps() {
                 return steps.filter(function (el) {
                     return !el.dataset.onlyFor || el.dataset.onlyFor === authSelect.value;
@@ -260,11 +253,7 @@ function step_script() {
                 steps.forEach(function (el) {
                     var isCurrent = el === stepEl;
                     el.hidden = !isCurrent;
-                    // A hidden step's required fields are still counted by
-                    // the browser's constraint validation and, being
-                    // unfocusable, break reportValidity() with a console
-                    // error. Only the visible step's fields carry `required`,
-                    // and only within the currently selected auth-fields group.
+                    // Only required within the current step AND the active auth-fields group.
                     el.querySelectorAll('[data-required]').forEach(function (input) {
                         var group = input.closest('.auth-fields');
                         input.required = isCurrent && (!group || group.dataset.auth === authSelect.value);

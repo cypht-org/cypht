@@ -13,7 +13,8 @@ class Hm_Web_Installer {
     private const FIELD_GROUPS = [
         'DB' => ['DB_DRIVER' => 'mysql', 'DB_HOST' => '127.0.0.1', 'DB_NAME' => 'cypht_db',
             'DB_USER' => 'cypht', 'DB_PASS' => ''],
-        'IMAP' => ['IMAP_AUTH_SERVER' => 'localhost', 'IMAP_AUTH_PORT' => '143'],
+        'IMAP' => ['IMAP_AUTH_SERVER' => 'localhost', 'IMAP_AUTH_PORT' => '143',
+            'IMAP_AUTH_NAME' => 'localhost', 'IMAP_AUTH_SIEVE_CONF_HOST' => ''],
         'LDAP' => ['LDAP_AUTH_SERVER' => 'localhost', 'LDAP_AUTH_PORT' => '389',
             'LDAP_AUTH_BASE_DN' => 'dc=example,dc=com', 'LDAP_AUTH_UID_ATTR' => 'uid'],
     ];
@@ -185,15 +186,17 @@ class Hm_Web_Installer {
             $values[$key] = $group === $auth_type && !empty($post[$key]) ? 'true' : 'false';
         }
 
+        // IMAP_AUTH_NAME is just a display label; default it to the server.
+        if ($auth_type === 'IMAP' && $values['IMAP_AUTH_NAME'] === '') {
+            $values['IMAP_AUTH_NAME'] = $values['IMAP_AUTH_SERVER'] !== '' ? $values['IMAP_AUTH_SERVER'] : 'localhost';
+        }
+
         return $values;
     }
 
-    /**
-     * Confirms the auth backend is actually reachable before .env is
-     * written. DB gets a real PDO connection attempt (Hm_Installer already
-     * has it); IMAP/LDAP only get a TCP reachability check, since a full
-     * protocol handshake needs credentials the wizard doesn't collect.
-     */
+    // DB gets a real PDO connection attempt; IMAP/LDAP only get a TCP
+    // reachability check, since a full handshake needs credentials the
+    // wizard doesn't collect.
     public function testAuthConnection(array $values) {
         switch ($values['AUTH_TYPE'] ?? '') {
             case 'DB':
