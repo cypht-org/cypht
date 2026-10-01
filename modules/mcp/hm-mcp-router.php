@@ -65,7 +65,25 @@ class Hm_MCP_Router {
             return $this->cors(new Hm_MCP_Http_Response(204));
         }
         $response = $this->route($path, $request);
+        $this->maintenance();
         return $machine ? $this->cors($response) : $response;
+    }
+
+    /* run the cleanup of expired state once every this many requests on average */
+    const PURGE_DIVISOR = 50;
+
+    /**
+     * Remove expired tokens, sessions, authorizations and old activity now and then
+     * @return void
+     */
+    protected function maintenance() {
+        if ($this->services === null || random_int(1, self::PURGE_DIVISOR) !== 1) {
+            return;
+        }
+        $store = $this->services->store();
+        if ($store->available()) {
+            $store->maybe_purge($this->config->int('activity_retention_days', 90), Hm_MCP_Endpoint::SESSION_TTL, 1);
+        }
     }
 
     /**

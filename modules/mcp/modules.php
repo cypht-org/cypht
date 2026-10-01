@@ -23,6 +23,9 @@ class Hm_Handler_mcp_settings_page extends Hm_Handler_Module {
     const PASSWORD_ATTEMPTS = 10;
     const PASSWORD_WINDOW = 900;
 
+    /* activity entries shown per page */
+    const ACTIVITY_PAGE_SIZE = 50;
+
     public function process() {
         $username = $this->session->get('username', false);
         $mcp_config = new Hm_MCP_Config($this->config);
@@ -53,6 +56,52 @@ class Hm_Handler_mcp_settings_page extends Hm_Handler_Module {
         }
         $this->out('mcp_settings', $store->settings($username));
         $this->out('mcp_connections', $connections);
+        $this->activity($store, $username);
+        $store->maybe_purge($mcp_config->int('activity_retention_days', 90), Hm_MCP_Endpoint::SESSION_TTL, 5);
+    }
+
+    /**
+     * Load one page of the activity log
+     * @param Hm_MCP_Store $store storage
+     * @param string $username current user
+     * @return void
+     */
+    private function activity($store, $username) {
+        $known = $store->activity_connections($username);
+        $filter = $this->request->get['mcp_activity'] ?? '';
+        $filter = is_string($filter) && array_key_exists($filter, $known) ? $filter : null;
+        $page = max(1, (int) ($this->request->get['mcp_activity_page'] ?? 1));
+        $total = $store->count_activity($username, $filter);
+        $pages = max(1, (int) ceil($total / self::ACTIVITY_PAGE_SIZE));
+        $page = min($page, $pages);
+        $this->out('mcp_activity', $store->activity($username, self::ACTIVITY_PAGE_SIZE, ($page - 1) * self::ACTIVITY_PAGE_SIZE, $filter));
+        $this->out('mcp_activity_total', $total);
+        $this->out('mcp_activity_page', $page);
+        $this->out('mcp_activity_pages', $pages);
+        $this->out('mcp_activity_filter', $filter);
+        $this->out('mcp_activity_connections', $known);
+    }
+
+    /**
+     * Record a change made in the settings page
+     * @param Hm_MCP_Store $store storage
+     * @param string $username current user
+     * @param string $operation what changed
+     * @param array|null $connection affected connection
+     * @param array $summary non sensitive details
+     * @return void
+     */
+    private function log($store, $username, $operation, $connection = null, $summary = []) {
+        $store->log_activity([
+            'username' => $username,
+            'connection_id' => $connection['id'] ?? null,
+            'connection_name' => $connection['name'] ?? null,
+            'channel' => 'settings',
+            'operation' => $operation,
+            'permission' => null,
+            'outcome' => 'ok',
+            'summary' => $summary ?: null,
+        ]);
     }
 
     /**
@@ -76,11 +125,17 @@ class Hm_Handler_mcp_settings_page extends Hm_Handler_Module {
                 break;
             case 'revoke_connection':
                 $connection_id = (string) ($this->request->post['mcp_connection_id'] ?? '');
-                if ($store->delete_connection($connection_id, $username)) {
+                $connection = $store->connection($connection_id);
+                if ($connection && $connection['username'] === $username && $store->delete_connection($connection_id, $username)) {
+                    $this->log($store, $username, 'revoke_connection', $connection, ['kind' => $connection['kind']]);
                     Hm_Msgs::add('Connection revoked');
                 } else {
                     Hm_Msgs::add('Connection not found', 'warning');
                 }
+                break;
+            case 'clear_activity':
+                $store->clear_activity($username);
+                Hm_Msgs::add('Activity log cleared');
                 break;
         }
     }
@@ -103,6 +158,9 @@ class Hm_Handler_mcp_settings_page extends Hm_Handler_Module {
             'accounts' => ['mode' => $mode, 'ids' => $mode === 'selected' ? $ids : []],
         ]);
         if ($saved) {
+            $enabled = array_keys(array_filter(Hm_MCP_Permissions::from_keys($post['mcp_permissions'] ?? [])));
+            $this->log($store, $username, 'save_settings', null, ['enabled' => !empty($post['mcp_enabled']),
+                'permissions' => implode(', ', $enabled), 'accounts' => $mode === 'selected' ? count($ids) : 'all']);
             Hm_Msgs::add('API and MCP settings saved');
         } else {
             Hm_Msgs::add('Could not save the settings', 'danger');
@@ -151,6 +209,10 @@ class Hm_Handler_mcp_settings_page extends Hm_Handler_Module {
         $this->out('mcp_new_token', ['name' => $name, 'token' => $token]);
         /* show the token in this response instead of redirecting, so it is never stored */
         $this->out('no_redirect', true);
+        $this->log($store, $username, 'create_token', ['id' => $id, 'name' => $name], [
+            'expires_days' => $days ?: 'never',
+            'permissions' => $permissions === null ? 'global' : implode(', ', array_keys(array_filter($permissions))),
+            'accounts' => $accounts === null ? 'global' : count($accounts)]);
         Hm_Msgs::add('Token created');
     }
 
@@ -170,11 +232,15 @@ class Hm_Handler_mcp_settings_page extends Hm_Handler_Module {
             Hm_Msgs::add($error, 'warning');
             return;
         }
+        $name = self::clean_name($post['mcp_name'] ?? '', $connection['name']);
         $store->update_connection($connection['id'], [
-            'name' => self::clean_name($post['mcp_name'] ?? '', $connection['name']),
+            'name' => $name,
             'permissions' => $permissions,
             'accounts' => $accounts,
         ]);
+        $this->log($store, $username, 'update_connection', ['id' => $connection['id'], 'name' => $name], [
+            'permissions' => $permissions === null ? 'global' : implode(', ', array_keys(array_filter($permissions))),
+            'accounts' => $accounts === null ? 'global' : count($accounts)]);
         Hm_Msgs::add('Connection updated');
     }
 
@@ -274,8 +340,135 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         $res .= $this->settings_form($settings);
         $res .= $this->connections($settings);
         $res .= $this->token_form($settings);
+        $res .= $this->activity_section();
         $res .= $this->connect_help();
         return $res.'</div>';
+    }
+
+    /* operations that are not tools, shown in the activity log */
+    const OTHER_OPERATIONS = [
+        'download_attachment' => 'Downloaded an attachment',
+        'create_token' => 'Token created',
+        'revoke_connection' => 'Connection revoked',
+        'update_connection' => 'Connection updated',
+        'save_settings' => 'API and MCP settings saved',
+        'authorize' => 'Connected with OAuth',
+        'revoke' => 'Connection revoked',
+        'unknown' => 'Unknown operation',
+    ];
+
+    const CHANNELS = ['mcp' => 'MCP', 'rest' => 'REST API', 'link' => 'Download link', 'settings' => 'Settings', 'oauth' => 'OAuth'];
+
+    const OUTCOMES = ['ok' => ['Completed', 'success'], 'denied' => ['Denied', 'warning'], 'error' => ['Failed', 'danger']];
+
+    const DETAIL_LABELS = ['account_id' => 'Account', 'accounts' => 'Accounts', 'messages' => 'Messages', 'folders' => 'Folders',
+        'results' => 'Results', 'error' => 'Error', 'content_type' => 'Type', 'view' => 'View', 'field' => 'Field',
+        'readable' => 'Readable', 'marked_read' => 'Marked as read', 'contacts' => 'Contacts', 'tags' => 'Tags',
+        'enabled' => 'Enabled', 'permissions' => 'Permissions', 'expires_days' => 'Expires in days', 'kind' => 'Type',
+        'recipients' => 'Recipients', 'domains' => 'Domains', 'client' => 'Client'];
+
+    /**
+     * Activity log with a connection filter and paging
+     * @return string
+     */
+    private function activity_section() {
+        $res = $this->section('Activity', 'clock-history');
+        $rows = $this->get('mcp_activity', []);
+        $known = $this->get('mcp_activity_connections', []);
+        $filter = $this->get('mcp_activity_filter');
+        $res .= '<div class="px-3 mt-3 mcp_activity">'.
+            '<p class="text-secondary">'.$this->trans('What each connection did. Message content is never recorded, only counts and identifiers.').'</p>';
+        $res .= '<div class="d-flex flex-wrap gap-2 align-items-end mb-3">';
+        if ($known) {
+            $res .= '<form method="get" action="" class="d-flex gap-2 align-items-end">'.
+                '<input type="hidden" name="'.$this->html_safe($this->get('page_param_name', 'page')).'" value="mcp" />'.
+                '<div><label class="form-label small mb-1" for="mcp_activity_filter">'.$this->trans('Connection').'</label>'.
+                '<select class="form-select form-select-sm" name="mcp_activity" id="mcp_activity_filter">'.
+                '<option value="">'.$this->trans('All connections').'</option>';
+            foreach ($known as $id => $name) {
+                $res .= '<option value="'.$this->html_safe($id).'"'.($filter === $id ? ' selected' : '').'>'.$this->html_safe($name ?: $id).'</option>';
+            }
+            $res .= '</select></div><button type="submit" class="btn btn-sm btn-outline-secondary">'.$this->trans('Filter').'</button></form>';
+        }
+        if ($rows) {
+            $res .= $this->form_start('clear_activity', 'mcp_clear_activity_form ms-auto').
+                '<button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>'.$this->trans('Clear activity log').'</button></form>';
+        }
+        $res .= '</div>';
+        if (!$rows) {
+            return $res.'<p class="fst-italic">'.$this->trans('No activity recorded yet.').'</p></div>';
+        }
+        $names = [];
+        foreach ($this->get('mcp_accounts', []) as $account) {
+            $names[$account['id']] = $account['user'] !== '' ? $account['user'] : $account['name'];
+        }
+        $titles = [];
+        foreach ((new Hm_MCP_Catalog())->all() as $name => $op) {
+            $titles[$name] = $op['title'];
+        }
+        $res .= '<div class="table-responsive"><table class="table table-sm table-striped align-middle mcp_activity_table"><thead><tr>'.
+            '<th>'.$this->trans('Date').'</th><th>'.$this->trans('Connection').'</th><th>'.$this->trans('Source').'</th>'.
+            '<th>'.$this->trans('Action').'</th><th>'.$this->trans('Result').'</th><th>'.$this->trans('Details').'</th></tr></thead><tbody>';
+        foreach ($rows as $row) {
+            $operation = (string) $row['operation'];
+            $label = $titles[$operation] ?? self::OTHER_OPERATIONS[$operation] ?? $operation;
+            list($outcome, $badge) = self::OUTCOMES[$row['outcome']] ?? [$row['outcome'], 'secondary'];
+            $res .= '<tr>'.
+                '<td class="text-nowrap small">'.$this->html_safe(date('Y-m-d H:i:s', (int) $row['created_at'])).'</td>'.
+                '<td>'.$this->html_safe($row['connection_name'] ?? '').'</td>'.
+                '<td class="small">'.$this->trans(self::CHANNELS[$row['channel']] ?? $row['channel']).'</td>'.
+                '<td><span title="'.$this->html_safe($operation).'">'.$this->trans($label).'</span></td>'.
+                '<td><span class="badge text-bg-'.$badge.'">'.$this->trans($outcome).'</span></td>'.
+                '<td class="small text-secondary">'.$this->details($row['summary'], $names).'</td>'.
+                '</tr>';
+        }
+        $res .= '</tbody></table></div>';
+        $page = (int) $this->get('mcp_activity_page', 1);
+        $pages = (int) $this->get('mcp_activity_pages', 1);
+        if ($pages > 1) {
+            $params = $filter ? ['mcp_activity' => rawurlencode($filter)] : [];
+            $res .= '<nav class="d-flex gap-2 align-items-center mb-3" aria-label="'.$this->trans('Activity').'">';
+            if ($page > 1) {
+                $res .= '<a class="btn btn-sm btn-outline-secondary" href="'.$this->build_page_url('mcp', $params + ['mcp_activity_page' => $page - 1], true).'">'.$this->trans('Newer').'</a>';
+            }
+            $res .= '<span class="small text-secondary">'.sprintf($this->trans('Page %d of %d'), $page, $pages).'</span>';
+            if ($page < $pages) {
+                $res .= '<a class="btn btn-sm btn-outline-secondary" href="'.$this->build_page_url('mcp', $params + ['mcp_activity_page' => $page + 1], true).'">'.$this->trans('Older').'</a>';
+            }
+            $res .= '</nav>';
+        }
+        return $res.'</div>';
+    }
+
+    /**
+     * Render activity details
+     * @param array|null $summary details
+     * @param array $names account id => label
+     * @return string HTML
+     */
+    private function details($summary, $names) {
+        if (!is_array($summary) || !$summary) {
+            return '';
+        }
+        $parts = [];
+        foreach ($summary as $key => $value) {
+            if ($key === 'account_id' && isset($names[$value])) {
+                $value = $names[$value];
+            } elseif (is_bool($value)) {
+                $value = $this->trans($value ? 'Yes' : 'No');
+            } elseif ($value === 'all') {
+                $value = $this->trans('All');
+            } elseif ($value === 'global') {
+                $value = $this->trans('Same as global');
+            } elseif ($value === 'never') {
+                $value = $this->trans('Never');
+            } elseif (is_array($value)) {
+                $value = implode(', ', array_map('strval', array_filter($value, 'is_scalar')));
+            }
+            $label = isset(self::DETAIL_LABELS[$key]) ? $this->trans(self::DETAIL_LABELS[$key]) : str_replace('_', ' ', (string) $key);
+            $parts[] = $this->html_safe($label).': '.$this->html_safe((string) $value);
+        }
+        return implode('<br />', $parts);
     }
 
     /**

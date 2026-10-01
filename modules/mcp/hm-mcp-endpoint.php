@@ -16,14 +16,22 @@ use Mcp\Schema\Content\BlobResourceContents;
 use Mcp\Schema\Content\ResourceLink;
 use Mcp\Schema\Content\TextContent;
 use Mcp\Schema\Content\TextResourceContents;
+use Mcp\Schema\JsonRpc\Request as Mcp_Request;
+use Mcp\Schema\JsonRpc\Response as Mcp_Response;
+use Mcp\Schema\Request\ListResourceTemplatesRequest;
+use Mcp\Schema\Request\ListToolsRequest;
 use Mcp\Schema\ResourceTemplate;
+use Mcp\Schema\Result\ListResourceTemplatesResult;
+use Mcp\Schema\Result\ListToolsResult;
 use Mcp\Schema\Result\CallToolResult;
 use Mcp\Schema\Tool;
 use Mcp\Schema\ToolAnnotations;
 use Mcp\Server;
 use Mcp\Server\ClientGateway;
+use Mcp\Server\Handler\Request\RequestHandlerInterface;
 use Mcp\Server\Handler\ResourceTemplateHandlerInterface;
 use Mcp\Server\Handler\ToolHandlerInterface;
+use Mcp\Server\Session\SessionInterface;
 use Mcp\Server\Session\SessionStoreInterface;
 use Mcp\Server\Transport\CallbackStream;
 use Mcp\Server\Transport\StreamableHttpTransport;
@@ -81,6 +89,56 @@ class Hm_MCP_Tool_Handler implements ToolHandlerInterface {
 
     public function execute(array $arguments, ClientGateway $gateway): mixed {
         return $this->endpoint->call($this->name, $arguments);
+    }
+}
+
+/**
+ * tools/list with only the tools the connection may use. Every tool stays
+ * registered, so a call to a disabled tool reaches the permission check, gets a
+ * clear error and is recorded in the activity log.
+ * @subpackage mcp/lib
+ */
+class Hm_MCP_List_Tools_Handler implements RequestHandlerInterface {
+
+    private $tools;
+
+    /**
+     * @param array $tools Tool definitions to list
+     */
+    public function __construct($tools) {
+        $this->tools = $tools;
+    }
+
+    public function supports(Mcp_Request $request): bool {
+        return $request instanceof ListToolsRequest;
+    }
+
+    public function handle(Mcp_Request $request, SessionInterface $session): Mcp_Response {
+        return new Mcp_Response($request->getId(), new ListToolsResult($this->tools, null));
+    }
+}
+
+/**
+ * resources/templates/list that hides attachments when reading is disabled
+ * @subpackage mcp/lib
+ */
+class Hm_MCP_List_Templates_Handler implements RequestHandlerInterface {
+
+    private $templates;
+
+    /**
+     * @param array $templates ResourceTemplate definitions to list
+     */
+    public function __construct($templates) {
+        $this->templates = $templates;
+    }
+
+    public function supports(Mcp_Request $request): bool {
+        return $request instanceof ListResourceTemplatesRequest;
+    }
+
+    public function handle(Mcp_Request $request, SessionInterface $session): Mcp_Response {
+        return new Mcp_Response($request->getId(), new ListResourceTemplatesResult($this->templates, null));
     }
 }
 
@@ -223,14 +281,22 @@ class Hm_MCP_Endpoint {
             ->setPaginationLimit(200)
             ->setSession(new Hm_MCP_Session_Store($this->services->store(), $principal->connection_id(), self::SESSION_TTL), null, 1, 50)
             ->setLogger($logger);
-        foreach ($this->services->catalog()->allowed($principal->permissions) as $name => $op) {
-            $builder->add(self::tool($name, $op), new Hm_MCP_Tool_Handler($this, $name));
+        $listed = [];
+        foreach ($this->services->catalog()->all() as $name => $op) {
+            if (!Hm_MCP_Catalog::exposed($op)) {
+                continue;
+            }
+            $tool = self::tool($name, $op);
+            $builder->add($tool, new Hm_MCP_Tool_Handler($this, $name));
+            if ($principal->can($op['permission'])) {
+                $listed[] = $tool;
+            }
         }
-        if ($principal->can('read')) {
-            $builder->add(new ResourceTemplate(self::ATTACHMENT_TEMPLATE, 'attachment', 'Email attachment',
-                'Content of an email attachment: text for text files, base64 data for other files. Links to these resources are returned by get_attachment.'),
-                new Hm_MCP_Resource_Handler($this));
-        }
+        $template = new ResourceTemplate(self::ATTACHMENT_TEMPLATE, 'attachment', 'Email attachment',
+            'Content of an email attachment: text for text files, base64 data for other files. Links to these resources are returned by get_attachment.');
+        $builder->add($template, new Hm_MCP_Resource_Handler($this));
+        $builder->addRequestHandler(new Hm_MCP_List_Tools_Handler($listed));
+        $builder->addRequestHandler(new Hm_MCP_List_Templates_Handler($principal->can('read') ? [$template] : []));
         $server = $builder->build();
 
         $factory = new HttpFactory();

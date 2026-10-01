@@ -8,6 +8,10 @@ var applyMcpPageHandlers = function() {
         return window.confirm(hm_trans('Revoke this connection? Clients using it will lose access immediately.'));
     });
 
+    $('.mcp_clear_activity_form').on('submit', function() {
+        return window.confirm(hm_trans('Clear the activity log? This cannot be undone.'));
+    });
+
     $('.mcp_copy').on('click', function() {
         var button = $(this);
         var input = document.getElementById(button.data('target'));

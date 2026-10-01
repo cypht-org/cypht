@@ -24,7 +24,7 @@ class Hm_Test_MCP_Settings extends TestCase {
             $this->markTestSkipped('MCP tables are not available in the test database');
         }
         $dbh = Hm_DB::connect($this->db_config);
-        foreach (['hm_mcp_settings', 'hm_mcp_connections', 'hm_mcp_tokens', 'hm_mcp_rate_limits'] as $table) {
+        foreach (['hm_mcp_settings', 'hm_mcp_connections', 'hm_mcp_tokens', 'hm_mcp_rate_limits', 'hm_mcp_activity'] as $table) {
             $dbh->exec('delete from '.$table);
         }
     }
@@ -33,12 +33,13 @@ class Hm_Test_MCP_Settings extends TestCase {
         return new Hm_MCP_Store($this->db_config);
     }
 
-    private function handler($post = [], $auth = true) {
+    private function handler($post = [], $auth = true, $get = []) {
         $test = new Handler_Test('mcp_settings_page', 'mcp');
         $test->config = array_merge($this->db_config->dump(), ['mcp_public_url' => 'https://mail.example.com']);
         $test->user_config = ['imap_servers' => $this->accounts];
         $test->session = ['username' => 'alice'];
         $test->post = $post;
+        $test->get = $get;
         $test->prep();
         $test->ses_obj->auth_state = $auth;
         return $test->run_only()->handler_response;
@@ -228,6 +229,85 @@ class Hm_Test_MCP_Settings extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_settings_changes_are_logged_and_activity_is_paged() {
+        $res = $this->handler(['mcp_action' => 'create_token', 'mcp_name' => 'Script', 'mcp_password' => 'secret', 'mcp_expires' => 7]);
+        $id = $res['mcp_connections'][0]['id'];
+        $this->handler(['mcp_action' => 'save_settings', 'mcp_enabled' => true, 'mcp_permissions' => ['read'], 'mcp_account_mode' => 'all']);
+        $res = $this->handler(['mcp_action' => 'revoke_connection', 'mcp_connection_id' => $id]);
+        $ops = array_column($res['mcp_activity'], 'operation');
+        $this->assertSame(['revoke_connection', 'save_settings', 'create_token'], $ops);
+        $this->assertSame('settings', $res['mcp_activity'][0]['channel']);
+        $this->assertSame('Script', $res['mcp_activity'][0]['connection_name']);
+        $this->assertSame(['expires_days' => 7, 'permissions' => 'global', 'accounts' => 'global'], $res['mcp_activity'][2]['summary']);
+        $this->assertStringNotContainsString('cyp_pat_', json_encode($res['mcp_activity']));
+        $this->assertStringNotContainsString('secret', json_encode($res['mcp_activity']));
+        $this->assertSame([$id => 'Script'], $res['mcp_activity_connections']);
+
+        $store = $this->store();
+        for ($i = 0; $i < 60; $i++) {
+            $store->log_activity(['username' => 'alice', 'connection_id' => 'con_other', 'connection_name' => 'Other',
+                'channel' => 'mcp', 'operation' => 'list_messages', 'outcome' => 'ok']);
+        }
+        $page1 = $this->handler();
+        $this->assertSame(63, $page1['mcp_activity_total']);
+        $this->assertSame(2, $page1['mcp_activity_pages']);
+        $this->assertCount(50, $page1['mcp_activity']);
+        $page2 = $this->handler([], true, ['mcp_activity_page' => 2]);
+        $this->assertCount(13, $page2['mcp_activity']);
+        $filtered = $this->handler([], true, ['mcp_activity' => $id]);
+        $this->assertSame($id, $filtered['mcp_activity_filter']);
+        $this->assertSame(2, $filtered['mcp_activity_total']);
+        $unknown = $this->handler([], true, ['mcp_activity' => 'con_not_mine']);
+        $this->assertNull($unknown['mcp_activity_filter']);
+
+        $cleared = $this->handler(['mcp_action' => 'clear_activity']);
+        $this->assertContains('Activity log cleared', $this->messages());
+        $this->assertSame(0, $cleared['mcp_activity_total']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_activity_output() {
+        $test = new Output_Test('mcp_settings_content', 'mcp');
+        $test->handler_response = [
+            'mcp_available' => true,
+            'mcp_configured' => true,
+            'mcp_public_url' => 'https://mail.example.com',
+            'mcp_accounts' => Hm_MCP_Permissions::account_list($this->accounts),
+            'mcp_settings' => Hm_MCP_Store::default_settings(),
+            'mcp_connections' => [],
+            'mcp_activity' => [
+                ['id' => 2, 'connection_id' => 'con_1', 'connection_name' => '<b>Bot</b>', 'channel' => 'mcp', 'operation' => 'search_messages',
+                    'permission' => 'read', 'outcome' => 'denied', 'summary' => ['error' => 'permission_denied'], 'created_at' => 1800000000],
+                ['id' => 1, 'connection_id' => 'con_1', 'connection_name' => '<b>Bot</b>', 'channel' => 'link', 'operation' => 'download_attachment',
+                    'permission' => 'read', 'outcome' => 'ok', 'summary' => ['account_id' => 'srv_a', 'readable' => true], 'created_at' => 1799999000],
+            ],
+            'mcp_activity_total' => 120,
+            'mcp_activity_page' => 2,
+            'mcp_activity_pages' => 3,
+            'mcp_activity_filter' => 'con_1',
+            'mcp_activity_connections' => ['con_1' => '<b>Bot</b>'],
+            'page_param_name' => 'page',
+        ];
+        $html = implode('', $test->run()->output_response);
+        $this->assertStringNotContainsString('<b>Bot</b>', $html);
+        $this->assertStringContainsString('&lt;b&gt;Bot&lt;/b&gt;', $html);
+        $this->assertStringContainsString('Search messages', $html);
+        $this->assertStringContainsString('Downloaded an attachment', $html);
+        $this->assertStringContainsString('text-bg-warning', $html);
+        $this->assertStringContainsString('work@example.com', $html);
+        $this->assertStringContainsString('value="clear_activity"', $html);
+        $this->assertStringContainsString('mcp_activity_page=1', $html);
+        $this->assertStringContainsString('mcp_activity_page=3', $html);
+        $this->assertStringContainsString('<option value="con_1" selected>', $html);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_module_strings_are_in_the_language_files() {
         $en = require APP_PATH.'language/en.php';
         $es = require APP_PATH.'language/es.php';
@@ -241,6 +321,12 @@ class Hm_Test_MCP_Settings extends TestCase {
             $strings[] = Hm_MCP_Permissions::label($key);
             $strings[] = Hm_MCP_Permissions::description($key);
         }
+        foreach ((new Hm_MCP_Catalog())->all() as $op) {
+            $strings[] = $op['title'];
+        }
+        $strings = array_merge($strings, array_values(Hm_Output_mcp_settings_content::OTHER_OPERATIONS),
+            array_values(Hm_Output_mcp_settings_content::CHANNELS), array_values(Hm_Output_mcp_settings_content::DETAIL_LABELS),
+            array_column(Hm_Output_mcp_settings_content::OUTCOMES, 0));
         foreach (array_unique($strings) as $string) {
             $string = str_replace("\\'", "'", $string);
             $this->assertArrayHasKey($string, $en, 'missing in en.php: '.$string);

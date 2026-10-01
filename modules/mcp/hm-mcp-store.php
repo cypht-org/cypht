@@ -707,6 +707,39 @@ class Hm_MCP_Store {
     }
 
     /**
+     * Number of activity entries of a user
+     * @param string $username owner
+     * @param string|null $connection_id filter by connection
+     * @return int
+     */
+    public function count_activity($username, $connection_id = null) {
+        $sql = 'select count(*) as total from hm_mcp_activity where username=?';
+        $args = [$username];
+        if ($connection_id !== null) {
+            $sql .= ' and connection_id=?';
+            $args[] = $connection_id;
+        }
+        $row = $this->row($sql, $args);
+        return $row ? (int) $row['total'] : 0;
+    }
+
+    /**
+     * Connections that appear in the activity log of a user, including removed ones
+     * @param string $username owner
+     * @return array connection id => last known name
+     */
+    public function activity_connections($username) {
+        $res = [];
+        $rows = $this->rows('select connection_id, connection_name, max(created_at) as last_seen from hm_mcp_activity where username=? and connection_id is not null group by connection_id, connection_name order by last_seen desc', [$username]);
+        foreach ($rows as $row) {
+            if (!array_key_exists($row['connection_id'], $res)) {
+                $res[$row['connection_id']] = (string) $row['connection_name'];
+            }
+        }
+        return $res;
+    }
+
+    /**
      * @param string $username owner
      * @return bool
      */
@@ -751,6 +784,31 @@ class Hm_MCP_Store {
 
     /* ------------------------------------------------------------- maintenance */
 
+    /* activity entries kept per user, older ones are removed by purge() */
+    const MAX_ACTIVITY_PER_USER = 10000;
+
+    /* current limit, changeable in tests */
+    public $activity_cap = self::MAX_ACTIVITY_PER_USER;
+
+    /**
+     * Run purge() on a fraction of calls, like PHP session garbage collection
+     * @param int $activity_days days of activity to keep
+     * @param int $session_ttl MCP session lifetime in seconds
+     * @param int $divisor run once every $divisor calls on average
+     * @return bool true if purge() ran
+     */
+    public function maybe_purge($activity_days, $session_ttl, $divisor = 50) {
+        if ($divisor > 1 && random_int(1, $divisor) !== 1) {
+            return false;
+        }
+        try {
+            $this->purge($activity_days, $session_ttl);
+        } catch (Exception $e) {
+            Hm_Debug::add('MCP purge failed: '.$e->getMessage(), 'warning');
+        }
+        return true;
+    }
+
     /**
      * Remove expired state
      * @param int $activity_days days of activity to keep
@@ -768,6 +826,16 @@ class Hm_MCP_Store {
         }
         $this->session_gc($session_ttl);
         $this->exec('delete from hm_mcp_activity where created_at<?', [$now - 86400 * max(1, $activity_days)]);
+        foreach ($this->rows('select username, count(*) as total from hm_mcp_activity group by username', []) as $row) {
+            if ((int) $row['total'] <= $this->activity_cap) {
+                continue;
+            }
+            $oldest_kept = $this->row(sprintf('select id from hm_mcp_activity where username=? order by id desc limit 1 offset %d',
+                max(0, (int) $this->activity_cap - 1)), [$row['username']]);
+            if ($oldest_kept) {
+                $this->exec('delete from hm_mcp_activity where username=? and id<?', [$row['username'], (int) $oldest_kept['id']]);
+            }
+        }
         $this->exec('delete from hm_mcp_rate_limits where window_start<?', [$now - 86400]);
         /* dynamically registered clients that never completed an authorization */
         $this->exec('delete from hm_mcp_oauth_clients where kind=? and last_used_at=0 and created_at<?', ['dcr', $now - 86400 * 7]);

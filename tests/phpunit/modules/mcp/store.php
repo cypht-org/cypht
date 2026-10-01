@@ -210,4 +210,29 @@ class Hm_Test_MCP_Store extends TestCase {
         $this->store->rate_reset('ip:1.2.3.4');
         $this->assertTrue($this->store->rate_limit('ip:1.2.3.4', 1, 60));
     }
+
+    public function test_activity_retention_cap_and_connections() {
+        foreach (['old' => $this->now - 86400 * 91, 'recent' => $this->now - 86400 * 2] as $op => $time) {
+            $this->store->clock = function () use ($time) { return $time; };
+            $this->store->log_activity(['username' => 'alice', 'connection_id' => 'con_old', 'connection_name' => 'Old name',
+                'channel' => 'mcp', 'operation' => $op, 'outcome' => 'ok']);
+        }
+        $this->store->clock = function () { return $this->now; };
+        for ($i = 0; $i < 5; $i++) {
+            $this->store->log_activity(['username' => 'alice', 'connection_id' => 'con_new', 'connection_name' => 'New',
+                'channel' => 'rest', 'operation' => 'op'.$i, 'outcome' => 'ok']);
+        }
+        $this->store->log_activity(['username' => 'bob', 'channel' => 'rest', 'operation' => 'x', 'outcome' => 'ok']);
+        $this->assertSame(7, $this->store->count_activity('alice'));
+        $this->assertSame(2, $this->store->count_activity('alice', 'con_old'));
+        $this->assertSame(['con_new' => 'New', 'con_old' => 'Old name'], $this->store->activity_connections('alice'));
+
+        $this->store->activity_cap = 4;
+        $this->store->purge(90, 86400);
+        $ops = array_column($this->store->activity('alice'), 'operation');
+        $this->assertNotContains('old', $ops);
+        $this->assertSame(['op4', 'op3', 'op2', 'op1'], $ops);
+        $this->assertSame(1, $this->store->count_activity('bob'));
+        $this->assertTrue($this->store->maybe_purge(90, 86400, 1));
+    }
 }

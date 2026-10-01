@@ -38,6 +38,11 @@ return array(
         '/api/v1/*' => 'mcp',
     ),
 
+    'allowed_get' => array(
+        'mcp_activity' => FILTER_UNSAFE_RAW,
+        'mcp_activity_page' => FILTER_VALIDATE_INT,
+    ),
+
     'allowed_post' => array(
         'mcp_action' => FILTER_UNSAFE_RAW,
         'mcp_enabled' => FILTER_VALIDATE_BOOLEAN,

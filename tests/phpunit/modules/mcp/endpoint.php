@@ -133,8 +133,12 @@ class Hm_Test_MCP_Endpoint extends TestCase {
         $this->store->save_settings('alice', ['permissions' => $permissions]);
         list($res, $data) = $this->rpc($this->personal, 'tools/list', new stdClass(), $session, 2);
         $this->assertSame([], $data['result']['tools']);
+        /* a client that still knows the tool gets a clear error, and the attempt is recorded */
         list($res, $data) = $this->rpc($this->personal, 'tools/call', ['name' => 'list_messages', 'arguments' => []], $session, 3);
-        $this->assertArrayHasKey('error', $data);
+        $this->assertTrue($data['result']['isError']);
+        $this->assertStringStartsWith('permission_denied:', $data['result']['content'][0]['text']);
+        $last = $this->store->activity('alice')[0];
+        $this->assertSame(['list_messages', 'denied', 'mcp'], [$last['operation'], $last['outcome'], $last['channel']]);
 
         $this->store->save_settings('alice', ['permissions' => Hm_MCP_Permissions::defaults()]);
         $this->store->update_connection($this->personal_id, ['accounts' => ['other']]);
