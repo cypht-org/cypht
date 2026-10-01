@@ -219,7 +219,7 @@ class Hm_MCP_Router {
      */
     protected function cors($response) {
         $response->with_header('Access-Control-Allow-Origin', '*');
-        $response->with_header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+        $response->with_header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
         $response->with_header('Access-Control-Allow-Headers',
             'Authorization, Content-Type, Accept, Mcp-Session-Id, Mcp-Protocol-Version, Mcp-Method, Mcp-Name, Last-Event-ID');
         $response->with_header('Access-Control-Expose-Headers', 'Mcp-Session-Id, Mcp-Protocol-Version, WWW-Authenticate');

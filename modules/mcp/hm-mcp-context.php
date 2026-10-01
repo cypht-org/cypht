@@ -339,7 +339,51 @@ class Hm_MCP_Context {
             'type' => (string) ($server['type'] ?? 'imap'),
             'hidden' => !empty($server['hide']),
             'can_send' => $this->smtp_for($id) !== false,
+            'send_as' => array_map(function ($sender) {
+                return ['name' => $sender['name'], 'email' => $sender['email']];
+            }, $this->senders($id)),
         ];
+    }
+
+    /**
+     * Addresses an account sends as: its Cypht profiles, default profile first, then
+     * the address of the account itself
+     * @param string $id account id
+     * @return array list of ['email', 'name', 'reply_to', 'signature', 'smtp_id', 'default']
+     */
+    public function senders($id) {
+        $server = $this->servers[$id] ?? [];
+        $profiles = [];
+        foreach ((array) $this->user_config->get('profiles', []) as $profile) {
+            if (!is_array($profile)) {
+                continue;
+            }
+            $same_account = (string) ($profile['imap_id'] ?? '') === (string) $id || (($profile['type'] ?? '') === 'imap'
+                && ($profile['user'] ?? null) === ($server['user'] ?? '') && ($profile['server'] ?? null) === ($server['server'] ?? ''));
+            $email = trim((string) ($profile['address'] ?? '')) ?: trim((string) ($profile['user'] ?? ''));
+            if (!$same_account || !Hm_MCP_Mime::valid_email($email)) {
+                continue;
+            }
+            $reply_to = trim((string) ($profile['replyto'] ?? ''));
+            $profiles[] = [
+                'email' => $email,
+                'name' => Hm_MCP_Mime::header_text($profile['name'] ?? ''),
+                'reply_to' => Hm_MCP_Mime::valid_email($reply_to) && strcasecmp($reply_to, $email) !== 0 ? $reply_to : '',
+                'signature' => (string) ($profile['sig'] ?? ''),
+                'smtp_id' => (string) ($profile['smtp_id'] ?? ''),
+                'default' => !empty($profile['default']),
+            ];
+        }
+        usort($profiles, function ($a, $b) { return (int) $b['default'] <=> (int) $a['default']; });
+        $user = trim((string) ($server['user'] ?? ''));
+        if (Hm_MCP_Mime::valid_email($user)) {
+            $profiles[] = ['email' => $user, 'name' => '', 'reply_to' => '', 'signature' => '', 'smtp_id' => '', 'default' => false];
+        }
+        $res = [];
+        foreach ($profiles as $sender) {
+            $res[strtolower($sender['email'])] = $res[strtolower($sender['email'])] ?? $sender;
+        }
+        return array_values($res);
     }
 
     /**
@@ -602,6 +646,30 @@ class Hm_MCP_Context {
             'uid' => $uid,
             'list_path' => sprintf('imap_%s_%s', $account, bin2hex($folder)),
         ]);
+    }
+
+    /**
+     * Link that opens a draft in the Cypht compose page
+     * @param string $account account id
+     * @param string $folder drafts folder
+     * @param string $uid draft uid
+     * @return string
+     */
+    public function draft_url($account, $folder, $uid) {
+        return $this->config->public_url().'/?'.http_build_query([
+            'page' => 'compose',
+            'imap_draft' => 1,
+            'list_path' => sprintf('imap_%s_%s', $account, bin2hex($folder)),
+            'uid' => $uid,
+        ]);
+    }
+
+    /**
+     * @return string language of the user, for text written into messages
+     */
+    public function language() {
+        return Hm_MCP_Strings::code($this->user_config->get('language_setting',
+            $this->site_config->get('default_language', $this->site_config->get('default_setting_language', 'en'))));
     }
 
     /**

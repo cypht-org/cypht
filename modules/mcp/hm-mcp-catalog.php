@@ -229,6 +229,7 @@ class Hm_MCP_Catalog {
             'type' => ['type' => 'string', 'description' => 'imap, jmap or ews'],
             'hidden' => ['type' => 'boolean', 'description' => 'Hidden from combined views'],
             'can_send' => ['type' => 'boolean'],
+            'send_as' => self::arr(self::address()),
         ], ['id', 'name', 'email']);
     }
 
@@ -307,6 +308,44 @@ class Hm_MCP_Catalog {
             'content_id' => ['type' => 'string'],
         ], ['part_id', 'filename', 'content_type']);
         $part_arg = self::str('Part id of the attachment, from the attachments of get_message.', 50, ['pattern' => '^[0-9]+(\\.[0-9]+)*$']);
+        $address_list = function ($description) {
+            return ['type' => 'array', 'description' => $description.' Each item is an address like "Name <user@example.com>" or user@example.com.',
+                'items' => self::str('Email address', 500, ['minLength' => 3]), 'maxItems' => Hm_MCP_Mime::MAX_RECIPIENTS];
+        };
+        /* file objects passed by ChatGPT for the fields listed in openai/fileParams */
+        $files = ['type' => 'array', 'maxItems' => 10, 'description' => 'Files the user shared in the conversation, to attach.',
+            'items' => ['type' => 'object', 'properties' => [
+                'download_url' => ['type' => 'string'],
+                'file_id' => ['type' => 'string'],
+                'mime_type' => ['type' => 'string'],
+                'file_name' => ['type' => 'string'],
+            ], 'required' => ['download_url', 'file_id'], 'additionalProperties' => false]];
+        $inline_files = ['type' => 'array', 'maxItems' => 10,
+            'description' => 'Files to attach, with their content in base64 (10 MB in total at most). For clients that cannot pass files.',
+            'items' => ['type' => 'object', 'properties' => [
+                'filename' => self::str('File name', 255, ['minLength' => 1]),
+                'content_type' => self::str('MIME type, detected from the content when omitted', 100),
+                'content_base64' => ['type' => 'string', 'description' => 'File content in base64'],
+            ], 'required' => ['filename', 'content_base64'], 'additionalProperties' => false]];
+        $draft_output = self::envelope([
+            'draft_id' => ['type' => ['string', 'null'], 'description' => 'Id of the draft, for update_draft and delete_draft. It changes every time the draft is saved.'],
+            'replaced_draft_id' => ['type' => 'string', 'description' => 'Id of the previous version, which no longer exists'],
+            'account_id' => ['type' => 'string'],
+            'folder' => ['type' => 'string'],
+            'from' => self::address(),
+            'to' => self::arr(self::address()),
+            'cc' => self::arr(self::address()),
+            'bcc' => self::arr(self::address()),
+            'subject' => ['type' => 'string'],
+            'format' => ['type' => 'string', 'description' => 'text, or html when the draft has a formatted version'],
+            'in_reply_to' => ['type' => 'string', 'description' => 'Message-ID of the message being answered'],
+            'attachments' => self::arr(self::obj([
+                'filename' => ['type' => 'string'],
+                'content_type' => ['type' => 'string'],
+                'size' => ['type' => 'integer'],
+            ], ['filename', 'content_type', 'size'])),
+            'url' => ['type' => ['string', 'null'], 'description' => 'Link that opens the draft in Cypht'],
+        ], ['draft_id', 'account_id', 'folder', 'subject', 'attachments']);
 
         return [
             'get_profile' => [
@@ -430,10 +469,12 @@ class Hm_MCP_Catalog {
                     'to' => self::arr(self::address()),
                     'cc' => self::arr(self::address()),
                     'reply_to' => self::arr(self::address()),
+                    'bcc' => self::arr(self::address()),
                     'date' => ['type' => ['string', 'null']],
                     'unread' => ['type' => 'boolean'],
                     'flagged' => ['type' => 'boolean'],
                     'answered' => ['type' => 'boolean'],
+                    'draft' => ['type' => 'boolean', 'description' => 'The message is a draft; change it with update_draft'],
                     'message_id_header' => ['type' => 'string'],
                     'in_reply_to' => ['type' => 'string'],
                     'references' => self::arr(['type' => 'string']),
@@ -730,6 +771,80 @@ class Hm_MCP_Catalog {
                 ], ['account_id', 'folder', 'deleted', 'remaining']),
                 'invoking' => 'Emptying folder',
                 'invoked' => 'Folder emptied',
+            ],
+            'create_draft' => [
+                'title' => 'Write a draft',
+                'permission' => 'drafts',
+                'kind' => 'write',
+                'handler' => 'create_draft',
+                'rest' => ['POST', '/drafts'],
+                'description' => 'Write a new message, a reply, a reply to all or a forward, and save it as a draft in the drafts folder of the account. Nothing is sent: the user can review and send the draft in Cypht. For replies and forwards pass message_id: recipients, subject, threading and the quoted original are filled in. Attach files the user shared with files, or send their content in attachments.',
+                'input' => self::input([
+                    'mode' => self::enum('What to write.', ['new', 'reply', 'reply_all', 'forward'], 'new'),
+                    'message_id' => self::str('Message to reply to or forward, from list_messages, search_messages or get_message.', 2000, ['minLength' => 8]),
+                    'account_id' => self::str('Account to write from, from list_accounts. Defaults to the account of the message being answered, or to the only account.', 255),
+                    'from' => self::str('Address to write as, one of send_as from list_accounts. Defaults to the default profile of the account.', 320),
+                    'to' => $address_list('Recipients. Replies default to the sender of the original message.'),
+                    'cc' => $address_list('Copy recipients. A reply to all defaults to the other recipients of the original message.'),
+                    'bcc' => $address_list('Hidden copy recipients.'),
+                    'subject' => self::str('Subject. Replies and forwards default to the original subject with Re: or Fwd:.', 500),
+                    'body' => self::str('Text of the message. For replies and forwards the original message is added below it.', 200000),
+                    'body_format' => self::enum('text keeps the body as plain text. markdown turns bold, italics, lists, headings and links into formatting, with a plain text version.', ['text', 'markdown'], 'text'),
+                    'quote_original' => self::bool('Include the original message below the text of a reply or forward.', true),
+                    'include_attachments' => self::bool('Forward the attachments of the original message too.', true),
+                    'include_signature' => self::bool('Add the signature of the sending profile below the text.'),
+                    'files' => $files,
+                    'attachments' => $inline_files,
+                ]),
+                'output' => $draft_output,
+                'meta' => ['openai/fileParams' => ['files']],
+                'invoking' => 'Writing draft',
+                'invoked' => 'Draft saved',
+            ],
+            'update_draft' => [
+                'title' => 'Change a draft',
+                'permission' => 'drafts',
+                'kind' => 'write',
+                'handler' => 'update_draft',
+                'rest' => ['PATCH', '/drafts/{draft_id}'],
+                'description' => 'Change a draft: recipients, subject or text, and add or remove attachments. Only the given fields change. The draft is saved again with a new draft_id. Nothing is sent.',
+                'input' => self::input([
+                    'draft_id' => self::str('Draft id from create_draft or update_draft, or the id of a message in the drafts folder.', 2000, ['minLength' => 8]),
+                    'from' => self::str('Address to write as, one of send_as from list_accounts.', 320),
+                    'to' => $address_list('New recipients, replacing the current ones.'),
+                    'cc' => $address_list('New copy recipients, replacing the current ones.'),
+                    'bcc' => $address_list('New hidden copy recipients, replacing the current ones.'),
+                    'subject' => self::str('New subject.', 500),
+                    'body' => self::str('New text of the draft. It replaces the whole text, including any quoted original message.', 200000),
+                    'body_format' => ['type' => 'string', 'enum' => ['text', 'markdown'],
+                        'description' => 'text or markdown. Defaults to the current format of the draft.'],
+                    'include_signature' => self::bool('Add the signature of the sending profile below the new text.'),
+                    'files' => $files,
+                    'attachments' => $inline_files,
+                    'remove_attachments' => ['type' => 'array', 'maxItems' => 50, 'uniqueItems' => true,
+                        'description' => 'part_id of attachments to remove, from the attachments of get_message.', 'items' => $part_arg],
+                ], ['draft_id']),
+                'output' => $draft_output,
+                'meta' => ['openai/fileParams' => ['files']],
+                'invoking' => 'Updating draft',
+                'invoked' => 'Draft updated',
+            ],
+            'delete_draft' => [
+                'title' => 'Delete a draft',
+                'permission' => 'drafts',
+                'kind' => 'destructive',
+                'handler' => 'delete_draft',
+                'rest' => ['DELETE', '/drafts/{draft_id}'],
+                'description' => 'Delete a draft for good. Only messages in the drafts folder can be deleted with this tool.',
+                'input' => self::input([
+                    'draft_id' => self::str('Draft id from create_draft or update_draft, or the id of a message in the drafts folder.', 2000, ['minLength' => 8]),
+                ], ['draft_id']),
+                'output' => self::envelope([
+                    'draft_id' => ['type' => 'string'],
+                    'deleted' => ['type' => 'boolean'],
+                ], ['draft_id', 'deleted']),
+                'invoking' => 'Deleting draft',
+                'invoked' => 'Draft deleted',
             ],
         ];
     }

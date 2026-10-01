@@ -136,6 +136,20 @@ class Hm_MCP_Services {
         return new Hm_MCP_Files($this);
     }
 
+    /* optional callables for Hm_MCP_Uploads (fetcher, resolver), used by tests */
+    public $upload_fetcher = null;
+    public $upload_resolver = null;
+
+    /**
+     * @return Hm_MCP_Uploads
+     */
+    public function uploads() {
+        $uploads = new Hm_MCP_Uploads($this->config);
+        $uploads->fetcher = $this->upload_fetcher;
+        $uploads->resolver = $this->upload_resolver;
+        return $uploads;
+    }
+
     /**
      * Authorization server, shared so tests can replace the credential check
      * @return Hm_MCP_OAuth

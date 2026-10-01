@@ -63,12 +63,8 @@ class Hm_MCP_OAuth_Page {
      * @return void
      */
     public function set_language($lang) {
-        $lang = is_string($lang) ? $lang : '';
-        if (!preg_match('/^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/', $lang) || !is_readable(APP_PATH.'language/'.$lang.'.php')) {
-            $lang = 'en';
-        }
-        $strings = require APP_PATH.'language/'.$lang.'.php';
-        $this->strings = is_array($strings) ? $strings : [];
+        $lang = Hm_MCP_Strings::code($lang);
+        $this->strings = Hm_MCP_Strings::load($lang);
         $this->lang = (string) ($this->strings['interface_lang'] ?? $lang);
         $this->dir = ($this->strings['interface_direction'] ?? 'ltr') === 'rtl' ? 'rtl' : 'ltr';
     }

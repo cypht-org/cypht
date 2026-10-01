@@ -367,3 +367,49 @@ class Hm_MCP_Format {
         return '';
     }
 }
+
+/**
+ * Translations from the Cypht language files, for text written outside the
+ * output modules (OAuth pages, reply lead-ins)
+ * @subpackage mcp/lib
+ */
+class Hm_MCP_Strings {
+
+    /* language code => translations */
+    private static $loaded = [];
+
+    /**
+     * @param mixed $lang language code such as en, es or pt-BR
+     * @return string a language with a file, en when unknown
+     */
+    public static function code($lang) {
+        $lang = is_string($lang) ? $lang : '';
+        if (!preg_match('/^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/', $lang) || !is_readable(APP_PATH.'language/'.$lang.'.php')) {
+            return 'en';
+        }
+        return $lang;
+    }
+
+    /**
+     * @param mixed $lang language code
+     * @return array translations of the language
+     */
+    public static function load($lang) {
+        $lang = self::code($lang);
+        if (!array_key_exists($lang, self::$loaded)) {
+            $strings = require APP_PATH.'language/'.$lang.'.php';
+            self::$loaded[$lang] = is_array($strings) ? $strings : [];
+        }
+        return self::$loaded[$lang];
+    }
+
+    /**
+     * @param mixed $lang language code
+     * @param string $string English text
+     * @return string translated text, the English text when there is no translation
+     */
+    public static function trans($lang, $string) {
+        $value = self::load($lang)[$string] ?? false;
+        return is_string($value) ? $value : $string;
+    }
+}

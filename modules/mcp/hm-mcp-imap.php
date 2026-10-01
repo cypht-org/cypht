@@ -95,6 +95,10 @@ class Hm_MCP_Imap {
         $res = [];
         foreach ((is_array($list) ? $list : []) as $key => $message) {
             $uid = (string) ($message['uid'] ?? $key);
+            if (!ctype_digit($uid) && preg_match('/^(\d+)\s/', $uid, $matches)) {
+                /* the Cypht parser can lose track of a response with 8-bit text in BODYSTRUCTURE */
+                $uid = $matches[1];
+            }
             if (in_array($uid, $wanted, true)) {
                 $res[$uid] = ['flags' => (string) ($message['flags'] ?? ''), 'size' => (int) ($message['size'] ?? 0),
                     'message_id' => trim((string) ($message['message_id'] ?? ''))];
@@ -277,7 +281,7 @@ class Hm_MCP_Imap {
      * @param mixed $value uid reported by the server
      * @return string|null
      */
-    protected static function new_uid($value) {
+    public static function new_uid($value) {
         if (is_int($value) || (is_string($value) && $value !== '' && strlen($value) < 200 && !preg_match('/[\s\x00-\x1F]/', $value))) {
             return (string) $value;
         }

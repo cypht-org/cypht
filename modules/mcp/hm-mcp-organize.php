@@ -172,8 +172,7 @@ trait Hm_MCP_Organize {
     /* ------------------------------------------------------ permanent delete */
 
     public function delete_messages_permanently($args) {
-        $ctx = $this->context();
-        $results = $this->each_folder($args['message_ids'], function ($mailbox, $account, $folder, $uids) use ($ctx) {
+        $results = $this->each_folder($args['message_ids'], function ($mailbox, $account, $folder, $uids) {
             if (!$mailbox->is_imap()) {
                 return self::fail_all($uids, 'Permanent deletion is only available for IMAP accounts.');
             }
@@ -184,48 +183,65 @@ trait Hm_MCP_Organize {
                     $res[$id] = self::not_found_result($id);
                 }
             }
-            $found = array_map('strval', array_keys($existing));
-            if (!$found) {
+            if (!$existing) {
                 return $res;
             }
-            $where = $folder;
-            $targets = array_combine($found, $found);
-            $trash = $ctx->special_folders($account['id'], $mailbox, ['trash'])['trash'] ?? null;
-            if (Hm_MCP_Imap::is_gmail($mailbox) && $trash && $folder !== $trash) {
-                /* on Gmail a deleted message outside the trash only loses a label */
-                $moved = Hm_MCP_Imap::move($mailbox, $folder, $found, $trash, self::message_id_headers($existing));
-                $this->retag($account['id'], $folder, $trash, $moved);
-                $targets = [];
-                foreach ($found as $uid) {
-                    if (!array_key_exists($uid, $moved)) {
-                        $res[$uids[$uid]] = self::result($uids[$uid], 'failed', ['reason' => 'The server did not delete the message.']);
-                    } elseif ($moved[$uid] === null) {
-                        $res[$uids[$uid]] = self::result($uids[$uid], 'failed', ['folder' => $trash,
-                            'reason' => 'The message was moved to the trash. Delete it from there to remove it for good.']);
-                    } else {
-                        $targets[$uid] = (string) $moved[$uid];
-                    }
-                }
-                $where = $trash;
-            }
-            if ($targets && !Hm_MCP_Imap::can_expunge($mailbox, $where, array_values($targets))) {
-                foreach (array_keys($targets) as $uid) {
-                    $res[$uids[$uid]] = self::result($uids[$uid], 'failed', ['reason' =>
-                        'Other messages in this folder are marked for deletion by another mail program and this server cannot delete single messages. Nothing was deleted.']);
-                }
-                return $res;
-            }
-            $deleted = $targets ? Hm_MCP_Imap::expunge($mailbox, $where, array_values($targets)) : false;
-            foreach (array_keys($targets) as $uid) {
-                $res[$uids[$uid]] = $deleted ? self::result($uids[$uid], 'ok')
-                    : self::result($uids[$uid], 'failed', ['reason' => 'The server did not delete the message.']);
-            }
-            if ($deleted) {
-                $this->untag($account['id'], $where, array_values($targets));
+            foreach ($this->erase($mailbox, $account['id'], $folder, $existing) as $uid => $outcome) {
+                $id = $uids[$uid];
+                $res[$id] = $outcome === true ? self::result($id, 'ok') : self::result($id, 'failed', ['reason' => $outcome]);
             }
             return $res;
         });
         return $this->batch_result($results, 'deleted permanently');
+    }
+
+    /**
+     * Delete messages for good, and remove them from Cypht tags. On Gmail, deleting a
+     * message outside the trash only removes a label, so messages go through the trash.
+     * @param object $mailbox mailbox opened for writing
+     * @param string $account_id account id
+     * @param string $folder folder of the messages
+     * @param array $existing uid => details from Hm_MCP_Imap::existing()
+     * @return array uid => true, or the reason the message was not deleted
+     */
+    protected function erase($mailbox, $account_id, $folder, $existing) {
+        $found = array_map('strval', array_keys($existing));
+        $res = [];
+        $where = $folder;
+        $targets = array_combine($found, $found);
+        $trash = $this->context()->special_folders($account_id, $mailbox, ['trash'])['trash'] ?? null;
+        if (Hm_MCP_Imap::is_gmail($mailbox) && $trash && $folder !== $trash) {
+            $moved = Hm_MCP_Imap::move($mailbox, $folder, $found, $trash, self::message_id_headers($existing));
+            $this->retag($account_id, $folder, $trash, $moved);
+            $targets = [];
+            foreach ($found as $uid) {
+                if (!array_key_exists($uid, $moved)) {
+                    $res[$uid] = 'The server did not delete the message.';
+                } elseif ($moved[$uid] === null) {
+                    $res[$uid] = 'The message was moved to the trash. Delete it from there to remove it for good.';
+                } else {
+                    $targets[$uid] = (string) $moved[$uid];
+                }
+            }
+            $where = $trash;
+        }
+        if (!$targets) {
+            return $res;
+        }
+        if (!Hm_MCP_Imap::can_expunge($mailbox, $where, array_values($targets))) {
+            foreach (array_keys($targets) as $uid) {
+                $res[$uid] = 'Other messages in this folder are marked for deletion by another mail program and this server cannot delete single messages. Nothing was deleted.';
+            }
+            return $res;
+        }
+        $deleted = Hm_MCP_Imap::expunge($mailbox, $where, array_values($targets));
+        foreach (array_keys($targets) as $uid) {
+            $res[$uid] = $deleted ? true : 'The server did not delete the message.';
+        }
+        if ($deleted) {
+            $this->untag($account_id, $where, array_values($targets));
+        }
+        return $res;
     }
 
     public function empty_folder($args) {

@@ -996,4 +996,12 @@ return array(
     'Tags updated' => false,
     'Folder' => false,
     'Failed messages' => false,
+    'Write a draft' => false,
+    'Change a draft' => false,
+    'Delete a draft' => false,
+    'Draft' => false,
+    'Attachments' => false,
+    'New message' => false,
+    'Reply to all' => false,
+    'Forwarded message' => false,
 );

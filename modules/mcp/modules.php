@@ -366,7 +366,11 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         'readable' => 'Readable', 'marked_read' => 'Marked as read', 'contacts' => 'Contacts', 'tags' => 'Tags',
         'enabled' => 'Enabled', 'permissions' => 'Permissions', 'expires_days' => 'Expires in days', 'kind' => 'Type',
         'recipients' => 'Recipients', 'domains' => 'Domains', 'client' => 'Client', 'reason' => 'Reason',
-        'destination' => 'Destination', 'failed' => 'Failed messages', 'tags_updated' => 'Tags updated', 'folder' => 'Folder'];
+        'destination' => 'Destination', 'failed' => 'Failed messages', 'tags_updated' => 'Tags updated', 'folder' => 'Folder',
+        'mode' => 'Draft', 'attachments' => 'Attachments'];
+
+    /* kinds of drafts */
+    const MODES = ['new' => 'New message', 'reply' => 'Reply', 'reply_all' => 'Reply to all', 'forward' => 'Forwarded message'];
 
     /* why an OAuth connection ended */
     const REASONS = [
@@ -465,6 +469,8 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
                 $value = $names[$value];
             } elseif ($key === 'reason' && is_string($value) && isset(self::REASONS[$value])) {
                 $value = $this->trans(self::REASONS[$value]);
+            } elseif ($key === 'mode' && is_string($value) && isset(self::MODES[$value])) {
+                $value = $this->trans(self::MODES[$value]);
             } elseif (is_bool($value)) {
                 $value = $this->trans($value ? 'Yes' : 'No');
             } elseif ($value === 'all') {

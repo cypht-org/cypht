@@ -15,6 +15,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_MCP_Mail {
 
     use Hm_MCP_Organize;
+    use Hm_MCP_Drafts;
 
     /* maximum folders to count when include_counts is set */
     const MAX_FOLDER_COUNTS = 60;
@@ -601,10 +602,13 @@ class Hm_MCP_Mail {
             'to' => Hm_MCP_Format::addresses(Hm_MCP_Format::header($headers, 'To')),
             'cc' => Hm_MCP_Format::addresses(Hm_MCP_Format::header($headers, 'Cc')),
             'reply_to' => Hm_MCP_Format::addresses(Hm_MCP_Format::header($headers, 'Reply-To')),
+            /* drafts keep hidden recipients, Cypht in X-Original-Bcc */
+            'bcc' => Hm_MCP_Format::addresses(Hm_MCP_Format::header($headers, 'Bcc') ?: Hm_MCP_Format::header($headers, 'X-Original-Bcc')),
             'date' => $date,
             'unread' => $flags['unread'],
             'flagged' => $flags['flagged'],
             'answered' => $flags['answered'],
+            'draft' => $flags['draft'],
             'message_id_header' => Hm_MCP_Format::text(Hm_MCP_Format::header($headers, 'Message-ID')),
             'in_reply_to' => Hm_MCP_Format::text(Hm_MCP_Format::header($headers, 'In-Reply-To')),
             'references' => $references,

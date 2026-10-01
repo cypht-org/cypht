@@ -178,7 +178,11 @@ class Hm_MCP_Fake_Mailbox {
         return $res;
     }
 
+    /* [folder, uid, read only] of every header read */
+    public $header_reads = [];
+
     public function get_message_headers($folder, $uid) {
+        $this->header_reads[] = [$folder, (string) $uid, $this->read_only];
         if (!isset($this->folders[$folder][(string) $uid])) {
             return [];
         }

@@ -32,6 +32,24 @@ class Hm_MCP_Config {
     }
 
     /**
+     * Raise the PHP memory limit to at least this many bytes
+     * @param int $bytes memory needed
+     * @return void
+     */
+    public static function ensure_memory($bytes) {
+        $limit = trim((string) ini_get('memory_limit'));
+        if ($limit === '' || $limit === '-1') {
+            return;
+        }
+        $value = (int) $limit;
+        $unit = strtolower(substr($limit, -1));
+        $value *= ['g' => 1073741824, 'm' => 1048576, 'k' => 1024][$unit] ?? 1;
+        if ($value < $bytes) {
+            @ini_set('memory_limit', (string) $bytes);
+        }
+    }
+
+    /**
      * A public URL must be absolute HTTPS, or HTTP for a loopback host
      * @param string $url candidate URL
      * @return bool

@@ -843,4 +843,12 @@ return array(
     'Tags updated' => 'Etiquetas actualizadas',
     'Folder' => 'Carpeta',
     'Failed messages' => 'Mensajes con error',
+    'Write a draft' => 'Escribir un borrador',
+    'Change a draft' => 'Modificar un borrador',
+    'Delete a draft' => 'Eliminar un borrador',
+    'Draft' => 'Borrador',
+    'Attachments' => 'Adjuntos',
+    'New message' => 'Mensaje nuevo',
+    'Reply to all' => 'Responder a todos',
+    'Forwarded message' => 'Mensaje reenviado',
 );
