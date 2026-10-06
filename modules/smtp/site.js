@@ -403,8 +403,7 @@ var text_to_bubbles = function(input) {
 
         for (var i = 0; i < recipients.length; i++) {
             if (is_valid_recipient(recipients[i])) {
-                const value = recipients[i].trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                append_bubble(value, input, contact_id, contact_type, contact_source);
+                append_bubble(recipients[i].trim(), input, contact_id, contact_type, contact_source);
             } else {
                 if (invalid_recipients) {
                     invalid_recipients = invalid_recipients + ', ';
@@ -419,7 +418,29 @@ var text_to_bubbles = function(input) {
 
 var bubble_index = 0;
 var append_bubble = function(value, to, id, type, source) {
-    var bubble = '<div id="bubble_'+bubble_index+'" class="bubble bubble_dropdown-toggle" onclick="toggle_bubble_dropdown(this)" draggable="true"  ondragstart="drag(event)" data-id="'+id+'"  data-type="'+type+'"  data-source="'+source+'" data-value="'+value+'">'+value+'<span class="bubble_close">&times;</span></div>';
+    var bubble = document.createElement('div');
+    bubble.id = 'bubble_' + bubble_index;
+    bubble.className = 'bubble bubble_dropdown-toggle';
+    bubble.draggable = true;
+    bubble.onclick = function() { toggle_bubble_dropdown(this); };
+    bubble.ondragstart = drag;
+    if (id !== null) {
+        bubble.dataset.id = id;
+    }
+    if (type !== null) {
+        bubble.dataset.type = type;
+    }
+    if (source !== null) {
+        bubble.dataset.source = source;
+    }
+    bubble.dataset.value = value;
+    bubble.textContent = value;
+
+    var close = document.createElement('span');
+    close.className = 'bubble_close';
+    close.textContent = '\u00d7';
+    bubble.appendChild(close);
+
     $(to).prev().append(bubble);
     bubble_index++;
 };
@@ -434,12 +455,32 @@ var toggle_bubble_dropdown = function (element) {
         var contact_source = element.getAttribute('data-source');
         dropdownContent = document.createElement('div');
         dropdownContent.classList.add('bubble_dropdown-content');
-        let html = '<ul><li><span data-value="' + textValue + '" onclick="copy_text_to_clipboard(this)"><i class="bi bi-copy"></i> Copy</span></li>';
-        if (contact_id !== "null") {
-            html += '<li><a href="?page=contacts&contact_id=' + contact_id + '&contact_source=' + contact_source + '&contact_type=' + contact_type + '"><i class="bi bi-pencil-fill"></i> Edit</a></li>';
+
+        var list = document.createElement('ul');
+        var copyItem = document.createElement('li');
+        var copy = document.createElement('span');
+        copy.dataset.value = textValue;
+        copy.onclick = function() { copy_text_to_clipboard(this); };
+        var copyIcon = document.createElement('i');
+        copyIcon.className = 'bi bi-copy';
+        copy.append(copyIcon, ' Copy');
+        copyItem.appendChild(copy);
+        list.appendChild(copyItem);
+
+        if (contact_id !== null && contact_id !== 'null') {
+            var editItem = document.createElement('li');
+            var edit = document.createElement('a');
+            edit.href = '?page=contacts&contact_id=' + encodeURIComponent(contact_id) +
+                '&contact_source=' + encodeURIComponent(contact_source || '') +
+                '&contact_type=' + encodeURIComponent(contact_type || '');
+            var editIcon = document.createElement('i');
+            editIcon.className = 'bi bi-pencil-fill';
+            edit.append(editIcon, ' Edit');
+            editItem.appendChild(edit);
+            list.appendChild(editItem);
         }
-        html += '</ul>';
-        dropdownContent.innerHTML = html;
+
+        dropdownContent.appendChild(list);
         element.parentNode.appendChild(dropdownContent);
     }
 
