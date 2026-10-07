@@ -539,7 +539,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             return '';
         }
 
-        $res = '<div class="subtitle mt-4 fw-bold">'.$this->trans('IMAP and JMAP Servers').'</div>';
+        $res = '<div class="subtitle mt-4 fw-bold"><i class="bi bi-envelope-at-fill me-2"></i>'.$this->trans('IMAP and JMAP Servers').'</div>';
         foreach ($list as $index => $vals) {
             $server_id = $vals['id'];
             $type = 'IMAP';
