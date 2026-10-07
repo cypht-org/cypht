@@ -153,7 +153,7 @@ abstract class Hm_Config {
                         $this->config[$key][$index]['object'] = false;
                         if ($no_password) {
                             if (!array_key_exists('auth', $server) || $server['auth'] != 'xoauth2') {
-                                $removed[$key][$index]['pass'] = $server['pass'];
+                                $removed[$key][$index] = $server['pass'];
                                 unset($this->config[$key][$index]['pass']);
                             }
                         }
