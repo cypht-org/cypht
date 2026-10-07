@@ -248,8 +248,8 @@ trait Hm_Handler_Validate {
 
         // Some proxies rewrite Origin to localhost while Referer still has the public host.
         if ($origin && $referer && $target) {
-            if (!$this->source_matches_target(parse_url($origin), $target) &&
-                $this->source_matches_target(parse_url($referer), $target)) {
+            if (!$this->source_matches_target($origin, $target) &&
+                $this->source_matches_target($referer, $target)) {
                 $source = $referer;
             }
         }
@@ -276,7 +276,7 @@ trait Hm_Handler_Validate {
      * @return boolean
      */
     private function validate_source($target, $source, $session, $request) {
-        if (!$this->source_matches_target(parse_url($source), $target)) {
+        if (!$this->source_matches_target($source, $target)) {
             $session->destroy($request);
             Hm_Debug::add('LOGGED OUT: invalid source origin', 'warning');
             return false;
@@ -295,11 +295,15 @@ trait Hm_Handler_Validate {
      * mismatch was ever observed. When a port is present on both sides it still
      * has to match, so a genuine cross-origin request is rejected as before.
      *
-     * @param array $source parse_url() result for the source
+     * @param string $source Origin or Referer URL
      * @param string $target target host, with or without a port
      * @return boolean
      */
     private function source_matches_target($source, $target) {
+        if (!is_string($source)) {
+            return false;
+        }
+        $source = parse_url($source);
         if (!is_array($source) || !array_key_exists('host', $source)) {
             return false;
         }
