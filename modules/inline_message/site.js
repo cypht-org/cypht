@@ -124,6 +124,9 @@ var update_imap_links = function(uid, details) {
 var capture_subject_click = function() {
     $(document).off('click', ".subject a");
     $(document).on("click", ".subject a", function(e) {
+        if (e.which === 2 || e.button === 1 || e.ctrlKey || e.metaKey || e.shiftKey) {
+            return true;
+        }
         var msg_details = get_inline_msg_details(this);
         var uid = msg_details[0];
         var list_path = msg_details[1];
