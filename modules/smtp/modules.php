@@ -443,7 +443,9 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             $draft_id = $this->request->get['uid'];
         }
 
-        $this->out('uploaded_files', get_uploaded_files($draft_id, $this->session));
+        /* Unprotected so a failed send can replace this with the files just posted.
+           A protected value cannot be overwritten by the submit handler. */
+        $this->out('uploaded_files', get_uploaded_files($draft_id, $this->session), false);
         $settings = $this->user_config;
         $compose_type = $settings->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
         if ($this->get('is_mobile', false)) {
@@ -724,7 +726,8 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             'draft_to' => isset($this->request->post['compose_to']) ? $this->request->post['compose_to'] : '',
             'draft_body' => '',
             'draft_subject' => $form['compose_subject'],
-            'draft_smtp' => $smtp_id
+            'draft_smtp' => $smtp_id,
+            'draft_compose_smtp_id' => $form['compose_smtp_id']
         );
         $delivery_receipt = !empty($this->request->post['compose_delivery_receipt']);
         $from_params = '';
@@ -746,6 +749,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $uploaded_files = get_uploaded_files_from_array(
             $uploaded_files
         );
+        $compose_files = uploaded_files_for_compose_form($uploaded_files);
 
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
@@ -754,7 +758,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
         if (!$smtp_details) {
             Hm_Msgs::add('Could not use the selected SMTP server', 'warning');
-            repopulate_compose_form($draft, $this);
+            repopulate_compose_form($draft, $this, $compose_files);
             return;
         }
 
@@ -772,7 +776,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $mailbox = Hm_SMTP_List::connect($smtp_id, false);
         if (! $mailbox || ! $mailbox->authed()) {
             Hm_Msgs::add("Failed to authenticate to the SMTP server", "danger");
-            repopulate_compose_form($draft, $this);
+            repopulate_compose_form($draft, $this, $compose_files);
             return;
         }
 
@@ -787,7 +791,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $recipients = $mime->get_recipient_addresses();
         if (empty($recipients)) {
             Hm_Msgs::add("No valid recipients found", "warning");
-            repopulate_compose_form($draft, $this);
+            repopulate_compose_form($draft, $this, $compose_files);
             return;
         }
 
@@ -795,7 +799,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $err_msg = $mailbox->send_message($from, $recipients, $mime->get_mime_msg(), $this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt']));
         if ($err_msg) {
             Hm_Msgs::add(sprintf("%s", $err_msg), 'danger');
-            repopulate_compose_form($draft, $this);
+            repopulate_compose_form($draft, $this, $compose_files);
             return;
         }
 
@@ -1231,7 +1235,10 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
 
         /* select the correct account to unsubscribe from mailing lists */
         $selected_id = false;
-        if (empty($recip) && !empty($from)) {
+        if (!empty($draft) && array_key_exists('draft_compose_smtp_id', $draft) && $draft['draft_compose_smtp_id']) {
+            $selected_id = $draft['draft_compose_smtp_id'];
+        }
+        if ($selected_id === false && empty($recip) && !empty($from)) {
             /* This solves the problem when a profile is not associated with the email */
             $server_found = false;
             foreach ($this->module_output()['compose_profiles'] as $id => $server) {
@@ -1260,7 +1267,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         // matching that server to preselect on the list of available smtp options
         // relying on recipient here might fail as real recipient is sometimes different
         // than the address specified in the profile
-        if (! empty($reply) && $imap_server) {
+        if ($selected_id === false && ! empty($reply) && $imap_server) {
             foreach ($this->get('compose_profiles') as $profile) {
                 if ($profile['server'] == $imap_server['server'] && $profile['user'] == $imap_server['user']) {
                     $smtp_profiles = profiles_by_smtp_id($this->get('compose_profiles'), $profile['smtp_id']);
@@ -2195,6 +2202,37 @@ function get_uploaded_files_from_array($uploaded_files) {
 }
 }
 
+/**
+ * Rows for the compose attachment table.
+ * Size is the decrypted length so the restored row matches the file the user attached.
+ * @param array $uploaded_files result of get_uploaded_files_from_array()
+ * @return array
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('uploaded_files_for_compose_form')) {
+function uploaded_files_for_compose_form($uploaded_files) {
+    $rows = array();
+    foreach ($uploaded_files as $file) {
+        if (!is_array($file) || !isset($file['name']) || $file['name'] === '') {
+            continue;
+        }
+        $size = 0;
+        if (!empty($file['filename']) && is_file($file['filename'])) {
+            $plain = Hm_Crypt::plaintext(@file_get_contents($file['filename']), Hm_Request_Key::generate());
+            if (is_string($plain)) {
+                $size = strlen($plain);
+            }
+        }
+        $rows[] = array(
+            'filename' => isset($file['filename']) ? $file['filename'] : '',
+            'name' => $file['name'],
+            'type' => isset($file['type']) ? $file['type'] : 'application/octet-stream',
+            'size' => $size,
+        );
+    }
+    return $rows;
+}}
+
 function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '', $profile_id = null, $body_type = false) {
     $uploaded_files = get_uploaded_files_from_array($uploaded_files);
     $mime = new Hm_MIME_Msg(
@@ -2470,9 +2508,12 @@ function outbound_address_check($mod, $from, $reply_to) {
  * @subpackage smtp/functions
  */
 if (!hm_exists('repopulate_compose_form')) {
-function repopulate_compose_form($draft, $handler_mod) {
+function repopulate_compose_form($draft, $handler_mod, $uploaded_files = null) {
     $handler_mod->out('no_redirect', true);
     $handler_mod->out('compose_draft', $draft);
+    if (is_array($uploaded_files)) {
+        $handler_mod->out('uploaded_files', $uploaded_files);
+    }
     if (array_key_exists('compose_msg_path', $handler_mod->request->post)
         && $handler_mod->request->post['compose_msg_path']) {
         $handler_mod->out('compose_msg_path', $handler_mod->request->post['compose_msg_path']);
