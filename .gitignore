@@ -34,3 +34,5 @@ lib/hm3/users/
 /docker/site/
 venv
 /logs/*.log
+/install.php
+/.install_token
