@@ -1307,4 +1307,329 @@ class Hm_Test_Mailbox extends TestCase {
         $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
         $this->assertEquals('simpletestfolder', $mailbox->prep_folder_name('simpletestfolder'));
     }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_message_headers_delegates_to_imap_connection() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mock_imap->method('select_mailbox')->with('INBOX')->willReturn(true);
+        $mock_imap->expects($this->once())
+            ->method('get_message_headers')
+            ->with(123)
+            ->willReturn('Subject: test');
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+
+        $this->assertEquals('Subject: test', $mailbox->get_message_headers('INBOX', 123));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_message_headers_returns_null_when_folder_selection_fails() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mock_imap->method('select_mailbox')->willReturn(false);
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+
+        $this->assertNull($mailbox->get_message_headers('NonExistentFolder', 123));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_message_content_delegates_to_imap_connection() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mock_imap->method('select_mailbox')->with('INBOX')->willReturn(true);
+        $mock_imap->expects($this->once())
+            ->method('get_message_content')
+            ->with(123, 0)
+            ->willReturn('message body');
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+
+        $this->assertEquals('message body', $mailbox->get_message_content('INBOX', 123));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_message_content_returns_null_when_not_authed() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('unauthenticated');
+        $mock_imap->expects($this->never())->method('get_message_content');
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+
+        $this->assertNull($mailbox->get_message_content('INBOX', 123));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_structured_message_for_specific_part() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mock_imap->method('select_mailbox')->with('INBOX')->willReturn(true);
+        $mock_imap->method('get_message_structure')->with(123)->willReturn(['struct']);
+        $mock_imap->method('search_bodystructure')
+            ->with(['struct'], ['imap_part_number' => 2])
+            ->willReturn([['subtype' => 'plain']]);
+        $mock_imap->method('get_message_content')
+            ->with(123, 2, false, ['subtype' => 'plain'])
+            ->willReturn('part text');
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+
+        [$msg_struct, $msg_struct_current, $msg_text, $part] = $mailbox->get_structured_message('INBOX', 123, 2, false);
+
+        $this->assertEquals(['struct'], $msg_struct);
+        $this->assertEquals(['subtype' => 'plain'], $msg_struct_current);
+        $this->assertEquals('part text', $msg_text);
+        $this->assertEquals(2, $part);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_structured_message_delegates_for_non_imap() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
+        $mock_ews->method('get_folder_status')->with('INBOX')->willReturn(['id' => 'inbox-id', 'name' => 'INBOX']);
+        $mock_ews->expects($this->once())
+            ->method('get_structured_message')
+            ->with(123, 0, true)
+            ->willReturn(['struct', 'current', 'text', 0]);
+
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+
+        $this->assertEquals(
+            ['struct', 'current', 'text', 0],
+            $mailbox->get_structured_message('INBOX', 123, 0, true)
+        );
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_store_message_appends_successfully_for_imap() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mock_imap->expects($this->once())
+            ->method('append_start')
+            ->with('INBOX', mb_strlen('raw message'), true, false)
+            ->willReturn(true);
+        $mock_imap->expects($this->once())
+            ->method('append_feed')
+            ->with("raw message\r\n");
+        $mock_imap->expects($this->once())
+            ->method('append_end')
+            ->willReturn(true);
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+
+        $this->assertTrue($mailbox->store_message('INBOX', 'raw message'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_store_message_returns_false_when_append_start_fails() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mock_imap->method('append_start')->willReturn(false);
+        $mock_imap->expects($this->never())->method('append_feed');
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+
+        $this->assertFalse($mailbox->store_message('INBOX', 'raw message'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_store_message_returns_false_when_not_authed() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('unauthenticated');
+        $mock_imap->expects($this->never())->method('append_start');
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+
+        $this->assertFalse($mailbox->store_message('INBOX', 'raw message'));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_message_action_delegates_to_connection() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mock_imap->method('select_mailbox')->with('INBOX')->willReturn(true);
+        $mock_imap->expects($this->once())
+            ->method('message_action')
+            ->with('FLAG', [123], false, 'Seen')
+            ->willReturn(['status' => true, 'responses' => []]);
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+
+        $result = $mailbox->message_action('INBOX', 'FLAG', [123], false, 'Seen');
+
+        $this->assertTrue($result['status']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_message_action_returns_false_status_when_folder_selection_fails() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mock_imap->method('select_mailbox')->willReturn(false);
+        $mock_imap->expects($this->never())->method('message_action');
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+
+        $result = $mailbox->message_action('NonExistentFolder', 'FLAG', [123]);
+
+        $this->assertFalse($result['status']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_stream_message_part_streams_content_for_imap() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mock_imap->method('select_mailbox')->with('INBOX')->willReturn(true);
+        $mock_imap->method('get_message_structure')->with(123)->willReturn(['struct']);
+        $mock_imap->method('search_bodystructure')
+            ->with(['struct'], ['imap_part_number' => 2])
+            ->willReturn([['type' => 'text', 'subtype' => 'plain']]);
+        $mock_imap->method('start_message_stream')->with(123, 2)->willReturn(10);
+
+        $lines = ['hello ', 'world', false];
+        $mock_imap->method('read_stream_line')->willReturnCallback(function() use (&$lines) {
+            return array_shift($lines);
+        });
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+
+        $received = [];
+        ob_start();
+        $mailbox->stream_message_part('INBOX', 123, 2, function($type, $name) use (&$received) {
+            $received[] = [$type, $name];
+        });
+        $output = ob_get_clean();
+
+        $this->assertNotEmpty($received);
+        $this->assertEquals('text/plain', $received[0][0]);
+        $this->assertStringContainsString('hello', $output);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_stream_message_part_delegates_for_non_imap() {
+        $callback = function() {};
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
+        $mock_ews->method('get_folder_status')->with('INBOX')->willReturn(['id' => 'inbox-id', 'name' => 'INBOX']);
+        $mock_ews->expects($this->once())
+            ->method('stream_message_part')
+            ->with(123, 2, $callback)
+            ->willReturn(true);
+
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+
+        $this->assertTrue($mailbox->stream_message_part('INBOX', 123, 2, $callback));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_remove_attachment_returns_null_when_folder_selection_fails() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mock_imap->method('select_mailbox')->willReturn(false);
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+
+        $this->assertNull($mailbox->remove_attachment('NonExistentFolder', 123, 0));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_remove_attachment_removes_and_reappends_message_for_imap() {
+        $raw_message = "From: sender@example.com\r\n"
+            ."To: recipient@example.com\r\n"
+            ."Subject: Test\r\n"
+            ."MIME-Version: 1.0\r\n"
+            ."Content-Type: multipart/mixed; boundary=\"BOUNDARY\"\r\n"
+            ."\r\n"
+            ."--BOUNDARY\r\n"
+            ."Content-Type: text/plain\r\n"
+            ."\r\n"
+            ."Hello\r\n"
+            ."--BOUNDARY\r\n"
+            ."Content-Type: application/octet-stream; name=\"file.txt\"\r\n"
+            ."Content-Disposition: attachment; filename=\"file.txt\"\r\n"
+            ."Content-Transfer-Encoding: base64\r\n"
+            ."\r\n"
+            ."aGVsbG8=\r\n"
+            ."--BOUNDARY--\r\n";
+
+        $struct = [0 => ['subs' => [
+            0 => ['file_attributes' => ['attachment' => true]],
+        ]]];
+
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mock_imap->method('select_mailbox')->with('INBOX')->willReturn(true);
+        $mock_imap->method('get_message_content')->with(123, 0, false, false)->willReturn($raw_message);
+        $mock_imap->method('get_message_structure')->with(123)->willReturn($struct);
+        $mock_imap->method('append_start')->willReturn(true);
+        $mock_imap->expects($this->once())->method('append_feed');
+        $mock_imap->method('append_end')->willReturn(true);
+        $mock_imap->method('message_action')->willReturn(['status' => true]);
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+
+        $this->assertTrue($mailbox->remove_attachment('INBOX', 123, 0));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_remove_attachment_delegates_for_non_imap() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
+        $mock_ews->method('get_folder_status')->with('INBOX')->willReturn(['id' => 'inbox-id', 'name' => 'INBOX']);
+        $mock_ews->method('get_mime_message_by_id')->with(123)->willReturn(null);
+        $mock_ews->method('get_structured_message')->with(123, false, false)->willReturn([[0 => ['subs' => []]]]);
+
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+
+        // no attachment matches part_id 0 in an empty struct, so nothing is stored/deleted
+        $this->assertNull($mailbox->remove_attachment('INBOX', 123, 0));
+    }
 }

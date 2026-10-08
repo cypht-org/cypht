@@ -6,6 +6,8 @@
  * @subpackage imap
  */
 
+use ZBateson\MailMimeParser\Message;
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
