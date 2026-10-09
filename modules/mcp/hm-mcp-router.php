@@ -1,0 +1,229 @@
+<?php
+
+/**
+ * Request router for the MCP server, OAuth endpoints and REST API
+ * @package modules
+ * @subpackage mcp
+ */
+
+if (!defined('DEBUG_MODE')) { die(); }
+
+/**
+ * Routes requests for the paths owned by the mcp module set
+ * @subpackage mcp/lib
+ */
+class Hm_MCP_Router {
+
+    /* Hm_MCP_Config */
+    public $config;
+
+    /* site configuration */
+    public $site_config;
+
+    /* Hm_MCP_Services, created on demand */
+    protected $services;
+
+    /**
+     * @param object $site_config site configuration
+     * @param Hm_MCP_Services|null $services services, created on demand when null
+     */
+    public function __construct($site_config, $services = null) {
+        $this->site_config = $site_config;
+        $this->config = $services ? $services->config : new Hm_MCP_Config($site_config);
+        $this->services = $services;
+    }
+
+    /**
+     * @return Hm_MCP_Services
+     */
+    public function services() {
+        if ($this->services === null) {
+            $this->services = new Hm_MCP_Services($this->site_config, $this->config);
+        }
+        return $this->services;
+    }
+
+    /**
+     * Handle one request
+     * @param Hm_MCP_Http_Request $request request details
+     * @return Hm_MCP_Http_Response
+     */
+    public function handle($request) {
+        if (!$this->config->is_configured()) {
+            return Hm_MCP_Http_Response::error(503, 'not_configured',
+                'The MCP server is not configured. Set MCP_PUBLIC_URL to the public HTTPS URL of this Cypht installation.');
+        }
+        if (!$this->config->host_allowed($request->host())) {
+            return Hm_MCP_Http_Response::error(403, 'invalid_host', 'The Host header is not allowed for this server.');
+        }
+        $path = rtrim($request->path, '/');
+        if ($path === '') {
+            $path = '/';
+        }
+        $machine = $path !== '/oauth/authorize';
+        if ($machine && $request->method === 'OPTIONS') {
+            return $this->cors(new Hm_MCP_Http_Response(204));
+        }
+        $response = $this->route($path, $request);
+        $this->maintenance();
+        return $machine ? $this->cors($response) : $response;
+    }
+
+    /* run the cleanup of expired state once every this many requests on average */
+    const PURGE_DIVISOR = 50;
+
+    /**
+     * Remove expired tokens, sessions, authorizations and old activity now and then
+     * @return void
+     */
+    protected function maintenance() {
+        if ($this->services === null || random_int(1, self::PURGE_DIVISOR) !== 1) {
+            return;
+        }
+        $store = $this->services->store();
+        if ($store->available()) {
+            $store->maybe_purge($this->config->int('activity_retention_days', 90), Hm_MCP_Endpoint::SESSION_TTL, 1);
+        }
+    }
+
+    /**
+     * @param string $path normalized path
+     * @param Hm_MCP_Http_Request $request request details
+     * @return Hm_MCP_Http_Response
+     */
+    protected function route($path, $request) {
+        switch ($path) {
+            case '/.well-known/oauth-protected-resource':
+            case '/.well-known/oauth-protected-resource/mcp':
+                return $this->only_get($request, function () { return $this->protected_resource_metadata(); });
+            case '/.well-known/oauth-authorization-server':
+            case '/.well-known/oauth-authorization-server/mcp':
+                return $this->only_get($request, function () { return $this->services()->oauth()->metadata(); });
+            case '/oauth/register':
+                return $this->only_post($request, function () use ($request) { return $this->services()->oauth()->register($request); });
+            case '/oauth/authorize':
+                return $this->services()->oauth()->authorize($request);
+            case '/oauth/token':
+                return $this->only_post($request, function () use ($request) { return $this->services()->oauth()->token($request); });
+            case '/oauth/revoke':
+                return $this->only_post($request, function () use ($request) { return $this->services()->oauth()->revoke($request); });
+            case '/mcp':
+                return $this->mcp($request);
+        }
+        if ($path === '/api/v1' || strpos($path, '/api/v1/') === 0) {
+            return $this->services()->rest()->handle($request, substr($path, strlen('/api/v1')));
+        }
+        return Hm_MCP_Http_Response::error(404, 'not_found', 'Not found');
+    }
+
+    /**
+     * Restrict an endpoint to POST
+     * @param Hm_MCP_Http_Request $request request details
+     * @param callable $handler endpoint handler
+     * @return Hm_MCP_Http_Response
+     */
+    protected function only_post($request, $handler) {
+        if ($request->method !== 'POST') {
+            return Hm_MCP_Http_Response::error(405, 'method_not_allowed', 'Method not allowed', ['Allow' => 'POST, OPTIONS']);
+        }
+        return $handler();
+    }
+
+    /**
+     * Restrict an endpoint to GET and HEAD
+     * @param Hm_MCP_Http_Request $request request details
+     * @param callable $handler endpoint handler
+     * @return Hm_MCP_Http_Response
+     */
+    protected function only_get($request, $handler) {
+        if (!in_array($request->method, ['GET', 'HEAD'], true)) {
+            return Hm_MCP_Http_Response::error(405, 'method_not_allowed', 'Method not allowed', ['Allow' => 'GET, HEAD, OPTIONS']);
+        }
+        return $handler();
+    }
+
+    /**
+     * Protected resource metadata (RFC 9728)
+     * @return Hm_MCP_Http_Response
+     */
+    public function protected_resource_metadata() {
+        return Hm_MCP_Http_Response::json([
+            'resource' => $this->config->resource(),
+            'authorization_servers' => [$this->config->issuer()],
+            'scopes_supported' => Hm_MCP_Permissions::scopes(),
+            'bearer_methods_supported' => ['header'],
+            'resource_name' => $this->site_config->get('app_name', 'Cypht'),
+        ], 200, ['Cache-Control' => 'public, max-age=300']);
+    }
+
+    /**
+     * Bearer challenge for unauthenticated requests (RFC 6750, RFC 9728)
+     * @param string|false $error OAuth error code when a token was rejected
+     * @param string $description error description
+     * @return string WWW-Authenticate header value
+     */
+    public function challenge($error = false, $description = '') {
+        $parts = [];
+        if ($error) {
+            $parts[] = sprintf('error="%s"', $error);
+            if ($description !== '') {
+                $parts[] = sprintf('error_description="%s"', str_replace(['"', '\\'], '', $description));
+            }
+        }
+        $parts[] = sprintf('resource_metadata="%s"', $this->config->resource_metadata_url());
+        /* no scope parameter: clients then request every scope in scopes_supported, and the
+           user narrows them on the consent page and in the settings */
+        return 'Bearer '.implode(', ', $parts);
+    }
+
+    /**
+     * Unauthorized response with the bearer challenge
+     * @param string|false $error OAuth error code
+     * @param string $description error description
+     * @return Hm_MCP_Http_Response
+     */
+    public function unauthorized($error = false, $description = '') {
+        $message = $description !== '' ? $description : 'A valid bearer token is required.';
+        return Hm_MCP_Http_Response::error(401, $error ?: 'unauthorized', $message,
+            ['WWW-Authenticate' => $this->challenge($error, $description)]);
+    }
+
+    /**
+     * MCP Streamable HTTP endpoint
+     * @param Hm_MCP_Http_Request $request request details
+     * @return Hm_MCP_Http_Response
+     */
+    protected function mcp($request) {
+        $token = $request->bearer_token();
+        if ($token === false) {
+            return $this->unauthorized();
+        }
+        $auth = $this->services()->auth()->authenticate($token, ['access', 'personal']);
+        if (!$auth['ok']) {
+            if ($auth['status'] === 401) {
+                return $this->unauthorized('invalid_token', $auth['message']);
+            }
+            return Hm_MCP_Http_Response::error($auth['status'], $auth['error'], $auth['message']);
+        }
+        if (!in_array($request->method, ['POST', 'DELETE'], true)) {
+            return Hm_MCP_Http_Response::error(405, 'method_not_allowed', 'Method not allowed', ['Allow' => 'POST, DELETE, OPTIONS']);
+        }
+        return $this->services()->mcp_endpoint()->handle($request, $auth['principal']);
+    }
+
+    /**
+     * Add CORS headers to machine endpoints. These endpoints never use cookies,
+     * so allowing any origin does not expose ambient credentials.
+     * @param Hm_MCP_Http_Response $response response
+     * @return Hm_MCP_Http_Response
+     */
+    protected function cors($response) {
+        $response->with_header('Access-Control-Allow-Origin', '*');
+        $response->with_header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
+        $response->with_header('Access-Control-Allow-Headers',
+            'Authorization, Content-Type, Accept, Mcp-Session-Id, Mcp-Protocol-Version, Mcp-Method, Mcp-Name, Last-Event-ID');
+        $response->with_header('Access-Control-Expose-Headers', 'Mcp-Session-Id, Mcp-Protocol-Version, WWW-Authenticate');
+        $response->with_header('Access-Control-Max-Age', '600');
+        return $response;
+    }
+}
