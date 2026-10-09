@@ -31,10 +31,12 @@ class Hm_IMAP_Timeout_Test_Client extends Hm_IMAP {
 class Hm_Test_IMAP_Timeouts extends TestCase {
     private $peer;
     private $client;
+    private $policy;
 
     protected function setUp(): void {
+        $this->policy = PolicyCases::forPolicy('mcp-imap-response-budget')['abort-stalled-response'][0];
         list($stream, $this->peer) = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
-        $this->client = new Hm_IMAP_Timeout_Test_Client($stream);
+        $this->client = new Hm_IMAP_Timeout_Test_Client($stream, $this->policy['input']['read_timeout']);
     }
 
     protected function tearDown(): void {
@@ -46,14 +48,15 @@ class Hm_Test_IMAP_Timeouts extends TestCase {
     }
 
     private function assert_read_aborts() {
+        $expected = $this->policy['expected'];
         $start = microtime(true);
-        $this->assertSame([], $this->client->get_response());
-        $this->assertLessThan(1, microtime(true) - $start);
-        $this->assertFalse($this->client->has_stream());
-        $this->assertSame('disconnected', $this->client->get_state());
+        $this->assertSame($expected['response'], $this->client->get_response());
+        $this->assertLessThan($expected['max_elapsed_seconds'], microtime(true) - $start);
+        $this->assertSame($expected['socket_open'], $this->client->has_stream());
+        $this->assertSame($expected['state'], $this->client->get_state());
         /* Cleanup must not send LOGOUT and wait on the failed socket again. */
         $this->client->disconnect();
-        $this->assertLessThan(1, microtime(true) - $start);
+        $this->assertLessThan($expected['max_elapsed_seconds'], microtime(true) - $start);
     }
 
     public function test_silent_server_does_not_hold_a_worker() {

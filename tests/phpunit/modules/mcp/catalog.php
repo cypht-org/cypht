@@ -76,13 +76,20 @@ class Hm_Test_MCP_Catalog extends TestCase {
     public function test_allowed_filters_by_permission() {
         $catalog = new Hm_MCP_Catalog();
         $none = array_fill_keys(Hm_MCP_Permissions::keys(), false);
-        $this->assertSame([], $catalog->allowed($none));
-        $read = $catalog->allowed(array_merge($none, ['read' => true]));
-        $this->assertArrayHasKey('list_messages', $read);
-        $this->assertArrayHasKey('search', $read);
-        $this->assertArrayHasKey('fetch', $read);
-        foreach ($read as $op) {
-            $this->assertSame('read', $op['permission']);
+        foreach (PolicyCases::forPolicy('mcp-tool-permissions') as list($case)) {
+            $allowed = $catalog->allowed(array_merge($none, $case['input']['permissions']));
+            foreach ($case['expected']['present'] as $name) {
+                $this->assertArrayHasKey($name, $allowed, $case['id']);
+            }
+            foreach ($case['expected']['absent'] as $name) {
+                $this->assertArrayNotHasKey($name, $allowed, $case['id']);
+            }
+            foreach ($allowed as $op) {
+                $this->assertContains($op['permission'], $case['expected']['permission_groups'], $case['id']);
+            }
+            if (!$case['expected']['permission_groups']) {
+                $this->assertSame([], $allowed);
+            }
         }
     }
 

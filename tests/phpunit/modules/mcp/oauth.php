@@ -227,29 +227,16 @@ class Hm_Test_MCP_OAuth extends TestCase {
     }
 
     public static function unsafe_redirect_uris() {
-        return [
-            ['http://evil.example.com/cb'],
-            ['https://chatgpt.com/cb#fragment'],
-            ['https://user:pass@chatgpt.com/cb'],
-            ['javascript:alert(1)'],
-            ['JavaScript:alert(1)'],
-            ['data:text/html,hello'],
-            ['file:///etc/passwd'],
-            ['/relative/path'],
-            ['https://chat gpt.com/cb'],
-            ['https://chatgpt.com/<cb>'],
-            [''],
-            [42],
-        ];
+        return PolicyCases::forPolicy('mcp-oauth-redirect-safety');
     }
 
     /**
      * @dataProvider unsafe_redirect_uris
      */
-    public function test_registration_rejects_unsafe_redirect_uris($uri) {
-        $res = $this->register(['client_name' => 'x', 'redirect_uris' => [$uri]]);
-        $this->assertSame(400, $res->status);
-        $this->assertSame('invalid_redirect_uri', $res->decoded()['error']);
+    public function test_registration_rejects_unsafe_redirect_uris($case) {
+        $res = $this->register(['client_name' => 'x', 'redirect_uris' => [$case['input']['redirect_uri']]]);
+        $this->assertSame($case['expected']['status'], $res->status);
+        $this->assertSame($case['expected']['error'], $res->decoded()['error']);
     }
 
     public function test_registration_rejects_invalid_metadata() {
@@ -594,29 +581,17 @@ class Hm_Test_MCP_OAuth extends TestCase {
     }
 
     public static function invalid_exchanges() {
-        return [
-            [['code_verifier' => str_repeat('a', 43)], 400, 'invalid_grant'],
-            [['code_verifier' => 'short'], 400, 'invalid_grant'],
-            [['code_verifier' => ''], 400, 'invalid_grant'],
-            [['redirect_uri' => 'https://chatgpt.com/other'], 400, 'invalid_grant'],
-            [['redirect_uri' => ''], 400, 'invalid_grant'],
-            [['code' => 'cyp_ac_'.str_repeat('B', 43)], 400, 'invalid_grant'],
-            [['resource' => 'https://other.example.com/mcp'], 400, 'invalid_target'],
-            [['client_id' => 'cl_unknown'], 401, 'invalid_client'],
-            [['client_id' => ''], 401, 'invalid_client'],
-            [['grant_type' => 'password'], 400, 'unsupported_grant_type'],
-            [['grant_type' => ''], 400, 'invalid_request'],
-        ];
+        return PolicyCases::forPolicy('mcp-oauth-code-binding');
     }
 
     /**
      * @dataProvider invalid_exchanges
      */
-    public function test_code_exchange_checks($overrides, $status, $error) {
+    public function test_code_exchange_checks($case) {
         $client_id = $this->client_id();
-        $res = $this->exchange($client_id, $this->code($client_id), $overrides);
-        $this->assertSame($status, $res->status, $res->body);
-        $this->assertSame($error, $res->decoded()['error']);
+        $res = $this->exchange($client_id, $this->code($client_id), $case['input']['overrides']);
+        $this->assertSame($case['expected']['status'], $res->status, $res->body);
+        $this->assertSame($case['expected']['error'], $res->decoded()['error']);
         $this->assertSame('no-store', $res->header('Cache-Control'));
         $this->assertSame([], $this->store->connections('alice'));
     }

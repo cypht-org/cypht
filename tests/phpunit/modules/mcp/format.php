@@ -46,11 +46,10 @@ class Hm_Test_MCP_Format extends TestCase {
      * @runInSeparateProcess
      */
     public function test_text_removes_control_and_invisible_characters() {
-        $smuggled = 'Pay invoice'.mb_chr(0xE0049).mb_chr(0xE0047).mb_chr(0xE004E);
-        $this->assertSame('Pay invoice', Hm_MCP_Format::text($smuggled));
-        $this->assertSame('ab', Hm_MCP_Format::text("a\u{200B}\u{202E}b"));
-        $this->assertSame('a b', Hm_MCP_Format::text("a\x00\x07\nb"));
-        $this->assertSame("line 1\nline 2", Hm_MCP_Format::plain_text("line 1\r\nline 2\x1B"));
+        foreach (PolicyCases::forPolicy('mcp-visible-message-text') as list($case)) {
+            $method = $case['input']['format'];
+            $this->assertSame($case['expected']['text'], Hm_MCP_Format::$method($case['input']['text']), $case['id']);
+        }
         $this->assertSame('café', Hm_MCP_Format::text("caf\xE9"));
         $this->assertTrue(mb_check_encoding(Hm_MCP_Format::text("caf\xE9"), 'UTF-8'));
     }

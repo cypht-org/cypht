@@ -29,12 +29,9 @@ class Hm_Test_MCP_Router extends TestCase {
     }
 
     public function test_public_url_must_be_https_or_loopback() {
-        $this->assertTrue(Hm_MCP_Config::valid_public_url('https://mail.example.com'));
-        $this->assertTrue(Hm_MCP_Config::valid_public_url('http://localhost:8080'));
-        $this->assertFalse(Hm_MCP_Config::valid_public_url('http://mail.example.com'));
-        $this->assertFalse(Hm_MCP_Config::valid_public_url('https://user:pass@mail.example.com'));
-        $this->assertFalse(Hm_MCP_Config::valid_public_url('https://mail.example.com/?x=1'));
-        $this->assertFalse(Hm_MCP_Config::valid_public_url('mail.example.com'));
+        foreach (PolicyCases::forPolicy('mcp-public-url') as list($case)) {
+            $this->assertSame($case['expected']['valid'], Hm_MCP_Config::valid_public_url($case['input']['url']), $case['id']);
+        }
     }
 
     public function test_rejects_unknown_host() {
