@@ -2,6 +2,12 @@
 
 use PHPUnit\Framework\TestCase;
 
+class Hm_Auth_Test_Login extends Hm_Auth {
+    public function check_credentials($user, $pass) {
+        return $user === 'unittestuser' && $pass === 'unittestpass';
+    }
+}
+
 /**
  * tests for Hm_PHP_Session
  */
@@ -103,6 +109,35 @@ class Hm_Test_PHP_Session extends TestCase {
         $session->check($request);
         $this->assertFalse($session->is_active());
         $session->destroy($request);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_check_logs_failed_authentication_from_remote_addr() {
+        $handler = new \Monolog\Handler\TestHandler(\Monolog\Level::Debug);
+        Hm_Logger::getLogger()->pushHandler($handler);
+        $request = new Hm_Mock_Request('HTTP');
+        $request->server['REMOTE_ADDR'] = '203.0.113.10';
+
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_Test_Login');
+        $this->assertFalse($session->check($request, 'nobody', 'knows'));
+
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_Test_Login');
+        $this->assertTrue($session->check($request, 'unittestuser', 'unittestpass'));
+        $session->destroy($request);
+
+        $request->server['REMOTE_ADDR'] = 'not-an-ip';
+        $session = new Hm_PHP_Session($this->config, 'Hm_Auth_Test_Login');
+        $this->assertFalse($session->check($request, 'nobody', 'knows'));
+
+        $lines = array();
+        foreach ($handler->getRecords() as $record) {
+            if ($record['message'] === 'Failed authentication from [203.0.113.10]') {
+                $lines[] = $record['message'];
+            }
+        }
+        $this->assertSame(array('Failed authentication from [203.0.113.10]'), $lines);
     }
     /**
      * @preserveGlobalState disabled
