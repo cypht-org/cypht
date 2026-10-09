@@ -24,10 +24,13 @@ class Hm_IMAP_List {
     use Hm_Server_List;
 
     public static $use_cache = false;
+    /* Runtime API budget; never stored with account credentials. */
+    public static $request_deadline = null;
     protected static $user_config;
     protected static $session;
 
     public static function init($user_config, $session) {
+        self::$request_deadline = null;
         self::initRepo('imap_servers', $user_config, $session, self::$server_list);
         self::bindServerTypes('imap');
         self::$user_config = $user_config;
@@ -47,6 +50,16 @@ class Hm_IMAP_List {
 
         if (array_key_exists('auth', $server)) {
             $config['auth'] = $server['auth'];
+        }
+
+        if (self::$request_deadline !== null) {
+            $remaining = self::$request_deadline - microtime(true);
+            if ($remaining <= 0) {
+                return false;
+            }
+            $config['timeout'] = min(10, $remaining);
+            $config['read_timeout'] = min(10, $remaining);
+            $config['read_deadline'] = self::$request_deadline;
         }
 
         self::$server_list[$id]['object'] = new Hm_Mailbox($id, self::$user_config, self::$session, $config);
@@ -273,6 +286,9 @@ if (!class_exists('Hm_IMAP')) {
          */
         public function authenticate($username, $password) {
             $this->get_capability();
+            if (!is_resource($this->handle)) {
+                return false;
+            }
             if (!$this->tls) {
                 $this->starttls();
             }
@@ -297,10 +313,14 @@ if (!class_exists('Hm_IMAP')) {
             }
             switch (mb_strtolower($this->auth)) {
                 case 'cram-md5':
-                    $this->banner = $this->fgets(1024);
+                    /* CAPABILITY already consumed the greeting. The next response
+                     * is the challenge after AUTHENTICATE, not another banner. */
                     $cram1 = 'AUTHENTICATE CRAM-MD5' . "\r\n";
                     $this->send_command($cram1);
                     $response = $this->get_response();
+                    if (empty($response[0]) || substr(trim($response[0]), 0, 1) !== '+') {
+                        return false;
+                    }
                     $challenge = base64_decode(substr(trim($response[0]), 1));
                     $pass = str_repeat(chr(0x00), (64-strlen($password)));
                     $ipad = str_repeat(chr(0x36), 64);

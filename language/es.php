@@ -703,6 +703,7 @@ return array(
     'How to connect' => 'Cómo conectar',
     'All accounts' => 'Todas las cuentas',
     'Only the selected accounts' => 'Solo las cuentas seleccionadas',
+    'Choose “Only the selected accounts” to select individual email accounts.' => 'Selecciona «Solo las cuentas seleccionadas» para elegir cuentas de correo concretas.',
     'Custom' => 'Personalizado',
     'OAuth app' => 'App OAuth',
     'Personal token' => 'Token personal',

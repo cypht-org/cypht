@@ -7,8 +7,31 @@
     word-break: break-all;
     font-size: .85rem;
 }
+.mcp_settings_page .mcp_section > summary {
+    list-style: none;
+    font-weight: 600;
+}
+.mcp_settings_page .mcp_section > summary::-webkit-details-marker {
+    display: none;
+}
+.mcp_settings_page .mcp_section > summary:focus-visible {
+    outline: 2px solid var(--bs-primary, #0d6efd);
+    outline-offset: 2px;
+}
+.mcp_settings_page .mcp_section_chevron {
+    transition: transform .15s ease-in-out;
+}
+.mcp_settings_page .mcp_section[open] .mcp_section_chevron {
+    transform: rotate(180deg);
+}
+.mcp_settings_page .mcp_section_body {
+    padding: .25rem 0 1rem;
+}
 .mcp_settings_page .mcp_inactive {
-    opacity: .55;
+    color: var(--bs-secondary-color, #6c757d);
+}
+.mcp_settings_page .mcp_choices_hint {
+    margin: .15rem 0 .4rem;
 }
 .mcp_settings_page details > summary {
     cursor: pointer;
@@ -16,4 +39,38 @@
 }
 .mcp_settings_page .mcp_connections .list-group-item {
     padding: .9rem 1rem;
+}
+.mcp_settings_page .mcp_activity_table {
+    width: 100%;
+    table-layout: fixed;
+}
+.mcp_settings_page .mcp_activity_col_date {
+    width: 11.5rem;
+}
+.mcp_settings_page .mcp_activity_col_connection {
+    width: 10rem;
+}
+.mcp_settings_page .mcp_activity_col_source {
+    width: 7rem;
+}
+.mcp_settings_page .mcp_activity_col_action {
+    width: 14rem;
+}
+.mcp_settings_page .mcp_activity_col_result {
+    width: 7.5rem;
+}
+.mcp_settings_page .mcp_activity_table th,
+.mcp_settings_page .mcp_activity_table td {
+    overflow-wrap: anywhere;
+}
+.mcp_settings_page .mcp_activity_table th {
+    white-space: nowrap;
+}
+.mcp_settings_page .mcp_activity_details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .15rem .8rem;
+}
+.mcp_settings_page .mcp_activity_detail {
+    overflow-wrap: anywhere;
 }

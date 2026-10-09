@@ -450,7 +450,7 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         }
         $res .= '</div>';
         if (!$rows) {
-            return $res.'<p class="fst-italic">'.$this->trans('No activity recorded yet.').'</p></div>';
+            return $res.'<p class="fst-italic">'.$this->trans('No activity recorded yet.').'</p></div></div></details>';
         }
         $names = [];
         foreach ($this->get('mcp_accounts', []) as $account) {
@@ -460,9 +460,16 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         foreach ((new Hm_MCP_Catalog())->all() as $name => $op) {
             $titles[$name] = $op['title'];
         }
-        $res .= '<div class="table-responsive"><table class="table table-sm table-striped align-middle mcp_activity_table"><thead><tr>'.
-            '<th>'.$this->trans('Date').'</th><th>'.$this->trans('Connection').'</th><th>'.$this->trans('Source').'</th>'.
-            '<th>'.$this->trans('Action').'</th><th>'.$this->trans('Result').'</th><th>'.$this->trans('Details').'</th></tr></thead><tbody>';
+        $page = (int) $this->get('mcp_activity_page', 1);
+        $pages = (int) $this->get('mcp_activity_pages', 1);
+        $res .= $this->activity_navigation($page, $pages, $filter);
+        $res .= '<div class="table-responsive"><table class="table table-sm table-striped align-middle mcp_activity_table">'.
+            '<colgroup><col class="mcp_activity_col_date" /><col class="mcp_activity_col_connection" />'.
+            '<col class="mcp_activity_col_source" /><col class="mcp_activity_col_action" />'.
+            '<col class="mcp_activity_col_result" /><col /></colgroup><thead><tr>'.
+            '<th scope="col">'.$this->trans('Date').'</th><th scope="col">'.$this->trans('Connection').'</th>'.
+            '<th scope="col">'.$this->trans('Source').'</th><th scope="col">'.$this->trans('Action').'</th>'.
+            '<th scope="col">'.$this->trans('Result').'</th><th scope="col">'.$this->trans('Details').'</th></tr></thead><tbody>';
         foreach ($rows as $row) {
             $operation = (string) $row['operation'];
             $label = $titles[$operation] ?? self::OTHER_OPERATIONS[$operation] ?? $operation;
@@ -477,21 +484,31 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
                 '</tr>';
         }
         $res .= '</tbody></table></div>';
-        $page = (int) $this->get('mcp_activity_page', 1);
-        $pages = (int) $this->get('mcp_activity_pages', 1);
-        if ($pages > 1) {
-            $params = $filter ? ['mcp_activity' => rawurlencode($filter)] : [];
-            $res .= '<nav class="d-flex gap-2 align-items-center mb-3" aria-label="'.$this->trans('Activity').'">';
-            if ($page > 1) {
-                $res .= '<a class="btn btn-sm btn-outline-secondary" href="'.$this->build_page_url('mcp', $params + ['mcp_activity_page' => $page - 1], true).'">'.$this->trans('Newer').'</a>';
-            }
-            $res .= '<span class="small text-secondary">'.sprintf($this->trans('Page %d of %d'), $page, $pages).'</span>';
-            if ($page < $pages) {
-                $res .= '<a class="btn btn-sm btn-outline-secondary" href="'.$this->build_page_url('mcp', $params + ['mcp_activity_page' => $page + 1], true).'">'.$this->trans('Older').'</a>';
-            }
-            $res .= '</nav>';
+        $res .= $this->activity_navigation($page, $pages, $filter);
+        return $res.'</div></div></details>';
+    }
+
+    /**
+     * Activity log navigation, shown above and below the table
+     * @param int $page current page
+     * @param int $pages total pages
+     * @param string|null $filter connection filter
+     * @return string
+     */
+    private function activity_navigation($page, $pages, $filter) {
+        if ($pages < 2) {
+            return '';
         }
-        return $res.'</div>';
+        $params = $filter ? ['mcp_activity' => rawurlencode($filter)] : [];
+        $res = '<nav class="mcp_activity_pagination d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3" aria-label="'.$this->trans('Activity').'">'.
+            '<div class="btn-group btn-group-sm" role="group" aria-label="'.$this->trans('Activity').'">';
+        if ($page > 1) {
+            $res .= '<a class="btn btn-outline-secondary" href="'.$this->build_page_url('mcp', $params + ['mcp_activity_page' => $page - 1], true).'">'.$this->trans('Newer').'</a>';
+        }
+        if ($page < $pages) {
+            $res .= '<a class="btn btn-outline-secondary" href="'.$this->build_page_url('mcp', $params + ['mcp_activity_page' => $page + 1], true).'">'.$this->trans('Older').'</a>';
+        }
+        return $res.'</div><span class="small text-secondary" aria-current="page">'.sprintf($this->trans('Page %d of %d'), $page, $pages).'</span></nav>';
     }
 
     /**
@@ -524,9 +541,10 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
                 $value = implode(', ', array_map('strval', array_filter($value, 'is_scalar')));
             }
             $label = isset(self::DETAIL_LABELS[$key]) ? $this->trans(self::DETAIL_LABELS[$key]) : str_replace('_', ' ', (string) $key);
-            $parts[] = $this->html_safe($label).': '.$this->html_safe((string) $value);
+            $parts[] = '<span class="mcp_activity_detail"><span class="text-secondary">'.$this->html_safe($label).':</span> '.
+                $this->html_safe((string) $value).'</span>';
         }
-        return implode('<br />', $parts);
+        return '<div class="mcp_activity_details">'.implode('', $parts).'</div>';
     }
 
     /**
@@ -544,7 +562,12 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
      * @return string
      */
     private function section($title, $icon) {
-        return '<div class="settings_subtitle p-3 border-bottom mt-4"><i class="bi bi-'.$icon.' me-2"></i>'.$this->trans($title).'</div>';
+        $id = 'mcp_section_'.str_replace('-', '_', $icon);
+        return '<details id="'.$id.'" class="mcp_section">'.
+            '<summary class="settings_subtitle cursor-pointer px-3 py-2 mt-3 border-bottom d-flex align-items-center justify-content-between" aria-controls="'.$id.'_body">'.
+            '<span><i class="bi bi-'.$icon.' me-2"></i>'.$this->trans($title).'</span>'.
+            '<i class="bi bi-chevron-down mcp_section_chevron" aria-hidden="true"></i></summary>'.
+            '<div class="mcp_section_body" id="'.$id.'_body">';
     }
 
     /**
@@ -603,9 +626,11 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         $selected = $settings['accounts']['mode'] === 'selected';
         $res .= $this->radio('mcp_account_mode', 'all', 'All accounts', !$selected, 'mcp_global_accounts_all', 'mcp_mode').
             $this->radio('mcp_account_mode', 'selected', 'Only the selected accounts', $selected, 'mcp_global_accounts_selected', 'mcp_mode');
+        $res .= '<div class="form-text mcp_choices_hint" data-mode-name="mcp_account_mode" data-mode-value="selected">'.
+            $this->trans('Choose “Only the selected accounts” to select individual email accounts.').'</div>';
         $res .= '<div class="ms-4 mt-2 mcp_choices" data-mode-name="mcp_account_mode" data-mode-value="selected">'.
             $this->account_checkboxes('mcp_global_acc_', $selected ? $settings['accounts']['ids'] : [], null).'</div>';
-        $res .= '<button type="submit" class="btn btn-primary mt-3">'.$this->trans('Save').'</button></form></div>';
+        $res .= '<button type="submit" class="btn btn-primary mt-3">'.$this->trans('Save').'</button></form></div></div></details>';
         return $res;
     }
 
@@ -699,6 +724,8 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         $res .= '<div class="mt-3"><div class="fw-semibold mb-1">'.$this->trans('Accounts for this connection').'</div>'.
             $this->radio('mcp_account_mode', 'inherit', 'Same as global', !$selected, $prefix.'acc_inherit', 'mcp_mode').
             $this->radio('mcp_account_mode', 'selected', 'Only the selected accounts', $selected, $prefix.'acc_selected', 'mcp_mode').
+            '<div class="form-text mcp_choices_hint" data-mode-name="mcp_account_mode" data-mode-value="selected">'.
+            $this->trans('Choose “Only the selected accounts” to select individual email accounts.').'</div>'.
             '<div class="ms-4 mt-1 mcp_choices" data-mode-name="mcp_account_mode" data-mode-value="selected">'.
             $this->account_checkboxes($prefix.'acc_', $selected ? $accounts : [], $allowed_accounts).'</div></div>';
         return $res;
@@ -714,7 +741,7 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         $res .= '<p class="px-3 mt-3 mb-2 text-secondary">'.$this->trans('Apps connected with OAuth, such as ChatGPT, and your personal access tokens.').'</p>';
         $connections = $this->get('mcp_connections', []);
         if (!$connections) {
-            return $res.'<p class="px-3 fst-italic">'.$this->trans('No connections yet.').'</p>';
+            return $res.'<p class="px-3 fst-italic">'.$this->trans('No connections yet.').'</p></div></details>';
         }
         $names = [];
         foreach ($this->get('mcp_accounts', []) as $account) {
@@ -751,7 +778,7 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
             }
             $res .= '</div>';
         }
-        return $res.'</div>';
+        return $res.'</div></div></details>';
     }
 
     /**
@@ -833,7 +860,7 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
             '<input class="form-control" type="password" required name="mcp_password" id="mcp_token_password" autocomplete="current-password" />'.
             '<div class="form-text">'.$this->trans('Your password lets this token decrypt your account settings. It is stored encrypted and can only be used together with the token.').'</div>'.
             '</div></div>';
-        $res .= '<button type="submit" class="btn btn-primary mt-3">'.$this->trans('Create token').'</button></form></div>';
+        $res .= '<button type="submit" class="btn btn-primary mt-3">'.$this->trans('Create token').'</button></form></div></div></details>';
         return $res;
     }
 
@@ -859,7 +886,7 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
             '<input class="form-control" type="password" required name="mcp_password" id="mcp_runner_password" autocomplete="current-password" />'.
             '</div></div>'.
             '<div class="form-text">'.$this->trans('A runner token can only send the messages you scheduled. It does not expire: revoke it in Connections when it is no longer needed.').'</div>'.
-            '<button type="submit" class="btn btn-primary mt-3">'.$this->trans('Create runner token').'</button></form></div>';
+            '<button type="submit" class="btn btn-primary mt-3">'.$this->trans('Create runner token').'</button></form></div></div></details>';
         return $res;
     }
 
@@ -872,7 +899,7 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
         $base = $this->get('mcp_public_url', '');
         if (!$base) {
             return $res.'<p class="px-3 mt-3 fst-italic">'.
-                $this->trans('The public URL is not configured. The site administrator must set MCP_PUBLIC_URL before clients can connect.').'</p>';
+                $this->trans('The public URL is not configured. The site administrator must set MCP_PUBLIC_URL before clients can connect.').'</p></div></details>';
         }
         $mcp = $base.'/mcp';
         $api = $base.'/api/v1';
@@ -899,6 +926,6 @@ class Hm_Output_mcp_settings_content extends Hm_Output_Module {
             $res .= '<h6 class="mt-3">'.$this->trans($title).'</h6><pre class="mcp_code"><code>'.$this->html_safe($code).'</code></pre>';
         }
         $res .= '<div class="form-text mb-3">'.$this->trans('Replace YOUR_TOKEN with a personal access token. Clients that support OAuth, like Claude Code, can also sign in without a token.').'</div></div>';
-        return $res;
+        return $res.'</div></details>';
     }
 }

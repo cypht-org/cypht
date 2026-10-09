@@ -194,6 +194,23 @@ class Hm_Test_MCP_Send extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_send_at_accepts_iso8601_with_timezone_offset() {
+        $boxes = $this->mailboxes();
+        $smtp = self::smtp();
+        $send_at = (new DateTimeImmutable('+2 days', new DateTimeZone('-03:00')))->format(DATE_ATOM);
+        $res = $this->run_op('send_message', ['account_id' => 'acc1', 'to' => ['bob@example.net'],
+            'subject' => 'ISO schedule', 'send_at' => $send_at], $boxes, $smtp);
+
+        $this->assertTrue($res['ok'], $res['ok'] ? '' : $res['error']->getMessage());
+        $this->assertSame('scheduled', $res['result']['data']['status']);
+        $this->assertSame(date(DATE_ATOM, strtotime($send_at)), $res['result']['data']['send_at']);
+        $this->assertSame([], $smtp['s1']->sent);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_auto_bcc_sends_a_copy_to_the_sender() {
         $boxes = $this->mailboxes();
         $smtp = self::smtp();
@@ -267,6 +284,9 @@ class Hm_Test_MCP_Send extends TestCase {
         $moved = $res['result']['data']['results'][0]['new_message_id'];
         $this->assertSame('X-Schedule: '.date('D, d M Y H:i O', strtotime($day.' 08:00')), explode("\r\n", $boxes['acc1']->folders['Scheduled']['2']['raw'])[0]);
         $this->assertCount(1, $boxes['acc1']->folders['Scheduled']);
+        $rescheduled = $this->run_op('list_scheduled', [], $boxes, $smtp)['result']['data']['messages'];
+        $this->assertCount(1, $rescheduled);
+        $this->assertSame(date(DATE_ATOM, strtotime($day.' 08:00')), $rescheduled[0]['send_at']);
         $this->assertSame('invalid_argument', self::error_code($this->run_op('manage_scheduled', ['action' => 'reschedule', 'message_ids' => [$moved]], $boxes, $smtp)));
         $res = $this->run_op('manage_scheduled', ['action' => 'cancel', 'message_ids' => [self::id('acc1', 'INBOX', '1')]], $boxes, $smtp);
         $this->assertTrue($res['ok'], $res['ok'] ? '' : $res['error']->getMessage());
@@ -289,6 +309,26 @@ class Hm_Test_MCP_Send extends TestCase {
         $this->assertStringNotContainsString('X-Schedule', $smtp['s1']->sent[0]['message']);
         $this->assertSame([], $boxes['acc1']->folders['Scheduled']);
         $this->assertCount(1, $boxes['acc1']->folders['Sent']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_reschedule_reports_failure_when_the_old_message_cannot_be_removed() {
+        $boxes = $this->mailboxes();
+        $smtp = self::smtp();
+        $scheduled = $this->run_op('send_message', ['account_id' => 'acc1', 'to' => ['bob@example.net'],
+            'subject' => 'Cannot move', 'send_at' => 'tomorrow'], $boxes, $smtp)['result']['data'];
+        $boxes['acc1']->failing_actions[] = 'DELETE';
+
+        $res = $this->run_op('manage_scheduled', ['action' => 'reschedule', 'message_ids' => [$scheduled['scheduled_id']],
+            'send_at' => 'next_week'], $boxes, $smtp);
+
+        $this->assertTrue($res['ok']);
+        $this->assertSame(['failed'], array_column($res['result']['data']['results'], 'status'));
+        $this->assertStringContainsString('could not be removed', $res['result']['data']['results'][0]['reason']);
+        $this->assertCount(2, $this->run_op('list_scheduled', [], $boxes, $smtp)['result']['data']['messages']);
     }
 
     /**
@@ -358,4 +398,3 @@ class Hm_Test_MCP_Send extends TestCase {
         $this->assertContains('list_scheduled', $defaults);
     }
 }
-

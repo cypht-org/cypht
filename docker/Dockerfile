@@ -64,6 +64,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
+COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/zz-cypht-timeouts.conf
 
 # Application and config files
 COPY composer.* ./

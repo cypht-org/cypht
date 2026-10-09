@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<phpunit bootstrap="bootstrap.php" cacheDirectory=".phpunit.cache">
+  <php>
+    <const name="CYPHT_PHPUNIT_TEST_MODE" value="phpunit"/>
+    <const name="IMAP_TEST" value="true"/>
+  </php>
+  <testsuites>
+    <testsuite name="imap_timeouts">
+      <file>modules/imap/timeouts.php</file>
+    </testsuite>
+  </testsuites>
+</phpunit>

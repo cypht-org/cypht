@@ -858,6 +858,7 @@ return array(
     'How to connect' => false,
     'All accounts' => false,
     'Only the selected accounts' => false,
+    'Choose “Only the selected accounts” to select individual email accounts.' => false,
     'Custom' => false,
     'OAuth app' => false,
     'Personal token' => false,

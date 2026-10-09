@@ -54,7 +54,7 @@ follows them or narrows them further.
 |---|---|
 | ChatGPT | Developer mode. Add the server URL `https://mail.example.com/mcp` and choose OAuth. |
 | Claude Code, Codex, Cursor, VS Code, scripts | OAuth, or a personal access token sent as `Authorization: Bearer ...`. The settings page shows ready to copy commands. |
-| Clients that only support stdio | `npx mcp-remote https://mail.example.com/mcp` |
+| Clients that only support stdio | `pnpm dlx mcp-remote https://mail.example.com/mcp` |
 | REST API | A personal access token. The OpenAPI document is at `/api/v1/openapi.json`. |
 
 The OAuth server works for public clients:
@@ -157,6 +157,12 @@ can send the message first. A runner token can only call this endpoint.
 | `MCP_SCHEDULED_GRACE` | `120` | Seconds the runner waits after the scheduled time |
 | `MCP_CLIENT_IP_HEADER` | (empty) | Trusted proxy header with the client address |
 
+IMAP connections share a 40 second request budget, including connection cleanup. Each socket
+read waits at most 10 seconds or the remaining request budget, whichever is shorter. A timeout
+or an incomplete response closes the connection and discards the partial result. The Docker
+image also limits PHP-FPM requests to 90 seconds, including work after the response is sent,
+so a blocked upstream request cannot occupy a worker indefinitely.
+
 ## Limitations
 
 - Changes to folders, flags and messages need IMAP accounts.
@@ -169,4 +175,11 @@ can send the message first. A runner token can only call this endpoint.
 
 ```
 cd tests/phpunit && ./run.sh --testsuite modules_mcp
+```
+
+The IMAP timeout tests use local socket pairs and the real IMAP library. Run from the repository
+root:
+
+```
+vendor/bin/phpunit --configuration tests/phpunit/imap-timeouts.xml
 ```

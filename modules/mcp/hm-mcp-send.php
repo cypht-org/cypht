@@ -155,9 +155,19 @@ trait Hm_MCP_Send {
                     } elseif ($action === 'reschedule') {
                         $sender = $this->message_sender($account['id'], Hm_MCP_Mime::parse($raw), (string) Hm_MCP_Imap::header_value($raw, 'X-Profile-ID'));
                         list($target, $new) = $this->store_scheduled($account['id'], self::scheduled_copy($raw, $when, $sender), $message_id);
-                        $this->remove_message($account['id'], $folder, $uid);
+                        if ($new === null) {
+                            throw new Hm_MCP_Error('upstream_error', 'The replacement was saved, but its message id could not be confirmed. The original scheduled message was left unchanged; check list_scheduled for duplicates.');
+                        }
+                        if (!$this->remove_message($account['id'], $folder, $uid)) {
+                            $rolled_back = $this->remove_message($account['id'], $target, $new);
+                            $reason = 'The previous scheduled message could not be removed, so rescheduling was not completed.';
+                            if (!$rolled_back) {
+                                $reason .= ' The replacement may also remain scheduled; check list_scheduled before sending.';
+                            }
+                            throw new Hm_MCP_Error('upstream_error', $reason);
+                        }
                         $res[$id] = self::result($id, 'ok', ['folder' => $target,
-                            'new_message_id' => $new === null ? null : Hm_MCP_Format::message_id($account['id'], $target, $new)]);
+                            'new_message_id' => Hm_MCP_Format::message_id($account['id'], $target, $new)]);
                     } else {
                         $this->check_send_limit();
                         $this->send_scheduled_copy($account['id'], $folder, $uid, $raw);

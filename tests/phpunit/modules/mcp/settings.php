@@ -211,6 +211,10 @@ class Hm_Test_MCP_Settings extends TestCase {
         $this->assertStringContainsString('name="hm_page_key"', $html);
         $this->assertStringContainsString('value="revoke_connection"', $html);
         $this->assertStringContainsString('Needs to reconnect', $html);
+        $this->assertSame(6, substr_count($html, 'class="mcp_section"'));
+        $this->assertSame(0, preg_match('/<details[^>]*class="mcp_section"[^>]*\bopen\b/', $html));
+        $this->assertStringContainsString('aria-controls="mcp_section_shield_lock_fill_body"', $html);
+        $this->assertStringContainsString('Choose “Only the selected accounts” to select individual email accounts.', $html);
     }
 
     /**
@@ -294,6 +298,11 @@ class Hm_Test_MCP_Settings extends TestCase {
         $html = implode('', $test->run()->output_response);
         $this->assertStringNotContainsString('<b>Bot</b>', $html);
         $this->assertStringContainsString('&lt;b&gt;Bot&lt;/b&gt;', $html);
+        $this->assertStringContainsString('<colgroup>', $html);
+        $this->assertStringContainsString('class="mcp_activity_details"', $html);
+        $this->assertSame(2, substr_count($html, 'class="mcp_activity_pagination'));
+        $this->assertLessThan(strpos($html, '<table class="table table-sm table-striped align-middle mcp_activity_table">'),
+            strpos($html, '<nav class="mcp_activity_pagination'));
         $this->assertStringContainsString('Search messages', $html);
         $this->assertStringContainsString('Downloaded an attachment', $html);
         $this->assertStringContainsString('text-bg-warning', $html);

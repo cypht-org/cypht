@@ -448,6 +448,9 @@ class Hm_MCP_Context {
      * @return object|false Hm_Mailbox
      */
     protected function connect($id) {
+        if ($this->time_left() <= 0) {
+            throw new Hm_MCP_Error('unavailable', 'The request time budget was exhausted.', ['account_id' => $id]);
+        }
         $server = Hm_IMAP_List::dump($id, true);
         if (!$server) {
             return false;
@@ -460,6 +463,8 @@ class Hm_MCP_Context {
                 $this->remember_token('imap', $id, $server, $result[1], $result[0]);
             }
         }
+        /* The budget also covers blocked reads, literals and connection cleanup. */
+        Hm_IMAP_List::$request_deadline = $this->deadline;
         return Hm_IMAP_List::connect($id);
     }
 
@@ -741,6 +746,9 @@ class Hm_MCP_Context {
             if (class_exists($class)) {
                 $class::clean_up();
             }
+        }
+        if (class_exists('Hm_IMAP_List')) {
+            Hm_IMAP_List::$request_deadline = null;
         }
         $this->mailboxes = [];
     }

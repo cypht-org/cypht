@@ -44,6 +44,13 @@ var applyMcpPageHandlers = function() {
                 }
             });
         });
+        $(form).find('.mcp_choices_hint').each(function() {
+            var hint = $(this);
+            var name = hint.data('mode-name');
+            var value = hint.data('mode-value');
+            var active = $(form).find('input[name="' + name + '"]:checked').val() === value;
+            hint.toggleClass('d-none', active);
+        });
     };
     $('.mcp_settings_page form').each(function() {
         var form = this;

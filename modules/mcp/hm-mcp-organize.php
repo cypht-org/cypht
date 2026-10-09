@@ -369,9 +369,11 @@ trait Hm_MCP_Organize {
      * @throws Hm_MCP_Error
      */
     protected static function future_time($value, $now, $name) {
-        $value = strtolower(trim($value));
-        if (isset(self::$snooze_presets[$value])) {
-            $time = strtotime(self::$snooze_presets[$value], $now);
+        $value = trim($value);
+        /* only the presets are case insensitive: lowercasing an ISO 8601 date-time breaks its T separator */
+        $preset = strtolower($value);
+        if (isset(self::$snooze_presets[$preset])) {
+            $time = strtotime(self::$snooze_presets[$preset], $now);
         } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
             $time = strtotime($value.' 08:00');
         } else {

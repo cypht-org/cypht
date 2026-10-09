@@ -324,8 +324,9 @@ class Hm_MCP_Format {
      */
     public static function parse_date_arg($value, $name) {
         $value = trim((string) $value);
-        if (preg_match('/^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?)?$/', $value)) {
-            $time = strtotime($value);
+        /* RFC 3339 allows a lowercase t and z, strtotime() only reads them uppercase */
+        if (preg_match('/^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}(:?\d{2})?)?)?$/i', $value)) {
+            $time = strtotime(strtoupper($value));
             if ($time !== false) {
                 return $time;
             }

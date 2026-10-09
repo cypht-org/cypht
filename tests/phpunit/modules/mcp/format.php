@@ -136,6 +136,8 @@ class Hm_Test_MCP_Format extends TestCase {
         $this->assertNull(Hm_MCP_Format::date('not a date'));
         $this->assertSame(strtotime('2026-01-31'), Hm_MCP_Format::parse_date_arg('2026-01-31', 'since'));
         $this->assertSame(strtotime('2026-01-31T10:00:00Z'), Hm_MCP_Format::parse_date_arg('2026-01-31T10:00:00Z', 'since'));
+        $this->assertSame(strtotime('2026-10-01T08:30:00-03:00'), Hm_MCP_Format::parse_date_arg('2026-10-01T08:30:00-03:00', 'send_at'));
+        $this->assertSame(strtotime('2026-10-01T08:30:00-03:00'), Hm_MCP_Format::parse_date_arg('2026-10-01t08:30:00-03:00', 'send_at'));
         foreach (['yesterday', '31/01/2026', '2026-01-31; DROP', ''] as $bad) {
             try {
                 Hm_MCP_Format::parse_date_arg($bad, 'since');
