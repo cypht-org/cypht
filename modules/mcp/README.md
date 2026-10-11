@@ -70,6 +70,15 @@ The OAuth server works for public clients:
   two factor code when the 2fa module set is on. They then choose the permissions and accounts
   for the connection.
 
+The sign in and consent pages load the same stylesheets as the rest of Cypht, `site.css` and the
+theme of the account, and use the markup of the login page, so the flow does not look like a
+different site. They load no JavaScript, and their CSP has no script source at all.
+
+> **Behind Cloudflare:** turn **Email Address Obfuscation** (Scrape Shield) off for the hostname.
+> It rewrites every address in the HTML as `[email protected]` plus a decoder script, so the
+> account list on the consent page becomes unreadable whenever that script is blocked, which any
+> tracking protection or ad blocker does.
+
 ## Operations
 
 | Permission | Default | Operations |

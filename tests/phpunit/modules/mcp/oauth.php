@@ -350,8 +350,11 @@ class Hm_Test_MCP_OAuth extends TestCase {
         $this->assertSame(200, $res->status);
         $this->assertStringNotContainsString('<script>alert(1)</script>', $res->body);
         $this->assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $res->body);
-        $this->assertStringNotContainsString('<img', $res->body);
+        $this->assertStringNotContainsString('<img src=x', $res->body);
+        $this->assertStringContainsString('&quot;&gt;&lt;img src=x onerror=alert(1)&gt;', $res->body);
         $this->assertStringContainsString('<strong>chatgpt.com</strong>', $res->body);
+        $this->assertStringContainsString('href="/site.css', $res->body);
+        $this->assertStringNotContainsString('<script', $res->body);
         $this->assertStringContainsString('lang="en"', $res->body);
         $this->assertStringContainsString('autocomplete="current-password"', $res->body);
         $this->assertStringNotContainsString('name="code"', $res->body);
@@ -359,6 +362,7 @@ class Hm_Test_MCP_OAuth extends TestCase {
         $this->assertStringContainsString("default-src 'none'", $csp);
         $this->assertStringContainsString("form-action 'self' https://chatgpt.com;", $csp);
         $this->assertStringContainsString("frame-ancestors 'none'", $csp);
+        $this->assertStringNotContainsString('script-src', $csp);
         $this->assertSame('no-store', $res->header('Cache-Control'));
         $this->assertSame('DENY', $res->header('X-Frame-Options'));
         $this->assertSame('same-origin', $res->header('Referrer-Policy'));

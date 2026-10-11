@@ -9,7 +9,12 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 /**
- * Self-contained HTML pages for the sign in and consent steps
+ * HTML pages for the sign in and consent steps
+ *
+ * They load the same stylesheets as the rest of Cypht (the combined `site.css` and the user's
+ * theme) and use the same Bootstrap markup as the login page, so the flow does not look like a
+ * different application. No JavaScript is loaded: the pages are plain forms, and the CSP has no
+ * script source at all.
  * @subpackage mcp/lib
  */
 class Hm_MCP_OAuth_Page {
@@ -26,27 +31,8 @@ class Hm_MCP_OAuth_Page {
     /* translations from the Cypht language file */
     private $strings = [];
 
-    const CSS = ':root{color-scheme:light dark}*{box-sizing:border-box}'.
-        'body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;'.
-        'background:#f3f4f6;color:#111827;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}'.
-        'main{width:100%;max-width:460px;background:#fff;border:1px solid #d1d5db;border-radius:12px;padding:28px}'.
-        '.app{margin:0 0 4px;color:#4b5563;font-size:14px;font-weight:600}'.
-        'h1{margin:0 0 16px;font-size:22px;line-height:1.3}p{margin:0 0 12px}'.
-        '.muted,.hint,.check small{color:#4b5563;font-size:14px}.hint{margin:6px 0 0}'.
-        '.error{border:1px solid #b91c1c;background:#fef2f2;color:#7f1d1d;border-radius:8px;padding:10px 12px;margin:0 0 16px}'.
-        'label{display:block;font-weight:600;margin:14px 0 4px}'.
-        'input[type=text],input[type=password]{width:100%;padding:10px 12px;border:1px solid #6b7280;border-radius:8px;font:inherit;background:#fff;color:inherit}'.
-        'input:focus-visible,button:focus-visible{outline:3px solid #2563eb;outline-offset:2px}'.
-        'fieldset{border:1px solid #d1d5db;border-radius:8px;margin:16px 0 0;padding:6px 14px 10px}legend{font-weight:600;padding:0 6px}'.
-        '.check{display:flex;gap:10px;align-items:flex-start;margin:10px 0}.check input{margin:4px 0 0;width:18px;height:18px;flex:none}'.
-        '.check label{margin:0}.check small{display:block;font-weight:400}'.
-        '.actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}'.
-        'button{flex:1;min-width:120px;padding:10px 16px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer;'.
-        'border:1px solid #1d4ed8;background:#1d4ed8;color:#fff}button.secondary{background:#fff;color:#111827;border-color:#6b7280}'.
-        '@media (prefers-color-scheme:dark){body{background:#111827;color:#f9fafb}main{background:#1f2937;border-color:#374151}'.
-        '.app,.muted,.hint,.check small{color:#d1d5db}input[type=text],input[type=password]{background:#111827;border-color:#9ca3af}'.
-        'button.secondary{background:#1f2937;color:#f9fafb;border-color:#9ca3af}fieldset{border-color:#4b5563}'.
-        '.error{background:#450a0a;color:#fecaca;border-color:#f87171}}';
+    /* theme asset name, validated against the themes shipped with the app */
+    private $theme = 'default';
 
     /**
      * @param string $lang Cypht language code
@@ -55,6 +41,56 @@ class Hm_MCP_OAuth_Page {
     public function __construct($lang, $app_name = 'Cypht') {
         $this->app_name = (string) $app_name !== '' ? (string) $app_name : 'Cypht';
         $this->set_language($lang);
+        $this->set_theme(defined('DEFAULT_THEME') ? DEFAULT_THEME : 'default');
+    }
+
+    /**
+     * Use the theme of the account, so the consent step matches the mailbox the user just saw.
+     * Falls back to the default theme when the name is unknown or its asset is missing.
+     * @param mixed $theme theme name from the user settings
+     * @return void
+     */
+    public function set_theme($theme) {
+        $theme = is_string($theme) ? strtolower($theme) : '';
+        if ($theme === '' || !preg_match('/^[a-z0-9_-]+$/', $theme) || !is_readable($this->theme_path($theme))) {
+            $theme = 'default';
+        }
+        $this->theme = $theme;
+    }
+
+    /**
+     * @param string $theme validated theme name
+     * @return string absolute path of the theme stylesheet
+     */
+    private function theme_path($theme) {
+        return APP_PATH.'modules/themes/assets/'.$theme.'/css/'.$theme.'.css';
+    }
+
+    /**
+     * URL of an asset of the app. The pages live under /oauth/, so relative paths would break and
+     * `base-uri 'none'` in the CSP rules out a <base> element.
+     * @param string $path path relative to the web root
+     * @return string
+     */
+    private static function asset($path) {
+        $root = defined('WEB_ROOT') ? (string) WEB_ROOT : '';
+        return '/'.ltrim($root, '/').($root !== '' && substr($root, -1) !== '/' ? '/' : '').$path;
+    }
+
+    /**
+     * The same stylesheets the app loads, in the same order
+     * @return string HTML
+     */
+    private function styles() {
+        $version = defined('CACHE_ID') && CACHE_ID ? '?v='.CACHE_ID : '';
+        $res = '<link href="'.self::esc(self::asset('site.css').$version).'" media="all" rel="stylesheet" type="text/css" />';
+        $res .= '<link href="'.self::esc(self::asset('modules/themes/assets/'.$this->theme.'/css/'.$this->theme.'.css').$version).
+            '" media="all" rel="stylesheet" type="text/css" />';
+        /* same web font declaration as the app, needed by the right to left languages */
+        $res .= '<style type="text/css">@font-face {font-family:"Behdad";'.
+            'src:url("'.self::esc(self::asset('modules/core/assets/fonts/Behdad/Behdad-Regular.woff2')).'") format("woff2"),'.
+            'url("'.self::esc(self::asset('modules/core/assets/fonts/Behdad/Behdad-Regular.woff')).'") format("woff");}</style>';
+        return $res;
     }
 
     /**
@@ -96,7 +132,7 @@ class Hm_MCP_OAuth_Page {
     }
 
     /**
-     * Build the page response
+     * Build the page response, with the same frame as the Cypht login page
      * @param string $title translated page title
      * @param string $body HTML content
      * @param array $form_targets extra CSP form-action sources, where a form submission may redirect to
@@ -106,17 +142,97 @@ class Hm_MCP_OAuth_Page {
     public function render($title, $body, $form_targets = [], $status = 200) {
         $html = '<!DOCTYPE html><html lang="'.self::esc($this->lang).'" dir="'.$this->dir.'"><head><meta charset="utf-8">'.
             '<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">'.
-            '<title>'.self::esc($title.' - '.$this->app_name).'</title><style>'.self::CSS.'</style></head><body>'.
-            '<main aria-labelledby="mcp_title"><p class="app">'.self::esc($this->app_name).'</p>'.
-            '<h1 id="mcp_title">'.self::esc($title).'</h1>'.$body.'</main></body></html>';
+            '<title>'.self::esc($title.' - '.$this->app_name).'</title>'.$this->styles().'</head>'.
+            '<body class="bg-light"><div class="d-flex align-items-center justify-content-center min-vh-100 p-3">'.
+            '<main class="card col-12 col-md-8 col-lg-5 p-3" aria-labelledby="mcp_title"><div class="card-body">'.
+            '<p class="text-center mb-4"><img class="w-50" alt="'.self::esc($this->app_name).'" src="'.
+            self::esc(self::asset('modules/core/assets/images/logo_dark.svg')).'"></p>'.
+            '<h1 id="mcp_title" class="h4 mb-3">'.self::esc($title).'</h1>'.$body.
+            '</div></main></div></body></html>';
         $response = Hm_MCP_Http_Response::html($html, $status);
         /* Chrome checks form-action on the redirect that follows a form submission */
         $sources = array_merge(["'self'"], array_values(array_unique(array_filter($form_targets))));
-        $response->with_header('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; ".
+        /* no script source at all: these pages are plain forms. 'unsafe-inline' is only for the
+           @font-face block, and 'self' covers site.css, the theme, the logo and the web fonts */
+        $response->with_header('Content-Security-Policy', "default-src 'none'; style-src 'self' 'unsafe-inline'; ".
+            "img-src 'self' data:; font-src 'self'; ".
             'form-action '.implode(' ', $sources)."; frame-ancestors 'none'; base-uri 'none'");
         /* keep the Origin header on our own form posts, browsers send "null" with no-referrer */
         $response->with_header('Referrer-Policy', 'same-origin');
         return $response;
+    }
+
+    /**
+     * Error block with the look of the rest of the app
+     * @param string $message already escaped text
+     * @return string HTML
+     */
+    public static function alert($message) {
+        return '<div class="alert alert-danger" role="alert">'.$message.'</div>';
+    }
+
+    /**
+     * A checkbox with the markup Cypht uses in its settings
+     * @param string $id element id
+     * @param string $name field name
+     * @param string $value field value
+     * @param bool $checked checked state
+     * @param string $label already escaped label
+     * @param string $detail already escaped secondary line, may be empty
+     * @return string HTML
+     */
+    public static function check($id, $name, $value, $checked, $label, $detail = '') {
+        return '<div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="'.self::esc($id).'" '.
+            'name="'.self::esc($name).'" value="'.self::esc($value).'"'.($checked ? ' checked' : '').'>'.
+            '<label class="form-check-label" for="'.self::esc($id).'">'.$label.'</label>'.
+            ($detail !== '' ? '<div class="form-text mt-0">'.$detail.'</div>' : '').'</div>';
+    }
+
+    /**
+     * A bordered group with a caption, like the blocks of the settings pages
+     * @param string $legend already escaped caption
+     * @param string $body HTML content
+     * @return string HTML
+     */
+    public static function group($legend, $body) {
+        return '<fieldset class="border rounded-3 px-3 pb-2 pt-1 mt-3">'.
+            '<legend class="float-none w-auto px-2 fs-6 fw-semibold">'.$legend.'</legend>'.$body.'</fieldset>';
+    }
+
+    /**
+     * The two decision buttons, side by side on wide screens and stacked on a phone
+     * @param string $accept already escaped label of the primary button
+     * @param string $reject already escaped label of the secondary button
+     * @param bool $reject_novalidate skip form validation when rejecting
+     * @return string HTML
+     */
+    public static function decisions($accept, $reject, $reject_novalidate = false) {
+        return '<div class="d-grid d-sm-flex gap-2 mt-4">'.
+            '<button type="submit" name="decision" value="allow" class="btn btn-primary flex-fill">'.$accept.'</button>'.
+            '<button type="submit" name="decision" value="deny" class="btn btn-outline-secondary flex-fill"'.
+            ($reject_novalidate ? ' formnovalidate' : '').'>'.$reject.'</button></div>';
+    }
+
+    /**
+     * A labelled text input with the floating label of the login page
+     * @param string $id element id
+     * @param string $name field name
+     * @param string $label already escaped label
+     * @param string $type input type
+     * @param array $attrs extra attributes as name => value, true for valueless ones
+     * @return string HTML
+     */
+    public static function field($id, $name, $label, $type = 'text', $attrs = []) {
+        $extra = '';
+        foreach ($attrs as $key => $value) {
+            if ($value === false || $value === null) {
+                continue;
+            }
+            $extra .= ' '.self::esc($key).($value === true ? '' : '="'.self::esc($value).'"');
+        }
+        return '<div class="mb-3 form-floating"><input class="form-control" type="'.self::esc($type).'" '.
+            'id="'.self::esc($id).'" name="'.self::esc($name).'" placeholder="'.$label.'"'.$extra.'>'.
+            '<label class="form-label" for="'.self::esc($id).'">'.$label.'</label></div>';
     }
 }
 
@@ -766,7 +882,11 @@ class Hm_MCP_OAuth {
         if ($user_config) {
             $lang = $user_config->get('language_setting', $lang);
         }
-        return new Hm_MCP_OAuth_Page($lang, (string) $this->site_config->get('app_name', 'Cypht'));
+        $page = new Hm_MCP_OAuth_Page($lang, (string) $this->site_config->get('app_name', 'Cypht'));
+        if ($user_config) {
+            $page->set_theme($user_config->get('theme_setting', defined('DEFAULT_THEME') ? DEFAULT_THEME : 'default'));
+        }
+        return $page;
     }
 
     /**
@@ -776,8 +896,8 @@ class Hm_MCP_OAuth {
      */
     private function error_page($message, $status) {
         $page = $this->page();
-        $body = '<div class="error" role="alert">'.$page->text(self::MESSAGES[$message]).'</div>'.
-            '<p class="muted">'.$page->text('Close this window and try again from the app.').'</p>';
+        $body = Hm_MCP_OAuth_Page::alert($page->text(self::MESSAGES[$message])).
+            '<p class="text-secondary mb-0">'.$page->text('Close this window and try again from the app.').'</p>';
         return $page->render($page->trans('The app could not be connected'), $body, [], $status);
     }
 
@@ -853,24 +973,34 @@ class Hm_MCP_OAuth {
     private function login_page($req, $error = '', $username = '', $status = 200) {
         $page = $this->page();
         $body = '<p>'.sprintf($page->text('%s wants to use your mail.'), '<strong>'.self::client_label($page, $req['client']).'</strong>').'</p>'.
-            '<p class="muted">'.sprintf($page->text('After you sign in, you will return to %s.'), '<strong>'.self::redirect_label($page, $req['redirect_uri']).'</strong>').'</p>';
+            '<p class="text-secondary">'.sprintf($page->text('After you sign in, you will return to %s.'), '<strong>'.self::redirect_label($page, $req['redirect_uri']).'</strong>').'</p>';
         if ($error) {
-            $body .= '<div class="error" role="alert">'.$page->text(self::MESSAGES[$error]).'</div>';
+            $body .= Hm_MCP_OAuth_Page::alert($page->text(self::MESSAGES[$error]));
         }
         $body .= '<form method="post" action="'.Hm_MCP_OAuth_Page::esc($this->config->url('/oauth/authorize')).'">'.
             self::hidden_fields($req['params'] + ['step' => 'login']).
-            '<label for="mcp_username">'.$page->text('Username').'</label>'.
-            '<input type="text" id="mcp_username" name="username" value="'.Hm_MCP_OAuth_Page::esc($username).'" autocomplete="username" '.
-            'autocapitalize="none" spellcheck="false" required'.($username === '' ? ' autofocus' : '').'>'.
-            '<label for="mcp_password">'.$page->text('Password').'</label>'.
-            '<input type="password" id="mcp_password" name="password" autocomplete="current-password" required'.($username !== '' ? ' autofocus' : '').'>';
+            Hm_MCP_OAuth_Page::field('mcp_username', 'username', $page->text('Username'), 'text', [
+                'value' => $username,
+                'autocomplete' => 'username',
+                'autocapitalize' => 'none',
+                'spellcheck' => 'false',
+                'required' => true,
+                'autofocus' => $username === '',
+            ]).
+            Hm_MCP_OAuth_Page::field('mcp_password', 'password', $page->text('Password'), 'password', [
+                'autocomplete' => 'current-password',
+                'required' => true,
+                'autofocus' => $username !== '',
+            ]);
         if ($this->two_factor_available()) {
-            $body .= '<label for="mcp_code">'.$page->text('Two-factor code').'</label>'.
-                '<input type="text" id="mcp_code" name="code" inputmode="numeric" autocomplete="one-time-code" aria-describedby="mcp_code_hint">'.
-                '<p class="hint" id="mcp_code_hint">'.$page->text('Only if two-factor authentication is turned on for your account.').'</p>';
+            $body .= Hm_MCP_OAuth_Page::field('mcp_code', 'code', $page->text('Two-factor code'), 'text', [
+                'inputmode' => 'numeric',
+                'autocomplete' => 'one-time-code',
+                'aria-describedby' => 'mcp_code_hint',
+            ]).
+            '<p class="form-text mt-0" id="mcp_code_hint">'.$page->text('Only if two-factor authentication is turned on for your account.').'</p>';
         }
-        $body .= '<div class="actions"><button type="submit" name="decision" value="allow">'.$page->text('Continue').'</button>'.
-            '<button type="submit" name="decision" value="deny" class="secondary" formnovalidate>'.$page->text('Cancel').'</button></div></form>';
+        $body .= Hm_MCP_OAuth_Page::decisions($page->text('Continue'), $page->text('Cancel'), true).'</form>';
         return $page->render($page->trans('Sign in to connect an app'), $body, [self::form_target($req['redirect_uri'])], $status);
     }
 
@@ -889,44 +1019,43 @@ class Hm_MCP_OAuth {
     private function consent_page($req, $username, $user_config, $settings, $ticket, $error = '', $checked = null, $checked_accounts = null) {
         $page = $this->page($user_config);
         $body = '<p>'.sprintf($page->text('Allow %s to use your mail?'), '<strong>'.self::client_label($page, $req['client']).'</strong>').'</p>'.
-            '<p class="muted">'.sprintf($page->text('Signed in as %s.'), '<strong>'.Hm_MCP_OAuth_Page::esc($username).'</strong>').' '.
+            '<p class="text-secondary">'.sprintf($page->text('Signed in as %s.'), '<strong>'.Hm_MCP_OAuth_Page::esc($username).'</strong>').' '.
             sprintf($page->text('You will return to %s.'), '<strong>'.self::redirect_label($page, $req['redirect_uri']).'</strong>').'</p>';
         if ($error) {
-            $body .= '<div class="error" role="alert">'.$page->text(self::MESSAGES[$error]).'</div>';
+            $body .= Hm_MCP_OAuth_Page::alert($page->text(self::MESSAGES[$error]));
         }
         $body .= '<form method="post" action="'.Hm_MCP_OAuth_Page::esc($this->config->url('/oauth/authorize')).'">'.
-            self::hidden_fields(['step' => 'consent', 'ticket' => $ticket]).
-            '<fieldset><legend>'.$page->text('It will be able to').'</legend>';
+            self::hidden_fields(['step' => 'consent', 'ticket' => $ticket]);
         $offered = self::offered_permissions($req['scope'], $settings);
+        $perms = '';
         foreach ($offered as $index => $key) {
-            $id = 'mcp_perm_'.$index;
-            $body .= '<div class="check"><input type="checkbox" id="'.$id.'" name="permissions[]" value="'.Hm_MCP_OAuth_Page::esc($key).'"'.
-                ($checked === null || in_array($key, $checked, true) ? ' checked' : '').'>'.
-                '<label for="'.$id.'">'.$page->text(Hm_MCP_Permissions::label($key)).
-                '<small>'.$page->text(Hm_MCP_Permissions::description($key)).'</small></label></div>';
+            $perms .= Hm_MCP_OAuth_Page::check('mcp_perm_'.$index, 'permissions[]', $key,
+                $checked === null || in_array($key, $checked, true),
+                $page->text(Hm_MCP_Permissions::label($key)),
+                $page->text(Hm_MCP_Permissions::description($key)));
         }
         if (!$offered) {
-            $body .= '<p class="hint">'.$page->text('Nothing is turned on in your settings yet. The app will not be able to do anything until you turn on permissions in Settings, API and MCP.').'</p>';
+            $perms = '<p class="form-text">'.$page->text('Nothing is turned on in your settings yet. The app will not be able to do anything until you turn on permissions in Settings, API and MCP.').'</p>';
         }
-        $body .= '</fieldset><fieldset><legend>'.$page->text('Accounts').'</legend>';
+        $body .= Hm_MCP_OAuth_Page::group($page->text('It will be able to'), $perms);
         $accounts = self::allowed_accounts($user_config, $settings);
+        $list = '';
         foreach ($accounts as $index => $account) {
-            $id = 'mcp_account_'.$index;
             $label = $account['name'] !== '' ? $account['name'] : $account['user'];
-            $detail = $account['user'] !== '' && $account['user'] !== $label ? '<small>'.Hm_MCP_OAuth_Page::esc($account['user']).'</small>' : '';
+            $detail = $account['user'] !== '' && $account['user'] !== $label ? Hm_MCP_OAuth_Page::esc($account['user']) : '';
             if ($account['hidden']) {
-                $detail .= '<small>'.$page->text('hidden').'</small>';
+                $detail .= ($detail !== '' ? ' · ' : '').$page->text('hidden');
             }
-            $body .= '<div class="check"><input type="checkbox" id="'.$id.'" name="accounts[]" value="'.Hm_MCP_OAuth_Page::esc($account['id']).'"'.
-                ($checked_accounts === null || in_array($account['id'], $checked_accounts, true) ? ' checked' : '').'>'.
-                '<label for="'.$id.'">'.Hm_MCP_OAuth_Page::esc($label).$detail.'</label></div>';
+            $list .= Hm_MCP_OAuth_Page::check('mcp_account_'.$index, 'accounts[]', $account['id'],
+                $checked_accounts === null || in_array($account['id'], $checked_accounts, true),
+                Hm_MCP_OAuth_Page::esc($label), $detail);
         }
         if (!$accounts) {
-            $body .= '<p class="hint">'.$page->text('No email accounts are configured yet.').'</p>';
+            $list = '<p class="form-text">'.$page->text('No email accounts are configured yet.').'</p>';
         }
-        $body .= '</fieldset><p class="hint">'.$page->text('Only permissions that are turned on in Settings, API and MCP are offered. You can change or remove this access there at any time.').'</p>'.
-            '<div class="actions"><button type="submit" name="decision" value="allow">'.$page->text('Allow').'</button>'.
-            '<button type="submit" name="decision" value="deny" class="secondary">'.$page->text('Deny').'</button></div></form>';
+        $body .= Hm_MCP_OAuth_Page::group($page->text('Accounts'), $list).
+            '<p class="form-text">'.$page->text('Only permissions that are turned on in Settings, API and MCP are offered. You can change or remove this access there at any time.').'</p>'.
+            Hm_MCP_OAuth_Page::decisions($page->text('Allow'), $page->text('Deny')).'</form>';
         return $page->render($page->trans('Connect an app to your mail'), $body, [self::form_target($req['redirect_uri'])]);
     }
 
