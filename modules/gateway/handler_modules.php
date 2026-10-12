@@ -59,7 +59,7 @@ class Hm_Handler_gateway_sso_data extends Hm_Handler_Module {
                 )
             );
             $context = @stream_context_create($opts);
-            $res = @file_get_contents('http://127.0.0.1:18080/api/v1/auth/sso', false, $context);
+            $res = @file_get_contents(rtrim(env('GATEWAY_INTERNAL_URL', 'http://127.0.0.1:18080'), '/') . '/api/v1/auth/sso', false, $context);
             if ($res) {
                 $data = @json_decode($res, true);
                 if (!empty($data['access_token'])) {

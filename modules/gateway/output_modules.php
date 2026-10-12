@@ -143,7 +143,7 @@ if (class_exists('Hm_Output_Module')) {
                 . '<div class="card mb-3 shadow-sm border-0"><div class="card-body p-3">'
                 . '<h5 class="card-title fw-bold mb-2"><i class="bi bi-robot text-primary me-2"></i>' . $this->trans('Model Context Protocol (MCP) Integration') . '</h5>'
                 . '<p class="text-muted small mb-2">' . $this->trans('Connect AI assistants (Claude, Cursor, Codex) to your webmail securely:') . '</p>'
-                . '<div class="bg-light p-2 rounded border font-monospace small mb-2 user-select-all"><code>' . (isset($_SERVER['HTTP_HOST']) ? 'http://' . $_SERVER['HTTP_HOST'] : 'http://127.0.0.1:8088') . '/mcp</code></div>'
+                . '<div class="bg-light p-2 rounded border font-monospace small mb-2 user-select-all"><code>' . (isset($_SERVER['HTTP_HOST']) ? (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] : 'http://127.0.0.1:8088') . '/mcp</code></div>'
                 . '<p class="text-muted small mb-0">' . $this->trans('Pass your generated token in the Authorization header: Bearer <PAT>') . '</p>'
                 . '</div></div>'
                 . '</div>'

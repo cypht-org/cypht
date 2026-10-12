@@ -22,6 +22,8 @@ API_LOGIN_KEY=<random secret shared only with gatewayd>
 GATEWAY_BRIDGE_KEY=<different random secret shared only with gatewayd>
 ```
 
+Set `GATEWAY_INTERNAL_URL` to the internal base URL of the Rust gateway daemon when it is not reachable at the default `http://127.0.0.1:18080`. This is used only for the server-side SSO handoff; public clients must not call this address.
+
 The Rust gateway needs matching `CYPHT_API_LOGIN_KEY` and `CYPHT_BRIDGE_KEY` values.
 
 ## v0.4 bridge scope
