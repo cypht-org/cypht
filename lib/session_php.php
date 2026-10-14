@@ -194,6 +194,11 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
         if ($user !== false && $pass !== false) {
             if ($this->auth($user, $pass)) {
                 $this->authed($request, $fingerprint);
+            } else {
+                $ip = $request->server['REMOTE_ADDR'] ?? '';
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    Hm_Logger::error(sprintf('Failed authentication from [%s]', $ip));
+                }
             }
         } elseif (array_key_exists($this->cname, $request->cookie)) {
             $this->get_key($request);
