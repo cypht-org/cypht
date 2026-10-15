@@ -117,7 +117,7 @@ class Hm_MIME_Msg {
         }
         if (!$this->final_msg) {
             if ($this->html) {
-                $res .= $this->text_body;
+                $res .= "\r\n".$this->text_body;
             }
             $res .="\r\n".$this->body;
             if (!empty($this->attachments)) {
@@ -286,8 +286,8 @@ class Hm_MIME_Msg {
                     "format=flowed\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n%s",
                     $this->boundary, $this->format_message_text($txt));
                 $body = sprintf("--%s\r\nContent-Type: text/html; charset=UTF-8; format=flowed\r\n".
-                    "Content-Transfer-Encoding: quoted-printable\r\n\r\n%s",
-                    $this->boundary, $this->format_message_text($body));
+                    "Content-Transfer-Encoding: quoted-printable\r\n\r\n%s\r\n--%s--\r\n",
+                    $this->boundary, $this->format_message_text($body), $this->boundary);
             }
         }
         $this->body = $body;
