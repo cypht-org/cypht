@@ -44,7 +44,7 @@ class Hm_Test_User_File_Config extends TestCase {
 
         $this->config->set('imap_servers', array(array('pass' => 'foo', 'server' => 'localhost')));
         $this->config->set('no_password_save_setting', true);
-        $this->assertEquals(array('imap_servers' => array(array('pass' => 'foo'))), $this->config->filter_servers());
+        $this->assertEquals(array('imap_servers' => array('foo')), $this->config->filter_servers());
     }
     /**
      * @preserveGlobalState disabled
@@ -277,5 +277,8 @@ class Hm_Test_User_File_Config extends TestCase {
         $this->config->restore_servers($removed);
         $dump = $this->config->dump();
         $this->assertEquals('secret', $dump['imap_servers'][0]['pass']);
+        $this->assertEquals('imap.test.com', $dump['imap_servers'][0]['server']);
+        $this->assertEquals('u', $dump['imap_servers'][0]['user']);
+        $this->assertEquals('plain', $dump['imap_servers'][0]['auth']);
     }
 }
