@@ -261,10 +261,14 @@ class Hm_Handler_process_enable_exclude_auto_bcc extends Hm_Handler_Module {
  */
 class Hm_Handler_get_test_chunk extends Hm_Handler_Module {
     public function process() {
-        $filepath = $this->config->get('attachment_dir');
-        $filepath = $filepath.'/chunks-'.$this->request->get['resumableIdentifier'];
-        $chunk_file = $filepath.'/'.$this->request->get['resumableFilename'].'.part'.$this->request->get['resumableChunkNumber'];
-        if (file_exists($chunk_file)) {
+        $resumable_identifier = trim(basename((string) ($this->request->get['resumableIdentifier'] ?? '')));
+        $resumable_filename = trim(basename((string) ($this->request->get['resumableFilename'] ?? '')));
+
+        $user_dir = user_attachment_dir($this->config->get('attachment_dir'), $this->session->get('username', false));
+        $expected_dir = $user_dir ? $user_dir.DIRECTORY_SEPARATOR.'chunks-'.$resumable_identifier : '';
+        $chunk_file = $expected_dir !== '' ? $expected_dir.DIRECTORY_SEPARATOR.$resumable_filename.'.part'.$this->request->get['resumableChunkNumber'] : '';
+        if ($user_dir && $resumable_identifier !== '' && $resumable_filename !== ''
+                && dirname($chunk_file) === $expected_dir && file_exists($chunk_file)) {
             header("HTTP/1.0 200 Ok");
         } else {
             header("HTTP/1.0 404 Not Found");
@@ -280,35 +284,44 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
         $from = $this->request->get['draft_smtp'];
         $filepath = $this->config->get('attachment_dir');
 
-        $userpath = md5($this->session->get('username', false));
-
-        // create the attachment folder for the profile to avoid
-        if (!is_dir($filepath.'/'.$userpath)) {
-            mkdir($filepath.'/'.$userpath, 0777, true);
+        $user_dir = user_attachment_dir($filepath, $this->session->get('username', false));
+        if (!$user_dir) {
+            Hm_Msgs::add('Invalid upload request', 'danger');
+            return;
         }
+
+        if (!is_dir($user_dir)) {
+            mkdir($user_dir, 0700, true);
+        }
+
+        $resumable_identifier = trim(basename((string) ($this->request->get['resumableIdentifier'] ?? '')));
+        $resumable_filename = trim(basename((string) ($this->request->get['resumableFilename'] ?? '')));
 
         if (!empty($this->request->files)) foreach ($this->request->files as $file) {
             if ($file['error'] != 0) {
-                Hm_Msgs::add('Error '.$file['error'].' in file '.$this->request->get['resumableFilename'], 'danger');
+                Hm_Msgs::add('Error '.$file['error'].' in file '.$resumable_filename, 'danger');
                 continue;
             }
 
-            if(isset($this->request->get['resumableIdentifier']) && trim($this->request->get['resumableIdentifier'])!=''){
-                $temp_dir = $filepath.'/'.$userpath.'/chunks-'.$this->request->get['resumableIdentifier'];
-            }
-            $dest_file = $temp_dir.'/'.$this->request->get['resumableFilename'].'.part'.$this->request->get['resumableChunkNumber'];
+            $temp_dir = $user_dir.DIRECTORY_SEPARATOR.'chunks-'.$resumable_identifier;
+            $dest_file = $temp_dir.DIRECTORY_SEPARATOR.$resumable_filename.'.part'.$this->request->get['resumableChunkNumber'];
 
-            // create the temporary directory
+            if ($resumable_identifier === '' || $resumable_filename === ''
+                    || dirname($dest_file) !== $temp_dir) {
+                Hm_Msgs::add('Invalid upload request', 'danger');
+                continue;
+            }
+
             if (!is_dir($temp_dir)) {
-                mkdir($temp_dir, 0777, true);
+                mkdir($temp_dir, 0700, true);
             }
 
             // move the temporary file
             if (!move_uploaded_file($file['tmp_name'], $dest_file)) {
-                Hm_Msgs::add('Error saving (move_uploaded_file) chunk '.$this->request->get['resumableChunkNumber'].' for file '.$this->request->get['resumableFilename'], 'danger');
+                Hm_Msgs::add('Error saving (move_uploaded_file) chunk '.$this->request->get['resumableChunkNumber'].' for file '.$resumable_filename, 'danger');
             } else {
                 // check if all the parts present, and create the final destination file
-                $result = createFileFromChunks($temp_dir, $this->request->get['resumableFilename'],
+                $result = createFileFromChunks($temp_dir, $resumable_filename,
                                 $this->request->get['resumableChunkSize'],
                                 $this->request->get['resumableTotalSize'],
                                 $this->request->get['resumableTotalChunks']);
@@ -344,7 +357,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         $msg_attrs = array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
         'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
         'draft_in_reply_to' => $inreplyto);
-        $uploaded_files = !$uploaded_files ? []: explode(',', $uploaded_files);
+        $uploaded_files = !$uploaded_files ? [] : parse_uploaded_files_list($uploaded_files);
         $profiles = $this->get('compose_profiles', array());
         $profile = profile_from_compose_smtp_id($profiles, $smtp);
 
@@ -358,9 +371,15 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
 
         if ($this->module_is_supported('imap')) {
             $userpath = md5($this->session->get('username', false));
-            foreach($uploaded_files as $key => $file) {
-                $uploaded_files[$key] = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$userpath.DIRECTORY_SEPARATOR.$file;
+            $attachment_dir = $this->config->get('attachment_dir');
+            $resolved = [];
+            foreach ($uploaded_files as $file) {
+                $path = user_attachment_path($attachment_dir, $userpath, $file);
+                if ($path !== false) {
+                    $resolved[] = $path;
+                }
             }
+            $uploaded_files = $resolved;
             $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
                     'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
                     'draft_in_reply_to' => $inreplyto, 'delivery_receipt' => $delivery_receipt, 'schedule' => $schedule,
@@ -714,9 +733,13 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* parse attachments */
         $uploaded_files = [];
         if (!empty($this->request->post['send_uploaded_files'])) {
-            $uploaded_files = explode(',', $this->request->post['send_uploaded_files']);
-            foreach($uploaded_files as $key => $file) {
-                $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.md5($this->session->get('username', false)).'/'.$file;
+            $userpath = md5($this->session->get('username', false));
+            $attachment_dir = $this->config->get('attachment_dir');
+            foreach (parse_uploaded_files_list($this->request->post['send_uploaded_files']) as $file) {
+                $path = user_attachment_path($attachment_dir, $userpath, $file);
+                if ($path !== false) {
+                    $uploaded_files[] = $path;
+                }
             }
         }
 
@@ -884,7 +907,9 @@ class Hm_Handler_process_enable_attachment_reminder_setting extends Hm_Handler_M
  */
 class Hm_Handler_attachment_dir extends Hm_Handler_Module {
     public function process() {
-        $this->out('attachment_dir', $this->config->get('attachment_dir'));
+        $attachment_dir = $this->config->get('attachment_dir');
+        $this->out('attachment_dir', $attachment_dir);
+        $this->out('user_attachment_dir', user_attachment_dir($attachment_dir, $this->session->get('username', false)));
     }
 }
 
@@ -893,17 +918,9 @@ class Hm_Handler_attachment_dir extends Hm_Handler_Module {
  */
 class Hm_Handler_clear_attachment_chunks extends Hm_Handler_Module {
     public function process() {
-        $attachment_dir = $this->config->get('attachment_dir');
-        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($attachment_dir));
-        foreach ($rii as $file) {
-            if ($file->getFilename() == '.' || $file->getFilename() == '..') {
-                continue;
-            }
-            if (is_dir($file->getPath()) && $file->getPath() != $attachment_dir){
-                if (mb_strpos($file->getPath(), 'chunks-') !== False) {
-                    rrmdir($file->getPath());
-                }
-            }
+        $user_dir = user_attachment_dir($this->config->get('attachment_dir'), $this->session->get('username', false));
+        foreach (user_attachment_chunk_dirs($user_dir) as $chunk_dir) {
+            rrmdir($chunk_dir);
         }
         Hm_Msgs::add('Attachment chunks cleaned');
     }
@@ -941,27 +958,7 @@ class Hm_Output_enable_compose_delivery_receipt_setting extends Hm_Output_Module
  */
 class Hm_Output_attachment_setting extends Hm_Output_Module {
     protected function output() {
-        $size_in_kbs = 0;
-        $num_chunks = 0;
-        if (!is_dir($this->get('attachment_dir'))) {
-            return;
-        }
-        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->get('attachment_dir')));
-        $files = array();
-
-        foreach ($rii as $file) {
-            if ($file->getFilename() == '.' || $file->getFilename() == '..') {
-                continue;
-            }
-            if ($file->isDir()){
-                continue;
-            }
-            if (mb_strpos($file->getPathname(), '.part') !== False) {
-                $num_chunks++;
-                $size_in_kbs += filesize($file->getPathname());
-                $files[] = $file->getPathname();
-            }
-        }
+        list($num_chunks, $size_in_kbs) = count_user_attachment_chunk_parts($this->get('user_attachment_dir'));
         if ($size_in_kbs > 0) {
             $size_in_kbs = round(($size_in_kbs / 1024), 2);
         }
@@ -1472,7 +1469,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
             return '';
         }
 
-        $res = '<div class="subtitle mt-4 fw-bold border-top pt-4">'.$this->trans('SMTP Servers').'</div>';
+        $res = '<div class="subtitle mt-4 fw-bold border-top pt-4"><i class="bi bi-send-check-fill me-2"></i>'.$this->trans('SMTP Servers').'</div>';
         foreach ($list as $index => $vals) {
 
             $no_edit = false;
@@ -1609,6 +1606,12 @@ class Hm_Output_stepper_setup_server_smtp extends Hm_Output_Module {
  * @subpackage smtp/handler
  */
 class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
+    /* seconds to wait before retrying a server that just failed to connect */
+    const FAILED_SERVER_COOLDOWN = 300;
+
+    /* short connect timeout for this background check */
+    const CONNECT_TIMEOUT = 3;
+
     /**
      * Send delayed messages
      * This should use cron
@@ -1620,10 +1623,23 @@ class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
 
         $servers = Hm_IMAP_List::dumpForMailbox();
         $scheduled_msg_count = 0;
+        $failed_servers = $this->session->get('scheduled_send_failed_servers', array());
+        $now = time();
 
         foreach ($servers as $server_id => $config) {
+            // dumpForMailbox() doesn't filter hidden servers like the source list does
+            if (! empty($config['hide'])) {
+                continue;
+            }
+
+            if (isset($failed_servers[$server_id]) && ($now - $failed_servers[$server_id]) < self::FAILED_SERVER_COOLDOWN) {
+                continue;
+            }
+
+            $config['timeout'] = self::CONNECT_TIMEOUT;
             $mailbox = new Hm_Mailbox($server_id, $this->user_config, $this->session, $config);
             if ($mailbox->connect()) {
+                unset($failed_servers[$server_id]);
                 $folder = 'Scheduled';
                 if (! $mailbox->folder_exists($folder)) {
                     continue;
@@ -1640,9 +1656,12 @@ class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
                         $scheduled_msg_count++;
                     }
                 }
+            } else {
+                $failed_servers[$server_id] = $now;
             }
         }
 
+        $this->session->set('scheduled_send_failed_servers', $failed_servers);
         $this->out('scheduled_msg_count', $scheduled_msg_count);
     }
 }
@@ -1981,6 +2000,15 @@ if (!hm_exists('rrmdir')) {
  */
 if (!hm_exists('createFileFromChunks')) {
     function createFileFromChunks($temp_dir, $fileName, $chunkSize, $totalSize,$total_files) {
+        // defense in depth: strip directory components and verify the assembled
+        // file stays in the parent of $temp_dir (the per-user attachment dir).
+        $fileName = trim(basename((string) $fileName));
+        $expected_dir = dirname($temp_dir);
+        $dest_file = $expected_dir.'/'.$fileName;
+        if ($fileName === '' || $fileName === '.' || $fileName === '..'
+                || dirname($dest_file) !== $expected_dir) {
+            return false;
+        }
         // count all the parts of this file
         // $fileName = Hm_Crypt::ciphertext($fileName, Hm_Request_Key::generate());
         $total_files_on_server_size = 0;
@@ -1994,19 +2022,19 @@ if (!hm_exists('createFileFromChunks')) {
         // If the Size of all the chunks on the server is equal to the size of the file uploaded.
         if ($total_files_on_server_size >= $totalSize) {
         // create the final destination file
-            if (($fp = fopen($temp_dir.'/../'.$fileName, 'w')) !== false) {
+            if (($fp = fopen($dest_file, 'w')) !== false) {
                 for ($i=1; $i<=$total_files; $i++) {
                     fwrite($fp, file_get_contents($temp_dir.'/'.$fileName.'.part'.$i));
                 }
                 fclose($fp);
-                $hashed_content = Hm_Crypt::ciphertext(file_get_contents($temp_dir.'/../'.$fileName), Hm_Request_Key::generate());
-                file_put_contents($temp_dir.'/../'.$fileName, $hashed_content);
+                $hashed_content = Hm_Crypt::ciphertext(file_get_contents($dest_file), Hm_Request_Key::generate());
+                file_put_contents($dest_file, $hashed_content);
             } else {
                 return false;
             }
 
             // rename the temporary directory (to avoid access from other
-            // concurrent chunks uploads) and than delete it
+            // concurrent chunks uploads) and then delete it
             if (rename($temp_dir, $temp_dir.'_UNUSED')) {
                 rrmdir($temp_dir.'_UNUSED');
             } else {
@@ -2016,6 +2044,134 @@ if (!hm_exists('createFileFromChunks')) {
         return true;
     }
 }
+
+/**
+ * Parse a list of uploaded attachment filenames from a request value.
+ * Prefers JSON (handles commas/unicode in names); falls back to comma-split
+ * for older clients. Each name is reduced to a basename so "../" cannot escape
+ * the per-user attachment directory when paths are built later.
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('parse_uploaded_files_list')) {
+function parse_uploaded_files_list($raw) {
+    if ($raw === false || $raw === null || $raw === '') {
+        return [];
+    }
+    if (is_array($raw)) {
+        $names = $raw;
+    } else {
+        $decoded = json_decode($raw, true);
+        $names = is_array($decoded) ? $decoded : explode(',', $raw);
+    }
+    $safe = [];
+    foreach ($names as $name) {
+        if (!is_string($name) && !is_numeric($name)) {
+            continue;
+        }
+        $name = trim(basename((string) $name));
+        if ($name === '' || $name === '.' || $name === '..') {
+            continue;
+        }
+        $safe[] = $name;
+    }
+    return $safe;
+}}
+
+/**
+ * Per-user attachment directory: attachment_dir/md5(username).
+ * Returns false if the username or base path is missing, or the path would escape the base.
+ * @subpackage smtp/functions
+ * @param string $attachment_dir
+ * @param mixed $username
+ * @return string|false
+ */
+if (!hm_exists('user_attachment_dir')) {
+function user_attachment_dir($attachment_dir, $username) {
+    if (!is_string($username) || $username === '' || !is_string($attachment_dir) || $attachment_dir === '') {
+        return false;
+    }
+    $base = rtrim($attachment_dir, '/\\');
+    if ($base === '') {
+        return false;
+    }
+    $dir = $base.DIRECTORY_SEPARATOR.md5($username);
+    if (dirname($dir) !== $base) {
+        return false;
+    }
+    return $dir;
+}}
+
+/**
+ * Immediate chunk directories under a per-user attachment folder.
+ * @subpackage smtp/functions
+ * @param string|false $user_dir
+ * @return array
+ */
+if (!hm_exists('user_attachment_chunk_dirs')) {
+function user_attachment_chunk_dirs($user_dir) {
+    $dirs = [];
+    if (!is_string($user_dir) || $user_dir === '' || !is_dir($user_dir)) {
+        return $dirs;
+    }
+    $user_dir = rtrim($user_dir, '/\\');
+    $entries = @scandir($user_dir);
+    if (!is_array($entries)) {
+        return $dirs;
+    }
+    foreach ($entries as $entry) {
+        if ($entry === '.' || $entry === '..' || !str_starts_with($entry, 'chunks-')) {
+            continue;
+        }
+        $path = $user_dir.DIRECTORY_SEPARATOR.$entry;
+        if (is_dir($path) && dirname($path) === $user_dir) {
+            $dirs[] = $path;
+        }
+    }
+    return $dirs;
+}}
+
+/**
+ * Count in-progress .part files for one user only.
+ * @subpackage smtp/functions
+ * @param string|false $user_dir
+ * @return array{0:int,1:int}
+ */
+if (!hm_exists('count_user_attachment_chunk_parts')) {
+function count_user_attachment_chunk_parts($user_dir) {
+    $num_chunks = 0;
+    $size_in_bytes = 0;
+    foreach (user_attachment_chunk_dirs($user_dir) as $chunk_dir) {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($chunk_dir, FilesystemIterator::SKIP_DOTS)
+        );
+        foreach ($iterator as $file) {
+            if ($file->isFile() && mb_strpos($file->getFilename(), '.part') !== false) {
+                $num_chunks++;
+                $size_in_bytes += $file->getSize();
+            }
+        }
+    }
+    return [$num_chunks, $size_in_bytes];
+}}
+
+/**
+ * Build a path under the current user's attachment directory.
+ * Returns false if the filename would escape that directory.
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('user_attachment_path')) {
+function user_attachment_path($attachment_dir, $userpath, $filename) {
+    $filename = trim(basename((string) $filename));
+    if ($filename === '' || $filename === '.' || $filename === '..') {
+        return false;
+    }
+    $expected_dir = rtrim($attachment_dir, '/\\').DIRECTORY_SEPARATOR.$userpath;
+    $path = $expected_dir.DIRECTORY_SEPARATOR.$filename;
+    if (dirname($path) !== $expected_dir) {
+        return false;
+    }
+    return $path;
+}}
 
 /**
  * @subpackage smtp/functions

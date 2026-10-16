@@ -33,10 +33,14 @@ function handleInvisibleResource(element, inline = false) {
     allowResource.classList.add('alert', 'alert-warning', 'p-1');
 
     const source = dataSrc.substring(0, 40) + (dataSrc.length > 40 ? '...' : '');
-    allowResource.innerHTML = `Source blocked: ${element.alt ? element.alt : source}
-    <a href="#" data-src="${dataSrc}" class="btn btn-light btn-sm">
-    Allow</a></div>
-    `;
+    allowResource.textContent = 'Source blocked: ' + (element.alt ? element.alt : source) + ' ';
+
+    const allowLink = document.createElement('a');
+    allowLink.href = '#';
+    allowLink.dataset.src = dataSrc;
+    allowLink.className = 'btn btn-light btn-sm';
+    allowLink.textContent = 'Allow';
+    allowResource.appendChild(allowLink);
 
     document.querySelector('.external_notices').insertAdjacentElement('beforeend', allowResource);
     handleAllowResource(allowResource, element.dataset.messagePart, inline);

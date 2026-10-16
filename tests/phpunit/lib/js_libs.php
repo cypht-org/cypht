@@ -30,8 +30,8 @@ class Hm_Test_JS_Libs extends TestCase {
      */
     public function test_get_js_libs_excludes_specified_paths(): void {
         $allLibs    = JS_LIBS;
-        $firstPath  = reset($allLibs);
-        $secondPath = next($allLibs);
+        $firstPath  = array_keys($allLibs)[0];
+        $secondPath = array_keys($allLibs)[1];
 
         $result = get_js_libs([$firstPath, $secondPath]);
 
@@ -49,7 +49,7 @@ class Hm_Test_JS_Libs extends TestCase {
      * @runInSeparateProcess
      */
     public function test_get_js_libs_returns_empty_string_when_all_excluded(): void {
-        $result = get_js_libs(array_values(JS_LIBS));
+        $result = get_js_libs(array_keys(JS_LIBS));
         $this->assertSame('', $result);
     }
 
@@ -110,5 +110,74 @@ class Hm_Test_JS_Libs extends TestCase {
         $excludeOne = get_js_libs_content([$keys[0]]);
 
         $this->assertGreaterThan(strlen($excludeTwo), strlen($excludeOne));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_js_libs_css_returns_link_tags_for_all_libs(): void {
+        $result = get_js_libs_css();
+
+        foreach (JS_LIBS_CSS as $css_files) {
+            foreach ($css_files as $path) {
+                $this->assertStringContainsString(
+                    '<link href="'.$path.'" media="all" rel="stylesheet" type="text/css" />',
+                    $result
+                );
+            }
+        }
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_js_libs_css_excludes_specified_keys(): void {
+        $keys = array_keys(JS_LIBS_CSS);
+
+        $result = get_js_libs_css([$keys[0]]);
+
+        foreach (JS_LIBS_CSS[$keys[0]] as $path) {
+            $this->assertStringNotContainsString($path, $result);
+        }
+
+        // remaining libs are still present
+        foreach (array_slice($keys, 1) as $key) {
+            foreach (JS_LIBS_CSS[$key] as $path) {
+                $this->assertStringContainsString($path, $result);
+            }
+        }
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_js_libs_css_returns_empty_string_when_all_excluded(): void {
+        $result = get_js_libs_css(array_keys(JS_LIBS_CSS));
+        $this->assertSame('', $result);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_js_libs_css_content_excludes_by_key(): void {
+        $keys = array_keys(JS_LIBS_CSS);
+
+        $withAll     = get_js_libs_css_content();
+        $withExclude = get_js_libs_css_content([$keys[0]]);
+
+        $this->assertLessThan(strlen($withAll), strlen($withExclude));
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_js_libs_css_content_returns_empty_string_when_all_excluded(): void {
+        $result = get_js_libs_css_content(array_keys(JS_LIBS_CSS));
+        $this->assertSame('', $result);
     }
 }

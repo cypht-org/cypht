@@ -327,8 +327,9 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
                 $this->out('login_time', $login_time);
             }
             if (array_key_exists('list_path', $this->request->get)) {
-                if (in_array($this->request->get['list_path'], array('combined_inbox', 'unread'), true)) {
-                    $this->out('list_parent', $this->request->get['list_path']);
+                $path = $this->request->get['list_path'];
+                if ($path && !preg_match('/^(?:imap|feeds|github|wp_|tag$)/', $path)) {
+                    $this->out('list_parent', $path);
                 }
             }
             Hm_Github_Uid_Cache::load($this->cache->get('github_read_uids', array(), true));
@@ -356,14 +357,13 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
                 $this->out('github_data_source_id', array_search($form['github_repo'], $repos, true));
             }
             if (array_key_exists('list_path', $this->request->get)) {
-                if ($this->request->get['list_path'] == 'unread') {
-                    $this->out('github_list_since', process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE)));
-                }
-                if ($this->request->get['list_path'] == 'combined_inbox') {
-                    $this->out('github_list_since', process_since_argument($this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE)));
-                }
-                if ($this->request->get['list_path'] == 'github_all') {
+                $path = $this->request->get['list_path'];
+                if ($path == 'github_all') {
                     $this->out('github_list_since', process_since_argument($this->user_config->get('github_since_setting', DEFAULT_GITHUB_SINCE)));
+                }
+                elseif ($path && !preg_match('/^(imap|feeds|github|wp_)/', $path) && $path !== 'tag') {
+                    $since = $this->user_config->get($path.'_since_setting', $this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE));
+                    $this->out('github_list_since', process_since_argument($since));
                 }
             }
             if (array_key_exists('github_unread', $this->request->post) && $this->request->post['github_unread']) {
@@ -379,7 +379,6 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
 class Hm_Handler_github_list_type extends Hm_Handler_Module {
     public function process() {
         $repos = $this->user_config->get('github_repos', array());
-        $excluded = $this->user_config->get('unread_exclude_github_setting', DEFAULT_UNREAD_EXCLUDE_GITHUB);
         $github_list = false;
         $parent = '';
         if (array_key_exists('list_parent', $this->request->get)) {
@@ -413,12 +412,14 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                     $this->append('data_sources', array('type' => 'github', 'name' => $repo, 'id' => $repo));
                 }
             }
-            elseif ($this->page == 'message_list' && ($path == 'combined_inbox' || $path == 'unread')) {
+            elseif ($this->page == 'message_list' && $path && !preg_match('/^(imap|feeds|github|wp_)/', $path) && $path !== 'tag') {
                 $github_list = true;
-                if (!$excluded || $path == 'combined_inbox') {
-                    foreach ($repos as $repo) {
-                        $this->append('data_sources', array('type' => 'github', 'name' => $repo, 'id' => $repo));
-                    }
+                $default_enabled = true;
+                if ($path == 'unread') {
+                    $default_enabled = !$this->user_config->get('unread_exclude_github_setting', DEFAULT_UNREAD_EXCLUDE_GITHUB);
+                }
+                foreach ($repos as $repo) {
+                    $this->append('data_sources', array('type' => 'github', 'name' => $repo, 'id' => $repo, 'default_enabled' => $default_enabled));
                 }
             }
             elseif ($this->page == 'message' && preg_match("/^github_(.+)$/", $path)) {
@@ -430,9 +431,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
         }
         if (!$github_list) {
             foreach ($repos as $repo) {
-                if (!$excluded) {
-                    $this->append('data_sources', array('group' => 'background', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
-                }
+                $this->append('data_sources', array('group' => 'background', 'type' => 'github', 'name' => 'Github', 'id' => $repo));
             }
         }
     }

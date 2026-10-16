@@ -92,6 +92,12 @@ Example:
 
 **Write Automated tests (for the new feature... if possible)**
 
+When an automated test protects an externally observable, security, privacy,
+data-protection, or project-process requirement, record its normalized cases in
+[docs/policy-cases.json](docs/policy-cases.json). See
+[docs/policy-cases.md](docs/policy-cases.md) for the decision rule and the
+required case format. Internal implementation tests do not need a policy entry.
+
 6. Run automated tests (if possible)
 
  - Unit Tests and integration tests with PHPUnit

@@ -127,6 +127,9 @@
     <testsuite name="tags">
       <file>./tags.php</file>
     </testsuite>
+    <testsuite name="tags_multi_account">
+      <file>./tags_multi_account.php</file>
+    </testsuite>
     <testsuite name="lib">
       <file>./lib/searchable.php</file>
       <file>./lib/scram_authenticator.php</file>
@@ -159,6 +162,9 @@
       <file>./modules/sievefilters/functions.php</file>
       <file>./modules/sievefilters/handler_modules.php</file>
     </testsuite>
+    <testsuite name="modules_smtp">
+      <file>./modules/smtp/handler_modules.php</file>
+    </testsuite>
     <testsuite name="modules_brute_force">
       <file>./modules/brute_force/handler_modules.php</file>
     </testsuite>
@@ -171,6 +177,9 @@
     </testsuite>
     <testsuite name="modules_ldap_contacts">
       <file>./modules/ldap_contacts/ldap_contacts.php</file>
+    </testsuite>
+    <testsuite name="modules_smtp">
+      <file>./modules/smtp/attachment_chunks.php</file>
     </testsuite>
     <testsuite name="mta_sts">
       <file>./mta_sts.php</file>

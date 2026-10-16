@@ -3,8 +3,8 @@
 <?php
 
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
-define('VENDOR_PATH', APP_PATH.'vendor/');
 define('MIGRATIONS_PATH', APP_PATH.'database/migrations');
+require APP_PATH.'lib/define_vendor_path.php';
 
 require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
