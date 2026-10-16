@@ -1,8 +1,6 @@
 ## Contacts
 
-This module set does not do anything by itself. It provides the framework
-for contact sources to be used in Cypht. Currently there are 3 contact
-sources supported:
+This module provides the base contact management framework, including the UI and a protocol layer that unifies all contact sources into a single, accessible storage layer. Currently, three contact sources are supported:
 
 - local contacts: Basic contact support locally within Cypht
 - LDAP contacts: Uses an LDAP server to access/manage contacts

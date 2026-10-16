@@ -10,8 +10,9 @@ if (strtolower(php_sapi_name()) !== 'cli') {
 
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
-define('VENDOR_PATH', APP_PATH.'vendor/');
 define('WEB_ROOT', '');
+require APP_PATH.'lib/define_vendor_path.php';
+
 chdir(APP_PATH);
 
 /* get the framework */
@@ -442,8 +443,6 @@ function get_module_assignments($settings) {
                 $js .= file_get_contents($js_module);
             }
         }
-
-        $css .= file_get_contents(sprintf("third_party/nprogress.css", 'third_party'));
     }
     return array($js, $css, $filters, $assets);
 }
@@ -479,7 +478,7 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
     $js_hash = '';
     $css_hash = '';
     if ($css) {
-        $css_out = file_get_contents(VENDOR_PATH . "twbs/bootstrap-icons/font/bootstrap-icons.css");
+        $css_out = get_js_libs_css_content(explode(',', $settings['js_exclude_deps']));
         $css_out .= compress($css, $css_compress);
         $css_hash = build_integrity_hash($css_out);
         file_put_contents('site.css', $css_out);

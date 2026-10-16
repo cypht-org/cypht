@@ -72,7 +72,7 @@ class Hm_Handler_remove_tag_from_message extends Hm_Handler_Module {
         foreach ($ids as $msg_part) {
             list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
             $folder = hex2bin($folder);
-            $untagged = Hm_Tags::removeMessage($msg_id, $form['tag_id']);
+            $untagged = Hm_Tags::removeMessage($msg_id, $form['tag_id'], $imap_server_id, $folder);
             if ($untagged) {
                 $untaged_messages++;
             }

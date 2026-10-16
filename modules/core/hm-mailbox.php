@@ -397,7 +397,10 @@ class Hm_Mailbox {
             return false;
         }
         if ($this->is_imap()) {
-            if ($this->connection->append_start($folder, mb_strlen($msg), $seen, $draft)) {
+            // IMAP APPEND literal size is in octets (bytes), not characters.
+            // mb_strlen() under-counts UTF-8 (e.g. attachment filenames with "é"),
+            // which makes APPEND fail and surfaces as "error occurred saving the sent message".
+            if ($this->connection->append_start($folder, strlen($msg), $seen, $draft)) {
                 $this->connection->append_feed($msg."\r\n");
                 return $this->connection->append_end();
             }
@@ -488,7 +491,7 @@ class Hm_Mailbox {
                 $attachment_id = get_attachment_id_for_mail_parser($struct, $part_id);
                 if ($attachment_id !== false) {
                     $msg = remove_attachment($attachment_id, $msg);
-                    if ($this->connection->append_start($folder, mb_strlen($msg))) {
+                    if ($this->connection->append_start($folder, strlen($msg))) {
                         $this->connection->append_feed($msg."\r\n");
                         if ($this->connection->append_end()) {
                             if ($this->connection->message_action('DELETE', array($uid))['status']) {
