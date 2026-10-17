@@ -1656,6 +1656,23 @@ a[disabled] {
   display: none;
 }
 
+.amp_email_notice {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  color: #856404;
+  font-size: 0.875em;
+  margin-bottom: 0.5em;
+  padding: 0.5em 0.75em;
+}
+
+.amp_email_frame {
+  border: 0;
+  display: block;
+  min-height: 320px;
+  width: 100%;
+}
+
 .long_header {
   display: none;
 }

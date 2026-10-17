@@ -120,9 +120,29 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
             if (array_key_exists('envelope', $struct) && is_array($struct['envelope']) && count($struct['envelope']) > 0) {
                 $txt .= format_imap_envelope($struct['envelope'], $this);
             }
-            if (isset($struct['subtype']) && mb_strtolower($struct['subtype']) == 'html') {
+            $subtype = isset($struct['subtype']) ? mb_strtolower($struct['subtype']) : '';
+            $msgText = $this->get('msg_text');
+            $enable_amp_email = $this->get('enable_amp_email', false);
+            $has_amp_part = false;
+            $msg_struct = $this->get('msg_struct', array());
+            array_walk_recursive($msg_struct, function ($value, $key) use (&$has_amp_part) {
+                if ($key === 'subtype' && mb_strtolower((string) $value) === 'x-amp-html') {
+                    $has_amp_part = true;
+                }
+            });
+            if (! $enable_amp_email && $has_amp_part) {
+                $txt .= '<div class="amp_email_notice">' . $this->trans('This email contains AMP content, but AMP support is disabled. Showing the HTML fallback.') . '</div>';
+            }
+            if ($subtype == 'html' || $subtype == 'x-amp-html') {
                 $allowed = $this->get('header_allow_images');
-                $msgText = $this->get('msg_text');
+                if ($subtype == 'x-amp-html' && $enable_amp_email) {
+                    if (! $allowed) {
+                        $txt .= '<div class="amp_email_notice">' . $this->trans('This message uses AMP for Email. Remote content is blocked until external resources are allowed.') . '</div>';
+                    }
+                    $txt .= format_amp_email($msgText);
+                    $this->out('msg_text', $txt . '</div>');
+                    return;
+                }
                 $blocked_remote_resources = count_blocked_remote_email_css_resources($msgText);
                 // Everything in the message starting with src="http:// or src="https:// or src='http:// or src='https://
                 $externalResRegexp = '/src="(https?:\/\/[^"]*)"|src=\'(https?:\/\/[^\']*)\'/i';
