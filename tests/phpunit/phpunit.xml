@@ -140,6 +140,7 @@
       <file>./lib/version.php</file>
       <file>./lib/logging.php</file>
       <file>./lib/output_debug.php</file>
+      <file>./lib/path_router.php</file>
     </testsuite>
     <!--<testsuite name="modules_imap">
             <file>./modules/imap/hm-imap.php</file>
@@ -183,6 +184,23 @@
     </testsuite>
     <testsuite name="mta_sts">
       <file>./mta_sts.php</file>
+    </testsuite>
+    <testsuite name="modules_mcp">
+      <file>./modules/mcp/router.php</file>
+      <file>./modules/mcp/crypto.php</file>
+      <file>./modules/mcp/store.php</file>
+      <file>./modules/mcp/settings.php</file>
+      <file>./modules/mcp/format.php</file>
+      <file>./modules/mcp/catalog.php</file>
+      <file>./modules/mcp/mail.php</file>
+      <file>./modules/mcp/endpoint.php</file>
+      <file>./modules/mcp/attachments.php</file>
+      <file>./modules/mcp/oauth.php</file>
+      <file>./modules/mcp/organize.php</file>
+      <file>./modules/mcp/drafts.php</file>
+      <file>./modules/mcp/send.php</file>
+      <file>./modules/mcp/runner.php</file>
+      <file>./modules/mcp/manage.php</file>
     </testsuite>
   </testsuites>
   <source>

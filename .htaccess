@@ -7,6 +7,15 @@
     RewriteCond %{REQUEST_URI} ^/$
     RewriteRule ^$ index.php [L]
 
+    # Pass the Authorization header to PHP (used by API and MCP clients)
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # URL paths served by module sets (MCP server, OAuth and REST API)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(mcp/?$|oauth/|api/v1(/|$)|\.well-known/(oauth-|openid-configuration)) index.php [L,QSA]
+
     # Force HTTPS (uncomment to enable)
     # RewriteCond %{HTTPS} !=on
     # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

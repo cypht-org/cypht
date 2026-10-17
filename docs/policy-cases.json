@@ -156,6 +156,525 @@
           }
         }
       ]
+    },
+    {
+      "id": "mcp-public-url",
+      "title": "MCP public URL validation",
+      "description": "The public OAuth issuer uses HTTPS, with HTTP allowed for local development only, and excludes credentials and query strings.",
+      "tests": [
+        "Hm_Test_MCP_Router::test_public_url_must_be_https_or_loopback"
+      ],
+      "cases": [
+        {
+          "id": "https",
+          "description": "Validate the https public URL.",
+          "input": {
+            "url": "https://mail.example.com"
+          },
+          "expected": {
+            "valid": true
+          }
+        },
+        {
+          "id": "loopback-http",
+          "description": "Validate the loopback-http public URL.",
+          "input": {
+            "url": "http://localhost:8080"
+          },
+          "expected": {
+            "valid": true
+          }
+        },
+        {
+          "id": "remote-http",
+          "description": "Validate the remote-http public URL.",
+          "input": {
+            "url": "http://mail.example.com"
+          },
+          "expected": {
+            "valid": false
+          }
+        },
+        {
+          "id": "embedded-credentials",
+          "description": "Validate the embedded-credentials public URL.",
+          "input": {
+            "url": "https://user:pass@mail.example.com"
+          },
+          "expected": {
+            "valid": false
+          }
+        },
+        {
+          "id": "query-string",
+          "description": "Validate the query-string public URL.",
+          "input": {
+            "url": "https://mail.example.com/?x=1"
+          },
+          "expected": {
+            "valid": false
+          }
+        },
+        {
+          "id": "missing-scheme",
+          "description": "Validate the missing-scheme public URL.",
+          "input": {
+            "url": "mail.example.com"
+          },
+          "expected": {
+            "valid": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "mcp-oauth-redirect-safety",
+      "title": "MCP OAuth redirect safety",
+      "description": "Client registration refuses redirects that expose credentials, use active content, target local files, or fail URI validation.",
+      "tests": [
+        "Hm_Test_MCP_OAuth::test_registration_rejects_unsafe_redirect_uris"
+      ],
+      "cases": [
+        {
+          "id": "remote-http",
+          "description": "Reject a remote-http redirect.",
+          "input": {
+            "redirect_uri": "http://evil.example.com/cb"
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_redirect_uri"
+          }
+        },
+        {
+          "id": "fragment",
+          "description": "Reject a fragment redirect.",
+          "input": {
+            "redirect_uri": "https://chatgpt.com/cb#fragment"
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_redirect_uri"
+          }
+        },
+        {
+          "id": "credentials",
+          "description": "Reject a credentials redirect.",
+          "input": {
+            "redirect_uri": "https://user:pass@chatgpt.com/cb"
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_redirect_uri"
+          }
+        },
+        {
+          "id": "javascript",
+          "description": "Reject a javascript redirect.",
+          "input": {
+            "redirect_uri": "javascript:alert(1)"
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_redirect_uri"
+          }
+        },
+        {
+          "id": "mixed-case-javascript",
+          "description": "Reject a mixed-case-javascript redirect.",
+          "input": {
+            "redirect_uri": "JavaScript:alert(1)"
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_redirect_uri"
+          }
+        },
+        {
+          "id": "data",
+          "description": "Reject a data redirect.",
+          "input": {
+            "redirect_uri": "data:text/html,hello"
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_redirect_uri"
+          }
+        },
+        {
+          "id": "local-file",
+          "description": "Reject a local-file redirect.",
+          "input": {
+            "redirect_uri": "file:///etc/passwd"
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_redirect_uri"
+          }
+        },
+        {
+          "id": "relative",
+          "description": "Reject a relative redirect.",
+          "input": {
+            "redirect_uri": "/relative/path"
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_redirect_uri"
+          }
+        },
+        {
+          "id": "host-whitespace",
+          "description": "Reject a host-whitespace redirect.",
+          "input": {
+            "redirect_uri": "https://chat gpt.com/cb"
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_redirect_uri"
+          }
+        },
+        {
+          "id": "unsafe-path",
+          "description": "Reject a unsafe-path redirect.",
+          "input": {
+            "redirect_uri": "https://chatgpt.com/<cb>"
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_redirect_uri"
+          }
+        },
+        {
+          "id": "empty",
+          "description": "Reject a empty redirect.",
+          "input": {
+            "redirect_uri": ""
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_redirect_uri"
+          }
+        },
+        {
+          "id": "non-string",
+          "description": "Reject a non-string redirect.",
+          "input": {
+            "redirect_uri": 42
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_redirect_uri"
+          }
+        }
+      ]
+    },
+    {
+      "id": "mcp-oauth-code-binding",
+      "title": "MCP OAuth authorization code binding",
+      "description": "Exchanging a code requires its PKCE verifier, client, redirect and resource, and never creates a connection when those checks fail.",
+      "tests": [
+        "Hm_Test_MCP_OAuth::test_code_exchange_checks"
+      ],
+      "cases": [
+        {
+          "id": "wrong-verifier",
+          "description": "Reject an exchange with wrong-verifier.",
+          "input": {
+            "overrides": {
+              "code_verifier": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_grant"
+          }
+        },
+        {
+          "id": "short-verifier",
+          "description": "Reject an exchange with short-verifier.",
+          "input": {
+            "overrides": {
+              "code_verifier": "short"
+            }
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_grant"
+          }
+        },
+        {
+          "id": "missing-verifier",
+          "description": "Reject an exchange with missing-verifier.",
+          "input": {
+            "overrides": {
+              "code_verifier": ""
+            }
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_grant"
+          }
+        },
+        {
+          "id": "changed-redirect",
+          "description": "Reject an exchange with changed-redirect.",
+          "input": {
+            "overrides": {
+              "redirect_uri": "https://chatgpt.com/other"
+            }
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_grant"
+          }
+        },
+        {
+          "id": "missing-redirect",
+          "description": "Reject an exchange with missing-redirect.",
+          "input": {
+            "overrides": {
+              "redirect_uri": ""
+            }
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_grant"
+          }
+        },
+        {
+          "id": "unknown-code",
+          "description": "Reject an exchange with unknown-code.",
+          "input": {
+            "overrides": {
+              "code": "cyp_ac_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+            }
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_grant"
+          }
+        },
+        {
+          "id": "wrong-resource",
+          "description": "Reject an exchange with wrong-resource.",
+          "input": {
+            "overrides": {
+              "resource": "https://other.example.com/mcp"
+            }
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_target"
+          }
+        },
+        {
+          "id": "unknown-client",
+          "description": "Reject an exchange with unknown-client.",
+          "input": {
+            "overrides": {
+              "client_id": "cl_unknown"
+            }
+          },
+          "expected": {
+            "status": 401,
+            "error": "invalid_client"
+          }
+        },
+        {
+          "id": "missing-client",
+          "description": "Reject an exchange with missing-client.",
+          "input": {
+            "overrides": {
+              "client_id": ""
+            }
+          },
+          "expected": {
+            "status": 401,
+            "error": "invalid_client"
+          }
+        },
+        {
+          "id": "password-grant",
+          "description": "Reject an exchange with password-grant.",
+          "input": {
+            "overrides": {
+              "grant_type": "password"
+            }
+          },
+          "expected": {
+            "status": 400,
+            "error": "unsupported_grant_type"
+          }
+        },
+        {
+          "id": "missing-grant",
+          "description": "Reject an exchange with missing-grant.",
+          "input": {
+            "overrides": {
+              "grant_type": ""
+            }
+          },
+          "expected": {
+            "status": 400,
+            "error": "invalid_request"
+          }
+        }
+      ]
+    },
+    {
+      "id": "mcp-tool-permissions",
+      "title": "MCP tool permission filtering",
+      "description": "Tools are advertised only within the permissions available to the connection. Sending and destructive tools require their own permissions.",
+      "tests": [
+        "Hm_Test_MCP_Catalog::test_allowed_filters_by_permission"
+      ],
+      "cases": [
+        {
+          "id": "all-disabled",
+          "description": "No enabled permission exposes tools.",
+          "input": {
+            "permissions": {}
+          },
+          "expected": {
+            "present": [],
+            "absent": [
+              "list_messages",
+              "send_message",
+              "delete_messages_permanently"
+            ],
+            "permission_groups": []
+          }
+        },
+        {
+          "id": "read-only",
+          "description": "Read access excludes sending and deletion.",
+          "input": {
+            "permissions": {
+              "read": true
+            }
+          },
+          "expected": {
+            "present": [
+              "list_messages",
+              "search",
+              "fetch"
+            ],
+            "absent": [
+              "send_message",
+              "trash_messages",
+              "delete_messages_permanently"
+            ],
+            "permission_groups": [
+              "read"
+            ]
+          }
+        },
+        {
+          "id": "send-only",
+          "description": "Send access does not grant reading or deletion.",
+          "input": {
+            "permissions": {
+              "send": true
+            }
+          },
+          "expected": {
+            "present": [
+              "send_message",
+              "send_draft",
+              "manage_scheduled"
+            ],
+            "absent": [
+              "list_messages",
+              "delete_messages_permanently"
+            ],
+            "permission_groups": [
+              "send"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "mcp-visible-message-text",
+      "title": "MCP visible message text",
+      "description": "Message text returned to assistants removes hidden Unicode and control characters while preserving plain text line breaks.",
+      "tests": [
+        "Hm_Test_MCP_Format::test_text_removes_control_and_invisible_characters"
+      ],
+      "cases": [
+        {
+          "id": "unicode-tags",
+          "description": "Normalize unicode-tags in message text.",
+          "input": {
+            "format": "text",
+            "text": "Pay invoice\udb40\udc49\udb40\udc47\udb40\udc4e"
+          },
+          "expected": {
+            "text": "Pay invoice"
+          }
+        },
+        {
+          "id": "invisible-and-bidi",
+          "description": "Normalize invisible-and-bidi in message text.",
+          "input": {
+            "format": "text",
+            "text": "a\u200b\u202eb"
+          },
+          "expected": {
+            "text": "ab"
+          }
+        },
+        {
+          "id": "control-characters",
+          "description": "Normalize control-characters in message text.",
+          "input": {
+            "format": "text",
+            "text": "a\u0000\u0007\nb"
+          },
+          "expected": {
+            "text": "a b"
+          }
+        },
+        {
+          "id": "plain-text-lines",
+          "description": "Normalize plain-text-lines in message text.",
+          "input": {
+            "format": "plain_text",
+            "text": "line 1\r\nline 2\u001b"
+          },
+          "expected": {
+            "text": "line 1\nline 2"
+          }
+        }
+      ]
+    },
+    {
+      "id": "mcp-imap-response-budget",
+      "title": "MCP IMAP response budget",
+      "description": "A silent server or incomplete response releases the socket within the read budget, discards partial data and lets cleanup return without waiting for LOGOUT.",
+      "tests": [
+        "Hm_Test_IMAP_Timeouts::test_silent_server_does_not_hold_a_worker",
+        "Hm_Test_IMAP_Timeouts::test_partial_line_does_not_retry_after_timeout",
+        "Hm_Test_IMAP_Timeouts::test_truncated_literal_does_not_retry_after_timeout",
+        "Hm_Test_IMAP_Timeouts::test_timeout_in_a_second_literal_discards_the_incomplete_response",
+        "Hm_Test_IMAP_Timeouts::test_absolute_deadline_caps_a_longer_socket_timeout"
+      ],
+      "cases": [
+        {
+          "id": "abort-stalled-response",
+          "description": "An incomplete response closes the connection within one second using a short socket timeout.",
+          "input": {
+            "read_timeout": 0.03
+          },
+          "expected": {
+            "response": [],
+            "max_elapsed_seconds": 1,
+            "state": "disconnected",
+            "socket_open": false
+          }
+        }
+      ]
     }
   ]
 }
