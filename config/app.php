@@ -571,6 +571,17 @@ return [
 
     /*
     | ------------------
+    | Enable AMP email
+    | ------------------
+    |
+    | AMP email requires loading its JavaScript runtime from cdn.ampproject.org.
+    | Enable this only if you trust that external runtime to execute in the
+    | sandboxed AMP email viewer.
+    */
+    'enable_amp_email' => env('ENABLE_AMP_EMAIL', false),
+
+    /*
+    | ------------------
     | Single server mode
     | ------------------
     |

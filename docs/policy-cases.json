@@ -109,7 +109,7 @@
               "X-Frame-Options": "SAMEORIGIN",
               "X-XSS-Protection": "1; mode=block",
               "X-Content-Type-Options": "nosniff",
-              "Content-Security-Policy": "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+              "Content-Security-Policy": "default-src 'none'; script-src 'self' 'unsafe-inline' https://cdn.ampproject.org; connect-src 'self'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
               "Content-Type": "application/json"
             }
           }
