@@ -335,7 +335,7 @@ class Hm_Mailbox {
         }
     }
 
-    public function get_structured_message($folder, $msg_id, $part, $text_only, $support_mstnef = false) {
+    public function get_structured_message($folder, $msg_id, $part, $text_only, $support_mstnef = false, $enable_amp_email = false) {
         if (! $this->select_folder($folder)) {
             return;
         }
@@ -357,15 +357,24 @@ class Hm_Mailbox {
                     if ($support_mstnef) {
                         list($part, $msg_text) = $this->connection->get_first_message_part($msg_id, 'application', 'ms-tnef', $msg_struct);
                     }
+                    if (! $part && $enable_amp_email) {
+                        list($part, $msg_text) = $this->connection->get_first_message_part($msg_id, 'text', 'x-amp-html', $msg_struct);
+                    }
                     if (! $part) {
                         list($part, $msg_text) = $this->connection->get_first_message_part($msg_id, 'text', 'html', $msg_struct);
+                    }
+                    if (! $part) {
+                        list($part, $msg_text) = $this->connection->get_first_message_part($msg_id, 'text', 'plain', $msg_struct);
                     }
                     if (!$part) {
                         list($part, $msg_text) = $this->connection->get_first_message_part($msg_id, 'text', false, $msg_struct);
                     }
                 }
                 else {
-                    list($part, $msg_text) = $this->connection->get_first_message_part($msg_id, 'text', false, $msg_struct);
+                    list($part, $msg_text) = $this->connection->get_first_message_part($msg_id, 'text', 'plain', $msg_struct);
+                    if (! $part) {
+                        list($part, $msg_text) = $this->connection->get_first_message_part($msg_id, 'text', false, $msg_struct);
+                    }
                 }
                 $struct = $this->connection->search_bodystructure($msg_struct, array('imap_part_number' => $part));
                 $msg_struct_current = array_shift($struct);
@@ -383,12 +392,12 @@ class Hm_Mailbox {
                     }
                 }
             }
-            if (isset($msg_struct_current['subtype']) && mb_strtolower($msg_struct_current['subtype'] == 'html')) {
+            if (isset($msg_struct_current['subtype']) && in_array(mb_strtolower($msg_struct_current['subtype']), array('html', 'x-amp-html'))) {
                 $msg_text = add_attached_images($msg_text, $msg_id, $msg_struct, $this->connection);
             }
             return [$msg_struct, $msg_struct_current, $msg_text, $part];
         } else {
-            return $this->connection->get_structured_message($msg_id, $part, $text_only);
+            return $this->connection->get_structured_message($msg_id, $part, $text_only, $enable_amp_email);
         }
     }
 
