@@ -49,16 +49,22 @@ function applyAdvancedSearchPageHandlers() {
         return delete_advanced_search();
     });
 
-    apply_saved_search();
-    var data = Hm_Utils.get_from_local_storage('formatted_advanced_search_data');
-    if (data && data.length) {
-        adv_collapse();
-        Hm_Utils.tbody().html(data);
-        $('.adv_controls').show();
-        $('.core_msg_control').off('click');
-        $('.core_msg_control').on("click", function() { return Hm_Message_List.message_action($(this).data('action')); });
-        if (typeof check_select_for_imap !== 'undefined') {
-            check_select_for_imap();
+    var saved_search_data = get_saved_advanced_search_data();
+    if (saved_search_data) {
+        load_advanced_search_from_data(saved_search_data, true);
+    }
+    else {
+        apply_saved_search();
+        var data = Hm_Utils.get_from_local_storage('formatted_advanced_search_data');
+        if (data && data.length) {
+            adv_collapse();
+            Hm_Utils.tbody().html(data);
+            $('.adv_controls').show();
+            $('.core_msg_control').off('click');
+            $('.core_msg_control').on("click", function() { return Hm_Message_List.message_action($(this).data('action')); });
+            if (typeof check_select_for_imap !== 'undefined') {
+                check_select_for_imap();
+            }
         }
     }
     Hm_Message_List.check_empty_list();
