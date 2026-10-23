@@ -314,13 +314,8 @@ class Hm_Output_advanced_search_data_handler extends Hm_Output_Module {
     protected function output() {
         if ($this->get('load_advanced_search_js') && $this->get('advanced_search_data')) {
             $search_data = $this->get('advanced_search_data');
-            return '<script type="text/javascript">
-                $(document).ready(function() {
-                    if (typeof load_advanced_search_from_data === "function") {
-                        load_advanced_search_from_data(' . json_encode($search_data) . ', true);
-                    }
-                });
-            </script>';
+            return '<script type="application/json" class="saved_advanced_search_data">'.
+                json_encode($search_data, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP).'</script>';
         }
         return '';
     }
