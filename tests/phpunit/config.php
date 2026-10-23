@@ -44,7 +44,7 @@ class Hm_Test_User_File_Config extends TestCase {
 
         $this->config->set('imap_servers', array(array('pass' => 'foo', 'server' => 'localhost')));
         $this->config->set('no_password_save_setting', true);
-        $this->assertEquals(array('imap_servers' => array('foo')), $this->config->filter_servers());
+        $this->assertEquals(array('imap_servers' => array(array('pass' => 'foo'))), $this->config->filter_servers());
     }
     /**
      * @preserveGlobalState disabled

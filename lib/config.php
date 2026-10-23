@@ -153,7 +153,7 @@ abstract class Hm_Config {
                         $this->config[$key][$index]['object'] = false;
                         if ($no_password) {
                             if (!array_key_exists('auth', $server) || $server['auth'] != 'xoauth2') {
-                                $removed[$key][$index] = $server['pass'];
+                                $removed[$key][$index]['pass'] = $server['pass'];
                                 unset($this->config[$key][$index]['pass']);
                             }
                         }
@@ -173,7 +173,8 @@ abstract class Hm_Config {
         foreach ($removed as $key => $vals) {
             foreach ($vals as $index => $server) {
                 if (is_array($server)) {
-                    $this->config[$key][$index] = $server;
+                    $current = $this->config[$key][$index] ?? [];
+                    $this->config[$key][$index] = array_merge(is_array($current) ? $current : [], $server);
                 } else {
                     $this->config[$key][$index]['pass'] = $server;
                 }
