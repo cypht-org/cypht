@@ -48,6 +48,17 @@ class Hm_Test_Core_Message_Functions extends TestCase {
         $this->assertDoesNotMatchRegularExpression('/\ssrc="https?:\/\//', $out);
         $this->assertStringContainsString('data-src="https://tracker.example.com/pixel.gif"', $out);
     }
+    public function test_format_amp_email_preserves_amp_document_in_sandbox() {
+        $email = '<html amp4email><head><meta charset="utf-8"><style amp4email-boilerplate>body{visibility:hidden}</style><script async src="https://cdn.ampproject.org/v0.js"></script></head><body><amp-img src="data:image/png;base64,foo"></amp-img></body></html>';
+        $out = format_amp_email($email);
+
+        $this->assertStringContainsString('class="amp_email_frame"', $out);
+        $this->assertStringContainsString('sandbox="allow-scripts allow-forms"', $out);
+        $this->assertStringContainsString('&lt;meta charset=&quot;utf-8&quot;&gt;', $out);
+        $this->assertStringContainsString('&lt;style amp4email-boilerplate&gt;', $out);
+        $this->assertStringContainsString('&lt;script async src=&quot;https://cdn.ampproject.org/v0.js&quot;&gt;', $out);
+        $this->assertStringNotContainsString('Content-Security-Policy', $out);
+    }
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
