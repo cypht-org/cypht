@@ -59,9 +59,13 @@ function parse_csv_with_headers($file_path, $delimiter = ';') {
 
 if (!hm_exists('convert_to_boolean')) {
 function convert_to_boolean($value) {
-    if (in_array($value, ['true', '1', 'yes'])) {
+    if (!is_string($value)) {
+        return $value;
+    }
+    $normalized = mb_strtolower(trim($value));
+    if (in_array($normalized, ['true', '1', 'yes'], true)) {
         return true;
-    } elseif (in_array($value, ['false', '0', 'no'])) {
+    } elseif (in_array($normalized, ['false', '0', 'no'], true)) {
         return false;
     }
     return $value;
