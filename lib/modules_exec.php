@@ -285,7 +285,7 @@ class Hm_Module_Exec {
      */
     public function setup_debug_modules() {
         $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(),
-            'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
+            'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array(), 'allowed_routes' => array());
         $modules = $this->site_config->get_modules();
         foreach ($modules as $name) {
             $path = sprintf(APP_PATH."modules/%s/setup.php", $name);
@@ -303,8 +303,11 @@ class Hm_Module_Exec {
      * @return array merged list
      */
     static public function merge_filters($existing, $new) {
-        foreach (array('allowed_output', 'allowed_get', 'allowed_cookie', 'allowed_post', 'allowed_server', 'allowed_pages') as $v) {
-            if (array_key_exists($v, $new)) {
+        foreach (array('allowed_output', 'allowed_get', 'allowed_cookie', 'allowed_post', 'allowed_server', 'allowed_pages', 'allowed_routes') as $v) {
+            if (array_key_exists($v, $new) && is_array($new[$v])) {
+                if (!array_key_exists($v, $existing) || !is_array($existing[$v])) {
+                    $existing[$v] = array();
+                }
                 if ($v == 'allowed_pages' || $v == 'allowed_output') {
                     $existing[$v] = array_merge($existing[$v], $new[$v]);
                 } else {

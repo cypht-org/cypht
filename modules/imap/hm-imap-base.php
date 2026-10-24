@@ -30,13 +30,15 @@ class Hm_IMAP_Base {
     protected $server_id = array();            // server ID response values
     protected $literal_overflow = false;
     public $struct_object = false;
+    public $read_timeout = null;               // optional per-read socket timeout in seconds
+    public $read_deadline = null;              // optional absolute request deadline
 
 
     /* attributes that can be set for the IMAP connaction */
     protected $config = array('server', 'port', 'tls', 'read_only',
         'utf7_folders', 'auth', 'search_charset', 'sort_speedup', 'folder_max',
         'use_cache', 'max_history', 'blacklisted_extensions', 'app_name', 'app_version',
-        'app_vendor', 'app_support_url', 'cache_limit', 'no_caps', 'timeout');
+        'app_vendor', 'app_support_url', 'cache_limit', 'no_caps', 'timeout', 'read_timeout', 'read_deadline');
 
     /* supported extensions */
     protected $client_extensions = array('SORT', 'COMPRESS', 'NAMESPACE', 'CONDSTORE',
@@ -71,10 +73,16 @@ class Hm_IMAP_Base {
     private function read_literal($size, $max, $current, $line_length) {
         $left_over = false;
         $literal_data = $this->fgets($line_length);
+        if ($literal_data === '' || $literal_data === false) {
+            return array('', false);
+        }
         $lit_size = strlen($literal_data);
         $current += $lit_size;
         while ($lit_size < $size) {
             $chunk = $this->fgets($line_length);
+            if ($chunk === '' || $chunk === false) {
+                return array('', false);
+            }
             $chunk_size = strlen($chunk);
             $lit_size += $chunk_size;
             $current += $chunk_size;
@@ -87,6 +95,9 @@ class Hm_IMAP_Base {
         if ($this->max_read) {
             while ($lit_size < $size) {
                 $temp = $this->fgets($line_length);
+                if ($temp === '' || $temp === false) {
+                    return array('', false);
+                }
                 $lit_size += strlen($temp);
             }
         }
@@ -207,15 +218,47 @@ class Hm_IMAP_Base {
      * @return string data read from the IMAP server
      */
     protected function fgets($len=false) {
-        if (is_resource($this->handle) && !feof($this->handle)) {
-            if ($len) {
-                return fgets($this->handle, $len);
-            }
-            else {
-                return fgets($this->handle);
-            }
+        if (!is_resource($this->handle)) {
+            return '';
         }
-        return '';
+        if (feof($this->handle)) {
+            $this->abort_read('IMAP connection closed while reading a response');
+            return '';
+        }
+        if ($this->read_timeout !== null || $this->read_deadline !== null) {
+            $timeout = $this->read_timeout !== null ? (float) $this->read_timeout : (float) ini_get('default_socket_timeout');
+            if ($this->read_deadline !== null) {
+                $timeout = min($timeout, $this->read_deadline - microtime(true));
+            }
+            if ($timeout <= 0) {
+                $this->abort_read('IMAP request time budget exhausted');
+                return '';
+            }
+            $seconds = (int) $timeout;
+            stream_set_timeout($this->handle, $seconds, max(1, (int) (($timeout - $seconds) * 1000000)));
+        }
+        $result = $len ? fgets($this->handle, $len) : fgets($this->handle);
+        $metadata = stream_get_meta_data($this->handle);
+        if ($result === false || $result === '' || !empty($metadata['timed_out'])) {
+            $this->abort_read(!empty($metadata['timed_out']) ? 'IMAP response read timed out' : 'IMAP response ended unexpectedly');
+            return '';
+        }
+        return $result;
+    }
+
+    /** Close a failed stream so later reads and LOGOUT cannot wait on it again. */
+    protected function abort_read($reason) {
+        $this->debug[] = $reason;
+        if (is_resource($this->handle)) {
+            fclose($this->handle);
+        }
+        $this->handle = false;
+        if (property_exists($this, 'state')) {
+            $this->state = 'disconnected';
+        }
+        if (property_exists($this, 'selected_mailbox')) {
+            $this->selected_mailbox = false;
+        }
     }
 
     /**
@@ -250,6 +293,10 @@ class Hm_IMAP_Base {
 
             /* read in a line up to 8192 bytes */
             $result[$n] = $this->fgets($line_length);
+            if ($result[$n] === '' || $result[$n] === false) {
+                $result = $chunked_result = array();
+                break;
+            }
 
             /* keep track of how much we have read and break out if we max out. This can
              * happen on large messages. We need this check to ensure we don't exhaust available
@@ -264,12 +311,16 @@ class Hm_IMAP_Base {
              * an end of line char. Keep checking the max read length as we go */
             while(mb_substr($result[$n], -2) != "\r\n" && mb_substr($result[$n], -1) != "\n") {
                 if (!is_resource($this->handle) || feof($this->handle)) {
-                    break;
+                    $this->abort_read('IMAP response ended before the end of a line');
+                    $result = $chunked_result = array();
+                    break 2;
                 }
-                $result[$n] .= $this->fgets($line_length);
-                if ($result[$n] === false) {
-                    break;
+                $next = $this->fgets($line_length);
+                if ($next === '' || $next === false) {
+                    $result = $chunked_result = array();
+                    break 2;
                 }
+                $result[$n] .= $next;
                 $current_size += mb_strlen($result[$n]);
                 if ($max && $current_size > $max) {
                     $this->max_read = true;
@@ -303,6 +354,10 @@ class Hm_IMAP_Base {
                     $current_size += mb_strlen($lit_text);
                     list($line_cont, $new_chunks) = $this->parse_line($lit_text, $current_size, $max, $line_length);
                     $chunks = array_merge($chunks, $new_chunks);
+                }
+                if (!is_resource($this->handle)) {
+                    $result = $chunked_result = array();
+                    break;
                 }
             }
 

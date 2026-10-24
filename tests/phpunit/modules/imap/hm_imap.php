@@ -8,7 +8,7 @@ class Hm_Test_Hm_IMAP extends TestCase {
         define('IMAP_TEST', true);
         require __DIR__.'/../../bootstrap.php';
         require APP_PATH.'modules/imap/hm-imap.php';
-        require APP_PATH.'modules/core/message_functions.php';
+        require_once APP_PATH.'modules/core/message_functions.php';
         $this->create();
         $this->connect();
     }

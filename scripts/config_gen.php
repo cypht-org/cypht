@@ -403,7 +403,7 @@ function get_module_assignments($settings) {
     $core = false;
     $js_exclude_dependencies = explode(',', ($settings['js_exclude_deps'] ?? ''));
     $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(),
-        'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
+        'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array(), 'allowed_routes' => array());
 
     if (isset($settings['modules'])) {
         $mods = get_modules($settings);

@@ -26,7 +26,7 @@ class Hm_Test_Module_Exec_Debug extends TestCase {
      */
     public function test_process_module_setup() {
         $this->module_exec->process_module_setup();
-        $this->assertEquals(array('allowed_output' => array(), 'allowed_post' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_server' => array(), 'allowed_pages' => array ()), $this->module_exec->filters);
+        $this->assertEquals(array('allowed_output' => array(), 'allowed_post' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(), 'allowed_server' => array(), 'allowed_pages' => array (), 'allowed_routes' => array()), $this->module_exec->filters);
     }
     /**
      * @preserveGlobalState disabled

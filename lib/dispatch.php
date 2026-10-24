@@ -181,6 +181,11 @@ class Hm_Dispatch {
         /* instantiate the module runner */
         $this->module_exec = new Hm_Module_Exec($this->site_config);
 
+        /* let module sets serve the URL paths they own, like API endpoints */
+        if (Hm_Path_Router::dispatch($this->site_config, $this->module_exec->filters)) {
+            return;
+        }
+
         /* process request input using the white-lists defined in modules */
         $this->request = new Hm_Request($this->module_exec->filters, $config);
 
