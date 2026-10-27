@@ -186,8 +186,6 @@ setup_site() {
 		STATUS_DONE
 	else
 		STATUS_ERROR
-		ls -l /run/php || true
-		sudo journalctl -u php"${PHP_V}"-fpm -n 40 --no-pager || true
 		exit 1
 	fi
 	
@@ -227,28 +225,9 @@ setup_site() {
 
 	sudo systemctl start nginx.service
 
-	CYPHT_STATUS=$(curl -sS -D /tmp/cypht.hdr -o /tmp/cypht.body -w '%{http_code}' 'http://cypht-test.org' || true)
-	LOCALHOST_STATUS=$(curl -sS -D /tmp/local.hdr -o /tmp/local.body -w '%{http_code}' 'http://localhost' || true)
-	CYPHT_STATUS=${CYPHT_STATUS:-000}
-	LOCALHOST_STATUS=${LOCALHOST_STATUS:-000}
-	echo "cypht-test.org ${CYPHT_STATUS}"
-	echo "localhost ${LOCALHOST_STATUS}"
-	echo "---- response ----"
-	head -c 2000 /tmp/cypht.body || true
-	echo
-	echo "---- listeners ----"
-	sudo ss -ltnp | grep -E ':80' || true
-	sudo ss -lxnp | grep -E 'php.*fpm' || true
-	echo "---- fpm ----"
-	php -v
-	php-fpm${PHP_V} -v || true
-	ls -l /run/php || true
-	systemctl is-active php${PHP_V}-fpm nginx apache2 || true
-	echo "---- nginx ----"
-	sudo tail -n 80 /var/log/nginx/error.log || true
-	echo "---- php-fpm ----"
-	sudo journalctl -u php${PHP_V}-fpm -n 80 --no-pager || true
-
+	CYPHT_STATUS=$(curl -s -o /dev/null -w '%{http_code}' 'http://cypht-test.org')
+	LOCALHOST_STATUS=$(curl -s -o /dev/null -w '%{http_code}' 'http://localhost')
+	
 	if [ "$CYPHT_STATUS" -eq 200 ] || [ "$LOCALHOST_STATUS" -eq 200 ]; then
 		STATUS_DONE
 	else
