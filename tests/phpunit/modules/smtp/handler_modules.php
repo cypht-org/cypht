@@ -170,4 +170,116 @@ class Hm_Test_Smtp_Handler_Modules extends TestCase {
 
         $this->assertArrayNotHasKey('visible', $test2->ses_obj->data['scheduled_send_failed_servers']);
     }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_send_failure_restores_posted_attachments_over_session() {
+        $attachment_dir = sys_get_temp_dir().'/cypht-send-fail-'.bin2hex(random_bytes(4));
+        $user_dir = $attachment_dir.'/'.md5('alice');
+        mkdir($user_dir, 0700, true);
+        $plain = 'attachment-body';
+        try {
+            $test = new Smtp_Handler_Test('load_smtp_servers_from_config', 'smtp');
+            $test->config = array('attachment_dir' => $attachment_dir);
+            $test->session = array(
+                'username' => 'alice',
+                'uploaded_files' => array(
+                    '7' => array(array(
+                        'name' => 'stale.txt',
+                        'type' => 'text/plain',
+                        'size' => 4,
+                        'filename' => $user_dir.'/stale.txt',
+                    )),
+                ),
+            );
+            $test->post = array(
+                'smtp_send' => 'Send',
+                'compose_subject' => 'Hello',
+                'compose_body' => 'Body text',
+                'compose_smtp_id' => '1',
+                'draft_id' => '7',
+                'post_archive' => '0',
+                'next_email_post' => '',
+                'compose_to' => 'alfred@example.com',
+                'send_uploaded_files' => json_encode(array('notes.pdf')),
+            );
+            $test->prep();
+            Hm_Request_Key::load($test->ses_obj, $test->req_obj, false);
+            file_put_contents(
+                $user_dir.'/notes.pdf',
+                Hm_Crypt::ciphertext($plain, Hm_Request_Key::generate())
+            );
+            Hm_Handler_Modules::add(
+                'test',
+                'process_compose_form_submit',
+                false,
+                'load_smtp_servers_from_config',
+                'after',
+                true,
+                'smtp'
+            );
+            $test->module_exec->run_handler_modules($test->req_obj, $test->ses_obj, 'test');
+
+            $response = $test->module_exec->handler_response;
+            $files = $response['uploaded_files'];
+            $this->assertCount(1, $files);
+            $this->assertSame('notes.pdf', $files[0]['name']);
+            $this->assertSame('application/pdf', $files[0]['type']);
+            $this->assertSame(strlen($plain), $files[0]['size']);
+            $this->assertTrue($response['no_redirect']);
+            $this->assertSame('Hello', $response['compose_draft']['draft_subject']);
+            $this->assertSame('alfred@example.com', $response['compose_draft']['draft_to']);
+            $this->assertSame('1', $response['compose_draft']['draft_compose_smtp_id']);
+            $this->assertFileExists($user_dir.'/notes.pdf');
+        } finally {
+            rrmdir($attachment_dir);
+        }
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_send_failure_with_no_attachments_clears_session_list() {
+        $test = new Smtp_Handler_Test('load_smtp_servers_from_config', 'smtp');
+        $test->config = array('attachment_dir' => sys_get_temp_dir());
+        $test->session = array(
+            'username' => 'alice',
+            'uploaded_files' => array(
+                '7' => array(array(
+                    'name' => 'stale.txt',
+                    'type' => 'text/plain',
+                    'size' => 4,
+                    'filename' => '/tmp/stale.txt',
+                )),
+            ),
+        );
+        $test->post = array(
+            'smtp_send' => 'Send',
+            'compose_subject' => 'Hello',
+            'compose_body' => 'Body text',
+            'compose_smtp_id' => '1',
+            'draft_id' => '7',
+            'post_archive' => '0',
+            'next_email_post' => '',
+            'compose_to' => 'alfred@example.com',
+        );
+        $test->prep();
+        Hm_Handler_Modules::add(
+            'test',
+            'process_compose_form_submit',
+            false,
+            'load_smtp_servers_from_config',
+            'after',
+            true,
+            'smtp'
+        );
+        $test->module_exec->run_handler_modules($test->req_obj, $test->ses_obj, 'test');
+
+        $response = $test->module_exec->handler_response;
+        $this->assertSame(array(), $response['uploaded_files']);
+        $this->assertSame('Hello', $response['compose_draft']['draft_subject']);
+    }
 }
