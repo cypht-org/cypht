@@ -62,11 +62,11 @@ git checkout -b fix-issue-123-description
 
 **Code **
 
-This is the core development phase where you implement your change. Before writing a line of code, take a moment to explore Cypht's architecture and code style.
+This is the core development phase where you implement your change. Before writing a line of code, take a moment to explore Cypht's architecture and [coding style](CODING_STYLE.md).
 
 Make changes that are minimal and specific to the issue you are solving. Avoid unnecessary refactoring or style changes in unrelated code.
 
-Match the existing code style (indentation, bracket placement, naming conventions for variables and functions). This makes your code feel like a natural part of the project.
+Apply the recommendations in the coding style guide to new and modified code. Avoid reformatting unrelated code.
 
 Add clear comments for complex logic, but strive to write code that is self-documenting through good variable and function names.
 
