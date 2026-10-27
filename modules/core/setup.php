@@ -66,6 +66,7 @@ add_handler('settings', 'process_mailto_handler_setting', true, 'core', 'date', 
 add_handler('settings', 'process_show_list_icons', true, 'core', 'date', 'after');
 add_handler('settings', 'reset_factory', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
+add_handler('settings', 'save_user_data', true, 'core', 'save_user_settings', 'after');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
 add_handler('settings', 'privacy_settings', true, 'core', 'date', 'after');
 add_handler('settings', 'process_search_all_folders_setting', true, 'core', 'save_user_settings', 'before');
