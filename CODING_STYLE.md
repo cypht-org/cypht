@@ -33,9 +33,6 @@ if ($config->get('disable_ini_settings')) {
 
 ## Naming
 
-- Match the naming convention already used in the file or module. The PHP
-  codebase uses `Hm_`-prefixed classes and both snake_case and camelCase method
-  names; JavaScript also contains both snake_case and camelCase.
 - Use camelCase for variable and function names.
 - Use descriptive names for variables and functions. Short names are suitable
   for small, local scopes such as loop counters.
@@ -127,8 +124,3 @@ $filters = [
 - Prefer existing theme variables and established component classes over
   hard-coded colors or duplicate styling.
 - Keep selectors scoped to the relevant module or component where practical.
-
-## Tests
-
-- Add or update PHPUnit tests for PHP behavior changes. Name test classes
-  `Hm_Test_*` and test methods `test_*`.
