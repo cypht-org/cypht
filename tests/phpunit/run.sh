@@ -53,4 +53,4 @@ else
     exit 1
 fi
 
-${PROJECT_ROOT}/vendor/bin/phpunit --configuration ${SCRIPT_DIR}/phpunit.xml --testdox $@
+${PROJECT_ROOT}/vendor/bin/phpunit --configuration ${SCRIPT_DIR}/phpunit.xml --testdox --display-deprecations --display-warnings $@
