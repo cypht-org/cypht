@@ -152,14 +152,42 @@ setup_ldap() {
 	fi
 }
 
+# The GitHub runner image can leave a regular file at phpX.Y-fpm.sock.
+# php-fpm will not replace it, and nginx then returns 502 with
+# "connect() to unix:/run/php/phpX.Y-fpm.sock failed (13: Permission denied)".
+configure_fpm_pool() {
+	local pool="/etc/php/${PHP_V}/fpm/pool.d/www.conf"
+	local sock="/run/php/php${PHP_V}-fpm.sock"
+	if [ ! -f "$pool" ]; then
+		echo "FPM pool not found: $pool"
+		return 1
+	fi
+	sudo sed -i -E "s|^[;[:space:]]*listen = .*|listen = ${sock}|" "$pool"
+	sudo sed -i -E "s|^[;[:space:]]*listen\\.owner = .*|listen.owner = www-data|" "$pool"
+	sudo sed -i -E "s|^[;[:space:]]*listen\\.group = .*|listen.group = www-data|" "$pool"
+	sudo sed -i -E "s|^[;[:space:]]*listen\\.mode = .*|listen.mode = 0660|" "$pool"
+	sudo grep -q '^listen = ' "$pool" || echo "listen = ${sock}" | sudo tee -a "$pool" >/dev/null
+	sudo grep -q '^listen.owner = ' "$pool" || echo "listen.owner = www-data" | sudo tee -a "$pool" >/dev/null
+	sudo grep -q '^listen.group = ' "$pool" || echo "listen.group = www-data" | sudo tee -a "$pool" >/dev/null
+	sudo grep -q '^listen.mode = ' "$pool" || echo "listen.mode = 0660" | sudo tee -a "$pool" >/dev/null
+}
+
 #config site
 setup_site() {
 	STATUS_TITLE "Setup php${PHP_V}-fpm"
+	sudo systemctl stop php"${PHP_V}"-fpm.service || true
+	if ! configure_fpm_pool; then
+		STATUS_ERROR
+		exit 1
+	fi
+	sudo rm -f "/run/php/php${PHP_V}-fpm.sock"
 	sudo systemctl start php"${PHP_V}"-fpm.service
-	if [ "$(sudo systemctl is-active php"${PHP_V}"-fpm.service)" == "active" ]; then
+	if [ "$(sudo systemctl is-active php"${PHP_V}"-fpm.service)" == "active" ] && sudo test -S "/run/php/php${PHP_V}-fpm.sock"; then
 		STATUS_DONE
 	else
 		STATUS_ERROR
+		ls -l /run/php || true
+		sudo journalctl -u php"${PHP_V}"-fpm -n 40 --no-pager || true
 		exit 1
 	fi
 	
@@ -199,9 +227,28 @@ setup_site() {
 
 	sudo systemctl start nginx.service
 
-	CYPHT_STATUS=$(curl -s -o /dev/null -w '%{http_code}' 'http://cypht-test.org')
-	LOCALHOST_STATUS=$(curl -s -o /dev/null -w '%{http_code}' 'http://localhost')
-	
+	CYPHT_STATUS=$(curl -sS -D /tmp/cypht.hdr -o /tmp/cypht.body -w '%{http_code}' 'http://cypht-test.org' || true)
+	LOCALHOST_STATUS=$(curl -sS -D /tmp/local.hdr -o /tmp/local.body -w '%{http_code}' 'http://localhost' || true)
+	CYPHT_STATUS=${CYPHT_STATUS:-000}
+	LOCALHOST_STATUS=${LOCALHOST_STATUS:-000}
+	echo "cypht-test.org ${CYPHT_STATUS}"
+	echo "localhost ${LOCALHOST_STATUS}"
+	echo "---- response ----"
+	head -c 2000 /tmp/cypht.body || true
+	echo
+	echo "---- listeners ----"
+	sudo ss -ltnp | grep -E ':80' || true
+	sudo ss -lxnp | grep -E 'php.*fpm' || true
+	echo "---- fpm ----"
+	php -v
+	php-fpm${PHP_V} -v || true
+	ls -l /run/php || true
+	systemctl is-active php${PHP_V}-fpm nginx apache2 || true
+	echo "---- nginx ----"
+	sudo tail -n 80 /var/log/nginx/error.log || true
+	echo "---- php-fpm ----"
+	sudo journalctl -u php${PHP_V}-fpm -n 80 --no-pager || true
+
 	if [ "$CYPHT_STATUS" -eq 200 ] || [ "$LOCALHOST_STATUS" -eq 200 ]; then
 		STATUS_DONE
 	else

@@ -512,7 +512,7 @@ class Hm_Output_header_css extends Hm_Output_Module {
             $res .= '<link href="' . WEB_ROOT . 'modules/themes/assets/default/css/default.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />';
         }
         if (DEBUG_MODE) {
-            $res .= '<link href="'.WEB_ROOT.'vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />';
+            $res .= get_js_libs_css(explode(',', $this->get('router_js_exclude_deps', '')));
             foreach (glob(APP_PATH.'modules'.DIRECTORY_SEPARATOR.'**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $rel_name = str_replace(APP_PATH, '', $name);
                 $mod = str_replace(array('modules', DIRECTORY_SEPARATOR), '', $rel_name);
@@ -520,7 +520,6 @@ class Hm_Output_header_css extends Hm_Output_Module {
                     $res .= '<link href="'.WEB_ROOT.sprintf("%ssite.css", $rel_name).'" media="all" rel="stylesheet" type="text/css" />';
                 }
             }
-            $res .= '<link href="'.WEB_ROOT.'third_party/nprogress.css" media="all" rel="stylesheet" type="text/css" />';
         }
         else {
             $res .= '<link href="'.WEB_ROOT.'site.css?v='.CACHE_ID.'" ';
@@ -666,6 +665,9 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_check_dirty_flag = function() { return '.($this->get('warn_for_unsaved_changes', '') ? '1' : '0').'; };'.
             'var hm_special_folders = function() { return '.json_encode($formattedSpecialFolders).'; };'.
             'var hm_page_param_name = function() { return "'.$this->get('page_param_name').'"; };'.
+            'var hm_append_url_query = function() { return "'.$this->get('append_url_query').'"; };'.
+            'var hm_custom_ajax_request_endpoint = function() { return "'.$this->get('custom_ajax_request_endpoint').'"; };'.
+            'var hm_extra_ajax_request_data = function() { return "'.$this->get('extra_ajax_request_data').'"; };'.
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {
@@ -1701,7 +1703,7 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
         $res = '<div class="sidebar-footer">';
         $res .= '<a class="logout_link" id="js-logout_link" href="'.$this->build_page_url('logout', [
             'prompt' => 'true',
-            'back_query' => base64_encode(serialize($this->get('router_get_export'))),
+            'back_query' => encode_logout_back_query($this->get('router_get_export', array())),
         ]).'" title="'. $this->trans('Logout') .'">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-power menu-icon"></i>';

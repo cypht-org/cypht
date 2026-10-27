@@ -194,12 +194,20 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
         if ($user !== false && $pass !== false) {
             if ($this->auth($user, $pass)) {
                 $this->authed($request, $fingerprint);
+            } else {
+                $ip = $request->server['REMOTE_ADDR'] ?? '';
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    Hm_Logger::error(sprintf('Failed authentication from [%s]', $ip));
+                }
             }
         } elseif (array_key_exists($this->cname, $request->cookie)) {
             $this->get_key($request);
             $this->existing = true;
             $this->start($request);
-            $this->check_fingerprint($request);
+            // Only enforce fingerprint for active sessions.
+            if ($this->is_active()) {
+                $this->check_fingerprint($request);
+            }
             $this->restore_long_session($request);
         }
         return $this->is_active();
@@ -240,12 +248,24 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
             $path = $request->path;
         }
         $domain = $this->site_config->get('cookie_domain', false);
+        if (!$domain && array_key_exists('HTTP_X_FORWARDED_HOST', $request->server)) {
+            $domain = trim(explode(',', $request->server['HTTP_X_FORWARDED_HOST'])[0]);
+        }
         if (!$domain && array_key_exists('HTTP_HOST', $request->server)) {
-            $host = parse_url($request->server['HTTP_HOST'],  PHP_URL_HOST);
+            $host = parse_url($request->server['HTTP_HOST'], PHP_URL_HOST);
             if (trim((string) $host)) {
                 $domain = $host;
             } else {
                 $domain = $request->server['HTTP_HOST'];
+            }
+        }
+        if ($domain) {
+            $host = parse_url($domain, PHP_URL_HOST);
+            if (trim((string) $host)) {
+                $domain = $host;
+            }
+            if (preg_match('/:\d+$/', $domain, $matches)) {
+                $domain = str_replace($matches[0], '', $domain);
             }
         }
         if ($domain == 'none') {

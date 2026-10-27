@@ -366,8 +366,9 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                 if (feed_exists($form['new_feed_address'])) {
                     Hm_Msgs::add(sprintf('Feed url %s already exists', $form['new_feed_address']), 'warning');
                 } else {
-                    $connection_test = address_from_url($form['new_feed_address']);
-                    if ($con = @fsockopen($connection_test, 80, $errno, $errstr, 2)) {
+                    if (!feed_url_is_allowed($form['new_feed_address'])) {
+                        Hm_Msgs::add('Feed address is not allowed', 'danger');
+                    } else {
                         $feed = is_news_feed($form['new_feed_address']);
                         if (!$feed) {
                             $feed = new Hm_Feed();
@@ -375,8 +376,12 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                             if (trim($homepage)) {
                                 list($type, $href) = search_for_feeds($homepage);
                                 if ($type && $href) {
-                                    Hm_Msgs::add('Discovered a feed at that address');
-                                    $found = true;
+                                    if (!feed_url_is_allowed($href)) {
+                                        Hm_Msgs::add('Discovered feed address is not allowed', 'warning');
+                                    } else {
+                                        Hm_Msgs::add('Discovered a feed at that address');
+                                        $found = true;
+                                    }
                                 }
                                 else {
                                     Hm_Msgs::add('Could not find an RSS or ATOM feed at that address', 'warning');
@@ -397,9 +402,6 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                             }
                             $href = $form['new_feed_address'];
                         }
-                    }
-                    else {
-                        Hm_Msgs::add(sprintf('Could not add feed: %s', $errstr), 'danger');
                     }
                 }
             }
@@ -467,6 +469,7 @@ class Hm_Handler_load_feeds_for_search extends Hm_Handler_Module {
 class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
     public function process() {
         $server_id = false;
+        $path = '';
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
             if (preg_match("/^feeds_(.+)$/", $path, $matches)) {
@@ -474,11 +477,16 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
             }
         }
 
+        $default_enabled = true;
+        if ($path == 'unread') {
+            $default_enabled = !$this->user_config->get('unread_exclude_feeds_setting', DEFAULT_UNREAD_EXCLUDE_FEEDS);
+        }
+
         foreach (Hm_Feed_List::dump() as $index => $vals) {
             if ($server_id !== false && $index != $server_id) {
                 continue;
             }
-            $this->append('data_sources', array('type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
+            $this->append('data_sources', array('type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id'], 'default_enabled' => $default_enabled));
         }
     }
 }

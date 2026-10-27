@@ -8,7 +8,6 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require_once APP_PATH . 'modules/tags/functions.php';
 require_once APP_PATH . 'modules/tags/hm-tags.php';
 
 require_once APP_PATH . 'modules/imap/hm-imap.php';

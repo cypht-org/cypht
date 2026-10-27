@@ -235,15 +235,22 @@ trait Hm_Handler_Validate {
         if ($target == 'none') {
             $target = false;
         }
-        $server_vars = [
-            'HTTP_REFERER' => 'source',
-            'HTTP_ORIGIN' => 'source',
-            'HTTP_HOST' => 'target',
-            'HTTP_X_FORWARDED_HOST' => 'target'
-        ];
-        foreach ($server_vars as $header => $type) {
-            if (!empty($request->server[$header])) {
-                $$type = $request->server[$header];
+        if (!empty($request->server['HTTP_HOST'])) {
+            $target = $request->server['HTTP_HOST'];
+        }
+        if (!empty($request->server['HTTP_X_FORWARDED_HOST'])) {
+            $target = trim(explode(',', $request->server['HTTP_X_FORWARDED_HOST'])[0]);
+        }
+
+        $origin = !empty($request->server['HTTP_ORIGIN']) ? $request->server['HTTP_ORIGIN'] : false;
+        $referer = !empty($request->server['HTTP_REFERER']) ? $request->server['HTTP_REFERER'] : false;
+        $source = $origin ?: $referer;
+
+        // Some proxies rewrite Origin to localhost while Referer still has the public host.
+        if ($origin && $referer && $target) {
+            if (!$this->source_matches_target($origin, $target) &&
+                $this->source_matches_target($referer, $target)) {
+                $source = $referer;
             }
         }
         return [$source, $target];
@@ -269,21 +276,48 @@ trait Hm_Handler_Validate {
      * @return boolean
      */
     private function validate_source($target, $source, $session, $request) {
-        $source = parse_url($source);
-        if (!is_array($source) || !array_key_exists('host', $source)) {
-            $session->destroy($request);
-            Hm_Debug::add('LOGGED OUT: invalid source origin', 'warning');
-            return false;
-        }
-        if (array_key_exists('port', $source)) {
-            $source['host'] .= ':'.$source['port'];
-        }
-        if ($source['host'] !== $target) {
+        if (!$this->source_matches_target($source, $target)) {
             $session->destroy($request);
             Hm_Debug::add('LOGGED OUT: invalid source origin', 'warning');
             return false;
         }
         return true;
+    }
+
+    /**
+     * Compare the host of a request source (Origin or Referer) with the target host
+     *
+     * The port is only compared when both sides carry one. The target comes from
+     * HTTP_HOST, which does not always keep the port the client used: nginx's
+     * $host drops it, while $http_host keeps it. Origin and Referer always keep
+     * it. Appending the source port before a strict comparison therefore rejects
+     * every request to a deployment served on a non-default port, even though no
+     * mismatch was ever observed. When a port is present on both sides it still
+     * has to match, so a genuine cross-origin request is rejected as before.
+     *
+     * @param string $source Origin or Referer URL
+     * @param string $target target host, with or without a port
+     * @return boolean
+     */
+    private function source_matches_target($source, $target) {
+        if (!is_string($source)) {
+            return false;
+        }
+        $source = parse_url($source);
+        if (!is_array($source) || !array_key_exists('host', $source)) {
+            return false;
+        }
+        $target = parse_url('//'.$target);
+        if (!is_array($target) || !array_key_exists('host', $target)) {
+            return false;
+        }
+        if ($source['host'] !== $target['host']) {
+            return false;
+        }
+        if (!array_key_exists('port', $source) || !array_key_exists('port', $target)) {
+            return true;
+        }
+        return $source['port'] === $target['port'];
     }
 }
 
@@ -460,8 +494,16 @@ abstract class Hm_Handler_Module {
     public function build_page_url($page, $params = []) {
         $url = '?'.$this->config->get('page_param_name').'='.$page;
         foreach ($params as $key => $value) {
-            $url .= '&'.urlencode($key).'='.urlencode($value);
+            if (!is_scalar($value)) {
+                continue;
+            }
+            $url .= '&'.urlencode((string) $key).'='.urlencode((string) $value);
         }
+
+        if ($extra_url_query = $this->config->get('append_url_query')) {
+            $url .= '&'.$extra_url_query;
+        }
+
         return $url;
     }
 
@@ -587,6 +629,11 @@ abstract class Hm_Output_Module {
         foreach ($params as $key => $value) {
             $url .= ($htm_context ? '&amp;': '&').$key.'='.$value;
         }
+
+        if ($extra_url_query = $this->get('append_url_query')) {
+            $url .= ($htm_context ? '&amp;': '&').$extra_url_query;
+        }
+        
         return $url;
     }
 

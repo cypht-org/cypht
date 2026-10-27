@@ -277,5 +277,8 @@ class Hm_Test_User_File_Config extends TestCase {
         $this->config->restore_servers($removed);
         $dump = $this->config->dump();
         $this->assertEquals('secret', $dump['imap_servers'][0]['pass']);
+        $this->assertEquals('imap.test.com', $dump['imap_servers'][0]['server']);
+        $this->assertEquals('u', $dump['imap_servers'][0]['user']);
+        $this->assertEquals('plain', $dump['imap_servers'][0]['auth']);
     }
 }

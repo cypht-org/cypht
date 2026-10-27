@@ -598,9 +598,32 @@ function preFetchMessageContent(msgPart, uid, path) {
     }, null, true)
 }
 
+const MSG_CACHE_PREFIX = 'msg_cache_';
+
 function getMessageStorageKey(uid, listPath = getListPathParam()) {
-    return uid + '_' + listPath;
+    const version = (typeof HM_BUILD_VERSION !== 'undefined' && HM_BUILD_VERSION) ? HM_BUILD_VERSION : 'dev';
+    return MSG_CACHE_PREFIX + version + '_' + uid + '_' + listPath;
 }
+
+/**
+ * Deletes any cached message entry written under an older HM_BUILD_VERSION.
+ * Runs once per page load.
+ */
+function purgeStaleMessageCache() {
+    const version = (typeof HM_BUILD_VERSION !== 'undefined' && HM_BUILD_VERSION) ? HM_BUILD_VERSION : 'dev';
+    const currentPrefix = MSG_CACHE_PREFIX + version + '_';
+    const staleKeys = [];
+    for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key && key.indexOf(MSG_CACHE_PREFIX) === 0 && key.indexOf(currentPrefix) !== 0) {
+            staleKeys.push(key);
+        }
+    }
+    staleKeys.forEach(function (key) {
+        Hm_Utils.remove_from_local_storage(key);
+    });
+}
+purgeStaleMessageCache();
 
 async function markPrefetchedMessagesAsRead(uid) {
     const listPath = getListPathParam();

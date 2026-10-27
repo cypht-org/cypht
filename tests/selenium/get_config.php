@@ -1,8 +1,9 @@
 <?php
 
 define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
+require APP_PATH.'lib/define_vendor_path.php';
 
-require '../../vendor/autoload.php';
+require VENDOR_PATH.'autoload.php';
 require '../../lib/framework.php';
 $environment = Hm_Environment::getInstance();
 $environment->load();

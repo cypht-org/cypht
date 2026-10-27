@@ -83,14 +83,14 @@ const routes = [
         handler: 'applyShortcutsPageHandlers'
     },
     {
-        page: 'tags',
-        handler: 'applyTagsPageHandlers'
-    },
-    {
         page: 'save'
     },
     {
         page: 'change_password'
+    },
+    {
+        page: 'accounts',
+        handler: 'applyAccountsPageHandlers'
     },
     {
         page: 'highlights',

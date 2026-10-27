@@ -713,6 +713,18 @@ var delete_advanced_search = function() {
     return false;
 };
 
+var get_saved_advanced_search_data = function() {
+    var el = document.querySelector('.saved_advanced_search_data');
+    if (!el) {
+        return false;
+    }
+    try {
+        return JSON.parse(el.textContent);
+    } catch (e) {
+        return false;
+    }
+};
+
 var load_advanced_search_from_data = function(search_data, execute_search) {
     if (!search_data) {
         return;

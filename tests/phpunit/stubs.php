@@ -94,10 +94,16 @@ class Hm_Repository_Wrapper {
 if (!defined("IMAP_TEST")) {
     class Hm_IMAP {
         static public $allow_connection = true;
+        static public $connect_calls = 0;
         static public $allow_auth = true;
         private $connected = false;
+        public $read_only = false;
+        public $search_charset = '';
+        public $use_cache = true;
+        public $selected_mailbox = false;
+        public $folder_state = false;
         public function get_state() { if (self::$allow_auth) { return $this->connected ? 'authenticated' : false; } return 'connected'; }
-        public function connect() { if (self::$allow_connection) { $this->connected = true; return true; } return false; }
+        public function connect() { self::$connect_calls++; if (self::$allow_connection) { $this->connected = true; return true; } return false; }
         public function show_debug() {}
         public function get_mailbox_status() { return null; }
         public function get_mailbox_list() { return null; }

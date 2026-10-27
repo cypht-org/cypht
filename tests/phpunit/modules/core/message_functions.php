@@ -18,14 +18,23 @@ class Hm_Test_Core_Message_Functions extends TestCase {
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
+     * @dataProvider external_resource_cases
      */
-    public function test_sanitize_email_html_blocks_css_tracking() {
-        $test = '<ul style="list-style-image: url(https://tracker.example.com/test)"><li>x</li></ul>';
-        $this->assertEquals(1, count_blocked_remote_email_css_resources($test));
-        $this->assertStringNotContainsString('tracker.example.com', sanitize_email_html($test));
+    public function test_sanitize_email_html_blocks_css_tracking($case) {
+        $html = $case['input']['html'];
+        $this->assertStringNotContainsString($case['expected']['must_not_contain'], sanitize_email_html($html));
+        if (array_key_exists('blocked_count', $case['expected'])) {
+            $this->assertEquals($case['expected']['blocked_count'], count_blocked_remote_email_css_resources($html));
+        }
+    }
 
-        $test = '<div style="background: url(https://tracker.example.com/bg)">x</div>';
-        $this->assertStringNotContainsString('tracker.example.com', sanitize_email_html($test));
+    public static function external_resource_cases() {
+        return PolicyCases::forPolicy('message-external-resource-blocking');
+    }
+
+    public function test_format_msg_html_keeps_images_non_loading_by_default() {
+        $test = '<img src="https://tracker.example.com/pixel.gif">';
+        $this->assertStringNotContainsString('src="https://tracker.example.com/pixel.gif"', format_msg_html($test));
 
         $allowed = true;
         $msgText = '<img src="https://tracker.example.com/pixel.gif"><ul style="list-style-image: url(https://tracker.example.com/list)"><li>x</li></ul>';

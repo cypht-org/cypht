@@ -110,7 +110,10 @@ class Hm_Format_HTML5 extends HM_Format {
         if (array_key_exists('router_module_list', $output)) {
             unset($output['router_module_list']);
         }
-        return implode('', $output);
+        if (array_is_list($output)) {
+            return implode('', $output);
+        }
+        return implode('', array_filter($output, 'is_string'));
     }
 }
 

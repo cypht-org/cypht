@@ -20,6 +20,21 @@ class Hm_Tags {
         self::initRepo('tags', $hmod->user_config, $hmod->session, self::$data);
     }
 
+    public static function colorPalette() {
+        return array(
+            '#d93025', '#e8710a', '#f9ab00', '#188038', '#12805c', '#039be5',
+            '#1a73e8', '#3949ab', '#8430ce', '#d01884', '#795548', '#5f6368',
+        );
+    }
+
+    public static function defaultColor() {
+        return '#5f6368';
+    }
+
+    public static function sanitizeColor($color) {
+        return in_array($color, self::colorPalette(), true) ? $color : self::defaultColor();
+    }
+
     public static function addMessage($tagId, $serverId, $folder, $messageId) {
         $folders = self::getFolders($tagId, $serverId);
         if (!in_array($folder, $folders)) {
@@ -37,17 +52,23 @@ class Hm_Tags {
         return self::edit($tagId, $tag);
     }
 
-    public static function removeMessage($messageId, $tagId) {
+    public static function removeMessage($messageId, $tagId, $serverId = null, $folder = null) {
         $tag = self::get($tagId);
         if (!$tag) {
             return false;
         }
-        foreach ($tag['server'] as $serverId => $folders) {
-            foreach ($folders as $folder => $messages) {
+        foreach ($tag['server'] as $currentServerId => $folders) {
+            if ($serverId !== null && $currentServerId != $serverId) {
+                continue;
+            }
+            foreach ($folders as $currentFolder => $messages) {
+                if ($folder !== null && $currentFolder !== $folder) {
+                    continue;
+                }
                 $newMessages = array_filter($messages, function($msgId) use ($messageId) {
                     return $msgId != $messageId;
                 });
-                $tag['server'][$serverId][$folder] = $newMessages;
+                $tag['server'][$currentServerId][$currentFolder] = $newMessages;
             }
         }
         return self::edit($tagId, $tag);
@@ -69,12 +90,18 @@ class Hm_Tags {
         return [];
     }
 
-    public static function getTagIdsWithMessage($messageId) {
+    public static function getTagIdsWithMessage($messageId, $serverId = null, $folder = null) {
         $tags = self::getAll();
         $tagIds = [];
         foreach ($tags as $tagId => $tag) {
-            foreach ($tag['server'] as $serverId => $folders) {
-                foreach ($folders as $messages) {
+            foreach ($tag['server'] as $currentServerId => $folders) {
+                if ($serverId !== null && $currentServerId != $serverId) {
+                    continue;
+                }
+                foreach ($folders as $currentFolder => $messages) {
+                    if ($folder !== null && $currentFolder !== $folder) {
+                        continue;
+                    }
                     // Exclude folder indentifiers
                     if (! is_array($messages)) {
                         continue;
@@ -96,7 +123,7 @@ class Hm_Tags {
         $oldServer = $params['oldServer'];
         $newServer = $params['newServer'] ?? '';
 
-        $tagIds = self::getTagIdsWithMessage($oldId);
+        $tagIds = self::getTagIdsWithMessage($oldId, $oldServer, $oldFolder);
         foreach ($tagIds as $tagId) {
             $tag = self::get($tagId);
             $folders = $tag['server'][$oldServer];

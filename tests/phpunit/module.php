@@ -61,8 +61,19 @@ class Hm_Test_Handler_Module extends TestCase {
         $this->handler_mod->request->server['HTTP_ORIGIN'] = 'asdf';
         $this->handler_mod->request->server['HTTP_HOST'] = 'localhost';
         $this->assertFalse($this->handler_mod->validate_origin($this->handler_mod->session, $this->handler_mod->request, $this->handler_mod->config));
+        /* the target lost the port on its way to PHP, so a port on the source
+         * alone is not evidence of a mismatch */
         $this->handler_mod->request->server['HTTP_ORIGIN'] = 'http://localhost:123';
+        $this->assertTrue($this->handler_mod->validate_origin($this->handler_mod->session, $this->handler_mod->request, $this->handler_mod->config));
+        /* when both sides carry a port it still has to match */
+        $this->handler_mod->request->server['HTTP_HOST'] = 'localhost:123';
+        $this->assertTrue($this->handler_mod->validate_origin($this->handler_mod->session, $this->handler_mod->request, $this->handler_mod->config));
+        $this->handler_mod->request->server['HTTP_ORIGIN'] = 'http://localhost:456';
         $this->assertFalse($this->handler_mod->validate_origin($this->handler_mod->session, $this->handler_mod->request, $this->handler_mod->config));
+        /* a different host is rejected whatever the ports are */
+        $this->handler_mod->request->server['HTTP_ORIGIN'] = 'http://otherhost:123';
+        $this->assertFalse($this->handler_mod->validate_origin($this->handler_mod->session, $this->handler_mod->request, $this->handler_mod->config));
+        $this->handler_mod->request->server['HTTP_HOST'] = 'localhost';
         $this->handler_mod->request->server['HTTP_ORIGIN'] = 'http://otherhost';
         $this->assertFalse($this->handler_mod->validate_origin($this->handler_mod->session, $this->handler_mod->request, $this->handler_mod->config));
         $this->handler_mod->config->set('cookie_domain', 'none');

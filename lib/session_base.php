@@ -44,8 +44,8 @@ trait Hm_Session_Fingerprint {
             return;
         }
         $id = $this->build_fingerprint($request->server);
-        $fingerprint = $this->get('fingerprint', null);
-        if ($fingerprint === false) {
+        $fingerprint = $this->get('fingerprint', false);
+        if ($fingerprint === false || $fingerprint === null) {
             $this->set_fingerprint($request);
             return;
         }
@@ -298,8 +298,14 @@ abstract class Hm_Session {
         if ($domain == 'none') {
             return '';
         }
+        if (!$domain && array_key_exists('HTTP_X_FORWARDED_HOST', $request->server)) {
+            $domain = trim(explode(',', $request->server['HTTP_X_FORWARDED_HOST'])[0]);
+        }
         if (!$domain && array_key_exists('HTTP_HOST', $request->server)) {
             $domain = $request->server['HTTP_HOST'];
+        }
+        if ($domain && preg_match('/:\d+$/', $domain, $matches)) {
+            $domain = str_replace($matches[0], '', $domain);
         }
         return $domain;
     }
