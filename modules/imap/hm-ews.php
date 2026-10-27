@@ -977,7 +977,7 @@ class Hm_EWS {
         }
     }
 
-    public function get_structured_message($itemId, $part, $text_only) {
+    public function get_structured_message($itemId, $part, $text_only, $enable_amp_email = false) {
         $message = $this->get_mime_message_by_id($itemId);
         $msg_struct = [];
         $this->parse_mime_part($message, $msg_struct, 0);
@@ -985,7 +985,10 @@ class Hm_EWS {
             $struct = $this->search_mime_part_in_struct($msg_struct, ['part_id' => $part], true);
         } else {
             $struct = null;
-            if (! $text_only) {
+            if (! $text_only && $enable_amp_email) {
+                $struct = $this->search_mime_part_in_struct($msg_struct, ['type' => 'text', 'subtype' => 'x-amp-html']);
+            }
+            if (! $struct && ! $text_only) {
                 $struct = $this->search_mime_part_in_struct($msg_struct, ['type' => 'text', 'subtype' => 'html']);
             }
             if (! $struct) {
@@ -1001,7 +1004,7 @@ class Hm_EWS {
             $msg_struct_current = null;
             $msg_text = '';
         }
-        if (isset($msg_struct_current['subtype']) && mb_strtolower($msg_struct_current['subtype'] == 'html')) {
+        if (isset($msg_struct_current['subtype']) && in_array(mb_strtolower($msg_struct_current['subtype']), array('html', 'x-amp-html'))) {
             // add inline images
             if (preg_match_all("/src=('|\"|)cid:([^\s'\"]+)/", $msg_text, $matches)) {
                 $cids = array_pop($matches);
