@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import WebDriverException
 import time
 
 class SettingsHelpers(WebTest):
@@ -37,13 +38,27 @@ class SettingsHelpers(WebTest):
         self.by_name('save_settings').click()
         self.wait_with_folder_list()
         self.safari_workaround()
-        WebDriverWait(self.driver, 60).until(EC.staleness_of(alert_message))
+        WebDriverWait(self.driver, 60).until(self._element_is_gone(alert_message))
         ignored_exceptions=(NoSuchElementException,StaleElementReferenceException,)
         _ = WebDriverWait(self.driver, 60, ignored_exceptions=ignored_exceptions).until(
             EC.presence_of_element_located((By.CLASS_NAME, 'sys_messages'))
         )
         alert_message = self.by_class('sys_messages')
         assert alert_message.text.strip() == 'Settings updated'
+
+    def _element_is_gone(self, element):
+        """Same check as EC.staleness_of, plus Chrome 156's inspector error for a detached node."""
+        def _predicate(_driver):
+            try:
+                element.is_enabled()
+                return False
+            except StaleElementReferenceException:
+                return True
+            except WebDriverException as exc:
+                if 'does not belong to the document' in str(exc):
+                    return True
+                raise
+        return _predicate
 
     def settings_section(self, section):
         WebDriverWait(self.driver, 60).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.settings')))
