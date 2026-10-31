@@ -345,6 +345,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                 $value = str_replace('\\', '', $value);
                                 $new_value = array();
                                 foreach (explode(' ', $value) as $v) {
+                                    // Keywords servers set on their own, Dovecot 2.4 does by default
+                                    if (in_array(mb_strtolower(trim($v)), array('$hasattachment', '$hasnoattachment'))) {
+                                        continue;
+                                    }
                                     $new_value[] = $this->trans(trim($v));
                                 }
                                 $value = implode(', ', $new_value);
