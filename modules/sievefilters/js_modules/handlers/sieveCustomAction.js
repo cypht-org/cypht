@@ -37,6 +37,7 @@ function handleSieveCustomAction() {
         custom_action_modal._imapAccount = mailbox;
         current_account = mailbox;
         current_account_element = find_account_element(mailbox);
+        custom_action_context = true;
 
         const singleTarget = $(this).hasClass('add_custom_action_message')
             ? 'imap_' + $(this).attr('data-msg-server-id') + '_' + $(this).attr('data-msg-uid') + '_' + $(this).attr('data-msg-folder')
