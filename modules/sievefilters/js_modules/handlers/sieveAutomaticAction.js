@@ -19,6 +19,7 @@ function handleSieveAutomaticAction() {
 
         const mailbox = $(this).attr('account');
         current_mailbox_for_filter = mailbox;
+        custom_action_context = false;
 
         const selected = [];
 
