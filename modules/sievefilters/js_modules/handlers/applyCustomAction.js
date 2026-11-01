@@ -53,7 +53,7 @@ function populateActionRows($table, actions) {
 
     actions.forEach(function (action) {
         const $row = $(
-            '<tr class="border draggable_action_row" default_value="' + (action.value || '') + '">' +
+            '<tr class="border draggable_action_row" default_value="' + (action.value || '') + '" default_account="' + (action.extra_option_value || '') + '">' +
             '   <td class="col-sm-1 drag-handle" style="cursor:grab;">&#9776;</td>' +
             '   <td class="col-sm-3">' +
             '       <select class="sieve_actions_select form-control form-control-sm" name="sieve_selected_actions[]">' +
@@ -77,8 +77,11 @@ function populateActionRows($table, actions) {
         // Set action type; trigger('change') re-builds the value field
         $row.find('.sieve_actions_select').val(action.action).trigger('change');
 
-        // Extra option value
-        $row.find('[name^=sieve_selected_extra_action_value]').val(action.extra_option_value || '');
+        // Extra option value (mailbox actions: set by the account picker)
+        const savedActionDef = get_account_actions().find(function (a) { return a.name === action.action; });
+        if (!savedActionDef || savedActionDef.type !== 'mailbox') {
+            $row.find('[name^=sieve_selected_extra_action_value]').val(action.extra_option_value || '');
+        }
 
         // For non-mailbox types the value field is replaced synchronously by the change handler
         const actionDef = hm_sieve_possible_actions().find(function (a) { return a.name === action.action; });
@@ -256,6 +259,7 @@ function handleApplyCustomAction() {
         // Set global account so get_account_actions() works for mailbox AJAX
         current_account = currentImapAccount;
         current_account_element = null;
+        custom_action_context = true;
 
         // Load fresh template into modal
         const templateEl = document.querySelector('#custom_action_template');
