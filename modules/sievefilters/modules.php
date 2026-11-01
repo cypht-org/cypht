@@ -1519,6 +1519,12 @@ class Hm_Output_account_sieve_filters extends Hm_Output_Module {
 /**
  * @subpackage sievefilters/output
  */
+class Hm_Output_sieve_extensions extends Hm_Output_Module {
+    protected function output() {
+        $this->out('sieve_extensions', $this->get('sieve_extensions', []));
+    }
+}
+
 class Hm_Output_check_filter_status extends Hm_Output_Module {
     protected function output() {
         if (!$this->get('sieve_filters_enabled')) {
@@ -1830,6 +1836,39 @@ class Hm_Handler_load_custom_action_by_id extends Hm_Handler_Module
         }
 
         $this->out('mailbox_name', $imap_servers[$imap_server_id]['name']);
+    }
+}
+
+/**
+ * Load the sieve extensions of an account, on demand. The sieve client has no
+ * read timeout and hangs on a silent server, so this must stay out of page
+ * rendering, and it releases the session so that a hang can't block other requests.
+ */
+class Hm_Handler_load_sieve_extensions extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+        list($success, $form) = $this->process_form(['imap_account']);
+        if (!$success) {
+            return;
+        }
+
+        foreach ($this->user_config->get('imap_servers', []) as $mailbox) {
+            if (($mailbox['name'] ?? '') !== $form['imap_account'] || empty($mailbox['sieve_config_host'])) {
+                continue;
+            }
+            $this->session->close_early();
+            set_time_limit(15);
+            try {
+                $client = get_sieve_client_factory($this->config)->init($this->user_config, $mailbox, $this->module_is_supported('nux'));
+                $this->out('sieve_extensions', $client->getExtensions());
+            } catch (Exception $e) {
+                Hm_Debug::add(sprintf('Sieve extensions unavailable: %s', $e->getMessage()));
+            }
+            return;
+        }
     }
 }
 
