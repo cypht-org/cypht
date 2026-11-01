@@ -37,6 +37,11 @@ setup_base_ajax_page('ajax_sieve_extensions', 'core');
 add_handler('ajax_sieve_extensions', 'load_sieve_extensions', true, 'sievefilters');
 add_output('ajax_sieve_extensions', 'sieve_extensions', true, 'sievefilters');
 
+/* imap accounts offered as copy/move targets in custom actions */
+setup_base_ajax_page('ajax_sieve_get_accounts', 'core');
+add_handler('ajax_sieve_get_accounts', 'load_sieve_accounts', true, 'sievefilters');
+add_output('ajax_sieve_get_accounts', 'sieve_accounts', true, 'sievefilters');
+
 
 /* custom actions */
 setup_base_ajax_page('ajax_save_custom_action', 'core');
@@ -208,6 +213,7 @@ return array(
         'ajax_imap_message_content',
         'ajax_message_custom_actions',
         'ajax_sieve_extensions',
+        'ajax_sieve_get_accounts',
         'ajax_save_custom_action',
         'ajax_apply_custom_action',
         'ajax_load_custom_action_by_id',
@@ -231,6 +237,7 @@ return array(
         'new_filter' => array(FILTER_UNSAFE_RAW, false),
         'message_custom_actions' => array(FILTER_UNSAFE_RAW, false),
         'sieve_extensions' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+        'imap_accounts_list' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'mailbox_name' => array(FILTER_UNSAFE_RAW, false),
         'custom_action_saved' => array(FILTER_VALIDATE_BOOL, false),
         'custom_action_id' => array(FILTER_UNSAFE_RAW, false),
