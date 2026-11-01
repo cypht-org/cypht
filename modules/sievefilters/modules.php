@@ -1024,19 +1024,6 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                     new \PhpSieveManager\Filters\Actions\KeepFilterAction()
                 );
             }
-            if ($action->action == 'imap_move') {
-                $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => $action->value])
-                );
-            }
-            if ($action->action == 'imap_copy') {
-                $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => $action->value])
-                );
-                $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\KeepFilterAction()
-                );
-            }
             if ($action->action == 'autoreply') {
                 $custom_condition->addAction(
                     new \PhpSieveManager\Filters\Actions\VacationFilterAction(['reason' => $action->value, 'subject' => $action->extra_option_value])
@@ -1519,6 +1506,24 @@ class Hm_Output_account_sieve_filters extends Hm_Output_Module {
 /**
  * @subpackage sievefilters/output
  */
+class Hm_Handler_load_sieve_accounts extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $accounts = [];
+        foreach ($this->user_config->get('imap_servers', []) as $id => $mailbox) {
+            $accounts[] = ['id' => (string) $id, 'name' => $mailbox['name'] ?? ''];
+        }
+        $this->out('imap_accounts_list', $accounts);
+    }
+}
+
+class Hm_Output_sieve_accounts extends Hm_Output_Module {
+    protected function output() {
+        $this->out('imap_accounts_list', $this->get('imap_accounts_list', []));
+    }
+}
+
 class Hm_Output_sieve_extensions extends Hm_Output_Module {
     protected function output() {
         $this->out('sieve_extensions', $this->get('sieve_extensions', []));
@@ -2080,15 +2085,19 @@ class Hm_Handler_apply_custom_action extends Hm_Handler_Module {
                             }
                             break;
                         case 'move':
-                        case 'imap_move':
-                            if ($value) {
-                                $mailbox->message_action($folder, 'MOVE', $msg_uids, $value);
-                            }
-                            break;
                         case 'copy':
-                        case 'imap_copy':
                             if ($value) {
-                                $mailbox->message_action($folder, 'COPY', $msg_uids, $value);
+                                $target_id = trim($action['extra_option_value'] ?? '');
+                                if ($target_id !== '' && $target_id !== (string) $server_id) {
+                                    $res = imap_move_different_server([$server_id => [$hex_folder => $msg_uids]], $action_name, [null, $target_id, bin2hex($value)], $this->cache);
+                                    $done = count($res['moved']);
+                                } else {
+                                    $res = $mailbox->message_action($folder, strtoupper($action_name), $msg_uids, $value);
+                                    $done = !empty($res['status']) ? count($msg_uids) : 0;
+                                }
+                                if ($done < count($msg_uids)) {
+                                    $errors[] = sprintf('Could not %s %d of %d message(s) to %s', $action_name, count($msg_uids) - $done, count($msg_uids), $value);
+                                }
                             }
                             break;
                         case 'flag':
