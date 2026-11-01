@@ -32,6 +32,11 @@ add_handler('ajax_message_custom_actions', 'load_message_custom_actions_context'
 add_handler('ajax_message_custom_actions', 'load_custom_actions', true, 'sievefilters', 'load_message_custom_actions_context', 'after');
 add_output('ajax_message_custom_actions', 'message_page_custom_actions', true, 'sievefilters');
 
+/* sieve extensions of an account, requested when its custom actions dropdown opens */
+setup_base_ajax_page('ajax_sieve_extensions', 'core');
+add_handler('ajax_sieve_extensions', 'load_sieve_extensions', true, 'sievefilters');
+add_output('ajax_sieve_extensions', 'sieve_extensions', true, 'sievefilters');
+
 
 /* custom actions */
 setup_base_ajax_page('ajax_save_custom_action', 'core');
@@ -202,6 +207,7 @@ return array(
         'ajax_block_account_sieve_filters',
         'ajax_imap_message_content',
         'ajax_message_custom_actions',
+        'ajax_sieve_extensions',
         'ajax_save_custom_action',
         'ajax_apply_custom_action',
         'ajax_load_custom_action_by_id',
@@ -224,6 +230,7 @@ return array(
         'reload_page' => array(FILTER_VALIDATE_BOOL, false),
         'new_filter' => array(FILTER_UNSAFE_RAW, false),
         'message_custom_actions' => array(FILTER_UNSAFE_RAW, false),
+        'sieve_extensions' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'mailbox_name' => array(FILTER_UNSAFE_RAW, false),
         'custom_action_saved' => array(FILTER_VALIDATE_BOOL, false),
         'custom_action_id' => array(FILTER_UNSAFE_RAW, false),
