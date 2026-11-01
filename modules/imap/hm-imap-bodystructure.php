@@ -388,6 +388,10 @@ class Hm_IMAP_Struct {
 
     /**
      * Search a parsed BODYSTRUCTURE response
+     *
+     * Parts where every field matches exactly are preferred. Only when there is no
+     * such part, fields may also match as a substring, for example a Content-ID that
+     * the server returns inside angle brackets.
      * @param array $struct the response to search
      * @param array $flds key => value list of fields and values to search for
      * @param bool $all true to return all matching parts
@@ -395,6 +399,24 @@ class Hm_IMAP_Struct {
      * @return array list of matching parts
      */
     public function recursive_search($struct, $flds, $all, $res, $parent=false) {
+        $exact = $this->search_parts($struct, $flds, $all, $res, $parent, true);
+        if (count($exact) > count($res)) {
+            return $exact;
+        }
+        return $this->search_parts($struct, $flds, $all, $res, $parent, false);
+    }
+
+    /**
+     * Search a parsed BODYSTRUCTURE response with exact or substring matching
+     * @param array $struct the response to search
+     * @param array $flds key => value list of fields and values to search for
+     * @param bool $all true to return all matching parts
+     * @param array $res holds results during recursive iterations
+     * @param mixed $parent the closest parent part with an envelope
+     * @param bool $exact true to only accept exact, case-insensitive matches
+     * @return array list of matching parts
+     */
+    private function search_parts($struct, $flds, $all, $res, $parent, $exact) {
         foreach ($struct as $msg_id => $vals) {
             $matches = 0;
             if (isset($flds['imap_part_number'])) {
@@ -403,24 +425,15 @@ class Hm_IMAP_Struct {
                 }
             }
 
-            $exactMatchFound = array_reduce(array_keys($flds), function ($carry, $key) use ($flds, $vals) {
-                if (isset($vals[$key]) && strcasecmp($vals[$key], $flds[$key]) === 0) {
-                    return $carry + 1;
+            foreach ($flds as $name => $fld_val) {
+                if (!isset($vals[$name])) {
+                    continue;
                 }
-                return $carry;
-            }, 0);
-            $partialMatchFound = array_reduce(array_keys($flds), function ($carry, $key) use ($flds, $vals) {
-                if (isset($vals[$key]) && mb_stristr($vals[$key], $flds[$key])) {
-                    return $carry + 1;
+                if ($exact ? strcasecmp($vals[$name], $fld_val) === 0 : mb_stristr($vals[$name], $fld_val)) {
+                    $matches++;
                 }
-            }, 0);
-
-            if ($exactMatchFound) {
-                $matches += $exactMatchFound;
-            } elseif ($partialMatchFound && ! $exactMatchFound) {
-                $matches += $partialMatchFound;
             }
-            
+
             if (array_key_exists('envelope', $vals)) {
                 $parent = $vals;
             }
@@ -439,7 +452,7 @@ class Hm_IMAP_Struct {
 
             }
             if (isset($vals['subs'])) {
-                $res = $this->recursive_search($vals['subs'], $flds, $all, $res, $parent);
+                $res = $this->search_parts($vals['subs'], $flds, $all, $res, $parent, $exact);
             }
         }
         return $res;
