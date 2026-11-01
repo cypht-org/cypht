@@ -282,13 +282,33 @@ var hm_sieve_possible_actions = function() {
 };
 
 var find_account_element = function(account_name) {
-    const accountElement = $('.add_filter, .edit_filter, .edit_script').filter(function () {
+    const accountElement = $('.add_filter, .edit_filter, .edit_script, .add_custom_action').filter(function () {
         return $(this).attr('account') === account_name ||
             $(this).attr('imap_account') === account_name;
     }).first();
 
     return accountElement.length ? accountElement : null;
 };
+
+/**
+ * Fetch the sieve extensions for a custom actions dropdown when it is opened.
+ */
+$(document).on('click', '#filter_message, #message_custom_actions_toggle', function () {
+    const button = $(this).siblings('.custom-actions').find('.add_custom_action');
+    if (!button.length || button.attr('sieve_extensions')) {
+        return;
+    }
+    button.attr('sieve_extensions', '[]');
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_sieve_extensions'},
+         {'name': 'imap_account', 'value': button.attr('account')}],
+        function (res) {
+            button.attr('sieve_extensions', JSON.stringify(Object.values(res.sieve_extensions || {})));
+        },
+        [],
+        true
+    );
+});
 
 var get_account_actions = () => {
     if (!current_account_element || !current_account_element.length) {
