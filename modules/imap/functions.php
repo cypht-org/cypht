@@ -297,8 +297,10 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $from = preg_replace("/(\<.+\>)/U", '', $msg['to']);
             $icon = 'sent';
         }
+        // Dovecot 2.4 sets the $HasNoAttachment keyword by default, which contains "attachment"
+        $msg_flags = str_ireplace('$HasNoAttachment', '', $msg['flags']);
         foreach (array('attachment', 'deleted', 'flagged', 'answered', 'draft') as $flag) {
-            if (mb_stristr($msg['flags'], $flag)) {
+            if (mb_stristr($msg_flags, $flag)) {
                 $flags[] = $flag;
             }
         }
