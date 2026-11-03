@@ -150,8 +150,14 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
         $headers['X-XSS-Protection'] = '1; mode=block';
         $headers['X-Content-Type-Options'] = 'nosniff';
         $headers['Expires'] = gmdate('D, d M Y H:i:s \G\M\T', strtotime('-1 year'));
-        $headers['Content-Security-Policy'] = "default-src 'none'; script-src 'self' 'unsafe-inline'; " .
-            "connect-src 'self'; font-src 'self' https://fonts.gstatic.com; img-src " . $img_src . " data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;";
+        $script_src = "'self' 'unsafe-inline'";
+        if ($this->config->get('enable_amp_email', false)) {
+            // The sandboxed AMP viewer needs this runtime to reveal its body and run AMP components; it cannot access the host page.
+            $script_src .= ' https://cdn.ampproject.org';
+        }
+        $headers['Content-Security-Policy'] = "default-src 'none'; script-src " . $script_src . "; " .
+            "connect-src 'self'; font-src 'self' https://fonts.gstatic.com; img-src " . $img_src . " data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " .
+            "base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self';";
         if ($this->request->type == 'AJAX') {
             $headers['Content-Type'] = 'application/json';
         }

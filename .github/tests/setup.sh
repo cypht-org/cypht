@@ -152,11 +152,37 @@ setup_ldap() {
 	fi
 }
 
+# The GitHub runner image can leave a regular file at phpX.Y-fpm.sock.
+# php-fpm will not replace it, and nginx then returns 502 with
+# "connect() to unix:/run/php/phpX.Y-fpm.sock failed (13: Permission denied)".
+configure_fpm_pool() {
+	local pool="/etc/php/${PHP_V}/fpm/pool.d/www.conf"
+	local sock="/run/php/php${PHP_V}-fpm.sock"
+	if [ ! -f "$pool" ]; then
+		echo "FPM pool not found: $pool"
+		return 1
+	fi
+	sudo sed -i -E "s|^[;[:space:]]*listen = .*|listen = ${sock}|" "$pool"
+	sudo sed -i -E "s|^[;[:space:]]*listen\\.owner = .*|listen.owner = www-data|" "$pool"
+	sudo sed -i -E "s|^[;[:space:]]*listen\\.group = .*|listen.group = www-data|" "$pool"
+	sudo sed -i -E "s|^[;[:space:]]*listen\\.mode = .*|listen.mode = 0660|" "$pool"
+	sudo grep -q '^listen = ' "$pool" || echo "listen = ${sock}" | sudo tee -a "$pool" >/dev/null
+	sudo grep -q '^listen.owner = ' "$pool" || echo "listen.owner = www-data" | sudo tee -a "$pool" >/dev/null
+	sudo grep -q '^listen.group = ' "$pool" || echo "listen.group = www-data" | sudo tee -a "$pool" >/dev/null
+	sudo grep -q '^listen.mode = ' "$pool" || echo "listen.mode = 0660" | sudo tee -a "$pool" >/dev/null
+}
+
 #config site
 setup_site() {
 	STATUS_TITLE "Setup php${PHP_V}-fpm"
+	sudo systemctl stop php"${PHP_V}"-fpm.service || true
+	if ! configure_fpm_pool; then
+		STATUS_ERROR
+		exit 1
+	fi
+	sudo rm -f "/run/php/php${PHP_V}-fpm.sock"
 	sudo systemctl start php"${PHP_V}"-fpm.service
-	if [ "$(sudo systemctl is-active php"${PHP_V}"-fpm.service)" == "active" ]; then
+	if [ "$(sudo systemctl is-active php"${PHP_V}"-fpm.service)" == "active" ] && sudo test -S "/run/php/php${PHP_V}-fpm.sock"; then
 		STATUS_DONE
 	else
 		STATUS_ERROR

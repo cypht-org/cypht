@@ -325,6 +325,9 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
                                 $this->request->get['resumableChunkSize'],
                                 $this->request->get['resumableTotalSize'],
                                 $this->request->get['resumableTotalChunks']);
+                if ($result) {
+                    remember_uploaded_file_size($this->session, $resumable_filename, $this->request->get['resumableTotalSize']);
+                }
             }
         }
     }
@@ -443,7 +446,9 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             $draft_id = $this->request->get['uid'];
         }
 
-        $this->out('uploaded_files', get_uploaded_files($draft_id, $this->session));
+        /* Unprotected so a failed send can replace this with the files just posted.
+           A protected value cannot be overwritten by the submit handler. */
+        $this->out('uploaded_files', get_uploaded_files($draft_id, $this->session), false);
         $settings = $this->user_config;
         $compose_type = $settings->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
         if ($this->get('is_mobile', false)) {
@@ -724,7 +729,8 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             'draft_to' => isset($this->request->post['compose_to']) ? $this->request->post['compose_to'] : '',
             'draft_body' => '',
             'draft_subject' => $form['compose_subject'],
-            'draft_smtp' => $smtp_id
+            'draft_smtp' => $smtp_id,
+            'draft_compose_smtp_id' => $form['compose_smtp_id']
         );
         $delivery_receipt = !empty($this->request->post['compose_delivery_receipt']);
         $from_params = '';
@@ -746,6 +752,10 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $uploaded_files = get_uploaded_files_from_array(
             $uploaded_files
         );
+        $compose_files = uploaded_files_for_compose_form(
+            $uploaded_files,
+            $this->session->get('uploaded_file_sizes', array())
+        );
 
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
@@ -754,7 +764,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
         if (!$smtp_details) {
             Hm_Msgs::add('Could not use the selected SMTP server', 'warning');
-            repopulate_compose_form($draft, $this);
+            repopulate_compose_form($draft, $this, $compose_files);
             return;
         }
 
@@ -772,7 +782,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $mailbox = Hm_SMTP_List::connect($smtp_id, false);
         if (! $mailbox || ! $mailbox->authed()) {
             Hm_Msgs::add("Failed to authenticate to the SMTP server", "danger");
-            repopulate_compose_form($draft, $this);
+            repopulate_compose_form($draft, $this, $compose_files);
             return;
         }
 
@@ -787,7 +797,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $recipients = $mime->get_recipient_addresses();
         if (empty($recipients)) {
             Hm_Msgs::add("No valid recipients found", "warning");
-            repopulate_compose_form($draft, $this);
+            repopulate_compose_form($draft, $this, $compose_files);
             return;
         }
 
@@ -795,7 +805,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $err_msg = $mailbox->send_message($from, $recipients, $mime->get_mime_msg(), $this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt']));
         if ($err_msg) {
             Hm_Msgs::add(sprintf("%s", $err_msg), 'danger');
-            repopulate_compose_form($draft, $this);
+            repopulate_compose_form($draft, $this, $compose_files);
             return;
         }
 
@@ -853,6 +863,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         if ($form['draft_id'] > 0) {
             delete_uploaded_files($this->session, 0);
         }
+        forget_uploaded_file_sizes($this->session, $uploaded_files);
     }
 }
 
@@ -1231,7 +1242,10 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
 
         /* select the correct account to unsubscribe from mailing lists */
         $selected_id = false;
-        if (empty($recip) && !empty($from)) {
+        if (!empty($draft) && array_key_exists('draft_compose_smtp_id', $draft) && $draft['draft_compose_smtp_id']) {
+            $selected_id = $draft['draft_compose_smtp_id'];
+        }
+        if ($selected_id === false && empty($recip) && !empty($from)) {
             /* This solves the problem when a profile is not associated with the email */
             $server_found = false;
             foreach ($this->module_output()['compose_profiles'] as $id => $server) {
@@ -1260,7 +1274,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         // matching that server to preselect on the list of available smtp options
         // relying on recipient here might fail as real recipient is sometimes different
         // than the address specified in the profile
-        if (! empty($reply) && $imap_server) {
+        if ($selected_id === false && ! empty($reply) && $imap_server) {
             foreach ($this->get('compose_profiles') as $profile) {
                 if ($profile['server'] == $imap_server['server'] && $profile['user'] == $imap_server['user']) {
                     $smtp_profiles = profiles_by_smtp_id($this->get('compose_profiles'), $profile['smtp_id']);
@@ -2040,8 +2054,9 @@ if (!hm_exists('createFileFromChunks')) {
             } else {
                 rrmdir($temp_dir);
             }
+            return true;
         }
-        return true;
+        return false;
     }
 }
 
@@ -2194,6 +2209,89 @@ function get_uploaded_files_from_array($uploaded_files) {
     return $parsed_files;
 }
 }
+
+/**
+ * Remember the original byte size of a finished upload.
+ * The compose form reads this after a failed send instead of opening the file.
+ * @param object $session session interface
+ * @param string $filename uploaded basename
+ * @param mixed $size resumableTotalSize from the upload request
+ * @return void
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('remember_uploaded_file_size')) {
+function remember_uploaded_file_size($session, $filename, $size) {
+    $filename = trim(basename((string) $filename));
+    if ($filename === '' || $filename === '.' || $filename === '..' || !is_numeric($size) || (int) $size < 0) {
+        return;
+    }
+    $sizes = $session->get('uploaded_file_sizes', array());
+    if (!is_array($sizes)) {
+        $sizes = array();
+    }
+    $sizes[$filename] = (int) $size;
+    $session->set('uploaded_file_sizes', $sizes);
+}}
+
+/**
+ * Drop cached upload sizes for files that were sent.
+ * @param object $session session interface
+ * @param array $files file rows or filenames
+ * @return void
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('forget_uploaded_file_sizes')) {
+function forget_uploaded_file_sizes($session, $files) {
+    $sizes = $session->get('uploaded_file_sizes', array());
+    if (!is_array($sizes) || !$sizes) {
+        return;
+    }
+    foreach ($files as $file) {
+        $name = is_array($file) ? ($file['name'] ?? '') : $file;
+        $name = trim(basename((string) $name));
+        if ($name !== '' && $name !== '.' && $name !== '..') {
+            unset($sizes[$name]);
+        }
+    }
+    $session->set('uploaded_file_sizes', $sizes);
+}}
+
+/**
+ * Rows for the compose attachment table after a failed send.
+ * Size comes from the upload cache. When that is missing, the stored file length is used.
+ * @param array $uploaded_files result of get_uploaded_files_from_array()
+ * @param array $cached_sizes filename => original byte size
+ * @return array
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('uploaded_files_for_compose_form')) {
+function uploaded_files_for_compose_form($uploaded_files, $cached_sizes = array()) {
+    if (!is_array($cached_sizes)) {
+        $cached_sizes = array();
+    }
+    $rows = array();
+    foreach ($uploaded_files as $file) {
+        if (!is_array($file) || !isset($file['name']) || $file['name'] === '') {
+            continue;
+        }
+        $size = 0;
+        if (isset($cached_sizes[$file['name']]) && is_numeric($cached_sizes[$file['name']]) && (int) $cached_sizes[$file['name']] >= 0) {
+            $size = (int) $cached_sizes[$file['name']];
+        } elseif (!empty($file['filename']) && is_file($file['filename'])) {
+            $bytes = @filesize($file['filename']);
+            if ($bytes !== false) {
+                $size = (int) $bytes;
+            }
+        }
+        $rows[] = array(
+            'filename' => isset($file['filename']) ? $file['filename'] : '',
+            'name' => $file['name'],
+            'type' => isset($file['type']) ? $file['type'] : 'application/octet-stream',
+            'size' => $size,
+        );
+    }
+    return $rows;
+}}
 
 function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '', $profile_id = null, $body_type = false) {
     $uploaded_files = get_uploaded_files_from_array($uploaded_files);
@@ -2470,9 +2568,12 @@ function outbound_address_check($mod, $from, $reply_to) {
  * @subpackage smtp/functions
  */
 if (!hm_exists('repopulate_compose_form')) {
-function repopulate_compose_form($draft, $handler_mod) {
+function repopulate_compose_form($draft, $handler_mod, $uploaded_files = null) {
     $handler_mod->out('no_redirect', true);
     $handler_mod->out('compose_draft', $draft);
+    if (is_array($uploaded_files)) {
+        $handler_mod->out('uploaded_files', $uploaded_files);
+    }
     if (array_key_exists('compose_msg_path', $handler_mod->request->post)
         && $handler_mod->request->post['compose_msg_path']) {
         $handler_mod->out('compose_msg_path', $handler_mod->request->post['compose_msg_path']);

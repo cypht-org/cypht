@@ -170,4 +170,156 @@ class Hm_Test_Smtp_Handler_Modules extends TestCase {
 
         $this->assertArrayNotHasKey('visible', $test2->ses_obj->data['scheduled_send_failed_servers']);
     }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_send_failure_restores_posted_attachments_over_session() {
+        $attachment_dir = sys_get_temp_dir().'/cypht-send-fail-'.bin2hex(random_bytes(4));
+        $user_dir = $attachment_dir.'/'.md5('alice');
+        mkdir($user_dir, 0700, true);
+        $plain = 'attachment-body';
+        try {
+            $test = new Smtp_Handler_Test('load_smtp_servers_from_config', 'smtp');
+            $test->config = array('attachment_dir' => $attachment_dir);
+            $test->session = array(
+                'username' => 'alice',
+                'uploaded_files' => array(
+                    '7' => array(array(
+                        'name' => 'stale.txt',
+                        'type' => 'text/plain',
+                        'size' => 4,
+                        'filename' => $user_dir.'/stale.txt',
+                    )),
+                ),
+                'uploaded_file_sizes' => array(
+                    'notes.pdf' => 4321,
+                ),
+            );
+            $test->post = array(
+                'smtp_send' => 'Send',
+                'compose_subject' => 'Hello',
+                'compose_body' => 'Body text',
+                'compose_smtp_id' => '1',
+                'draft_id' => '7',
+                'post_archive' => '0',
+                'next_email_post' => '',
+                'compose_to' => 'alfred@example.com',
+                'send_uploaded_files' => json_encode(array('notes.pdf')),
+            );
+            $test->prep();
+            Hm_Request_Key::load($test->ses_obj, $test->req_obj, false);
+            file_put_contents(
+                $user_dir.'/notes.pdf',
+                Hm_Crypt::ciphertext($plain, Hm_Request_Key::generate())
+            );
+            Hm_Handler_Modules::add(
+                'test',
+                'process_compose_form_submit',
+                false,
+                'load_smtp_servers_from_config',
+                'after',
+                true,
+                'smtp'
+            );
+            $test->module_exec->run_handler_modules($test->req_obj, $test->ses_obj, 'test');
+
+            $response = $test->module_exec->handler_response;
+            $files = $response['uploaded_files'];
+            $this->assertCount(1, $files);
+            $this->assertSame('notes.pdf', $files[0]['name']);
+            $this->assertSame('application/pdf', $files[0]['type']);
+            $this->assertSame(4321, $files[0]['size']);
+            $this->assertNotSame(filesize($user_dir.'/notes.pdf'), $files[0]['size']);
+            $this->assertTrue($response['no_redirect']);
+            $this->assertSame('Hello', $response['compose_draft']['draft_subject']);
+            $this->assertSame('alfred@example.com', $response['compose_draft']['draft_to']);
+            $this->assertSame('1', $response['compose_draft']['draft_compose_smtp_id']);
+            $this->assertFileExists($user_dir.'/notes.pdf');
+        } finally {
+            rrmdir($attachment_dir);
+        }
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_send_failure_with_no_attachments_clears_session_list() {
+        $test = new Smtp_Handler_Test('load_smtp_servers_from_config', 'smtp');
+        $test->config = array('attachment_dir' => sys_get_temp_dir());
+        $test->session = array(
+            'username' => 'alice',
+            'uploaded_files' => array(
+                '7' => array(array(
+                    'name' => 'stale.txt',
+                    'type' => 'text/plain',
+                    'size' => 4,
+                    'filename' => '/tmp/stale.txt',
+                )),
+            ),
+        );
+        $test->post = array(
+            'smtp_send' => 'Send',
+            'compose_subject' => 'Hello',
+            'compose_body' => 'Body text',
+            'compose_smtp_id' => '1',
+            'draft_id' => '7',
+            'post_archive' => '0',
+            'next_email_post' => '',
+            'compose_to' => 'alfred@example.com',
+        );
+        $test->prep();
+        Hm_Handler_Modules::add(
+            'test',
+            'process_compose_form_submit',
+            false,
+            'load_smtp_servers_from_config',
+            'after',
+            true,
+            'smtp'
+        );
+        $test->module_exec->run_handler_modules($test->req_obj, $test->ses_obj, 'test');
+
+        $response = $test->module_exec->handler_response;
+        $this->assertSame(array(), $response['uploaded_files']);
+        $this->assertSame('Hello', $response['compose_draft']['draft_subject']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_attachment_row_uses_disk_size_when_upload_cache_is_missing() {
+        $dir = sys_get_temp_dir().'/cypht-size-fallback-'.bin2hex(random_bytes(4));
+        mkdir($dir, 0700, true);
+        $path = $dir.'/notes.pdf';
+        file_put_contents($path, str_repeat('x', 80));
+        try {
+            $rows = uploaded_files_for_compose_form(array(array(
+                'filename' => $path,
+                'name' => 'notes.pdf',
+                'type' => 'application/pdf',
+            )));
+            $this->assertSame(80, $rows[0]['size']);
+            $this->assertSame(filesize($path), $rows[0]['size']);
+        } finally {
+            rrmdir($dir);
+        }
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_upload_size_cache_remembers_and_forgets_sent_files() {
+        $session = new Hm_Mock_Session();
+        remember_uploaded_file_size($session, 'notes.pdf', '4321');
+        remember_uploaded_file_size($session, '../other.txt', -1);
+        $this->assertSame(array('notes.pdf' => 4321), $session->get('uploaded_file_sizes', array()));
+
+        forget_uploaded_file_sizes($session, array(array('name' => 'notes.pdf')));
+        $this->assertSame(array(), $session->get('uploaded_file_sizes', array()));
+    }
 }

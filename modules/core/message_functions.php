@@ -47,6 +47,18 @@ function format_msg_html($str, $images=false) {
 }}
 
 /**
+ * Format an AMP for Email document in an opaque sandbox.
+ * @subpackage core/functions
+ * @param string $str AMP email markup
+ * @return string
+ */
+if (!hm_exists('format_amp_email')) {
+function format_amp_email($str) {
+    return '<iframe class="amp_email_frame" sandbox="allow-scripts allow-forms" referrerpolicy="no-referrer" srcdoc="' .
+        htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"></iframe>';
+}}
+
+/**
  * Sanitize HTML for email
  * @subpackage core/functions
  * @param string $html content to sanitize

@@ -173,7 +173,8 @@ abstract class Hm_Config {
         foreach ($removed as $key => $vals) {
             foreach ($vals as $index => $server) {
                 if (is_array($server)) {
-                    $this->config[$key][$index] = $server;
+                    $current = $this->config[$key][$index] ?? [];
+                    $this->config[$key][$index] = array_merge(is_array($current) ? $current : [], $server);
                 } else {
                     $this->config[$key][$index]['pass'] = $server;
                 }

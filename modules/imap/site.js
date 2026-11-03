@@ -909,7 +909,7 @@ var imap_message_view_finished = function(msg_uid, detail, listParent, skip_link
     $('#show_message_source').on("click", function(e) {
         e.preventDefault();
         const detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
-        window.open(`?page=message_source&imap_msg_uid=${getMessageUidParam()}&imap_server_id=${detail.server_id}&imap_folder=${detail.folder}`);
+        window.open(`?page=message_source&imap_msg_uid=${getMessageUidParam()}&imap_server_id=${detail.server_id}&imap_folder=${detail.folder}`, '_blank', 'noopener');
     });
     $(document).on('click', '#unblock_sender', function(e) {
         e.preventDefault();
