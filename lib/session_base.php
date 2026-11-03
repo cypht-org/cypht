@@ -298,7 +298,7 @@ abstract class Hm_Session {
         if ($domain == 'none') {
             return '';
         }
-        if (!$domain && array_key_exists('HTTP_X_FORWARDED_HOST', $request->server)) {
+        if (!$domain && !empty($request->server['HTTP_X_FORWARDED_HOST'])) {
             $domain = trim(explode(',', $request->server['HTTP_X_FORWARDED_HOST'])[0]);
         }
         if (!$domain && array_key_exists('HTTP_HOST', $request->server)) {
