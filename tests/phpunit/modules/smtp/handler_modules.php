@@ -193,6 +193,9 @@ class Hm_Test_Smtp_Handler_Modules extends TestCase {
                         'filename' => $user_dir.'/stale.txt',
                     )),
                 ),
+                'uploaded_file_sizes' => array(
+                    'notes.pdf' => 4321,
+                ),
             );
             $test->post = array(
                 'smtp_send' => 'Send',
@@ -227,7 +230,8 @@ class Hm_Test_Smtp_Handler_Modules extends TestCase {
             $this->assertCount(1, $files);
             $this->assertSame('notes.pdf', $files[0]['name']);
             $this->assertSame('application/pdf', $files[0]['type']);
-            $this->assertSame(strlen($plain), $files[0]['size']);
+            $this->assertSame(4321, $files[0]['size']);
+            $this->assertNotSame(filesize($user_dir.'/notes.pdf'), $files[0]['size']);
             $this->assertTrue($response['no_redirect']);
             $this->assertSame('Hello', $response['compose_draft']['draft_subject']);
             $this->assertSame('alfred@example.com', $response['compose_draft']['draft_to']);
@@ -281,5 +285,41 @@ class Hm_Test_Smtp_Handler_Modules extends TestCase {
         $response = $test->module_exec->handler_response;
         $this->assertSame(array(), $response['uploaded_files']);
         $this->assertSame('Hello', $response['compose_draft']['draft_subject']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_attachment_row_uses_disk_size_when_upload_cache_is_missing() {
+        $dir = sys_get_temp_dir().'/cypht-size-fallback-'.bin2hex(random_bytes(4));
+        mkdir($dir, 0700, true);
+        $path = $dir.'/notes.pdf';
+        file_put_contents($path, str_repeat('x', 80));
+        try {
+            $rows = uploaded_files_for_compose_form(array(array(
+                'filename' => $path,
+                'name' => 'notes.pdf',
+                'type' => 'application/pdf',
+            )));
+            $this->assertSame(80, $rows[0]['size']);
+            $this->assertSame(filesize($path), $rows[0]['size']);
+        } finally {
+            rrmdir($dir);
+        }
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_upload_size_cache_remembers_and_forgets_sent_files() {
+        $session = new Hm_Mock_Session();
+        remember_uploaded_file_size($session, 'notes.pdf', '4321');
+        remember_uploaded_file_size($session, '../other.txt', -1);
+        $this->assertSame(array('notes.pdf' => 4321), $session->get('uploaded_file_sizes', array()));
+
+        forget_uploaded_file_sizes($session, array(array('name' => 'notes.pdf')));
+        $this->assertSame(array(), $session->get('uploaded_file_sizes', array()));
     }
 }
