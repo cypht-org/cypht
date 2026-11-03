@@ -325,6 +325,9 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
                                 $this->request->get['resumableChunkSize'],
                                 $this->request->get['resumableTotalSize'],
                                 $this->request->get['resumableTotalChunks']);
+                if ($result) {
+                    remember_uploaded_file_size($this->session, $resumable_filename, $this->request->get['resumableTotalSize']);
+                }
             }
         }
     }
@@ -749,7 +752,10 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $uploaded_files = get_uploaded_files_from_array(
             $uploaded_files
         );
-        $compose_files = uploaded_files_for_compose_form($uploaded_files);
+        $compose_files = uploaded_files_for_compose_form(
+            $uploaded_files,
+            $this->session->get('uploaded_file_sizes', array())
+        );
 
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
@@ -857,6 +863,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         if ($form['draft_id'] > 0) {
             delete_uploaded_files($this->session, 0);
         }
+        forget_uploaded_file_sizes($this->session, $uploaded_files);
     }
 }
 
@@ -2047,8 +2054,9 @@ if (!hm_exists('createFileFromChunks')) {
             } else {
                 rrmdir($temp_dir);
             }
+            return true;
         }
-        return true;
+        return false;
     }
 }
 
@@ -2203,24 +2211,76 @@ function get_uploaded_files_from_array($uploaded_files) {
 }
 
 /**
- * Rows for the compose attachment table.
- * Size is the decrypted length so the restored row matches the file the user attached.
+ * Remember the original byte size of a finished upload.
+ * The compose form reads this after a failed send instead of opening the file.
+ * @param object $session session interface
+ * @param string $filename uploaded basename
+ * @param mixed $size resumableTotalSize from the upload request
+ * @return void
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('remember_uploaded_file_size')) {
+function remember_uploaded_file_size($session, $filename, $size) {
+    $filename = trim(basename((string) $filename));
+    if ($filename === '' || $filename === '.' || $filename === '..' || !is_numeric($size) || (int) $size < 0) {
+        return;
+    }
+    $sizes = $session->get('uploaded_file_sizes', array());
+    if (!is_array($sizes)) {
+        $sizes = array();
+    }
+    $sizes[$filename] = (int) $size;
+    $session->set('uploaded_file_sizes', $sizes);
+}}
+
+/**
+ * Drop cached upload sizes for files that were sent.
+ * @param object $session session interface
+ * @param array $files file rows or filenames
+ * @return void
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('forget_uploaded_file_sizes')) {
+function forget_uploaded_file_sizes($session, $files) {
+    $sizes = $session->get('uploaded_file_sizes', array());
+    if (!is_array($sizes) || !$sizes) {
+        return;
+    }
+    foreach ($files as $file) {
+        $name = is_array($file) ? ($file['name'] ?? '') : $file;
+        $name = trim(basename((string) $name));
+        if ($name !== '' && $name !== '.' && $name !== '..') {
+            unset($sizes[$name]);
+        }
+    }
+    $session->set('uploaded_file_sizes', $sizes);
+}}
+
+/**
+ * Rows for the compose attachment table after a failed send.
+ * Size comes from the upload cache. When that is missing, the stored file length is used.
  * @param array $uploaded_files result of get_uploaded_files_from_array()
+ * @param array $cached_sizes filename => original byte size
  * @return array
  * @subpackage smtp/functions
  */
 if (!hm_exists('uploaded_files_for_compose_form')) {
-function uploaded_files_for_compose_form($uploaded_files) {
+function uploaded_files_for_compose_form($uploaded_files, $cached_sizes = array()) {
+    if (!is_array($cached_sizes)) {
+        $cached_sizes = array();
+    }
     $rows = array();
     foreach ($uploaded_files as $file) {
         if (!is_array($file) || !isset($file['name']) || $file['name'] === '') {
             continue;
         }
         $size = 0;
-        if (!empty($file['filename']) && is_file($file['filename'])) {
-            $plain = Hm_Crypt::plaintext(@file_get_contents($file['filename']), Hm_Request_Key::generate());
-            if (is_string($plain)) {
-                $size = strlen($plain);
+        if (isset($cached_sizes[$file['name']]) && is_numeric($cached_sizes[$file['name']]) && (int) $cached_sizes[$file['name']] >= 0) {
+            $size = (int) $cached_sizes[$file['name']];
+        } elseif (!empty($file['filename']) && is_file($file['filename'])) {
+            $bytes = @filesize($file['filename']);
+            if ($bytes !== false) {
+                $size = (int) $bytes;
             }
         }
         $rows[] = array(
