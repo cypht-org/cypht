@@ -9,6 +9,9 @@ chrome_options.add_argument('--disable-gpu')
 chrome_options.BinaryLocation = "/usr/bin/google-chrome"
 
 chrome_options.add_argument("--headless=new")  # or "--headless" depending on Chrome version
+# Chrome 157 asks before HTTP on public hostnames. cypht-test.org is not localhost.
+chrome_options.add_argument("--unsafely-treat-insecure-origin-as-secure=http://cypht-test.org")
+chrome_options.add_argument("--disable-features=HttpsFirstBalancedModeAutoEnable")
 chrome_options.add_argument("--window-size=1920,1080")
 chrome_options.add_argument("--force-device-scale-factor=1")
 chrome_options.add_argument("--no-sandbox")
