@@ -35,6 +35,15 @@ trait Hm_Output_Module_Exec {
      * @return void
      */
     public function run_output_modules($request, $active_session, $page, $handler_response) {
+        if ($this->is_halted() && $request->type == 'AJAX') {
+            $status = 'not callable';
+            if (!empty($handler_response['ajax_halt_status']) && is_string($handler_response['ajax_halt_status'])) {
+                $status = $handler_response['ajax_halt_status'];
+            }
+            $this->output_response = array('status' => $status);
+            $this->output_data = $this->output_response;
+            return;
+        }
         $input = $handler_response;
         $protected = array();
         $modules = Hm_Output_Modules::get_for_page($page);
@@ -152,7 +161,13 @@ trait Hm_Handler_Module_Exec {
         $this->cache = $cache_setup->setup_cache();
         $modules = Hm_Handler_Modules::get_for_page($page);
         foreach ($modules as $name => $args) {
+            if ($this->is_halted() && !Hm_Handler_Modules::runs_after_halt($name)) {
+                continue;
+            }
             list($input, $protected) = $this->run_handler_module($input, $protected, $name, $args, $session);
+        }
+        if ($this->is_halted() && $session->is_active()) {
+            $session->close_early();
         }
         if ($input) {
             $this->handler_response = $input;
@@ -221,6 +236,24 @@ class Hm_Module_Exec {
     public $handlers = array();
     public $outputs = array();
 
+    /* a handler asked the remaining handler modules to stop */
+    private $halted = false;
+
+    /**
+     * Stop handler modules that are not marked to run after a halt
+     * @return void
+     */
+    public function halt() {
+        $this->halted = true;
+    }
+
+    /**
+     * @return bool true when a handler has halted the remaining modules
+     */
+    public function is_halted() {
+        return $this->halted;
+    }
+
     /**
      * @param object $config site config
      */
@@ -277,6 +310,7 @@ class Hm_Module_Exec {
         $this->filters = $this->site_config->get('input_filters', array());
         $this->handlers = $this->site_config->get('handler_modules', array());
         $this->outputs = $this->site_config->get('output_modules', array());
+        Hm_Handler_Modules::load_after_halt($this->site_config->get('handlers_after_halt', array()));
     }
 
     /**
