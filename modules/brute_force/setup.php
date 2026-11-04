@@ -17,10 +17,10 @@ handler_source('brute_force');
 
 // brute_force_check must run BEFORE the core login handler so it can block
 // the request before credentials are evaluated.
-add_module_to_all_pages('handler', 'brute_force_check', false, 'brute_force', 'login', 'before');
+add_module_to_all_pages('handler', 'brute_force_check', false, 'brute_force', 'login', 'before', true);
 
 // brute_force_track must run AFTER the core login handler so it can observe
 // whether the session became active (= login succeeded).
-add_module_to_all_pages('handler', 'brute_force_track', false, 'brute_force', 'login', 'after');
+add_module_to_all_pages('handler', 'brute_force_track', false, 'brute_force', 'login', 'after', true);
 
 return [];
