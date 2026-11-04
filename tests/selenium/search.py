@@ -39,15 +39,24 @@ class SearchTest(WebTest):
         WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(elem))
         elem.click()
 
-        # Wait until tbody is empty (re-find table element after page reload)
-        WebDriverWait(self.driver, 60).until(
-            lambda driver: len(driver.find_elements(By.CSS_SELECTOR, '.message_table_body tr')) == 0
-        )
+        # Reset reloads ?page=search and then replaces the message tbody.
+        # Query from the driver each time so a replaced tbody cannot go stale.
+        def results_cleared(driver):
+            try:
+                if driver.execute_script("return document.readyState") != "complete":
+                    return False
+                terms = driver.find_elements(By.ID, 'search_terms')
+                if not terms or terms[0].get_attribute('value') not in (None, ''):
+                    return False
+                if not driver.find_elements(By.CSS_SELECTOR, '.message_table_body'):
+                    return False
+                return len(driver.find_elements(By.CSS_SELECTOR, '.message_table_body tr')) == 0
+            except Exception:
+                return False
 
-        # Assert that tbody is actually empty (re-find table element)
-        table = self.by_class('message_table_body')
-        table_rows = table.find_elements(By.TAG_NAME, 'tr')
-        assert len(table_rows) == 0, f"Expected tbody to be empty, but found {len(table_rows)} rows"
+        WebDriverWait(self.driver, 60).until(results_cleared)
+        row_count = len(self.driver.find_elements(By.CSS_SELECTOR, '.message_table_body tr'))
+        assert row_count == 0, f"Expected tbody to be empty, but found {row_count} rows"
 
 if __name__ == '__main__':
 
