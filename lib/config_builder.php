@@ -502,6 +502,7 @@ function write_config_file($settings, $filters) {
         'handler_modules' => Hm_Handler_Modules::dump(),
         'output_modules' => Hm_Output_Modules::dump(),
         'input_filters' => $filters,
+        'handlers_after_halt' => Hm_Handler_Modules::after_halt_list(),
     ];
     $dynamicConfigPath = APP_PATH.'config/dynamic.php';
     // Create or overwrite the PHP file

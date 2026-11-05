@@ -101,7 +101,10 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
             Hm_Request_Key::load($this->session, $this->request, false);
             $this->out('2fa_key', Hm_Request_Key::generate());
             $this->out('2fa_required', true);
-            $this->session->close_early();
+            if ($this->request->type == 'AJAX') {
+                $this->out('ajax_halt_status', '2fa required');
+            }
+            $this->halt();
         }
         else {
             $this->session->set('2fa_confirmed', true);

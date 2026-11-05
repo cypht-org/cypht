@@ -5,7 +5,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 handler_source('themes');
 output_source('themes');
 
-add_module_to_all_pages('handler', 'load_theme', true, 'themes', 'load_user_data', 'after', true);
+add_module_to_all_pages('handler', 'load_theme', true, 'themes', 'load_user_data', 'after');
 add_module_to_all_pages('output', 'theme_css', true, 'themes', 'header_css', 'before');
 
 add_handler('ajax_hm_folders', 'load_theme', true, 'themes', 'load_user_data', 'after');
