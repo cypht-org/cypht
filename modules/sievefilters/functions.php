@@ -106,14 +106,18 @@ if (!hm_exists('get_mailbox_filters')) {
         try {
             $client = $factory->init($user_config, $mailbox, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
             $scripts = [];
+            $has_main_script = false;
             foreach ($client->listScripts() as $script) {
-                if (mb_strstr($script, 'cypht')) {
+                if ($script === 'main_script') {
+                    $has_main_script = true;
+                }
+                if (!in_array($script, ['main_script', 'blocked_senders'], true)) {
                     $scripts[] = $script;
                 }
             }
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
-            return ['count' => 0, 'list' => ''];
+            return ['count' => 0, 'list' => '', 'managed' => true];
         }
 
         $scripts_sorted = [];
@@ -126,9 +130,10 @@ if (!hm_exists('get_mailbox_filters')) {
                 $base_class = 'filter';
             }
             else {
+                // Script created outside Cypht
+                $scripts_sorted[$script_name] = PHP_INT_MAX;
                 continue;
             }
-            $parsed_name = str_replace('_', ' ', $exp_name[0]);
             $scripts_sorted[$script_name] = $exp_name[sizeof($exp_name) - 2];
         }
         asort($scripts_sorted);
@@ -136,6 +141,29 @@ if (!hm_exists('get_mailbox_filters')) {
         $script_list = '';
         foreach ($scripts_sorted as $script_name => $sc) {
             $exp_name = explode('-', $script_name);
+            if ($sc === PHP_INT_MAX) {
+                $is_disabled = strpos($script_name, 'sdisabled_') === 0;
+                $ext_name = $is_disabled ? substr($script_name, strlen('sdisabled_')) : $script_name;
+                $attrs = 'script_name_parsed="' . htmlspecialchars($ext_name) . '" priority="0" imap_account="' . htmlspecialchars($mailbox['name']) . '" script_name="' . htmlspecialchars($script_name) . '"';
+                $script_list .= '
+            <tr>
+                <td>0</td>
+                <td>' . htmlspecialchars($ext_name) . '</td>
+                <td>
+                    <span class="form-switch">
+                        <input ' . $attrs . ' class="toggle_filter form-check-input" type="checkbox" role="switch" name="script_state"' . ($is_disabled ? '' : ' checked') . '>
+                    </span>
+                    <a href="#" ' . $attrs . ' sieve_extensions=\'' . htmlspecialchars(json_encode($mailbox['sieve_extensions']), ENT_QUOTES) . '\' class="edit_script ps-2">
+                        <i class="bi bi-pencil-fill"></i>
+                    </a>
+                    <a href="#" ' . $attrs . ' class="delete_script ps-2">
+                        <i class="bi bi-trash3 text-danger"></i>
+                    </a>
+                </td>
+            </tr>
+            ';
+                continue;
+            }
             $parsed_name = str_replace('_', ' ', $exp_name[0]);
 
             if (count($exp_name) > 3) {
@@ -169,7 +197,7 @@ if (!hm_exists('get_mailbox_filters')) {
             </tr>
             ';
         }
-        return ['count' => count($scripts), 'list' => $script_list];
+        return ['count' => count($scripts), 'list' => $script_list, 'managed' => $has_main_script];
     }
 }
 
@@ -190,6 +218,9 @@ if (!hm_exists('generate_main_script')) {
             if (mb_strstr($script_name, 'cypht')) {
                 $ex_name = explode('-', $script_name);
                 $sorted_list[$script_name] = $ex_name[1];
+            } elseif ($script_name != 'blocked_senders' && strpos($script_name, 'sdisabled_') !== 0) {
+                // Scripts created outside Cypht run first, with priority 0
+                $sorted_list[$script_name] = 0;
             }
         }
         asort($sorted_list);
