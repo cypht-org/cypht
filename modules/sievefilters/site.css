@@ -1,9 +1,19 @@
+.custom-actions-message {
+    min-width: 300px;
+}
 .sortable-ghost {
     background-color: var(--bs-secondary-bg-subtle);
     border: 2px dashed var(--bs-secondary);
     opacity: 0.6;
 }
+.sieve-filter-actions-block.table-responsive,
+.sieve-filter-conditions-block.table-responsive {
+    overflow: visible;
+}
 
+.folder-tree-dropdown .folder-tree-picker {
+    z-index: 1070;
+}
 .tingle-modal * {
     box-sizing: border-box
 }
@@ -489,4 +499,22 @@ table.filter_actions_modal_table th {
         width: 18px;
         height: 18px;
     }
+}
+
+/* Sieve Filters Accounts Section */
+.sievefilters_accounts_item {
+    margin: 10px;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.sievefilters_accounts_title {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.sievefilters_accounts_title:hover {
+    background-color: rgba(0, 0, 0, 0.05);
 }

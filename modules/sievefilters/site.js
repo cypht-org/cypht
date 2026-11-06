@@ -10,6 +10,10 @@ var current_editing_script_name = "";
 // var hm_sieve_current_account = "";
 var current_account;
 var current_account_element;
+var mailbox_folders_cache = {};
+var imap_accounts_cache = null;
+// Custom actions run over IMAP: copy/move need no sieve extension and can target another account
+var custom_action_context = false;
 var is_editing_filter = false;
 var current_editing_filter_name = '';
 
@@ -101,7 +105,7 @@ var load_sieve_filters = function(pageName) {
                     (res) => {
                         $(`#${spinnerId}`).remove();
                         $('#sieve_accounts').append(res.sieve_detail_display);
-                    
+                        hideDismissedSieveInfoBubbles();
                     }
                 );
             }
@@ -267,13 +271,33 @@ var hm_sieve_possible_actions = function() {
 };
 
 var find_account_element = function(account_name) {
-    const accountElement = $('.add_filter, .edit_filter, .edit_script').filter(function () {
+    const accountElement = $('.add_filter, .edit_filter, .edit_script, .add_custom_action').filter(function () {
         return $(this).attr('account') === account_name ||
             $(this).attr('imap_account') === account_name;
     }).first();
 
     return accountElement.length ? accountElement : null;
 };
+
+/**
+ * Fetch the sieve extensions for a custom actions dropdown when it is opened.
+ */
+$(document).on('click', '#filter_message, #message_custom_actions_toggle', function () {
+    const button = $(this).siblings('.custom-actions').find('.add_custom_action');
+    if (!button.length || button.attr('sieve_extensions')) {
+        return;
+    }
+    button.attr('sieve_extensions', '[]');
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_sieve_extensions'},
+         {'name': 'imap_account', 'value': button.attr('account')}],
+        function (res) {
+            button.attr('sieve_extensions', JSON.stringify(Object.values(res.sieve_extensions || {})));
+        },
+        [],
+        true
+    );
+});
 
 var get_account_actions = () => {
     if (!current_account_element || !current_account_element.length) {
@@ -288,6 +312,7 @@ var get_account_actions = () => {
 
     possible_actions = possible_actions.filter((value) => {
         return ! value.hasOwnProperty('require') || extensions.includes(value.require)
+            || (custom_action_context && value.type === 'mailbox')
     })
 
     return possible_actions;
@@ -406,9 +431,6 @@ const Hm_Filters = (function (hm) {
         let actions_value = $('[name^=sieve_selected_action_value]').map(function(idx, elem) {
             return $(elem).val();
         }).get();
-        let actions_field_type = $('[name^=sieve_selected_action_value]').map(function(idx, elem) {
-            return $(elem).attr('type');
-        }).get();
         let actions_extra_value = $('input[name^=sieve_selected_extra_action_value]').map(function(idx, elem) {
             return $(elem).val();
         }).get();
@@ -418,18 +440,29 @@ const Hm_Filters = (function (hm) {
             return false;
         }
 
+        // Checking the field's own type=hidden isn't enough to know a value can be skipped —
+        // "keep" is legitimately hidden/empty on purpose, but "move"/"copy to folder" also
+        // use a hidden input (populated by the folder-tree picker) and DO require a value.
+        // Look up the action's own definition instead so an unselected folder gets caught
+        // here too, same as every other action needing a value.
+        const possible_actions = (typeof get_account_actions === 'function') ? get_account_actions() : hm_sieve_possible_actions();
         idx = 0;
         actions_type.forEach(function (elem, key) {
-            console.log(actions_field_type[idx])
-            if (actions_value[idx] === "" && actions_field_type[idx] !== 'hidden') {
+            const actionDef = possible_actions.find(function (a) { return a.name === elem; });
+            const requiresValue = !actionDef || actionDef.type !== 'none';
+            // A sieve script runs on the account's own server, so fileinto can't reach another account
+            const ownAccount = (imap_accounts_cache || []).find(function (a) { return a.name === imap_account; });
+            if (actionDef && actionDef.type === 'mailbox' && ownAccount && actions_extra_value[idx] && actions_extra_value[idx] !== ownAccount.id) {
+                showErrorMsg(hm_trans('Sieve filters can only copy or move to folders of their own account (' + imap_account + '). Use a custom action to target another account.'), '.sieve-filter-actions-block', 10000);
+                validation_failed = true;
+            }
+            if (requiresValue && actions_value[idx] === "") {
                 let order = ordinal_number(key + 1);
-                let previous_messages = $('.sys_messages').html();
-                previous_messages += previous_messages ? '<br>': '';
-                showErrorMsg(
-                  "The " + order + " action (" + elem + ") must be provided",
-                  ".sieve-filter-actions-block",
-                  10000
-                );
+                const actionLabel = actionDef ? actionDef.description : elem;
+                const message = (actionDef && actionDef.type === 'mailbox')
+                    ? "The " + order + " action (" + actionLabel + ") requires a folder to be selected"
+                    : "The " + order + " action (" + actionLabel + ") must be provided";
+                showErrorMsg(message, ".sieve-filter-actions-block", 10000);
                 validation_failed = true;
             }
             actions_parsed.push(
@@ -697,6 +730,116 @@ const registerSieveModalEvents = () => {
     });
 
     /**
+     * Builds <option> HTML for a folder list, rendering the hierarchy as an
+     * indented tree. Each folder is rendered as a clickable list-group item
+     * with a Bootstrap Icons folder icon. The full IMAP path is stored as a
+     * data attribute; a hidden <input> keeps the selected value for form
+     * submission. Delimiter is auto-detected (/ or .).
+     *
+     * @param {string[]} folders      - flat list of full folder path strings
+     * @param {string}   selectedValue - pre-selected folder path (may be empty)
+     * @returns {string} HTML for the custom picker widget
+     */
+    function buildFolderTreeOptions(folders, selectedValue) {
+        if (!folders || !folders.length) {
+            return '<div class="text-muted small p-2">No folders found</div>' +
+                   '<input type="hidden" name="sieve_selected_action_value[]" value="">';
+        }
+        const slashCount = folders.filter(function(f) { return f.includes('/'); }).length;
+        const dotCount   = folders.filter(function(f) { return f.includes('.') && !f.startsWith('.'); }).length;
+        const sep = dotCount > slashCount ? '.' : '/';
+        let items = '';
+        folders.forEach(function(folder) {
+            const parts      = folder.split(sep);
+            const depth      = parts.length - 1;
+            const label      = parts[parts.length - 1];
+            const paddingPx  = (depth * 20 + 10) + 'px';
+            const connector  = depth > 0 ? '\u2514\u00a0' : '';
+            const activeClass = selectedValue === folder ? ' active' : '';
+            const escapedVal  = folder.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+            items += '<a href="#" class="list-group-item list-group-item-action py-1 folder-tree-item' + activeClass + '"' +
+                     ' data-value="' + escapedVal + '" style="padding-left:' + paddingPx + ';padding-right:0.5rem">' +
+                     connector + '<i class="bi bi-folder2 me-1"></i>' + label + '</a>';
+        });
+        const hiddenVal = selectedValue ? selectedValue.replace(/&/g, '&amp;').replace(/"/g, '&quot;') : '';
+        const btnLabel  = selectedValue ? selectedValue.replace(/&/g, '&amp;') : 'Select a folder\u2026';
+        return '<div class="folder-tree-dropdown position-relative">' +
+               '<button type="button" class="btn btn-sm btn-outline-secondary w-100 text-start folder-tree-toggle">' +
+               '<i class="bi bi-folder2 me-1"></i><span class="folder-tree-label">' + btnLabel + '</span>' +
+               '<i class="bi bi-chevron-down ms-1 float-end mt-1"></i></button>' +
+               '<div class="folder-tree-picker list-group list-group-flush border rounded position-absolute w-100" ' +
+               'style="max-height:200px;overflow-y:auto;display:none;z-index:1050;background:#fff">' +
+               items + '</div>' +
+               '</div>' +
+               '<input type="hidden" name="sieve_selected_action_value[]" value="' + hiddenVal + '">';
+    }
+
+    function loadAccountFolders(account, elem, defVal, showList = false) {
+        const render = function (folders) {
+            elem.html(buildFolderTreeOptions(folders, defVal));
+            if (showList) {
+                elem.find('.folder-tree-toggle').trigger('click');
+            }
+        };
+        elem.attr('data-folders-account', account);
+        if (mailbox_folders_cache[account]) {
+            render(mailbox_folders_cache[account]);
+            return;
+        }
+        elem.html(hm_spinner());
+        Hm_Ajax.request(
+            [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_get_mailboxes'},
+                {'name': 'imap_account', 'value': account} ],
+            function(res) {
+                const folders = JSON.parse(res.mailboxes);
+                mailbox_folders_cache[account] = folders;
+                // Ignore a late response if another account was selected meanwhile
+                if (elem.attr('data-folders-account') === account) {
+                    render(folders);
+                }
+            }
+        );
+    }
+
+    /**
+     * Account picker for copy/move. The hidden extra value holds
+     * the target server id, and the folders follow the selected account.
+     */
+    function renderAccountSelect(elem_extra, elem, defVal, defAccount) {
+        const render = function (accounts) {
+            const select = $('<select class="action_account_select form-control form-control-sm"></select>');
+            accounts.forEach(function (account) {
+                select.append($('<option></option>').val(account.id).text(account.name));
+            });
+            const current = accounts.find(function (a) { return a.name === current_account; });
+            const selected = accounts.find(function (a) { return a.id === defAccount; }) || current || accounts[0];
+            if (!selected) {
+                return;
+            }
+            select.val(selected.id);
+            elem_extra.val(selected.id).siblings('.action_account_select').remove();
+            elem_extra.before(select);
+            select.on('change', function () {
+                elem_extra.val($(this).val());
+                loadAccountFolders(this.options[this.selectedIndex].text, elem, '', true);
+            });
+            loadAccountFolders(selected.name, elem, defVal);
+        };
+        if (imap_accounts_cache) {
+            render(imap_accounts_cache);
+            return;
+        }
+        elem.html(hm_spinner());
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_sieve_get_accounts'}],
+            function (res) {
+                imap_accounts_cache = Object.values(res.imap_accounts_list || {});
+                render(imap_accounts_cache);
+            }
+        );
+    }
+
+    /**
      * Action change
      */
     $(document).off('change', '.sieve_actions_select').on('change', '.sieve_actions_select', function () {
@@ -706,6 +849,8 @@ const registerSieveModalEvents = () => {
         let elem_extra = $(this).parent().next().find('.condition_extra_action_value');
         let action_name = $(this).val();
         let selected_action;
+        tr_elem.find('.action_account_select').remove();
+        elem_extra.val('');
         get_account_actions().forEach(function (action) {
            if (action_name === action.name) {
                 selected_action = action;
@@ -744,28 +889,44 @@ const registerSieveModalEvents = () => {
                 elem.html('<select name="sieve_selected_action_value[]" class="form-control form-control-sm">'+ options +'</select>');
             }
             if (selected_action.type === 'mailbox') {
-                let mailboxes = null;
-                tr_elem.children().eq(2).html(hm_spinner());
-                Hm_Ajax.request(
-                    [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_get_mailboxes'},
-                        {'name': 'imap_account', 'value': current_account} ],
-                    function(res) {
-                        mailboxes = JSON.parse(res.mailboxes);
-                        options = '';
-                        mailboxes.forEach(function(val) {
-                            if (tr_elem.attr('default_value') === val) {
-                                options = options + '<option value="' + val + '" selected>'+ val +'</option>'
-                            } else {
-                                options = options + '<option value="' + val + '">'+ val +'</option>'
-                            }
-                        });
-                        elem.html('<select name="sieve_selected_action_value[]" class="form-control form-control-sm">'+ options +'</select>');
-                        $("[name^=sieve_selected_action_value]").last().val(elem.parent().attr('default_value'));
-                    }
-                );
+                const defVal = tr_elem.attr('default_value') || '';
+                renderAccountSelect(elem_extra, elem, defVal, tr_elem.attr('default_account') || '');
             }
         }
     })
+
+    /**
+     * Folder tree picker — item selection + close
+     */
+    $(document).on('click', '.folder-tree-item', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const $picker = $(this).closest('.folder-tree-picker');
+        $picker.find('.active').removeClass('active');
+        $(this).addClass('active');
+        const value = $(this).data('value');
+        const $dropdown = $picker.closest('.folder-tree-dropdown');
+        $dropdown.next('input[name^="sieve_selected_action_value"]').val(value);
+        $dropdown.find('.folder-tree-label').text(value);
+        $picker.hide();
+    });
+
+    /**
+     * Folder tree dropdown — toggle open/close
+     */
+    $(document).on('click', '.folder-tree-toggle', function(e) {
+        e.stopPropagation();
+        $(this).next('.folder-tree-picker').toggle();
+    });
+
+    /**
+     * Folder tree dropdown — close on outside click
+     */
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.folder-tree-dropdown').length) {
+            $('.folder-tree-picker').hide();
+        }
+    });
 
     /**
      * Condition type change
@@ -819,7 +980,7 @@ const registerSieveModalEvents = () => {
  * These require modal instances or operate on elements that only exist
  * on the sieve filters settings page.
  */
-const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
+const registerSievePageEvents = (edit_filter_modal, edit_script_modal, custom_action_modal) => {
     $(document).off('click', '.sievefilters_accounts_title').on('click', '.sievefilters_accounts_title', function() {
         $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
     });
@@ -831,6 +992,7 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
         $('#stop_filtering').prop('checked', false);
         current_account = $(this).attr('account');
         current_account_element = $(this);
+        custom_action_context = false;
         edit_filter_modal.open();
 
         // Reset the form fields when opening the modal
@@ -849,6 +1011,7 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
         current_editing_script_name = '';
         current_account = $(this).attr('account');
         current_account_element = $(this);
+        custom_action_context = false;
         edit_script_modal.open();
     });
 
@@ -923,6 +1086,7 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
         current_editing_script_name = $(this).attr('script_name');
         current_account = $(this).attr('imap_account');
         current_account_element = $(this);
+        custom_action_context = false;
         $('.modal_sieve_script_name').val($(this).attr('script_name_parsed'));
         $('.modal_sieve_script_priority').val($(this).attr('priority'));
         Hm_Ajax.request(
@@ -944,10 +1108,12 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
         let obj = $(this);
         current_account = $(this).attr('account');
         current_account_element = $(this);
+        custom_action_context = false;
         is_editing_filter = true;
         current_editing_filter_name = $(this).attr('script_name');
         current_account = $(this).attr('imap_account');
         current_account_element = $(this);
+        custom_action_context = false;
         // $('#stop_filtering').prop('checked', false);
         $('.modal_sieve_filter_name').val($(this).attr('script_name_parsed'));
         $('.modal_sieve_filter_priority').val($(this).attr('priority'));
@@ -996,6 +1162,110 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
     });
 
     /**
+     * Create custom action
+     */
+    $(document).off('click', '.create_custom_action').on('click', '.create_custom_action', function() {
+
+        const account = $(this).attr('account');
+        current_account = account;
+        custom_action_context = true;
+
+        // Clear previous buttons from modal footer
+        custom_action_modal.customButtons = [];
+        custom_action_modal.modalFooter.children().not('.btn-secondary').remove();
+        custom_action_modal.setTitle('Create Custom Action');
+
+
+        $('.custom_action_name_input').val('');
+        const $table = custom_action_modal.modal.find('.filter_actions_modal_table');
+        $table.empty();
+
+        custom_action_modal.addFooterBtn(
+            hm_trans('Save Custom Action'),
+            'btn-primary ms-auto',
+            function () {
+                createCustomActionFromList(custom_action_modal, { applyAfterSave: false, imapAccount: account });
+            },
+        );
+
+        custom_action_modal.open();
+    });
+
+    /**
+     * Edit custom action
+     */
+    $(document).off('click', '.edit_custom_action').on('click', '.edit_custom_action', function(e) {
+        e.preventDefault();
+        const account = $(this).attr('data-imap-account');
+        const actionId = $(this).attr('data-action-id');
+        const actionName = $(this).attr('data-action-name');
+
+        current_account = account;
+        custom_action_context = true;
+        $('.custom_action_name_input').val(actionName);
+        const $table = custom_action_modal.modal.find('.filter_actions_modal_table');
+        $table.empty();
+
+        Hm_Ajax.request(
+            [   {'name': 'hm_ajax_hook', 'value': 'ajax_load_custom_action_by_id'},
+                {'name': 'imap_account', 'value': account},
+                {'name': 'custom_action_id', 'value': actionId}
+            ],
+            function(res) {
+                if (res.custom_action_error) {
+                    Hm_Notices.show(res.custom_action_error, 'danger');
+                    return;
+                }
+
+                const action = res.custom_action;
+                localStorage.setItem('actions', JSON.stringify(action));
+
+                if (action.actions && typeof action.actions === 'object') {
+                    populateActionRows($table, Object.values(action.actions));
+                }
+
+                // Clear previous buttons from modal footer
+                custom_action_modal.customButtons = [];
+                custom_action_modal.modalFooter.children().not('.btn-secondary').remove();
+                
+                custom_action_modal.setTitle('Edit Custom Action - ' + action.name);
+                custom_action_modal.addFooterBtn(
+                    hm_trans('Edit'),
+                    'btn-primary ms-auto',
+                    function () {
+                        createCustomActionFromList(custom_action_modal, { applyAfterSave: false, imapAccount: account, actionId: actionId });
+                    },
+                );
+                custom_action_modal.open();
+            }
+        );
+    });
+
+    /**
+     * Delete custom action
+     */
+    $(document).off('click', '.delete_custom_action').on('click', '.delete_custom_action', function(e) {
+        e.preventDefault();
+        if (!confirm('Do you want to delete this custom action?')) {
+            return;
+        }
+        let obj = $(this);
+        let actionId = $(this).attr('data-action-id');
+        let account = $(this).attr('data-imap-account');
+        
+        Hm_Ajax.request(
+            [   {'name': 'hm_ajax_hook', 'value': 'ajax_delete_custom_action'},
+                {'name': 'custom_action_id', 'value': actionId},
+                {'name': 'imap_account', 'value': account}],
+            function(res) {
+                if (res.custom_action_deleted == '1') {
+                    obj.closest('tr').remove();
+                }
+            }
+        );
+    });
+
+    /**
      * Actions Drag and Drop
      */
     const actionsTbody = document.querySelector(".filter_actions_modal_table");
@@ -1008,6 +1278,50 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
         });
     }
 };
+/**
+ * Info bubbles explaining Filters (automatic) vs Custom actions (manual).
+ * Dismissal is remembered per browser session, keyed by data-info-key.
+ */
+function hideDismissedSieveInfoBubbles() {
+    $('#sieve_accounts').find('.sieve-info-bubble').each(function () {
+        const key = $(this).data('info-key');
+        if (key && Hm_Utils.get_from_local_storage(key) === '1') {
+            $(this).remove();
+        }
+    });
+}
+
+function registerSieveInfoBubbles() {
+    $(document).off('click', '.sieve-info-bubble-close').on('click', '.sieve-info-bubble-close', function (e) {
+        e.preventDefault();
+        const $bubble = $(this).closest('.sieve-info-bubble');
+        const key = $bubble.data('info-key');
+        if (key) {
+            Hm_Utils.save_to_local_storage(key, '1');
+        }
+        $bubble.remove();
+    });
+}
+
+/**
+ * Register tab switching for Filters / Custom actions
+ */
+function registerSieveTabSwitching() {
+    $(document).off('click', '.sieve-tab-btn').on('click', '.sieve-tab-btn', function (e) {
+        e.preventDefault();
+        const tabName = $(this).data('tab');
+        const $container = $(this).closest('.filter_subblock');
+        
+        // Update tab button states
+        $container.find('.sieve-tab-btn').removeClass('active').attr('aria-selected', 'false');
+        $(this).addClass('active').attr('aria-selected', 'true');
+        
+        // Update content visibility
+        $container.find('.sieve-tab-content').addClass('d-none');
+        $container.find('.sieve-tab-content[data-tab-id="' + tabName + '"]').removeClass('d-none');
+    });
+}
+
 
 function blockListPageHandlers() {
     $(document).on('change', '.select_default_behaviour', function(e) {
@@ -1223,12 +1537,14 @@ function sieveFiltersPageHandler() {
         isFilterFromCustomActions: false,
     });
 
-    const edit_filter_modal = createEditFilterModal(
+    //-------------------------------------------------------------------- Filter modal for creating/editing filters
+    edit_filter_modal = createEditFilterModal(
         save_filter_inner,
         getCurrentAccount,
     );
 
-    var edit_script_modal = new Hm_Modal({
+    //-------------------------------------------------------------------- Script modal for creating/editing scripts
+    edit_script_modal = new Hm_Modal({
         size: 'xl',
         modalId: 'myEditScript'
     });
@@ -1242,10 +1558,24 @@ function sieveFiltersPageHandler() {
         save_script(current_account);
     });
 
+    //-------------------------------------------------------------------- Custom action modal for creating/editing custom actions 
+    custom_action_modal = new Hm_Modal({
+        size: 'xl',
+        modalId: 'myCustomActionModalFromSieve',
+    });
+
+    custom_action_modal.setTitle(hm_trans('Setup a new Custom Action'));
+    const templateEl = document.querySelector('#custom_action_template');
+    if (templateEl) {
+        custom_action_modal.setContent(templateEl.innerHTML);
+    }
+
     /**************************************************************************************
      * Initialize sieve button events
      **************************************************************************************/
-    registerSievePageEvents(edit_filter_modal, edit_script_modal);
+    registerSievePageEvents(edit_filter_modal, edit_script_modal, custom_action_modal);
+    registerSieveTabSwitching();
+    registerSieveInfoBubbles();
 
     const save_script = Hm_Filters.save_script;
     // const save_filter = Hm_Filters.save_filter;
@@ -1327,8 +1657,11 @@ function collectChips(container) {
 }
 
 let current_mailbox_for_filter;
-let edit_filter_modal_for_custom_actions;
+let edit_filter_modal_for_automatic_actions;
 let edit_filter_template_content;
+let custom_action_modal;
+let edit_filter_modal;
+let edit_script_modal;
 
 function createFilterFromList(launcherModal) {
     const froms = collectChips('#filter-from-list');
@@ -1343,6 +1676,7 @@ function createFilterFromList(launcherModal) {
     const mailboxName = current_mailbox_for_filter;
     current_account = mailboxName;
     current_account_element = find_account_element(mailboxName);
+    custom_action_context = false;
 
     const filterDraft = {
         from: froms,
@@ -1372,7 +1706,7 @@ function createFilterFromList(launcherModal) {
     };
 
     // Dispose previous modal if it exists
-    if (edit_filter_modal_for_custom_actions) {
+    if (edit_filter_modal_for_automatic_actions) {
         try {
             const existingModal = document.getElementById('myEditFilterModal');
             if (existingModal) {
@@ -1385,12 +1719,12 @@ function createFilterFromList(launcherModal) {
         }
     }
 
-    edit_filter_modal_for_custom_actions = createEditFilterModal(
+    edit_filter_modal_for_automatic_actions = createEditFilterModal(
         save_filter,
         getCurrentAccount,
         { isFromMessageList: true },
     );
-    edit_filter_modal_for_custom_actions.open();
+    edit_filter_modal_for_automatic_actions.open();
     launcherModal.hide();
 
     // Remove any previous dry run results
@@ -1629,6 +1963,7 @@ $(function () {
         e.preventDefault();
         current_account = $(this).attr("account");
         current_account_element = find_account_element(current_account);
+        custom_action_context = false;
 
         const edit_filter_modal = createEditFilterModal(
             Hm_Filters.save_filter,

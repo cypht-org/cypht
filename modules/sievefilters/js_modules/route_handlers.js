@@ -5,6 +5,8 @@ function applyBlockListPageHandlers() {
 function applySieveFiltersPageHandler() {
     sieveFiltersPageHandler();
 
+    handleSieveCustomAction();
+
     return () => {
         cleanUpSieveFiltersPage();
     };

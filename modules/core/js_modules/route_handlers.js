@@ -156,6 +156,8 @@ function applyMessageListPageHandlers(routeParams) {
         Hm_Message_List.sort($(this).val());
     });
 
+    if (window.handleSieveAutomaticAction) handleSieveAutomaticAction();
+
     Hm_MessagesStore.bindSourceToggleInputs(routeParams.list_path, async () => {
         messagesStore.removeFromLocalStorage();
 
@@ -171,13 +173,21 @@ function applyMessageListPageHandlers(routeParams) {
 
     if (window.handleSieveCustomAction) handleSieveCustomAction();
 
+    if (window.handleApplyCustomAction) handleApplyCustomAction();
+
     // TODO: Refactor this handler to be more modular(applicable only for the imap list type)
     return applyImapMessageListPageHandlers(routeParams);
 }
 
 function applyMessagePageHandlers(routeParams) {
     const path = routeParams.list_path.substr(0, 4);
-    
+  
+    if (window.handleApplyCustomAction) handleApplyCustomAction();
+
+    // Wires up #add_custom_action_button ("Create for message like this"), same as
+    // applyMessageListPageHandlers does for the list's "Create from Selected" button.
+    if (window.handleSieveCustomAction) handleSieveCustomAction();
+
     switch (path) {
         case 'imap':
         case 'trac':
