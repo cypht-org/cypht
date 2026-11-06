@@ -7,10 +7,10 @@ output_source('account');
 
 /* create account page */
 setup_base_page('accounts', 'core');
-add_handler('accounts', 'process_create_account', true, 'account', 'login', 'after');
-add_handler('accounts', 'process_delete_account', true, 'account', 'process_create_account', 'after');
 add_handler('accounts', 'check_internal_users', true, 'account', 'login', 'after');
-add_handler('accounts', 'account_list', true, 'account', 'check_internal_users', 'after');
+add_handler('accounts', 'process_create_account', true, 'account', 'load_user_data', 'after');
+add_handler('accounts', 'process_delete_account', true, 'account', 'process_create_account', 'after');
+add_handler('accounts', 'account_list', true, 'account', 'process_delete_account', 'after');
 add_output('accounts', 'create_form', true, 'account', 'version_upgrade_checker', 'after');
 add_output('accounts', 'user_list', true, 'account', 'create_form', 'after');
 
