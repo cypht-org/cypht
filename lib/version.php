@@ -1,3 +1,3 @@
 <?php
 
-define('CYPHT_VERSION', '2.13.1');
+define('CYPHT_VERSION', '2.14.0');
