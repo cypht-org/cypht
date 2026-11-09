@@ -255,6 +255,17 @@ return [
     'disable_origin_check' => env('DISABLE_ORIGIN_CHECK', false),
 
     /*
+    | ---------------------
+    | Disable version check
+    | ---------------------
+    |
+    | Change this to true to skip the api.github.com release check, e.g. on
+    | networks without Internet access.
+    |
+    */
+    'disable_version_check' => env('DISABLE_VERSION_CHECK', false),
+
+    /*
     | -----------
     | Admin Users
     | -----------
