@@ -1279,16 +1279,27 @@ class Hm_Handler_version_upgrade_checker extends Hm_Handler_Module {
 
     public function process()
     {
+        if ($this->config->get('disable_version_check', false)) {
+            $this->out('need_upgrade', false);
+            $this->out('latest_version', null);
+            return;
+        }
+
         $latestVersion = $this->session->get('latest_version') ?: null;
-        if (! $latestVersion) {
+        $lastFailure = (int) $this->session->get('latest_version_check_failed', 0);
+        if (! $latestVersion && (time() - $lastFailure) > 3600) {
             $api = new Hm_API_Curl();
+            $api->connect_timeout = 3;
+            $api->timeout = 5;
             $data = $api->command('https://api.github.com/repos/cypht-org/cypht/releases');
 
-            if ($api->last_status == 200) {
+            if ($api->last_status == 200 && is_array($data) && ! empty($data)) {
                 $latestRelease = reset($data);
                 $latestVersion = substr($latestRelease['tag_name'], 1);
 
                 $this->session->set('latest_version', $latestVersion);
+            } else {
+                $this->session->set('latest_version_check_failed', time());
             }
         }
 
