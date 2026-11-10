@@ -14,6 +14,9 @@ class Hm_API_Curl {
     public $last_status;
     public $format = '';
 
+    public $connect_timeout = 0;
+    public $timeout = 0;
+
     /**
      * Init
      * @param string $format format of the result
@@ -61,6 +64,12 @@ class Hm_API_Curl {
         Hm_Functions::c_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         Hm_Functions::c_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        if ($this->connect_timeout > 0) {
+            Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->connect_timeout);
+        }
+        if ($this->timeout > 0) {
+            Hm_Functions::c_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
+        }
     }
 
     /**

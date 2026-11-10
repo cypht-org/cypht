@@ -124,7 +124,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_generate_main_script_orders_cypht_scripts_by_priority() {
+    public function test_generate_main_script_orders_scripts_by_priority_with_external_first() {
         $result = generate_main_script(array(
             'manual_script-30-cypht',
             'main_script',
@@ -135,8 +135,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
         ));
 
         $this->assertStringStartsWith("require [\"include\"];", $result);
-        $this->assertStringContainsString("include :personal \"blocked_senders\";\ninclude :personal \"archive_now-5-cypht\";\ninclude :personal \"from_message-20-cyphtfilter\";\ninclude :personal \"manual_script-30-cypht\";", $result);
-        $this->assertStringNotContainsString('not-managed-script', $result);
+        $this->assertStringContainsString("include :personal \"blocked_senders\";\ninclude :personal \"not-managed-script\";\ninclude :personal \"archive_now-5-cypht\";\ninclude :personal \"from_message-20-cyphtfilter\";\ninclude :personal \"manual_script-30-cypht\";", $result);
     }
 
     /**
@@ -626,7 +625,7 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_get_mailbox_filters_lists_only_cypht_scripts() {
+    public function test_get_mailbox_filters_lists_cypht_and_external_scripts() {
         $scripts = array(
             'main_script' => 'require ["include"];',
             'project_archive-20-cypht' => 'require ["fileinto"];',
@@ -669,9 +668,9 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
 
         $result = get_mailbox_filters($mailbox, $site_config, $user_config);
 
-        $this->assertEquals(2, $result['count']);
+        $this->assertEquals(3, $result['count']);
         $this->assertStringContainsString('from message', $result['list']);
         $this->assertStringContainsString('project archive', $result['list']);
-        $this->assertStringNotContainsString('external-script', $result['list']);
+        $this->assertStringContainsString('external-script', $result['list']);
     }
 }

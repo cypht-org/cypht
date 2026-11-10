@@ -649,7 +649,7 @@ function smtpSettingsPageHandler() {
 }
 
 $(function() {
-    if (hm_is_logged() && window.inAppContext) {
+    if (hm_is_logged() && window.inAppContext && hm_module_is_supported('scheduled_sends')) {
         let scheduled_msg_count = 0;
         let sendScheduledMessages = function() { 
             Hm_Ajax.request(

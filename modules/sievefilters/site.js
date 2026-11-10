@@ -876,7 +876,7 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
     /**
      * Toggle Filter
      */
-    $('.toggle_filter').off('change').on('change', function () {
+    $(document).off('change', '.toggle_filter').on('change', '.toggle_filter', function () {
         const checkbox = $(this);
         Hm_Ajax.request(
             [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_toggle_script_state'},
@@ -884,6 +884,10 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
                 {'name': 'script_state', 'value': checkbox.prop('checked')},
                 {'name': 'sieve_script_name', 'value': checkbox.attr('script_name')}],
             function(res) {
+                if (res.new_script_name) {
+                    checkbox.closest('tr').find('[script_name]').attr('script_name', res.new_script_name);
+                    return;
+                }
                 if (res.success) {
                     checkbox.prop('checked', !checkbox.prop('checked'));
                 }
