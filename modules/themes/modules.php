@@ -158,13 +158,15 @@ if (!hm_exists('custom_themes')) {
         if (!is_array($custom)) {
             return $themes;
         }
-        if (!array_key_exists('theme', $custom)) {
+        // Accept both the documented format (['file|Name']) and the
+        // historical one (['theme' => ['file|Name']]).
+        if (array_key_exists('theme', $custom) && is_array($custom['theme'])) {
+            $custom = $custom['theme'];
+        }
+        if (!is_array($custom)) {
             return $themes;
         }
-        if (!is_array($custom['theme'])) {
-            return $themes;
-        }
-        foreach ($custom['theme'] as $val) {
+        foreach ($custom as $val) {
             if (mb_strpos($val, '|') === false) {
                 continue;
             }
