@@ -399,11 +399,11 @@ class Hm_IMAP_Struct {
      * @return array list of matching parts
      */
     public function recursive_search($struct, $flds, $all, $res, $parent=false) {
-        $exact = $this->search_parts($struct, $flds, $all, $res, $parent, true);
+        $exact = $this->searchParts($struct, $flds, $all, $res, $parent, true);
         if (count($exact) > count($res)) {
             return $exact;
         }
-        return $this->search_parts($struct, $flds, $all, $res, $parent, false);
+        return $this->searchParts($struct, $flds, $all, $res, $parent, false);
     }
 
     /**
@@ -416,7 +416,7 @@ class Hm_IMAP_Struct {
      * @param bool $exact true to only accept exact, case-insensitive matches
      * @return array list of matching parts
      */
-    private function search_parts($struct, $flds, $all, $res, $parent, $exact) {
+    private function searchParts($struct, $flds, $all, $res, $parent, $exact) {
         foreach ($struct as $msg_id => $vals) {
             $matches = 0;
             if (isset($flds['imap_part_number'])) {
@@ -425,11 +425,11 @@ class Hm_IMAP_Struct {
                 }
             }
 
-            foreach ($flds as $name => $fld_val) {
+            foreach ($flds as $name => $fieldValue) {
                 if (!isset($vals[$name])) {
                     continue;
                 }
-                if ($exact ? strcasecmp($vals[$name], $fld_val) === 0 : mb_stristr($vals[$name], $fld_val)) {
+                if ($exact ? strcasecmp($vals[$name], $fieldValue) === 0 : mb_stristr($vals[$name], $fieldValue)) {
                     $matches++;
                 }
             }
@@ -452,7 +452,7 @@ class Hm_IMAP_Struct {
 
             }
             if (isset($vals['subs'])) {
-                $res = $this->search_parts($vals['subs'], $flds, $all, $res, $parent, $exact);
+                $res = $this->searchParts($vals['subs'], $flds, $all, $res, $parent, $exact);
             }
         }
         return $res;

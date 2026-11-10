@@ -20,43 +20,43 @@ class Hm_Test_IMAP_Bodystructure extends TestCase {
     }
 
     /* multipart/related with an HTML part and an inline image */
-    private function related_message() {
-        return $this->struct(array(
+    private function relatedMessage() {
+        return $this->struct([
             '(',
                 '(', 'text', 'html', '(', 'charset', 'utf-8', ')', 'NIL', 'NIL', 'quoted-printable', '120', '4', 'NIL', 'NIL', 'NIL', 'NIL', ')',
                 '(', 'image', 'jpeg', '(', 'name', 'logo.jpg', ')', '<logo@example.com>', 'NIL', 'base64', '2048', 'NIL',
                     '(', 'inline', '(', 'filename', 'logo.jpg', ')', ')', 'NIL', 'NIL', ')',
                 'related', '(', 'boundary', 'b1', ')', 'NIL', 'NIL', 'NIL',
-            ')'
-        ));
+            ')',
+        ]);
     }
 
     /* multipart/alternative with an AMP part before the HTML part */
-    private function amp_message() {
-        return $this->struct(array(
+    private function ampMessage() {
+        return $this->struct([
             '(',
                 '(', 'text', 'plain', '(', 'charset', 'utf-8', ')', 'NIL', 'NIL', '7bit', '10', '1', 'NIL', 'NIL', 'NIL', 'NIL', ')',
                 '(', 'text', 'x-amp-html', '(', 'charset', 'utf-8', ')', 'NIL', 'NIL', '7bit', '20', '1', 'NIL', 'NIL', 'NIL', 'NIL', ')',
                 '(', 'text', 'html', '(', 'charset', 'utf-8', ')', 'NIL', 'NIL', '7bit', '30', '1', 'NIL', 'NIL', 'NIL', 'NIL', ')',
                 'alternative', '(', 'boundary', 'b2', ')', 'NIL', 'NIL', 'NIL',
-            ')'
-        ));
+            ')',
+        ]);
     }
 
     public function test_search_finds_image_by_content_id_in_angle_brackets() {
-        $res = $this->related_message()->search(array('id' => 'logo@example.com', 'type' => 'image'));
-        $this->assertSame(array('2'), array_map('strval', array_keys($res)));
+        $res = $this->relatedMessage()->search(['id' => 'logo@example.com', 'type' => 'image']);
+        $this->assertSame(['2'], array_map('strval', array_keys($res)));
         $this->assertSame('jpeg', $res[2]['subtype']);
     }
 
     public function test_search_prefers_exact_subtype_over_substring() {
-        $res = $this->amp_message()->search(array('type' => 'text', 'subtype' => 'html'), false);
-        $this->assertSame(array('3'), array_map('strval', array_keys($res)));
+        $res = $this->ampMessage()->search(['type' => 'text', 'subtype' => 'html'], false);
+        $this->assertSame(['3'], array_map('strval', array_keys($res)));
     }
 
     public function test_search_by_part_number() {
-        $res = $this->amp_message()->search(array('imap_part_number' => '2'));
-        $this->assertSame(array('2'), array_map('strval', array_keys($res)));
+        $res = $this->ampMessage()->search(['imap_part_number' => '2']);
+        $this->assertSame(['2'], array_map('strval', array_keys($res)));
         $this->assertSame('x-amp-html', $res[2]['subtype']);
     }
 }
