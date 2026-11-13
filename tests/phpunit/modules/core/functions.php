@@ -101,6 +101,37 @@ class Hm_Test_Core_Functions extends TestCase {
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
+     * @dataProvider partial_settings_cases
+     */
+    public function test_partial_settings_only_process_submitted_fields($case) {
+        $parent = build_parent_mock();
+        $handler = new Hm_Handler_Test($parent, 'settings');
+        foreach ($case['input']['current'] as $name => $value) {
+            $handler->user_config->set($name, $value);
+        }
+        $handler->request->post = array_merge(
+            array('save_settings' => 1),
+            $case['input']['post']
+        );
+
+        process_site_setting('unread_per_source', $handler, 'max_source_setting_callback', 20);
+        process_site_setting('flagged_per_source', $handler, 'max_source_setting_callback', 20);
+        process_site_setting('show_list_icons', $handler, 'max_source_setting_callback', true, true);
+
+        foreach ($handler->get('new_user_settings') as $name => $value) {
+            $handler->user_config->set($name, $value);
+        }
+        foreach ($case['expected']['settings'] as $name => $value) {
+            $this->assertSame($value, $handler->user_config->get($name));
+        }
+    }
+
+    public static function partial_settings_cases() {
+        return PolicyCases::forPolicy('site-settings-partial-save');
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_process_since_argument() {
         $this->assertEquals(date('j-M-Y'), process_since_argument('foo'));
