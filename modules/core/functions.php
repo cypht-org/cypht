@@ -391,23 +391,12 @@ function get_oauth2_data($config) {
  * @param object $handler hm hanndler module object
  * @param function $callback a function to sanitize the submitted value
  * @param mixed $default a default to use if callback is not submitted
- * @param bool $checkbox true if this is a checkbox setting
+ * @param bool $checkbox retained for compatibility with existing callers
  * @return void
  */
 if (!hm_exists('process_site_setting')) {
 function process_site_setting($type, $handler, $callback=false, $default=false, $checkbox=false) {
-    if ($checkbox) {
-        list($success, $form) = $handler->process_form(array('save_settings'));
-        if (array_key_exists($type, $handler->request->post)) {
-            $form = array($type => $handler->request->post[$type]);
-        }
-        else {
-            $form = array($type => false);
-        }
-    }
-    else {
-        list($success, $form) = $handler->process_form(array('save_settings', $type));
-    }
+    list($success, $form) = $handler->process_form(array('save_settings', $type));
     $new_settings = $handler->get('new_user_settings', array());
     $settings = $handler->get('user_settings', array());
 
@@ -982,4 +971,3 @@ function decode_logout_back_query($encoded) {
     }
     return $safe;
 }}
-

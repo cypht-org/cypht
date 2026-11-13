@@ -55,6 +55,38 @@
       ]
     },
     {
+      "id": "site-settings-partial-save",
+      "title": "Site settings partial saves",
+      "description": "A settings save changes only submitted fields, preserving other values in the current session.",
+      "tests": [
+        "Hm_Test_Core_Functions::test_partial_settings_only_process_submitted_fields"
+      ],
+      "cases": [
+        {
+          "id": "preserve-settings-changed-in-another-tab",
+          "description": "Saving a different field from a stale tab preserves current numeric and checkbox settings.",
+          "input": {
+            "current": {"unread_per_source_setting": 42, "show_list_icons_setting": true, "flagged_per_source_setting": 20},
+            "post": {"flagged_per_source": 30}
+          },
+          "expected": {
+            "settings": {"unread_per_source_setting": 42, "show_list_icons_setting": true, "flagged_per_source_setting": 30}
+          }
+        },
+        {
+          "id": "explicitly-uncheck-setting",
+          "description": "An explicitly unchecked checkbox is saved without changing other settings.",
+          "input": {
+            "current": {"unread_per_source_setting": 42, "show_list_icons_setting": true, "flagged_per_source_setting": 20},
+            "post": {"show_list_icons": false}
+          },
+          "expected": {
+            "settings": {"unread_per_source_setting": 42, "show_list_icons_setting": false, "flagged_per_source_setting": 20}
+          }
+        }
+      ]
+    },
+    {
       "id": "message-external-resource-blocking",
       "title": "Message external-resource blocking",
       "description": "Remote resources in message HTML are not loaded or retained as active resources.",

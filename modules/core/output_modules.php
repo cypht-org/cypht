@@ -731,7 +731,7 @@ class Hm_Output_start_settings_form extends Hm_Output_Module {
      */
     protected function output() {
         return '<div class="user_settings px-0"><div class="content_title px-3">'.$this->trans('Site Settings').'</div>'.
-            '<form method="POST"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+            '<form method="POST" id="site_settings_form"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<div class="px-3"><table class="settings_table table table-borderless"><colgroup>'.
             '<col class="label_col"><col class="setting_col"></colgroup>';
     }
@@ -2643,5 +2643,4 @@ class Hm_Output_version_upgrade_checker extends Hm_Output_Module {
         ';
     }
 }
-
 
