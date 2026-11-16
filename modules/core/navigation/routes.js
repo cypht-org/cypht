@@ -79,6 +79,9 @@ const routes = [
         handler: 'applySieveFiltersPageHandler'
     },
     {
+        page: 'bounces'
+    },
+    {
         page: 'shortcuts',
         handler: 'applyShortcutsPageHandlers'
     },
