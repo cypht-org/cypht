@@ -14,7 +14,7 @@ var is_editing_filter = false;
 var current_editing_filter_name = '';
 
 var hm_sieve_condition_fields = function() {
-    return {
+    const fields = {
         'Message': [
             {
                 name: 'subject',
@@ -82,6 +82,16 @@ var hm_sieve_condition_fields = function() {
             },
         ],
     };
+    if (hm_module_is_supported('bounces')) {
+        // evaluated by host-side filter runners, see modules/bounces/README.md
+        fields.Message.push({
+            name: 'bounce',
+            description: 'Is bounce',
+            type: 'none',
+            options: ['Soft', 'Hard'],
+        });
+    }
+    return fields;
 };
 
   /**************************************************************************************
@@ -175,7 +185,7 @@ function showErrorMsg(msg, parentClass, fadeTime = null) {
  * @type {[{name: string, description: string, placeholder: string, type: string, selected: boolean},{name: string, description: string, placeholder: string, type: string},{name: string, description: string, type: string},{name: string, description: string, type: string},{name: string, description: string, placeholder: string, type: string}]}
  */
 var hm_sieve_possible_actions = function() {
-    return [
+    const actions = [
         {
             name: 'keep',
             description: 'Deliver (Keep)',
@@ -264,6 +274,16 @@ var hm_sieve_possible_actions = function() {
             require: 'vacation'
         }
     ];
+    if (hm_module_is_supported('bounces')) {
+        actions.push({
+            name: 'bounce',
+            description: 'Add to bounce list',
+            type: 'none',
+            extra_field: false,
+            require: 'bounce'
+        });
+    }
+    return actions;
 };
 
 var find_account_element = function(account_name) {
