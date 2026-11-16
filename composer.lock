@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c208df0cb8889dccd04d662f09ecd3f1",
+    "content-hash": "edc7b320a63af715dce3545ec166baf8",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -346,16 +346,16 @@
         },
         {
             "name": "garethp/php-ews",
-            "version": "v0.11.2",
+            "version": "v0.11.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Garethp/php-ews.git",
-                "reference": "7618ec49ba20390b8c0f5f7094b9df6e7bed6031"
+                "reference": "6faf11c68c6c5c44d96d979e872d684d8f06a2ff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Garethp/php-ews/zipball/7618ec49ba20390b8c0f5f7094b9df6e7bed6031",
-                "reference": "7618ec49ba20390b8c0f5f7094b9df6e7bed6031",
+                "url": "https://api.github.com/repos/Garethp/php-ews/zipball/6faf11c68c6c5c44d96d979e872d684d8f06a2ff",
+                "reference": "6faf11c68c6c5c44d96d979e872d684d8f06a2ff",
                 "shasum": ""
             },
             "require": {
@@ -406,9 +406,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Garethp/php-ews/issues",
-                "source": "https://github.com/Garethp/php-ews/tree/v0.11.2"
+                "source": "https://github.com/Garethp/php-ews/tree/v0.11.3"
             },
-            "time": "2026-03-11T20:23:22+00:00"
+            "time": "2026-07-21T15:20:50+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
