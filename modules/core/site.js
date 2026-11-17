@@ -2315,7 +2315,7 @@ $(function() {
     $('.save_settings').on("click", function (e) {
         $('.general_setting input[type=checkbox]').each(function () {
             if (this.hasAttribute('disabled') && this.checked) {
-                this.removeAttr('disabled');
+                this.removeAttribute('disabled');
             }
         });
     })

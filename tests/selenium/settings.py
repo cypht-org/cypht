@@ -132,6 +132,54 @@ class SettingsTests(SettingsHelpers):
         print(self.by_class('content_title').text)
         assert self.by_class('content_title').text == 'Site Settings'
 
+    def stale_tab_preserves_other_settings_test(self):
+        first_tab = self.driver.current_window_handle
+        url = self.driver.current_url
+        unread = self.by_name('unread_per_source').get_attribute('value')
+        flagged = self.by_name('flagged_per_source').get_attribute('value')
+        icons = self.by_name('show_list_icons').is_selected()
+        new_unread = '41' if unread != '41' else '42'
+        new_flagged = '43' if flagged != '43' else '44'
+        second_tab = None
+
+        try:
+            self.driver.switch_to.new_window('tab')
+            second_tab = self.driver.current_window_handle
+            self.go(url)
+            self.wait_on_class('settings_table')
+
+            self.driver.switch_to.window(first_tab)
+            self.driver.execute_script(
+                "arguments[0].value = arguments[1]; arguments[2].checked = arguments[3];",
+                self.by_name('unread_per_source'), new_unread, self.by_name('show_list_icons'), not icons
+            )
+            self.save_settings()
+
+            self.driver.switch_to.window(second_tab)
+            self.driver.execute_script("arguments[0].value = arguments[1];",
+                                       self.by_name('flagged_per_source'), new_flagged)
+            self.save_settings()
+            assert self.by_name('unread_per_source').get_attribute('value') == new_unread
+            assert self.by_name('flagged_per_source').get_attribute('value') == new_flagged
+            assert self.by_name('show_list_icons').is_selected() != icons
+        finally:
+            if second_tab:
+                self.driver.switch_to.window(second_tab)
+                self.driver.close()
+            self.driver.switch_to.window(first_tab)
+            self.go(url)
+            self.wait_on_class('settings_table')
+            needs_restore = (self.by_name('unread_per_source').get_attribute('value') != unread or
+                             self.by_name('flagged_per_source').get_attribute('value') != flagged or
+                             self.by_name('show_list_icons').is_selected() != icons)
+            if needs_restore:
+                self.driver.execute_script(
+                    "arguments[0].value = arguments[1]; arguments[2].value = arguments[3]; arguments[4].checked = arguments[5];",
+                    self.by_name('unread_per_source'), unread, self.by_name('flagged_per_source'), flagged,
+                    self.by_name('show_list_icons'), icons
+                )
+                self.save_settings()
+
     def list_style_test(self):
         self.dropdown_test('general_setting', 'list_style', 'email_style', 'news_style')
 
@@ -254,6 +302,7 @@ if __name__ == '__main__':
 
         # general options
         'load_settings_page',
+        'stale_tab_preserves_other_settings_test',
         'mail_format_test',
         'theme_test',
         'list_style_test',
