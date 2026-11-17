@@ -258,6 +258,107 @@
           }
         }
       ]
+    },
+    {
+      "id": "second-factor-attempt-lockout",
+      "title": "Second factor locks after repeated failures",
+      "description": "Wrong login codes are counted per account. Enough failures lock the second factor. A later password login shows the lock message instead of the code form, until a correct code clears the counter.",
+      "tests": [
+        "Hm_Test_2fa_Handler_Modules::test_second_factor_attempt_lockout"
+      ],
+      "cases": [
+        {
+          "id": "wrong-code-is-counted",
+          "description": "A wrong 6-digit login code is stored against the account and does not confirm the session.",
+          "input": {
+            "username": "alice",
+            "code": "000000",
+            "valid": false,
+            "seed_count": 0,
+            "seed_locked_for": 0
+          },
+          "expected": {
+            "confirmed": false,
+            "session_destroyed": false,
+            "locked": false,
+            "attempt_count": 1,
+            "error": "does not match"
+          }
+        },
+        {
+          "id": "fifth-failure-locks-and-ends-session",
+          "description": "The 6-digit failure that reaches the limit locks the account and ends the password session.",
+          "input": {
+            "username": "alice",
+            "code": "000000",
+            "valid": false,
+            "seed_count": 4,
+            "seed_locked_for": 0
+          },
+          "expected": {
+            "confirmed": false,
+            "session_destroyed": true,
+            "locked": true,
+            "attempt_count": 5,
+            "error": "",
+            "notice": "ERR: Too many"
+          }
+        },
+        {
+          "id": "locked-login-shows-the-lock-message",
+          "description": "A later password login reads the active lock and shows the lock message instead of the code form.",
+          "input": {
+            "username": "alice",
+            "submit_code": false,
+            "seed_count": 5,
+            "seed_locked_for": 900
+          },
+          "expected": {
+            "confirmed": false,
+            "session_destroyed": true,
+            "locked": true,
+            "attempt_count": 5,
+            "error": "",
+            "notice": "ERR: Too many",
+            "code_form": false
+          }
+        },
+        {
+          "id": "locked-account-rejects-a-valid-code",
+          "description": "A new password session cannot submit the current 6-digit authenticator code while the account lock is active.",
+          "input": {
+            "username": "alice",
+            "valid": true,
+            "seed_count": 5,
+            "seed_locked_for": 900
+          },
+          "expected": {
+            "confirmed": false,
+            "session_destroyed": true,
+            "locked": true,
+            "attempt_count": 5,
+            "error": "",
+            "notice": "ERR: Too many"
+          }
+        },
+        {
+          "id": "valid-code-clears-the-counter",
+          "description": "The current 6-digit authenticator code confirms the session and removes the failure counter.",
+          "input": {
+            "username": "alice",
+            "valid": true,
+            "seed_count": 2,
+            "seed_locked_for": 0
+          },
+          "expected": {
+            "confirmed": true,
+            "session_destroyed": false,
+            "locked": false,
+            "attempt_count": null,
+            "error": ""
+          }
+        }
+      ]
     }
   ]
 }
