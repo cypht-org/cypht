@@ -1010,7 +1010,7 @@ return [
     | API login
     | ----------
     */
-    // 'api_login_key' => env('API_LOGIN_KEY'),
+    'api_login_key' => env('API_LOGIN_KEY'),
 
     /*
     | -----------------------------------------------------------------------------
