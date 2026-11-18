@@ -588,7 +588,11 @@ function process_bootswatch_files() {
                 if ($folder == 'default') {
                     $content = file_get_contents(VENDOR_PATH . 'twbs/bootstrap/dist/css/bootstrap.min.css');
                 } else {
-                    $content = file_get_contents(VENDOR_PATH . 'thomaspark/bootswatch/dist/' . $folder . '/bootstrap.min.css');
+                    $content = @file_get_contents(VENDOR_PATH . 'thomaspark/bootswatch/dist/' . $folder . '/bootstrap.min.css');
+                    if ($content === false) {
+                        /* Theme not based on Bootswatch: use the base Bootstrap build */
+                        $content = file_get_contents(VENDOR_PATH . 'twbs/bootstrap/dist/css/bootstrap.min.css');
+                    }
                 }
                 // Append customization done to the default theme
                 $custom = file_get_contents($target);

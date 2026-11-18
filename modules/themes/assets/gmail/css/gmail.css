@@ -1,0 +1,399 @@
+/*
+ * Gmail-inspired light theme for Cypht.
+ *
+ * CSS-only: it changes colors, typography and density, and does not move
+ * any element of the layout.
+ */
+
+@import url('../../../../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css');
+
+/* ------------------------------------------------------------------ */
+/* Palette and typography                                             */
+/* ------------------------------------------------------------------ */
+html:root {
+	--gm-read: #f2f6fc;
+	--gm-hover: #f2f6fc;
+	--gm-selected: #d3e3fd;
+	--gm-primary: #0b57d0;
+	--gm-primary-hover: #0842a0;
+	--gm-compose-bg: #c2e7ff;
+	--gm-compose-text: #001d35;
+	--gm-text: #202124;
+	--gm-text-2: #5f6368;
+	--gm-border: #f1f3f4;
+	--gm-border-strong: #dadce0;
+}
+
+html body,
+body.ltr_page {
+	background-color: #ffffff !important;
+	color: var(--gm-text);
+	font-family: "Google Sans Text", "Google Sans", "Roboto", "Segoe UI", Arial, sans-serif;
+	font-size: 14px;
+	-webkit-font-smoothing: antialiased;
+}
+
+a {
+	color: var(--gm-primary);
+}
+
+/* ------------------------------------------------------------------ */
+/* Sidebar                                                            */
+/* ------------------------------------------------------------------ */
+.folder_cell,
+.folder_list {
+	background-color: #ffffff;
+}
+
+.folders > li > a {
+	border-radius: 0 16px 16px 0;
+	color: var(--gm-text);
+	font-size: 14px;
+	min-height: 32px;
+	padding-left: 16px;
+	text-decoration: none;
+}
+
+.folders > li > a:hover {
+	background-color: var(--gm-hover);
+}
+
+.folders > li > a.selected_menu {
+	background-color: var(--gm-selected);
+	color: #001d35;
+	font-weight: 700;
+}
+
+.folders > li > a.selected_menu .nav-label,
+.folders > li > a.selected_menu .menu-icon {
+	color: #001d35;
+}
+
+.menu-icon {
+	color: #444746;
+	font-size: 20px;
+	margin-right: 20px;
+	width: 20px;
+	text-align: center;
+}
+
+.nav-label {
+	font-size: 14px;
+}
+
+/* Compose entry, Gmail-like */
+.folders > li.menu_compose > a {
+	background-color: var(--gm-compose-bg);
+	color: var(--gm-compose-text);
+	border-radius: 16px;
+	font-weight: 500;
+}
+
+.folders > li.menu_compose > a:hover {
+	background-color: #a8dafc;
+}
+
+.folders > li.menu_compose > a .menu-icon {
+	color: var(--gm-compose-text);
+}
+
+/* Search: rounded pill, no layout change */
+.menu_search .input-group {
+	background-color: var(--gm-border);
+	border-radius: 24px;
+	overflow: hidden;
+}
+
+.menu_search .input-group:focus-within {
+	background-color: #ffffff;
+	box-shadow: 0 1px 1px 0 rgba(65, 69, 73, .3), 0 1px 3px 1px rgba(65, 69, 73, .15);
+}
+
+.menu_search .input-group-text {
+	background: transparent;
+	border: none;
+	color: var(--gm-text-2);
+}
+
+.menu_search .search_terms,
+.search_terms {
+	background: transparent;
+	border: none;
+	color: var(--gm-text);
+	font-size: 14px;
+}
+
+.search_terms::placeholder {
+	color: var(--gm-text-2);
+}
+
+/* Account rows: name on the left, unread count on the right */
+li[data-server-id] {
+	position: relative;
+}
+
+li[data-server-id] > a.imap_folder_link {
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding-right: 56px;
+}
+
+li[data-server-id] > .unread_count {
+	position: absolute;
+	right: 16px;
+	top: 5px;
+	margin: 0;
+}
+
+li[data-server-id] .unread_count {
+	background-color: var(--gm-primary);
+	color: #ffffff;
+	border: none;
+	border-radius: 10px;
+	padding: 1px 8px;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+li.menu_unread .total_unread_count,
+li.menu_unread .badge {
+	background-color: var(--gm-primary);
+	color: #ffffff;
+	border: none;
+	border-radius: 10px;
+	padding: 1px 8px;
+	font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ */
+/* Content bars                                                       */
+/* ------------------------------------------------------------------ */
+.content_title,
+.bar {
+	background-color: #ffffff;
+	border-bottom: 1px solid var(--gm-border);
+	box-shadow: none;
+	color: var(--gm-text);
+}
+
+.content_title h2,
+.content_title .card_title {
+	font-size: 18px;
+	font-weight: 400;
+	color: var(--gm-text);
+}
+
+.list_controls,
+.list_sources,
+.mailbox_list_title {
+	background-color: #ffffff;
+	border-bottom: 1px solid var(--gm-border);
+	color: var(--gm-text);
+}
+
+/* ------------------------------------------------------------------ */
+/* Message list: read rows tinted, unread rows white and bold         */
+/* ------------------------------------------------------------------ */
+.message_table tbody tr.email.seen,
+.message_table_body tr.email.seen,
+tr.email.seen,
+tr[class~="seen"] {
+	background-color: var(--gm-read);
+}
+
+.message_table tbody tr.email.seen > td,
+.message_table_body tr.email.seen > td,
+tr.email.seen > td {
+	background-color: transparent;
+}
+
+.message_table tbody tr.email.unseen,
+.message_table_body tr.email.unseen,
+tr.email.unseen,
+tr[class~="unseen"] {
+	background-color: #ffffff;
+}
+
+.message_table tbody tr.email.unseen > td,
+.message_table_body tr.email.unseen > td,
+tr.email.unseen > td {
+	background-color: transparent;
+}
+
+.message_table tbody tr.email:hover,
+.message_table_body tr.email:hover {
+	background-color: #e8f0fe;
+}
+
+.message_table tr.email.unseen .from,
+.message_table tr.email.unseen .from_col,
+.message_table tr.email.unseen .subject,
+.message_table tr.email.unseen .subject_col,
+.message_table_body tr.email.unseen .from,
+.message_table_body tr.email.unseen .from_col,
+.message_table_body tr.email.unseen .subject,
+.message_table_body tr.email.unseen .subject_col {
+	font-weight: 700;
+	color: var(--gm-text);
+}
+
+.message_table .from,
+.message_table .from_col,
+.message_table .subject,
+.message_table .subject_col {
+	color: var(--gm-text);
+}
+
+.message_table .msg_date,
+.message_table .date_col {
+	color: var(--gm-text-2);
+	font-size: 12px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reading and composing                                              */
+/* ------------------------------------------------------------------ */
+.msg_text {
+	color: var(--gm-text);
+	font-size: 14px;
+	line-height: 1.55;
+}
+
+.message_headers {
+	color: var(--gm-text-2);
+	font-size: 13px;
+}
+
+.message_headers .header_subject,
+.msg_headers .header_subject {
+	color: var(--gm-text);
+	font-size: 22px;
+	font-weight: 400;
+}
+
+.compose_subject {
+	font-size: 16px;
+	font-weight: 500;
+}
+
+.compose_to,
+.compose_subject,
+.compose_body,
+.compose_cc,
+.compose_bcc {
+	color: var(--gm-text);
+	font-size: 14px;
+}
+
+.smtp_send {
+	background-color: var(--gm-primary);
+	border-radius: 18px;
+	color: #ffffff;
+	font-weight: 500;
+}
+
+.smtp_send:hover {
+	background-color: var(--gm-primary-hover);
+}
+
+/* ------------------------------------------------------------------ */
+/* Buttons, forms, cards                                              */
+/* ------------------------------------------------------------------ */
+.btn {
+	border-radius: 18px;
+	font-weight: 500;
+	font-size: 14px;
+	box-shadow: none;
+}
+
+.btn-primary {
+	background-color: var(--gm-primary);
+	border-color: var(--gm-primary);
+	color: #ffffff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+	background-color: var(--gm-primary-hover);
+	border-color: var(--gm-primary-hover);
+}
+
+.btn-secondary,
+.btn-light,
+.btn-outline-secondary {
+	border-color: var(--gm-border-strong);
+	color: var(--gm-primary);
+}
+
+.form-control,
+.form-select {
+	background-color: #ffffff;
+	border-color: var(--gm-border-strong);
+	border-radius: 4px;
+	color: var(--gm-text);
+	font-size: 14px;
+}
+
+.form-control:focus,
+.form-select:focus {
+	border-color: var(--gm-primary);
+	box-shadow: 0 0 0 1px var(--gm-primary);
+}
+
+.card {
+	background-color: #ffffff;
+	border: 1px solid var(--gm-border-strong);
+	border-radius: 8px;
+	box-shadow: none;
+}
+
+.login_form .btn-lg,
+.login_form .btn-primary {
+	border-radius: 20px;
+}
+
+.settings_subtitle {
+	background-color: #ffffff;
+	color: var(--gm-text);
+	font-size: 16px;
+	font-weight: 500;
+}
+
+.settings .table > tbody > tr > td,
+.settings table td {
+	border-bottom: 1px solid var(--gm-border);
+	color: var(--gm-text);
+}
+
+.modal-content {
+	border: none;
+	border-radius: 8px;
+}
+
+/* Notifications */
+.sys_messages .alert,
+.sys_messages > div {
+	background-color: #323232;
+	border: none;
+	border-radius: 4px;
+	color: #ffffff;
+}
+
+/* Discreet scrollbars */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #dadce0 transparent;
+}
+
+::-webkit-scrollbar {
+	height: 8px;
+	width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #dadce0;
+	border-radius: 8px;
+}

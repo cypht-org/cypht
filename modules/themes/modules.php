@@ -119,6 +119,7 @@ if (!hm_exists('hm_themes')) {
     {
         return array(
             'default' => 'White Bread (Default)',
+            'gmail' => 'Gmail',
             'cosmo' => 'Cosmo',
             'cerulean' => 'Cerulean',
             'cyborg' => 'Cyborg',
