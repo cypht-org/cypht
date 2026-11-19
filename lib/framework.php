@@ -39,6 +39,7 @@ require APP_PATH.'lib/api.php';
 require APP_PATH.'lib/webdav_formats.php';
 require APP_PATH.'lib/js_libs.php';
 require APP_PATH.'lib/version.php';
+require APP_PATH.'lib/tls.php';
 
 require_once APP_PATH.'modules/core/functions.php';
 require_once APP_PATH.'modules/core/hm-server-target.php';

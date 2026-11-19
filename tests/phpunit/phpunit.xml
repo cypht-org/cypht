@@ -141,6 +141,7 @@
       <file>./lib/installer.php</file>
       <file>./lib/web_installer.php</file>
       <file>./lib/logging.php</file>
+      <file>./lib/tls.php</file>
       <file>./lib/output_debug.php</file>
     </testsuite>
     <!--<testsuite name="modules_imap">

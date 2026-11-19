@@ -4,7 +4,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 if (!hm_exists('connect_to_smtp_server')) {
-    function connect_to_smtp_server($address, $name, $port, $user, $pass, $tls, $type, $server_id = false) {
+    function connect_to_smtp_server($address, $name, $port, $user, $pass, $tls, $type, $server_id = false, $tls_verify = null) {
         $target = hm_server_connect_target($address, null);
         if (!hm_server_port_is_valid($port) || $target === false) {
             Hm_Msgs::add('Could not add server', 'danger');
@@ -19,6 +19,9 @@ if (!hm_exists('connect_to_smtp_server')) {
             'port' => $port,
             'user' => $user,
             'tls' => $tls);
+        if ($tls_verify !== null) {
+            $smtp_list['tls_verify'] = (bool) $tls_verify;
+        }
 
         if (!$server_id || ($server_id && $pass)) {
             $smtp_list['pass'] = $pass;

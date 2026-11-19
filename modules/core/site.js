@@ -2239,12 +2239,14 @@ var fillImapData = function(details) {
     } else {
         $("input[name='srv_setup_stepper_imap_tls'][value='false']").prop("checked", true);
     }
+    $('#srv_setup_stepper_imap_allow_insecure').prop('checked', details.tls_verify === false);
 };
 
 var fillSmtpData = function(details) {
     $('#srv_setup_stepper_smtp_server_id').val(details.id);
     $('#srv_setup_stepper_smtp_address').val(details.server);
     $('#srv_setup_stepper_smtp_port').val(details.port);
+    $('#srv_setup_stepper_smtp_allow_insecure').prop('checked', details.tls_verify === false);
 };
 
 var fillJmapData = function(details) {
@@ -2435,6 +2437,8 @@ function submitSmtpImapServer() {
         { name: 'srv_setup_stepper_imap_address', value: $('#srv_setup_stepper_imap_address').val() },
         { name: 'srv_setup_stepper_imap_port', value: $('#srv_setup_stepper_imap_port').val() },
         { name: 'srv_setup_stepper_imap_tls', value: $('input[name="srv_setup_stepper_imap_tls"]:checked').val() },
+        { name: 'srv_setup_stepper_imap_allow_insecure', value: $('#srv_setup_stepper_imap_allow_insecure').prop('checked') ? '1' : '0' },
+        { name: 'srv_setup_stepper_smtp_allow_insecure', value: $('#srv_setup_stepper_smtp_allow_insecure').prop('checked') ? '1' : '0' },
         { name: 'srv_setup_stepper_enable_sieve', value: $('#srv_setup_stepper_enable_sieve').prop('checked') },
         { name: 'srv_setup_stepper_imap_sieve_mode_tls', value: $('#srv_setup_stepper_imap_sieve_mode_tls').prop('checked') },
         { name: 'srv_setup_stepper_create_profile', value: $('#srv_setup_stepper_create_profile').prop('checked') },
@@ -2491,6 +2495,8 @@ function resetQuickSetupForm() {
     $("#srv_setup_stepper_is_sender").prop('checked', true);
     $("#srv_setup_stepper_is_receiver").prop('checked', true);
     $("#srv_setup_stepper_enable_sieve").prop('checked', false);
+    $("#srv_setup_stepper_imap_allow_insecure").prop('checked', false);
+    $("#srv_setup_stepper_smtp_allow_insecure").prop('checked', false);
     $("#srv_setup_stepper_imap_sieve_mode_tls").prop('checked', false);
     $("#srv_setup_stepper_only_jmap").prop('checked', false);
     $('#step_config-imap_bloc').show();
@@ -2709,6 +2715,8 @@ function getServiceDetails(providerKey){
 
                     if(serverConfig.tls)$("input[name='srv_setup_stepper_imap_tls'][value='true']").prop("checked", true);
                     else $("input[name='srv_setup_stepper_imap_tls'][value='false']").prop("checked", true);
+                    $('#srv_setup_stepper_imap_allow_insecure').prop('checked', false);
+                    $('#srv_setup_stepper_smtp_allow_insecure').prop('checked', false);
 
                     if (serverConfig.hasOwnProperty('sieve')) {
                         $('#srv_setup_stepper_enable_sieve')
