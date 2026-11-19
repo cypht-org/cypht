@@ -130,7 +130,7 @@ class Hm_User_Config_Shared_State {
     public function open($password, array $permanent) {
         for ($attempt = 0; $attempt < 20; $attempt++) {
             $stored = $this->store->read($this->username);
-            $record = self::decode_record($stored['payload']);
+            $record = $stored ? self::decode_record($stored['payload']) : null;
             if ($record) {
                 $key = self::unwrap_key($record, $password);
                 if ($key) {

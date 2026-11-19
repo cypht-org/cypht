@@ -199,24 +199,30 @@ class Hm_User_Config_Shared_File_Store extends Hm_User_Config_Shared_Store {
         $this->check_revision($revision);
         return $this->with_lock($username, function ($path) use ($revision, $payload) {
             $current = $this->read_path($path);
-            if (($current === null ? null : $current['revision']) !== $revision) {
+            $current_revision = $current ? $current['revision'] : null;
+            if ($current_revision !== $revision) {
                 return false;
             }
+
             $record = json_encode(['revision' => ($revision ?? 0) + 1, 'payload' => base64_encode($payload)], JSON_THROW_ON_ERROR);
             $temporary = $path . '.' . bin2hex(random_bytes(16)) . '.tmp';
             $handle = fopen($temporary, 'x');
             if ($handle === false) {
                 throw new RuntimeException('Unable to create the shared-state temporary file');
             }
+
             try {
                 if (!chmod($temporary, 0600) || fwrite($handle, $record) !== strlen($record) || !fflush($handle)) {
                     throw new RuntimeException('Unable to write the shared state');
                 }
-                if (function_exists('fsync') && !fsync($handle)) {
+
+                if (!fsync($handle)) {
                     throw new RuntimeException('Unable to sync the shared state');
                 }
+
                 fclose($handle);
                 $handle = null;
+                
                 if (!rename($temporary, $path)) {
                     throw new RuntimeException('Unable to replace the shared state');
                 }
@@ -258,6 +264,7 @@ class Hm_User_Config_Shared_DB_Store extends Hm_User_Config_Shared_Store {
         }
         $this->dbh->beginTransaction();
         try {
+            // Acquire a write lock without changing the revision.
             $stmt = $this->dbh->prepare('update hm_user_shared_state set revision = revision where user_key = ?');
             $stmt->execute([$this->user_key($username)]);
             $result = $operation();
@@ -284,12 +291,16 @@ class Hm_User_Config_Shared_DB_Store extends Hm_User_Config_Shared_Store {
         if ($record === false) {
             return null;
         }
+
+        // Some PDO drivers return binary columns as streams instead of strings.
         if (is_resource($record['payload'])) {
             $record['payload'] = stream_get_contents($record['payload']);
         }
+
         if (!is_string($record['payload']) || $record['payload'] === '' || (int) $record['revision'] < 1) {
             throw new RuntimeException('Invalid shared-state record');
         }
+        
         return ['revision' => (int) $record['revision'], 'payload' => $this->decode_payload($record['payload'])];
     }
 
