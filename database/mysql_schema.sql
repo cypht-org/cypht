@@ -18,6 +18,12 @@ CREATE TABLE IF NOT EXISTS hm_user_settings (
     PRIMARY KEY (username)
 );
 
+CREATE TABLE IF NOT EXISTS hm_user_shared_state (
+    user_key CHAR(64) PRIMARY KEY NOT NULL,
+    revision BIGINT NOT NULL,
+    payload LONGBLOB NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS hm_login_attempts (
     attempt_key VARCHAR(255),
     attempt_count INT DEFAULT 0,

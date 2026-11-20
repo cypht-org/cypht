@@ -137,6 +137,97 @@ abstract class Hm_Session {
     /* session lifetime */
     public $lifetime = 0;
 
+    private $shared_state;
+
+    /**
+     * Open or resume shared user configuration state.
+     * @param Hm_Config $config user configuration object
+     * @param string|null $password account password, or null to resume
+     * @return void
+     * @throws Exception if the store or shared state cannot be opened or the session must sign in again
+     */
+    public function open_shared_state($config, $password = null) {
+        $username = $this->get('username');
+        $store = Hm_User_Config_Shared_Session::create_store($this->site_config);
+        $state = new Hm_User_Config_Shared_State($store, $username);
+        $shared_session = new Hm_User_Config_Shared_Session($state, $this, $config, $username);
+        if ($password === null) {
+            $shared_session->resume();
+        } else {
+            $shared_session->login($password);
+        }
+        $this->shared_state = $shared_session;
+        Hm_Dispatch::set_shared_session($this);
+    }
+
+    /**
+     * Persist current request settings into the shared state.
+     * @return void
+     * @throws Exception if flushing fails or the generation was replaced
+     */
+    public function flush_shared_state() {
+        if ($this->shared_state) {
+            $this->shared_state->flush();
+        }
+    }
+
+    /**
+     * Mirror a session user-data write into the shared configuration.
+     * @param string $name setting name
+     * @param mixed $value setting value
+     * @return void
+     */
+    protected function set_shared_user_value($name, $value) {
+        if ($this->shared_state) {
+            $this->shared_state->set_user_value($name, $value);
+        }
+    }
+
+    /**
+     * Save shared settings to permanent user configuration.
+     * @param string|false $password account password, or false for unencrypted config
+     * @return bool whether a shared state was available to save
+     * @throws Throwable if saving the shared state fails
+     */
+    public function save_shared_state($password) {
+        if (!$this->shared_state) {
+            return false;
+        }
+        $this->shared_state->save($password);
+        return true;
+    }
+
+    /**
+     * Check whether this session has an attached shared state.
+     * @return bool whether a shared state is attached
+     */
+    public function has_shared_state() {
+        return $this->shared_state !== null;
+    }
+
+    /**
+     * Rewrap the shared-state key with a new account password.
+     * @param string $password new account password
+     * @return void
+     * @throws Exception if rewrapping the key fails or the generation was replaced
+     */
+    public function rewrap_shared_state($password) {
+        if ($this->shared_state) {
+            $this->shared_state->change_password($password);
+        }
+    }
+
+    /**
+     * Detach and clear this session's shared-state bridge.
+     * @return void
+     */
+    public function detach_shared_state() {
+        if ($this->shared_state) {
+            $this->shared_state->detach();
+        }
+        $this->shared_state = null;
+    }
+
     /**
      * check for an active session or an attempt to start one
      * @param object $request request object

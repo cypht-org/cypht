@@ -26,6 +26,31 @@ abstract class Hm_Config {
     /* flag to save config after page handling */
     public $save_on_login = false;
 
+    private $shared_session;
+
+    /**
+     * Attach a shared-state bridge to this configuration.
+     * @param Hm_User_Config_Shared_Session|null $shared_session bridge, or null to detach
+     * @return void
+     */
+    public function attach_shared_session($shared_session) {
+        $this->shared_session = $shared_session;
+    }
+
+    /**
+     * Save unencrypted settings to the shared state when one is attached.
+     * @param string|false $username account name, or false for existing behavior
+     * @return void
+     * @throws Throwable if saving the shared state fails
+     */
+    protected function save_automatically($username) {
+        if ($this->shared_session) {
+            $this->shared_session->save(false, true);
+        } else {
+            $this->save($username, false);
+        }
+    }
+
     /**
      * This method must be overriden by classes extending this one
      * @param string $source source or identifier to determine the source
@@ -292,7 +317,7 @@ class Hm_User_Config_File extends Hm_Config {
     public function set($name, $value) {
         $this->config[$name] = $value;
         if (!$this->crypt) {
-            $this->save($this->username, false);
+            $this->save_automatically($this->username);
         }
     }
 
@@ -308,7 +333,7 @@ class Hm_User_Config_File extends Hm_Config {
             'smtp_servers' => $this->config['smtp_servers']
         ];
         if (!$this->crypt) {
-            $this->save($this->username, false);
+            $this->save_automatically($this->username);
         }
     }
 }
@@ -443,7 +468,7 @@ class Hm_User_Config_DB extends Hm_Config {
     public function set($name, $value) {
         $this->config[$name] = $value;
         if (!$this->crypt) {
-            $this->save($this->username, false);
+            $this->save_automatically($this->username);
         }
     }
 
@@ -459,7 +484,7 @@ class Hm_User_Config_DB extends Hm_Config {
             'smtp_servers' => $this->config['smtp_servers']
         ];
         if (!$this->crypt) {
-            $this->save($this->username, false);
+            $this->save_automatically($this->username);
         }
     }
 }
