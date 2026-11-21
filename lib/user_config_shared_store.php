@@ -23,6 +23,15 @@ abstract class Hm_User_Config_Shared_Store {
     abstract public function compare_and_swap($username, $revision, $payload);
 
     /**
+     * Delete a shared-state record if its revision matches.
+     * @param string $username account name
+     * @param int $revision expected current revision
+     * @return bool whether the record was deleted
+     * @throws Exception if arguments are invalid or storage fails
+     */
+    abstract public function delete_if_revision($username, $revision);
+
+    /**
      * Run an operation exclusively against an existing user's shared state.
      * @param string $username account name
      * @param callable $operation operation to run while synchronized
@@ -237,6 +246,30 @@ class Hm_User_Config_Shared_File_Store extends Hm_User_Config_Shared_Store {
             return true;
         });
     }
+
+    /**
+     * Delete a user's shared-state record if its revision matches.
+     * @param string $username account name
+     * @param int $revision expected current revision
+     * @return bool whether the record was deleted
+     * @throws Exception if arguments are invalid or the file cannot be deleted
+     */
+    public function delete_if_revision($username, $revision) {
+        $this->check_revision($revision);
+        if ($revision === null) {
+            throw new InvalidArgumentException('A revision is required to delete shared state');
+        }
+        return $this->with_lock($username, function ($path) use ($revision) {
+            $current = $this->read_path($path);
+            if ($current === null || $current['revision'] !== $revision) {
+                return false;
+            }
+            if (!unlink($path)) {
+                throw new RuntimeException('Unable to delete the shared state');
+            }
+            return true;
+        });
+    }
 }
 
 class Hm_User_Config_Shared_DB_Store extends Hm_User_Config_Shared_Store {
@@ -332,6 +365,23 @@ class Hm_User_Config_Shared_DB_Store extends Hm_User_Config_Shared_Store {
         }
         $stmt = $this->dbh->prepare($sql);
         $stmt->execute([$key, $payload]);
+        return $stmt->rowCount() === 1;
+    }
+
+    /**
+     * Delete a user's shared-state record if its revision matches.
+     * @param string $username account name
+     * @param int $revision expected current revision
+     * @return bool whether the record was deleted
+     * @throws Exception if arguments are invalid or a database operation fails
+     */
+    public function delete_if_revision($username, $revision) {
+        $this->check_revision($revision);
+        if ($revision === null) {
+            throw new InvalidArgumentException('A revision is required to delete shared state');
+        }
+        $stmt = $this->dbh->prepare('delete from hm_user_shared_state where user_key = ? and revision = ?');
+        $stmt->execute([$this->user_key($username), $revision]);
         return $stmt->rowCount() === 1;
     }
 }

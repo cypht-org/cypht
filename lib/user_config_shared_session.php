@@ -56,6 +56,19 @@ class Hm_User_Config_Shared_Session {
     }
 
     /**
+     * Return the session identity and configured idle timeout for lease tracking.
+     * @return array{0:string,1:int} session identifier and idle timeout in seconds
+     * @throws RuntimeException if the session has no identifier
+     */
+    private function session_lease() {
+        $session_id = $this->session->session_key;
+        if (!is_string($session_id) || $session_id === '') {
+            throw new RuntimeException('The active session has no identifier');
+        }
+        return [$session_id, (int) $this->config->get('idle_time', 1) * 3600];
+    }
+
+    /**
      * Open or initialize shared user state using the account password.
      * @param string $password account password
      * @return void
@@ -65,7 +78,8 @@ class Hm_User_Config_Shared_Session {
         if ($this->config->decrypt_failed) {
             throw new RuntimeException('Permanent settings could not be decrypted');
         }
-        $data = $this->state->open($password, $this->config->dump());
+        list($session_id, $timeout) = $this->session_lease();
+        $data = $this->state->open($password, $this->config->dump(), $session_id, $timeout);
         $this->session->set('shared_state_credentials', $this->state->credentials());
         $this->apply($data);
         $this->config->attach_shared_session($this);
@@ -81,7 +95,8 @@ class Hm_User_Config_Shared_Session {
         if (!is_array($credentials)) {
             throw new Hm_Shared_State_Reauthentication_Required('Sign in again to enable shared settings');
         }
-        $this->apply($this->state->resume($credentials));
+        list($session_id, $timeout) = $this->session_lease();
+        $this->apply($this->state->resume($credentials, $session_id, $timeout));
         $this->config->attach_shared_session($this);
     }
 
@@ -164,6 +179,15 @@ class Hm_User_Config_Shared_Session {
      */
     public function change_password($password) {
         $this->state->change_password($password);
+    }
+
+    /**
+     * Release this session's lease from shared state.
+     * @return void
+     * @throws Exception if the lease cannot be released
+     */
+    public function release() {
+        $this->state->release_session($this->session->session_key);
     }
 
     /**

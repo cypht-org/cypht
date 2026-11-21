@@ -11,6 +11,8 @@ class Hm_User_Config_Shared_State {
     private $key;
     private $generation;
     private $baseline;
+    private $session_key;
+    private $session_timeout = 0;
 
     /**
      * Create a shared-state manager for one account.
@@ -73,10 +75,61 @@ class Hm_User_Config_Shared_State {
         if (!is_array($record) || !is_string($record['generation'] ?? null) ||
             !is_string($record['salt'] ?? null) ||
             !is_string($record['wrapped'] ?? null) ||
-            !is_string($record['data'] ?? null)) {
+            !is_string($record['data'] ?? null) ||
+            (isset($record['sessions']) && !is_array($record['sessions']))) {
             throw new RuntimeException('Invalid encrypted shared state');
         }
+        $record['sessions'] = $record['sessions'] ?? [];
+        foreach ($record['sessions'] as $session_id => $expires_at) {
+            // Guard against malformed or tampered session entries.
+            if (!is_string($session_id) || !preg_match('/^[a-f0-9]{64}$/D', $session_id) ||
+                !is_int($expires_at) || $expires_at < 0) {
+                throw new RuntimeException('Invalid shared-state session lease');
+            }
+        }
+        
         return $record;
+    }
+
+    /**
+     * Hash a session identifier before storing it in the shared-state record.
+     * @param string|null $session_id session identifier
+     * @return string|null hashed session identifier, or null when lease tracking is disabled
+     * @throws InvalidArgumentException if the session identifier is empty
+     */
+    private static function session_key($session_id) {
+        if ($session_id === null) {
+            return null;
+        }
+        if (!is_string($session_id) || $session_id === '') {
+            throw new InvalidArgumentException('A session identifier is required');
+        }
+        return hash('sha256', $session_id);
+    }
+
+    /**
+     * Remove leases that have passed their configured session timeout.
+     * @param array $sessions session lease map
+     * @return array active session leases
+     */
+    private static function active_sessions(array $sessions) {
+        $now = time();
+        return array_filter($sessions, static function ($expires_at) use ($now) {
+            return $expires_at === 0 || $expires_at > $now;
+        });
+    }
+
+    /**
+     * Calculate a session lease expiry.
+     * @param int $timeout idle timeout in seconds, or zero for no timeout
+     * @return int expiry timestamp, or zero for no timeout
+     * @throws InvalidArgumentException if the timeout is negative or not an integer
+     */
+    private static function session_expiry($timeout) {
+        if (!is_int($timeout) || $timeout < 0) {
+            throw new InvalidArgumentException('The session timeout must be a nonnegative integer');
+        }
+        return $timeout === 0 ? 0 : time() + $timeout;
     }
 
     /**
@@ -124,10 +177,14 @@ class Hm_User_Config_Shared_State {
      * Open existing shared state, or replace inaccessible state with loaded permanent settings.
      * @param string $password account password
      * @param array $permanent successfully loaded permanent settings
+     * @param string|null $session_id active session identifier, or null to disable lease tracking
+     * @param int $session_timeout idle timeout in seconds, or zero for no timeout
      * @return array settings and dirty descriptions
-     * @throws Exception if shared state cannot be read, initialized, or serialized
+     * @throws Exception if shared state cannot be read, initialized, serialized, or lease arguments are invalid
      */
-    public function open($password, array $permanent) {
+    public function open($password, array $permanent, $session_id = null, $session_timeout = 0) {
+        $session_key = self::session_key($session_id);
+        $session_expiry = $session_key === null ? null : self::session_expiry($session_timeout);
         for ($attempt = 0; $attempt < 20; $attempt++) {
             $stored = $this->store->read($this->username);
             $record = $stored ? self::decode_record($stored['payload']) : null;
@@ -135,10 +192,32 @@ class Hm_User_Config_Shared_State {
                 $key = self::unwrap_key($record, $password);
                 if ($key) {
                     $data = self::decode_data($record, $key);
-                    $this->key = $key;
-                    $this->generation = $record['generation'];
-                    $this->baseline = $data;
-                    return $data;
+                    if ($session_key === null) {
+                        $this->key = $key;
+                        $this->generation = $record['generation'];
+                        $this->baseline = $data;
+                        return $data;
+                    }
+
+                    $sessions = self::active_sessions($record['sessions']);
+                    if ($sessions) {
+                        $sessions[$session_key] = $session_expiry;
+                        $record['sessions'] = $sessions;
+
+                        if ($this->store->compare_and_swap(
+                            $this->username,
+                            $stored['revision'],
+                            self::encode_record($record)
+                        )) {
+                            $this->key = $key;
+                            $this->generation = $record['generation'];
+                            $this->baseline = $data;
+                            $this->session_key = $session_key;
+                            $this->session_timeout = $session_timeout;
+                            return $data;
+                        }
+                        continue;
+                    }
                 }
             }
 
@@ -147,12 +226,15 @@ class Hm_User_Config_Shared_State {
             $record = array_merge([
                 'generation' => bin2hex(random_bytes(16)),
                 'data' => self::encode_data($data, $key),
+                'sessions' => $session_key === null ? [] : [$session_key => $session_expiry],
             ], self::wrap_key($key, $password));
             
             if ($this->store->compare_and_swap($this->username, $stored['revision'] ?? null, self::encode_record($record))) {
                 $this->key = $key;
                 $this->generation = $record['generation'];
                 $this->baseline = $data;
+                $this->session_key = $session_key;
+                $this->session_timeout = $session_key === null ? 0 : $session_timeout;
                 return $data;
             }
         }
@@ -187,27 +269,106 @@ class Hm_User_Config_Shared_State {
     /**
      * Resume a shared state using credentials stored in an authenticated session.
      * @param array $credentials shared-state key and generation credentials
+     * @param string|null $session_id active session identifier, or null to disable lease tracking
+     * @param int $session_timeout idle timeout in seconds, or zero for no timeout
      * @return array settings and dirty descriptions
-     * @throws Exception if credentials or the stored state are invalid or belong to another generation
+     * @throws Exception if credentials, session lease, or stored state are invalid or belong to another generation
      */
-    public function resume(array $credentials) {
+    public function resume(array $credentials, $session_id = null, $session_timeout = 0) {
         $key = base64_decode($credentials['key'] ?? '', true);
         $generation = $credentials['generation'] ?? null;
         if (!is_string($key) || strlen($key) !== 32 || !is_string($generation)) {
             throw new RuntimeException('Invalid shared-state session credentials');
         }
-        $stored = $this->store->read($this->username);
-        if ($stored === null) {
-            throw new RuntimeException('The shared state is missing');
+        $session_key = self::session_key($session_id);
+        $session_expiry = $session_key === null ? null : self::session_expiry($session_timeout);
+        for ($attempt = 0; $attempt < 20; $attempt++) {
+            $stored = $this->store->read($this->username);
+            if ($stored === null) {
+                throw new Hm_Shared_State_Reauthentication_Required('The shared state expired; sign in again');
+            }
+            $record = self::decode_record($stored['payload']);
+            if (!hash_equals($record['generation'], $generation)) {
+                throw new Hm_Shared_State_Reauthentication_Required('The shared state was replaced; sign in again');
+            }
+            $data = self::decode_data($record, $key);
+            if ($session_key !== null) {
+                $sessions = self::active_sessions($record['sessions']);
+                if (!array_key_exists($session_key, $sessions)) {
+                    if (!$sessions) {
+                        if (!$this->store->delete_if_revision($this->username, $stored['revision'])) {
+                            continue;
+                        }
+                    } elseif ($sessions !== $record['sessions']) {
+                        $record['sessions'] = $sessions;
+                        if (!$this->store->compare_and_swap(
+                            $this->username,
+                            $stored['revision'],
+                            self::encode_record($record)
+                        )) {
+                            continue;
+                        }
+                    }
+                    throw new Hm_Shared_State_Reauthentication_Required('The session expired; sign in again');
+                }
+
+                $sessions[$session_key] = $session_expiry;
+                $record['sessions'] = $sessions;
+                if (!$this->store->compare_and_swap(
+                    $this->username,
+                    $stored['revision'],
+                    self::encode_record($record)
+                )) {
+                    continue;
+                }
+            }
+
+            $this->key = $key;
+            $this->generation = $generation;
+            $this->baseline = $data;
+            $this->session_key = $session_key;
+            $this->session_timeout = $session_key === null ? 0 : $session_timeout;
+            
+            return $data;
         }
-        $record = self::decode_record($stored['payload']);
-        if (!hash_equals($record['generation'], $generation)) {
-            throw new Hm_Shared_State_Reauthentication_Required('The shared state was replaced; sign in again');
+        throw new RuntimeException('Shared-state session update conflicted repeatedly');
+    }
+
+    /**
+     * Release a session's lease and delete the draft when the last lease ends.
+     * @param string $session_id session identifier
+     * @return void
+     * @throws Exception if shared state cannot be updated or deleted
+     */
+    public function release_session($session_id) {
+        $session_key = self::session_key($session_id);
+        for ($attempt = 0; $attempt < 20; $attempt++) {
+            $stored = $this->store->read($this->username);
+            if ($stored === null) {
+                return;
+            }
+            $record = self::decode_record($stored['payload']);
+            if (!hash_equals($record['generation'], $this->generation)) {
+                return;
+            }
+            $sessions = self::active_sessions($record['sessions']);
+            unset($sessions[$session_key]);
+            if (!$sessions) {
+                if ($this->store->delete_if_revision($this->username, $stored['revision'])) {
+                    return;
+                }
+                continue;
+            }
+            $record['sessions'] = $sessions;
+            if ($this->store->compare_and_swap(
+                $this->username,
+                $stored['revision'],
+                self::encode_record($record)
+            )) {
+                return;
+            }
         }
-        $this->key = $key;
-        $this->generation = $generation;
-        $this->baseline = self::decode_data($record, $key);
-        return $this->baseline;
+        throw new RuntimeException('Shared-state session release conflicted repeatedly');
     }
 
     /**
@@ -290,6 +451,12 @@ class Hm_User_Config_Shared_State {
                 throw new Hm_Shared_State_Reauthentication_Required('The shared state was replaced; sign in again');
             }
             $latest = self::decode_data($record, $this->key);
+            $original_sessions = $record['sessions'];
+            if ($this->session_key !== null) {
+                $sessions = self::active_sessions($record['sessions']);
+                $sessions[$this->session_key] = self::session_expiry($this->session_timeout);
+                $record['sessions'] = $sessions;
+            }
             $merged = [
                 'config' => self::merge($this->baseline['config'], $data['config'], $latest['config']),
                 'changed_settings' => self::merge_changes(
@@ -299,6 +466,14 @@ class Hm_User_Config_Shared_State {
                 ),
             ];
             if ($merged === $latest) {
+                if ($record['sessions'] !== $original_sessions &&
+                    !$this->store->compare_and_swap(
+                        $this->username,
+                        $stored['revision'],
+                        self::encode_record($record)
+                    )) {
+                    continue;
+                }
                 $this->baseline = $data;
                 return $latest;
             }

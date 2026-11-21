@@ -329,8 +329,7 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
      * @return void
      */
     public function destroy($request) {
-        $this->flush_shared_state();
-        $this->detach_shared_state();
+        $this->release_shared_state();
         if (function_exists('delete_uploaded_files')) {
             delete_uploaded_files($this);
         }

@@ -79,8 +79,7 @@ class Hm_Memcached_Session extends Hm_DB_Session {
      * @return void
      */
     public function destroy($request) {
-        $this->flush_shared_state();
-        $this->detach_shared_state();
+        $this->release_shared_state();
         if (Hm_Functions::function_exists('delete_uploaded_files')) {
             delete_uploaded_files($this);
         }

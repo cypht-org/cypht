@@ -52,6 +52,17 @@ class Hm_Test_User_Config_Shared_Store extends TestCase {
     }
 
     /** @return void */
+    public function test_delete_only_removes_the_expected_revision() {
+        foreach ($this->stores() as $store) {
+            $this->assertTrue($store->compare_and_swap('alice', null, 'ciphertext one'));
+            $this->assertFalse($store->delete_if_revision('alice', 2));
+            $this->assertSame(1, $store->read('alice')['revision']);
+            $this->assertTrue($store->delete_if_revision('alice', 1));
+            $this->assertNull($store->read('alice'));
+        }
+    }
+
+    /** @return void */
     public function test_file_rejects_corrupt_record() {
         $store = new Hm_User_Config_Shared_File_Store($this->directory);
         $store->compare_and_swap('alice', null, 'ciphertext');

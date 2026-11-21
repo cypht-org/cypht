@@ -229,6 +229,20 @@ abstract class Hm_Session {
     }
 
     /**
+     * Flush and release this session's shared-state lease during logout.
+     * @return void
+     * @throws Throwable if flushing or releasing shared state fails
+     */
+    public function release_shared_state() {
+        if ($this->shared_state) {
+            $this->shared_state->flush();
+            $this->shared_state->release();
+            $this->shared_state->detach();
+            $this->shared_state = null;
+        }
+    }
+
+    /**
      * check for an active session or an attempt to start one
      * @param object $request request object
      * @return bool
