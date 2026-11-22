@@ -43,6 +43,15 @@
     <testsuite name="config">
       <file>./config.php</file>
     </testsuite>
+    <testsuite name="user_config_shared_store">
+      <file>./user_config_shared_store.php</file>
+    </testsuite>
+    <testsuite name="user_config_shared_state">
+      <file>./user_config_shared_state.php</file>
+    </testsuite>
+    <testsuite name="user_config_shared_session">
+      <file>./user_config_shared_session.php</file>
+    </testsuite>
     <testsuite name="site_file_config">
       <file>./site_file_config.php</file>
     </testsuite>
