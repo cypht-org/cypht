@@ -26,7 +26,7 @@ class Hm_Sieve_Client_Factory {
             if ($target === false || !hm_server_port_is_valid($sieve_port)) {
                 throw new Exception('Invalid config host');
             }
-            $client = new PhpSieveManager\ManageSieve\Client($target['host'], $sieve_port);
+            $client = new Hm_Sieve_Shared_Client($target['host'], $sieve_port);
             $client->connect($imap_account['user'], $imap_account['pass'], $sieve_tls, "", "PLAIN");
             self::$instances[$cache_key] = $client;
             return $client;
@@ -37,5 +37,14 @@ class Hm_Sieve_Client_Factory {
             }
             throw new Exception($errorMsg);
         }
+    }
+}
+
+class Hm_Sieve_Shared_Client extends PhpSieveManager\ManageSieve\Client {
+    public function close() {
+    }
+
+    public function __destruct() {
+        parent::close();
     }
 }

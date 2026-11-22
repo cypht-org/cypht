@@ -765,4 +765,26 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
         $this->assertSame($alice_client, $factory->init(null, $alice_account, false));
         $this->assertSame($bob_client, $factory->init(null, $bob_account, false));
     }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_shared_client_keeps_connection_open_until_destroyed() {
+        require_once APP_PATH.'modules/sievefilters/hm-sieve.php';
+
+        $socket = fopen('php://memory', 'r+');
+        $client = new Hm_Sieve_Shared_Client('sieve.example.com');
+        foreach (array('sock' => $socket, 'connected' => true) as $name => $value) {
+            $property = new ReflectionProperty(PhpSieveManager\ManageSieve\Client::class, $name);
+            $property->setAccessible(true);
+            $property->setValue($client, $value);
+        }
+
+        $client->close();
+        $this->assertTrue(is_resource($socket));
+
+        unset($client);
+        $this->assertFalse(is_resource($socket));
+    }
 }
