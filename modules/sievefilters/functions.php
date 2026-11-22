@@ -660,6 +660,7 @@ if (!hm_exists('get_sieve_linked_mailbox')) {
                     $folders[$s] = $obj->value;
                 }
             }
+            $client->close();
             return $folders;
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
