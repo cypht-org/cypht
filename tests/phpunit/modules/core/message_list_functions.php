@@ -94,6 +94,24 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_dates_holders_callback_escapes_attribute_breakout() {
+        $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
+        $payload = '"><img src=x onerror=alert(1)>';
+        $safe = $mod->html_safe($payload);
+        $html = dates_holders_callback(array($payload, $payload), 'email', $mod);
+        $this->assertSame(2, substr_count($html, 'value="'.$safe.'"'));
+        $this->assertStringNotContainsString('<img', $html);
+        $date = 'Wed, 21 Oct 2026 02:03:26 +0000';
+        $plain = dates_holders_callback(array($date, $date), 'email', $mod);
+        $this->assertStringContainsString('value="'.$date.'"', $plain);
+        $row = message_list_row(array(array('dates_holders_callback', $payload, $payload)), 'imap_1_2_494e424f58', 'email', $mod);
+        $this->assertStringContainsString('value="'.$safe.'"', $row[0]);
+        $this->assertStringNotContainsString('<img', $row[0]);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_icon_callback() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
         $this->assertEquals('<td class="icon" title="Flagged, Answered, Attachment"> F A <i class="bi bi-plus-circle"></i></td>', icon_callback(array(array('flagged', 'answered', 'attachment')), 'email', $mod));
