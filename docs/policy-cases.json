@@ -513,6 +513,50 @@
           "expected": {"connect_calls": 0}
         }
       ]
+    },
+    {
+      "id": "mail-tls-verification",
+      "title": "Mail server TLS verification",
+      "description": "IMAP, SMTP, and autodiscovery verify certificates unless a server explicitly allows an insecure connection.",
+      "tests": [
+        "Hm_Test_Tls::test_mail_tls_verification_policy"
+      ],
+      "cases": [
+        {
+          "id": "missing-flag-verifies",
+          "description": "A server record without tls_verify still verifies the certificate.",
+          "input": {
+            "config": {}
+          },
+          "expected": {
+            "verify": true
+          }
+        },
+        {
+          "id": "explicit-verify",
+          "description": "A server that sets tls_verify verifies the certificate.",
+          "input": {
+            "config": {
+              "tls_verify": true
+            }
+          },
+          "expected": {
+            "verify": true
+          }
+        },
+        {
+          "id": "explicit-insecure",
+          "description": "Only an explicit tls_verify value of false skips certificate checks.",
+          "input": {
+            "config": {
+              "tls_verify": false
+            }
+          },
+          "expected": {
+            "verify": false
+          }
+        }
+      ]
     }
   ]
 }

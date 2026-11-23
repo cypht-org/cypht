@@ -1164,12 +1164,14 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
             /*
             *  Connect to SMTP server if user wants to send emails
             */
+            $smtp_tls_verify = empty($this->request->post['srv_setup_stepper_smtp_allow_insecure']);
+            $imap_tls_verify = empty($this->request->post['srv_setup_stepper_imap_allow_insecure']);
             if($isSender){
                 if (!$this->module_is_supported('smtp')) {
                     Hm_Msgs::add("SMTP module is not enabled",'danger');
                     return;
                 }
-                $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, 'smtp', $smtpServerId);
+                $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, 'smtp', $smtpServerId, $smtp_tls_verify);
                 if(!isset($this->smtp_server_id)){
                     Hm_Msgs::add("Could not save server", 'danger');
                     return;
@@ -1233,7 +1235,9 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                         $this,
                         $hideFromCombinedView,
                         $imapServerId,
-                        $imapSieveTls
+                        $imapSieveTls,
+                        true,
+                        $imap_tls_verify
                     );
 
                     if(!isset($this->imap_server_id)) {

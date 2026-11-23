@@ -1586,7 +1586,7 @@ if (!hm_exists('forward_dropdown')) {
 }
 
 if (!hm_exists('connect_to_imap_server')) {
-    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false, $sieve_tls = false, $show_errors = true) {
+    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false, $sieve_tls = false, $show_errors = true, $tls_verify = null) {
         $site_config = (is_object($context) && isset($context->config)) ? $context->config : null;
         if ($type === 'jmap') {
             $target_ok = hm_server_url_is_allowed($address, $site_config);
@@ -1617,6 +1617,9 @@ if (!hm_exists('connect_to_imap_server')) {
             'port' => $port,
             'user' => $user,
             'tls' => $tls);
+        if ($tls_verify !== null) {
+            $imap_list['tls_verify'] = (bool) $tls_verify;
+        }
 
         if (!$server_id || ($server_id && $pass)) {
             $imap_list['pass'] = $pass;

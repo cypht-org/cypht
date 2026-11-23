@@ -187,6 +187,7 @@ return array(
         'smtp_delete' => FILTER_VALIDATE_INT,
         'smtp_send' => FILTER_VALIDATE_INT,
         'submit_smtp_server' => FILTER_UNSAFE_RAW,
+        'new_smtp_allow_insecure' => FILTER_VALIDATE_BOOLEAN,
         'smtp_server_id' => FILTER_UNSAFE_RAW,
         'smtp_user' => FILTER_UNSAFE_RAW,
         'smtp_pass' => FILTER_UNSAFE_RAW,

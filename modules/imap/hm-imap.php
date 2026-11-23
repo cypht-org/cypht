@@ -44,6 +44,7 @@ class Hm_IMAP_List {
             'server'    => $server['server'],
             'port'      => $server['port'],
             'tls'       => $server['tls'],
+            'tls_verify' => hm_server_tls_verify($server),
             'type'      => array_key_exists('type', $server) ? $server['type'] : 'imap',
             'username'  => $user,
             'password'  => $pass,
@@ -106,9 +107,9 @@ if (!class_exists('Hm_IMAP')) {
         /* maximum characters to read in from a request */
         public $max_read = false;
 
-        /* SSL connection knobs */
-        public $verify_peer_name = false;
-        public $verify_peer = false;
+        /* SSL connection knobs. Overridden from the server tls_verify flag in connect(). */
+        public $verify_peer_name = true;
+        public $verify_peer = true;
 
         /* IMAP server IP address or hostname */
         public $server = '127.0.0.1';
@@ -230,11 +231,10 @@ if (!class_exists('Hm_IMAP')) {
                 else {
                     $this->server = 'tcp://'.$this->server;
                 }
+                $this->verify_peer = hm_server_tls_verify($config);
+                $this->verify_peer_name = $this->verify_peer;
                 $this->debug[] = 'Connecting to '.$this->server.' on port '.$this->port;
-                $ctx = stream_context_create();
-
-                stream_context_set_option($ctx, 'ssl', 'verify_peer_name', $this->verify_peer_name);
-                stream_context_set_option($ctx, 'ssl', 'verify_peer', $this->verify_peer);
+                $ctx = hm_tls_stream_context($this->verify_peer);
 
                 $this->handle = Hm_Functions::stream_socket_client($this->server, $this->port, $errorno, $errorstr, $this->timeout, STREAM_CLIENT_CONNECT, $ctx);
                 if (is_resource($this->handle)) {
@@ -278,8 +278,14 @@ if (!class_exists('Hm_IMAP')) {
          */
         public function authenticate($username, $password) {
             $this->get_capability();
+            /* Implicit TLS is already encrypted. Otherwise STARTTLS must succeed before
+             * any login command: a failed upgrade used to fall through and send the
+             * password on the plaintext socket. No STARTTLS capability still returns true. */
             if (!$this->tls) {
-                $this->starttls();
+                if (!$this->starttls()) {
+                    $this->debug[] = 'Log in for ' . $username . ' FAILED';
+                    return false;
+                }
             }
             $scramMechanisms = [
                 'scram-sha-1', 'scram-sha-1-plus',
@@ -358,27 +364,50 @@ if (!class_exists('Hm_IMAP')) {
         }
 
         /**
-         * attempt starttls
-         * @return void
+         * Attempt STARTTLS. A server that does not offer it keeps the plaintext session.
+         * A failed upgrade closes the socket and must not be followed by authentication.
+         * @return bool true when login may continue
          */
         public function starttls() {
-            if ($this->is_supported('STARTTLS')) {
-                $command = "STARTTLS\r\n";
-                $this->send_command($command);
-                $response = $this->get_response();
-                if (!empty($response)) {
-                    $end = array_pop($response);
-                    if (mb_substr($end, 0, mb_strlen('A'.$this->command_count.' OK')) == 'A'.$this->command_count.' OK') {
-                        Hm_Functions::stream_socket_enable_crypto($this->handle, get_tls_stream_type());
-                    }
-                    else {
-                        $this->debug[] = 'Unexpected results from STARTTLS: '.implode(' ', $response);
-                    }
-                }
-                else {
-                    $this->debug[] = 'No response from STARTTLS command';
-                }
+            if (!$this->is_supported('STARTTLS')) {
+                return true;
             }
+            $command = "STARTTLS\r\n";
+            $this->send_command($command);
+            $response = $this->get_response();
+            if (empty($response)) {
+                $this->debug[] = 'No response from STARTTLS command';
+                $this->abort_tls('Could not start TLS');
+                return false;
+            }
+            $end = array_pop($response);
+            if (mb_substr($end, 0, mb_strlen('A'.$this->command_count.' OK')) != 'A'.$this->command_count.' OK') {
+                $this->debug[] = 'Unexpected results from STARTTLS: '.implode(' ', $response);
+                $this->abort_tls('Could not start TLS');
+                return false;
+            }
+            if (Hm_Functions::stream_socket_enable_crypto($this->handle, get_tls_stream_type()) !== true) {
+                $this->debug[] = 'STARTTLS crypto negotiation failed';
+                $this->abort_tls('Could not start TLS');
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Close the socket after a failed STARTTLS upgrade.
+         * @param string $message user-facing connection error
+         * @return void
+         */
+        private function abort_tls($message) {
+            $this->con_error_msg = $message;
+            $this->debug[] = $message;
+            if (is_resource($this->handle)) {
+                fclose($this->handle);
+            }
+            $this->handle = false;
+            $this->state = 'disconnected';
+            Hm_Msgs::add($message, 'danger');
         }
 
         /* ------------------ UNSELECTED STATE COMMANDS ------------------------ */

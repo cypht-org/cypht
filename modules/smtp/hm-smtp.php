@@ -35,6 +35,7 @@ class Hm_SMTP_List {
             'server'    => $server['server'],
             'port'      => $server['port'],
             'tls'       => $server['tls'],
+            'tls_verify' => hm_server_tls_verify($server),
             'username'  => $user,
             'password'  => $pass,
             'type'      => array_key_exists('type', $server) && !empty($server['type']) ? $server['type'] : 'smtp',
@@ -75,6 +76,7 @@ class Hm_SMTP {
     private $starttls;
     private $port;
     private $tls;
+    private $tls_verify = true;
     private $auth;
     private $handle;
     private $debug;
@@ -146,6 +148,7 @@ class Hm_SMTP {
         if (!$this->tls && !$this->starttls) {
             $this->starttls = true;
         }
+        $this->tls_verify = hm_server_tls_verify($conf);
         $this->request_auths = array(
             'scram-sha-512-plus',
             'scram-sha-512',
@@ -301,9 +304,7 @@ class Hm_SMTP {
             $server = 'tls://'.$server;
         }
         $this->debug[] = 'Connecting to '.$server.' on port '.$this->port;
-        $ctx = stream_context_create();
-        stream_context_set_option($ctx, 'ssl', 'verify_peer_name', false);
-        stream_context_set_option($ctx, 'ssl', 'verify_peer', false);
+        $ctx = hm_tls_stream_context($this->tls_verify);
         $this->handle = Hm_Functions::stream_socket_client($server, $this->port, $errorno, $errorstr, 30, STREAM_CLIENT_CONNECT, $ctx);
         if (is_resource($this->handle)) {
             $this->debug[] = 'Successfully opened port to the SMTP server';
@@ -327,9 +328,8 @@ class Hm_SMTP {
             $this->send_command($command);
             $response = $this->get_response();
             if ($this->compare_response($response, '220') != 0) {
-                // Log technical details for debugging
                 error_log("SMTP STARTTLS command failed. Expected 220, got: " . print_r($response, true));
-                $result = "We couldn't secure the connection to the SMTP server (STARTTLS failed). Please try again later.";
+                return $this->abort_starttls();
             }
             if(isset($certfile) && $certfile) {
                 stream_context_set_option($this->handle, 'tls', 'local_cert', $certfile);
@@ -337,7 +337,10 @@ class Hm_SMTP {
                     stream_context_set_option($this->handle, 'tls', 'passphrase', $certpass);
                 }
             }
-            Hm_Functions::stream_socket_enable_crypto($this->handle, get_tls_stream_type());
+            if (Hm_Functions::stream_socket_enable_crypto($this->handle, get_tls_stream_type()) !== true) {
+                error_log("SMTP STARTTLS crypto negotiation failed for {$this->server}:{$this->port}");
+                return $this->abort_starttls();
+            }
             $command = 'EHLO '.$this->hostname;
             $this->send_command($command);
             $response = $this->get_response();
@@ -362,6 +365,24 @@ class Hm_SMTP {
                 }
             }
         }
+        return $result;
+    }
+
+    /**
+     * Close the socket after STARTTLS was offered and then failed.
+     * Authentication must not continue on this connection.
+     * @return string
+     */
+    private function abort_starttls() {
+        if (is_resource($this->handle)) {
+            fclose($this->handle);
+        }
+        $this->handle = false;
+        $this->connected = false;
+        $this->state = 'disconnected';
+        $result = "We couldn't secure the connection to the SMTP server (STARTTLS failed). Please try again later.";
+        $this->debug[] = $result;
+        Hm_Msgs::add('Could not start TLS', 'danger');
         return $result;
     }
 

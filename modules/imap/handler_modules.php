@@ -1695,7 +1695,8 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                         'server' => $target['host'],
                         'hide' => $hidden,
                         'port' => $form['new_imap_port'],
-                        'tls' => $tls);
+                        'tls' => $tls,
+                        'tls_verify' => empty($this->request->post['new_imap_allow_insecure']));
 
                     if ($sieve_host !== '') {
                         $imap_list['sieve_config_host'] = $sieve_host;

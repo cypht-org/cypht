@@ -501,7 +501,8 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                         'name' => $form['new_smtp_name'],
                         'server' => $target['host'],
                         'port' => $form['new_smtp_port'],
-                        'tls' => $tls));
+                        'tls' => $tls,
+                        'tls_verify' => empty($this->request->post['new_smtp_allow_insecure'])));
 
                     Hm_Msgs::add('Added SMTP server!');
                     $this->session->record_unsaved('SMTP server added');
@@ -1388,6 +1389,11 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
                                     <input type="radio" name="tls" id="smtp_notls" value="0" />
                                     <label for="smtp_notls">'.$this->trans('STARTTLS or unencrypted').'</label>
                                 </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="new_smtp_allow_insecure" id="new_smtp_allow_insecure" value="1" />
+                                    <label class="form-check-label" for="new_smtp_allow_insecure">'.$this->trans('Accept an invalid certificate').'</label>
+                                    <div class="form-text">'.$this->trans('Leave this off unless the server uses a self-signed or private certificate.').'</div>
+                                </div>
 
                                 <div class="">
                                     <input class="btn btn-primary px-5" type="submit" value="'.$this->trans('Add').'" name="submit_smtp_server" />
@@ -1625,6 +1631,13 @@ class Hm_Output_stepper_setup_server_smtp extends Hm_Output_Module {
                            </label>
                        </div>
                    </div>
+                 </div>
+                 <div class="form-check mt-2">
+                     <input class="form-check-input" type="checkbox" id="srv_setup_stepper_smtp_allow_insecure" name="srv_setup_stepper_smtp_allow_insecure" value="1">
+                     <label class="form-check-label" for="srv_setup_stepper_smtp_allow_insecure">
+                       '.$this->trans('Accept an invalid certificate').'
+                     </label>
+                     <div class="form-text">'.$this->trans('Leave this off unless the server uses a self-signed or private certificate.').'</div>
                  </div>
            </div>
         ';
