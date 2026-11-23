@@ -359,6 +359,160 @@
           }
         }
       ]
+    },
+    {
+      "id": "user-added-server-hosts",
+      "title": "User-added server host policy",
+      "description": "User-added mail servers share the core host helper with feeds. Public hosts are allowed. Internal hosts follow ALLOW_INTERNAL_SERVERS. Link-local addresses, including cloud metadata, are always denied. Alternate IP spellings are judged as the address they dial.",
+      "tests": [
+        "Hm_Test_Core_Server_Target::test_user_added_server_host_policy"
+      ],
+      "cases": [
+        {
+          "id": "public-ipv4-allowed",
+          "description": "A public IPv4 address can be added with the default flags.",
+          "input": {"host": "8.8.8.8", "flags": {}},
+          "expected": {"allowed": true, "class": "public", "canonical": "8.8.8.8"}
+        },
+        {
+          "id": "private-ipv4-allowed-when-enabled",
+          "description": "An RFC1918 address can be added when internal servers are allowed.",
+          "input": {"host": "10.1.1.1", "flags": {"allow_internal_servers": true}},
+          "expected": {"allowed": true, "class": "internal", "canonical": "10.1.1.1"}
+        },
+        {
+          "id": "private-ipv4-blocked-by-default",
+          "description": "An RFC1918 address is rejected when internal servers are disabled.",
+          "input": {"host": "192.168.1.1", "flags": {}},
+          "expected": {"allowed": false, "class": "internal", "canonical": "192.168.1.1"}
+        },
+        {
+          "id": "link-local-always-blocked",
+          "description": "A link-local address, including a cloud metadata address, is always rejected.",
+          "input": {"host": "169.254.169.254", "flags": {}},
+          "expected": {"allowed": false, "class": "link_local", "canonical": "169.254.169.254"}
+        },
+        {
+          "id": "link-local-blocked-when-internal-allowed",
+          "description": "Link-local stays denied even when internal servers are allowed.",
+          "input": {"host": "169.254.1.1", "flags": {"allow_internal_servers": true}},
+          "expected": {"allowed": false, "class": "link_local", "canonical": "169.254.1.1"}
+        },
+        {
+          "id": "loopback-allowed-when-enabled",
+          "description": "A loopback address can be added when internal servers are allowed.",
+          "input": {"host": "127.0.0.1", "flags": {"allow_internal_servers": true}},
+          "expected": {"allowed": true, "class": "internal", "canonical": "127.0.0.1"}
+        },
+        {
+          "id": "localhost-name-is-internal",
+          "description": "The hostname localhost follows the internal-server setting.",
+          "input": {"host": "localhost", "flags": {"allow_internal_servers": true}},
+          "expected": {"allowed": true, "canonical": "localhost"}
+        },
+        {
+          "id": "loopback-blocked-by-default",
+          "description": "IPv6 loopback is rejected when internal servers are disabled.",
+          "input": {"host": "::1", "flags": {}},
+          "expected": {"allowed": false, "class": "internal", "canonical": "::1"}
+        },
+        {
+          "id": "mapped-loopback-follows-internal-flag",
+          "description": "An IPv4-mapped loopback address is judged as internal under the internal-server flag.",
+          "input": {"host": "::ffff:127.0.0.1", "flags": {}},
+          "expected": {"allowed": false, "class": "internal", "canonical": "127.0.0.1"}
+        },
+        {
+          "id": "mapped-public-unwrapped",
+          "description": "An IPv4-mapped public address is allowed as that public address.",
+          "input": {"host": "::ffff:8.8.8.8", "flags": {}},
+          "expected": {"allowed": true, "class": "public", "canonical": "8.8.8.8"}
+        },
+        {
+          "id": "decimal-loopback",
+          "description": "A 32-bit decimal address is judged as the dotted address it dials.",
+          "input": {"host": "2130706433", "flags": {"allow_internal_servers": true}},
+          "expected": {"allowed": true, "class": "internal", "canonical": "127.0.0.1"}
+        },
+        {
+          "id": "short-loopback",
+          "description": "A short IPv4 form is judged as the dotted address it dials.",
+          "input": {"host": "127.1", "flags": {"allow_internal_servers": true}},
+          "expected": {"allowed": true, "class": "internal", "canonical": "127.0.0.1"}
+        },
+        {
+          "id": "short-private",
+          "description": "A two-part private address expands before the internal-server flag is applied.",
+          "input": {"host": "10.1", "flags": {}},
+          "expected": {"allowed": false, "class": "internal", "canonical": "10.0.0.1"}
+        },
+        {
+          "id": "octal-loopback",
+          "description": "An octal IPv4 spelling is judged as the dotted address it dials.",
+          "input": {"host": "0177.0.0.1", "flags": {"allow_internal_servers": true}},
+          "expected": {"allowed": true, "class": "internal", "canonical": "127.0.0.1"}
+        },
+        {
+          "id": "hex-loopback",
+          "description": "A hex IPv4 spelling is judged as the dotted address it dials.",
+          "input": {"host": "0x7f.0.0.1", "flags": {"allow_internal_servers": true}},
+          "expected": {"allowed": true, "class": "internal", "canonical": "127.0.0.1"}
+        },
+        {
+          "id": "transport-prefix-rejected",
+          "description": "A unix socket transport is not a mail server host.",
+          "input": {"host": "unix:///tmp/mail.sock", "flags": {}},
+          "expected": {"allowed": false, "canonical": false}
+        },
+        {
+          "id": "tls-prefix-rejected",
+          "description": "A tls transport prefix is not accepted as a hostname.",
+          "input": {"host": "tls://127.0.0.1", "flags": {}},
+          "expected": {"allowed": false, "canonical": false}
+        },
+        {
+          "id": "unspecified-address-is-internal",
+          "description": "The unspecified IPv4 address follows the internal-server flag.",
+          "input": {"host": "0.0.0.0", "flags": {"allow_internal_servers": true}},
+          "expected": {"allowed": true, "class": "internal", "canonical": "0.0.0.0"}
+        },
+        {
+          "id": "multicast-is-public-under-php-flags",
+          "description": "A multicast address is treated as public by PHP filter flags.",
+          "input": {"host": "224.0.0.1", "flags": {}},
+          "expected": {"allowed": true, "class": "public", "canonical": "224.0.0.1"}
+        },
+        {
+          "id": "shared-address-space-allowed",
+          "description": "Shared address space is not treated as link-local or internal.",
+          "input": {"host": "100.64.0.1", "flags": {}},
+          "expected": {"allowed": true, "class": "public", "canonical": "100.64.0.1"}
+        },
+        {
+          "id": "jmap-file-url-rejected",
+          "description": "A JMAP URL must be http or https.",
+          "input": {"url": "file://localhost/etc/passwd", "flags": {}},
+          "expected": {"allowed": false}
+        },
+        {
+          "id": "jmap-link-local-url-rejected",
+          "description": "A JMAP URL on a link-local host is always rejected.",
+          "input": {"url": "http://169.254.169.254/latest/meta-data/", "flags": {}},
+          "expected": {"allowed": false}
+        },
+        {
+          "id": "jmap-public-url-allowed",
+          "description": "A JMAP URL on a public host is allowed.",
+          "input": {"url": "https://8.8.8.8/jmap", "flags": {}},
+          "expected": {"allowed": true}
+        },
+        {
+          "id": "saved-link-local-is-not-dialed",
+          "description": "Opening a saved mailbox does not dial a link-local host.",
+          "input": {"host": "169.254.169.254", "port": 80},
+          "expected": {"connect_calls": 0}
+        }
+      ]
     }
   ]
 }

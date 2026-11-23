@@ -1597,6 +1597,10 @@ class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
          * Used on the servers page to add a new JMAP server
          */
         if (isset($this->request->post['submit_jmap_server'])) {
+            if ($this->config->get('single_server_mode', false)) {
+                Hm_Msgs::add('Additional servers cannot be added in single server mode', 'warning');
+                return;
+            }
             list($success, $form) = $this->process_form(array('new_jmap_name', 'new_jmap_address'));
             if (!$success) {
                 $this->out('old_form', $form);
@@ -1608,7 +1612,17 @@ class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
                 $hidden = true;
             }
             $parsed = parse_url($form['new_jmap_address']);
-            if (array_key_exists('host', $parsed) && @get_headers($form['new_jmap_address'])) {
+            $jmap_context = stream_context_create(array(
+                'http' => array(
+                    'follow_location' => 0,
+                    'timeout' => 5,
+                ),
+                'https' => array(
+                    'follow_location' => 0,
+                    'timeout' => 5,
+                ),
+            ));
+            if (is_array($parsed) && array_key_exists('host', $parsed) && hm_server_url_is_allowed($form['new_jmap_address'], $this->config) && @get_headers($form['new_jmap_address'], false, $jmap_context)) {
 
                 Hm_IMAP_List::add(array(
                     'name' => $form['new_jmap_name'],
@@ -1641,6 +1655,10 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
          * Used on the servers page to add a new IMAP server
          */
         if (isset($this->request->post['submit_imap_server'])) {
+            if ($this->config->get('single_server_mode', false)) {
+                Hm_Msgs::add('Additional servers cannot be added in single server mode', 'warning');
+            }
+            else {
             list($success, $form) = $this->process_form(
                 array('new_imap_name',
                     'new_imap_address',
@@ -1659,24 +1677,40 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                 if (isset($this->request->post['new_imap_hidden'])) {
                     $hidden = true;
                 }
-                if ($con = fsockopen($form['new_imap_address'], $form['new_imap_port'], $errno, $errstr, 5)) {
+                $target = hm_server_connect_target($form['new_imap_address'], $this->config);
+                $sieve_host = '';
+                if (isset($this->request->post['sieve_config_host']) && $this->request->post['sieve_config_host']) {
+                    $sieve_host = $this->request->post['sieve_config_host'];
+                }
+                $errno = 0;
+                $errstr = '';
+                $con = false;
+                if ($target && hm_server_port_is_valid($form['new_imap_port']) && ($sieve_host === '' || hm_sieve_host_is_allowed($sieve_host, $this->config))) {
+                    $con = @fsockopen($target['dial'], (int) $form['new_imap_port'], $errno, $errstr, 5);
+                }
+                if ($con) {
+                    fclose($con);
                     $imap_list = array(
                         'name' => $form['new_imap_name'],
-                        'server' => $form['new_imap_address'],
+                        'server' => $target['host'],
                         'hide' => $hidden,
                         'port' => $form['new_imap_port'],
                         'tls' => $tls);
 
-                    if (isset($this->request->post['sieve_config_host']) && $this->request->post['sieve_config_host']) {
-                        $imap_list['sieve_config_host'] = $this->request->post['sieve_config_host'];
+                    if ($sieve_host !== '') {
+                        $imap_list['sieve_config_host'] = $sieve_host;
                     }
                     Hm_IMAP_List::add($imap_list);
                     Hm_Msgs::add('Added server!');
                     $this->session->record_unsaved('IMAP server added');
                 }
                 else {
-                    Hm_Msgs::add(sprintf('Could not add server: %s', $errstr), 'danger');
+                    if ($errstr !== '') {
+                        Hm_Debug::add(sprintf('Could not add IMAP server: %s', $errstr));
+                    }
+                    Hm_Msgs::add('Could not add server', 'danger');
                 }
+            }
             }
         }
         $this->out('is_jmap_supported', $this->module_is_supported('jmap'));
