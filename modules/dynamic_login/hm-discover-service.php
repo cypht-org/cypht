@@ -156,9 +156,7 @@ class Hm_Discover_Services {
     }
 
     private function connect($port, $trans) {
-        $ctx = stream_context_create();
-        stream_context_set_option($ctx, 'ssl', 'verify_peer_name', false);
-        stream_context_set_option($ctx, 'ssl', 'verify_peer', false);
+        $ctx = hm_tls_stream_context(true);
         return @stream_socket_client($trans.$this->server.':'.$port, $errn,
             $errs, $this->timeout, STREAM_CLIENT_CONNECT, $ctx);
     }

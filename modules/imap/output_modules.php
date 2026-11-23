@@ -1493,6 +1493,13 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                             </div>
                         </div>
                       </div>
+                      <div class="form-check mt-2">
+                          <input class="form-check-input" type="checkbox" id="srv_setup_stepper_imap_allow_insecure" name="srv_setup_stepper_imap_allow_insecure" value="1">
+                          <label class="form-check-label" for="srv_setup_stepper_imap_allow_insecure">
+                            '.$this->trans('Accept an invalid certificate').'
+                          </label>
+                          <div class="form-text">'.$this->trans('Leave this off unless the server uses a self-signed or private certificate.').'</div>
+                      </div>
                    ';
 
                      if ($this->get('sieve_filters_enabled')) {

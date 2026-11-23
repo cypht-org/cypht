@@ -134,8 +134,12 @@ jobs:
             sudo setfacl -d -m g::rwx "$(pwd)"
             # chrome
             #wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor > /etc/apt/trusted.gpg.d/google.gpg
-            sudo wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-            sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+            sudo mkdir -p /etc/apt/keyrings
+            sudo wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub \
+              | sudo gpg --dearmor --yes -o /etc/apt/keyrings/google-chrome.gpg
+            sudo chmod 644 /etc/apt/keyrings/google-chrome.gpg
+            echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" \
+              | sudo tee /etc/apt/sources.list.d/google-chrome.list
             sudo apt-get update
             sudo apt-get install -y google-chrome-stable dovecot-imapd dovecot-lmtpd postfix python3-pip ldap-utils libldap2-dev
             sudo bash .github/tests/selenium/webdriver/webdriver.sh
