@@ -28,5 +28,16 @@ return [
     | enabled 2fa, they will have to use a backup code to login, then reset there
     | account in the authenticator app.
     */
-    '2fa_simple' => env('APP_2FA_SIMPLE', false)
+    '2fa_simple' => env('APP_2FA_SIMPLE', false),
+
+    /*
+    | Failures of the login code before that account's second factor is locked.
+    | The counter survives a new password login. A successful code clears it.
+    */
+    '2fa_max_attempts' => env('APP_2FA_MAX_ATTEMPTS', 5),
+
+    /*
+    | How long a locked second factor stays locked, in seconds.
+    */
+    '2fa_lockout_duration' => env('APP_2FA_LOCKOUT_DURATION', 900),
 ];

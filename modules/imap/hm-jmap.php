@@ -532,8 +532,7 @@ class Hm_JMAP {
             array_key_exists('apiUrl', $res) &&
             array_key_exists('accounts', $res)) {
 
-            $this->init_session($res, $url);
-            return true;
+            return $this->init_session($res, $url);
         }
         return false;
     }
@@ -945,44 +944,28 @@ class Hm_JMAP {
      * Start a JMAP session
      * @param array $data JMAP auth response
      * @param string $url url to access JMAP
-     * @return void
+     * @return bool
      */
     private function init_session($data, $url) {
+        $api_url = $this->jmap_session_url($data['apiUrl'] ?? '', $url);
+        $download_url = $this->jmap_session_url($data['downloadUrl'] ?? '', $url);
+        $upload_url = $this->jmap_session_url($data['uploadUrl'] ?? '', $url);
+        if ($api_url === false || $download_url === false || $upload_url === false) {
+            Hm_Debug::add('JMAP session URL blocked by server target policy');
+            return false;
+        }
         $this->state = 'authenticated';
         $this->session = $data;
-        if (!str_contains($data['apiUrl'], $url)){
-            $this->api_url = sprintf(
-                '%s%s',
-                preg_replace("/\/$/", '', $url),
-                $data['apiUrl']
-            );
-        }else{
-            $this->api_url = $data['apiUrl'];
-        }
-        if (!str_contains($data['downloadUrl'], $url)){
-            $this->download_url = sprintf(
-                '%s%s',
-                preg_replace("/\/$/", '', $url),
-                $data['downloadUrl']
-            );
-        }else{
-            $this->download_url = $data['downloadUrl'];
-        }
-        if (!str_contains($data['uploadUrl'], $url)){
-            $this->upload_url = sprintf(
-                '%s%s',
-                preg_replace("/\/$/", '', $url),
-                $data['uploadUrl']
-            );
-        }else{
-            $this->upload_url = $data['uploadUrl'];
-        }
+        $this->api_url = $api_url;
+        $this->download_url = $download_url;
+        $this->upload_url = $upload_url;
         foreach ($data['accounts'] as $account) {
             $this->account_id = array_keys($data['accounts'])[0];
         }
         if ($this->account_id && count($this->folder_list) == 0) {
             $this->reset_folders();
         }
+        return true;
     }
 
     /**
@@ -1040,13 +1023,48 @@ class Hm_JMAP {
      * @return array
      */
     private function send_command($url, $methods=array(), $method='POST', $post=array(), $headers=array()) {
+        if (!hm_server_url_is_allowed($url, null)) {
+            Hm_Debug::add('Blocked JMAP request to a disallowed host');
+            return array();
+        }
         $body = '';
         if (count($methods) > 0) {
             $body = $this->format_request($methods);
         }
         $headers = $this->merge_headers($headers);
         $this->requests[] = array($url, $headers, $body, $method, $post);
-        return $this->api->command($url, $headers, $post, $body, $method);
+        return $this->api->command($url, $headers, $post, $body, $method, false);
+    }
+
+    /**
+     * Keep a session endpoint on an allowed host. Relative paths stay on the user-supplied origin.
+     * @param string $value endpoint from the session document
+     * @param string $base user-supplied JMAP URL
+     * @return string|false
+     */
+    private function jmap_session_url($value, $base) {
+        if (!is_string($value) || $value === '') {
+            return false;
+        }
+        if (preg_match('#^https?://#i', $value)) {
+            $absolute = $value;
+        } elseif (str_starts_with($value, '/')) {
+            $parts = parse_url($base);
+            if (empty($parts['scheme']) || empty($parts['host'])) {
+                return false;
+            }
+            $origin = $parts['scheme'].'://'.$parts['host'];
+            if (!empty($parts['port'])) {
+                $origin .= ':'.$parts['port'];
+            }
+            $absolute = $origin.$value;
+        } else {
+            $absolute = rtrim($base, '/').'/'.ltrim($value, '/');
+        }
+        if (!hm_server_url_is_allowed($absolute, null)) {
+            return false;
+        }
+        return $absolute;
     }
 
     /**

@@ -1053,6 +1053,11 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
             $priority = 0;
         }
         $script_name = generate_script_name($this->request->post['sieve_script_name'], $priority);
+        $editing = $this->request->post['current_editing_script'] ?? '';
+        if ($editing !== '' && ($this->request->post['is_editing_script'] ?? '') === 'true' && !mb_strstr($editing, 'cypht')) {
+            // Keep the original name of scripts created outside Cypht
+            $script_name = $editing;
+        }
         foreach ($this->user_config->get('imap_servers') as $mailbox) {
             if ($mailbox['name'] == $this->request->post['imap_account']) {
                 $imap_account = $mailbox;
@@ -1367,6 +1372,11 @@ class Hm_Output_account_sieve_filters extends Hm_Output_Module {
         $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 d-flex justify-content-between border-bottom cursor-pointer">' . $mailbox['name'];
         $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
         $res .= '<div class="sievefilters_accounts filter_block p-3 d-none"><div class="filter_subblock">';
+        if ($num_filters > 0 && !$result['managed']) {
+            $res .= '<div class="alert alert-warning" role="alert"><i class="bi bi-exclamation-triangle me-2"></i>'
+                . $this->trans('Cypht does not manage these filters yet. They were created outside Cypht and are still run directly by your mail server. Enabling/disabling a filter, deleting one, or adding a new filter or script will make Cypht manage them.')
+                . '</div>';
+        }
         $res .= '<button class="add_filter btn btn-primary" account="'.$mailbox['name'].'"  sieve_extensions=\'' . json_encode($mailbox['sieve_extensions']) . '\'>Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script btn btn-light border">Add Script</button>';
         $res .= '<table class="filter_details table my-3"><tbody>';
         $res .= '<tr><th class="text-secondary fw-light col-sm-1">Priority</th><th class="text-secondary fw-light col-sm-9">Name</th><th class="text-secondary fw-light col-sm-2">Actions</th></tr>';
@@ -1512,18 +1522,36 @@ class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
             $this->out('success', false);
             return;
         }
-        $imap_account = Hm_IMAP_List::dump($form['imap_account']);
+        $imap_account = null;
+        foreach ($this->user_config->get('imap_servers') as $mailbox) {
+            if ($mailbox['name'] == $form['imap_account']) {
+                $imap_account = $mailbox;
+                break;
+            }
+        }
+        if (!$imap_account) {
+            $this->out('success', false);
+            return;
+        }
         $factory = get_sieve_client_factory($this->config);
         $success = false;
         try {
             $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
             $state = $form['script_state'] ? 'enabled': 'disabled';
             $scripts = $client->listScripts();
+            $new_name = null;
             foreach ($scripts as $key => $script) {
                 if ($script == 'main_script') {
                     $client->removeScripts('main_script');
                 }
-                if ($script == $form['sieve_script_name']) {
+                if ($script == $form['sieve_script_name'] && !mb_strstr($script, 'cypht')) {
+                    $base = strpos($script, 'sdisabled_') === 0 ? substr($script, strlen('sdisabled_')) : $script;
+                    $new_name = in_array($form['script_state'], [true, 'true', '1', 1], true) ? $base : 'sdisabled_' . $base;
+                    if ($new_name !== $script) {
+                        $client->renameScript($script, $new_name);
+                    }
+                    $success = true;
+                } elseif ($script == $form['sieve_script_name']) {
                     if (! $form['script_state']) {
                         unset($scripts[$key]);
                     }
@@ -1540,6 +1568,10 @@ class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
             Hm_Msgs::add("Script $state");
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
+        }
+        if ($new_name !== null) {
+            $this->out('new_script_name', $new_name);
+            $success = false;
         }
         $this->out('success', $success);
     }

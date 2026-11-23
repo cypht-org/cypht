@@ -810,4 +810,6 @@ return array(
     'Select a Mail Account' => false,
     'Mail Account' => false,
     'You must select a mail account first' => false,
+    'Could not add server' => false,
+    'Additional servers cannot be added in single server mode' => false,
 );

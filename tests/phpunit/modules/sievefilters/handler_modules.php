@@ -512,7 +512,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
         $test = new Sieve_Handler_Test('sieve_toggle_script_state', 'sievefilters');
         $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
         $test->post = array(
-            'imap_account' => 0,
+            'imap_account' => 'Primary Account',
             'script_state' => 0,
             'sieve_script_name' => 'manual_script-15-cypht',
         );
@@ -789,7 +789,7 @@ class Hm_Test_Sievefilters_Handler_Modules extends TestCase {
         $test = new Sieve_Handler_Test('sieve_toggle_script_state', 'sievefilters');
         $test->config = array('sieve_client_factory' => 'Hm_Test_Sieve_Client_Factory');
         $test->post = array(
-            'imap_account' => 0,
+            'imap_account' => 'Primary Account',
             'script_state' => 1,
             'sieve_script_name' => 'sdisabled_manual_script-15-cypht',
         );

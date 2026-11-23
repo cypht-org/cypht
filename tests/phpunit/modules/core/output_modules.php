@@ -438,7 +438,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_start_settings_form() {
         $test = new Output_Test('start_settings_form', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="user_settings px-0"><div class="content_title px-3">Site Settings</div><form method="POST"><input type="hidden" name="hm_page_key" value="" /><div class="px-3"><table class="settings_table table table-borderless"><colgroup><col class="label_col"><col class="setting_col"></colgroup>'), $res->output_response);
+        $this->assertEquals(array('<div class="user_settings px-0"><div class="content_title px-3">Site Settings</div><form method="POST" id="site_settings_form"><input type="hidden" name="hm_page_key" value="" /><div class="px-3"><table class="settings_table table table-borderless"><colgroup><col class="label_col"><col class="setting_col"></colgroup>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

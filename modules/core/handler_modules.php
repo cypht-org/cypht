@@ -1125,6 +1125,10 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
             'srv_setup_stepper_smtp_server_id',
         ));
         if ($success) {
+            if ($this->config->get('single_server_mode', false)) {
+                Hm_Msgs::add('Additional servers cannot be added in single server mode', 'warning');
+                return;
+            }
             // Destructure form array into variables
             [
                 'srv_setup_stepper_profile_name' => $profileName,
@@ -1160,12 +1164,14 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
             /*
             *  Connect to SMTP server if user wants to send emails
             */
+            $smtp_tls_verify = empty($this->request->post['srv_setup_stepper_smtp_allow_insecure']);
+            $imap_tls_verify = empty($this->request->post['srv_setup_stepper_imap_allow_insecure']);
             if($isSender){
                 if (!$this->module_is_supported('smtp')) {
                     Hm_Msgs::add("SMTP module is not enabled",'danger');
                     return;
                 }
-                $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, 'smtp', $smtpServerId);
+                $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, 'smtp', $smtpServerId, $smtp_tls_verify);
                 if(!isset($this->smtp_server_id)){
                     Hm_Msgs::add("Could not save server", 'danger');
                     return;
@@ -1229,7 +1235,9 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                         $this,
                         $hideFromCombinedView,
                         $imapServerId,
-                        $imapSieveTls
+                        $imapSieveTls,
+                        true,
+                        $imap_tls_verify
                     );
 
                     if(!isset($this->imap_server_id)) {
@@ -1279,16 +1287,27 @@ class Hm_Handler_version_upgrade_checker extends Hm_Handler_Module {
 
     public function process()
     {
+        if ($this->config->get('disable_version_check', false)) {
+            $this->out('need_upgrade', false);
+            $this->out('latest_version', null);
+            return;
+        }
+
         $latestVersion = $this->session->get('latest_version') ?: null;
-        if (! $latestVersion) {
+        $lastFailure = (int) $this->session->get('latest_version_check_failed', 0);
+        if (! $latestVersion && (time() - $lastFailure) > 3600) {
             $api = new Hm_API_Curl();
+            $api->connect_timeout = 3;
+            $api->timeout = 5;
             $data = $api->command('https://api.github.com/repos/cypht-org/cypht/releases');
 
-            if ($api->last_status == 200) {
+            if ($api->last_status == 200 && is_array($data) && ! empty($data)) {
                 $latestRelease = reset($data);
                 $latestVersion = substr($latestRelease['tag_name'], 1);
 
                 $this->session->set('latest_version', $latestVersion);
+            } else {
+                $this->session->set('latest_version_check_failed', time());
             }
         }
 

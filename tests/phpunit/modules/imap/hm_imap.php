@@ -8,7 +8,7 @@ class Hm_Test_Hm_IMAP extends TestCase {
         define('IMAP_TEST', true);
         require __DIR__.'/../../bootstrap.php';
         require APP_PATH.'modules/imap/hm-imap.php';
-        require APP_PATH.'modules/core/message_functions.php';
+        require_once APP_PATH.'modules/core/message_functions.php';
         $this->create();
         $this->connect();
     }
@@ -238,6 +238,24 @@ class Hm_Test_Hm_IMAP extends TestCase {
         $this->connect();
         $res = $this->debug();
         $this->assertEquals(array(), $res['responses'][1]);
+        $this->assertStringNotContainsString('LOGIN', implode("\n", array_keys($res['commands'])));
+        $this->assertNotEquals('authenticated', $this->imap->get_state());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_starttls_crypto_failure_does_not_login() {
+        require_once APP_PATH.'modules/core/functions.php';
+        $this->reset();
+        Hm_Functions::$crypto_enabled = false;
+        Fake_IMAP_Server::$custom_responses['A1 CAPABILITY'] = "* CAPABILITY IMAP4rev1 LITERAL+ ".
+            "SASL-IR LOGIN-REFERRALS ID ENABLE IDLE AUTH=PLAIN STARTTLS\r\n";
+        $this->connect();
+        $res = $this->debug();
+        $this->assertStringNotContainsString('LOGIN', implode("\n", array_keys($res['commands'])));
+        $this->assertNotEquals('authenticated', $this->imap->get_state());
+        $this->assertContains('Could not start TLS', $res['debug']);
     }
     /**
      * @preserveGlobalState disabled

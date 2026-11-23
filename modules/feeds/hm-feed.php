@@ -10,7 +10,8 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 if (!hm_exists('feed_url_is_allowed')) {
 /**
- * Reject feed URLs that resolve to private or reserved addresses (SSRF mitigation).
+ * Reject feed URLs that resolve to non-public addresses (SSRF mitigation).
+ * Uses the shared host helper in public-only mode.
  * @param string $url
  * @return bool
  */
@@ -37,36 +38,7 @@ function feed_url_is_allowed($url) {
     if (preg_match('/(^localhost|\.(local|localhost|internal)$)/', $host)) {
         return false;
     }
-    if (filter_var($host, FILTER_VALIDATE_IP)) {
-        return filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
-    }
-    $ips = array();
-    if (function_exists('dns_get_record')) {
-        $records = @dns_get_record($host, DNS_A + DNS_AAAA);
-        if (is_array($records)) {
-            foreach ($records as $record) {
-                if (!empty($record['ip'])) {
-                    $ips[] = $record['ip'];
-                }
-                if (!empty($record['ipv6'])) {
-                    $ips[] = $record['ipv6'];
-                }
-            }
-        }
-    }
-    if (empty($ips)) {
-        $resolved = gethostbyname($host);
-        if ($resolved === $host || filter_var($resolved, FILTER_VALIDATE_IP) === false) {
-            return false;
-        }
-        $ips[] = $resolved;
-    }
-    foreach (array_unique($ips) as $ip) {
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
-            return false;
-        }
-    }
-    return true;
+    return hm_server_url_is_allowed($url, null, false);
 }}
 
 /**

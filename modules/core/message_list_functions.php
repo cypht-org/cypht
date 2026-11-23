@@ -375,13 +375,22 @@ function date_callback($vals, $style, $output_mod) {
     return sprintf('<td class="msg_date%s" title="%s">%s%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $delayed_class, $output_mod->html_safe(date('r', $vals[1])), ($delayed_class ? '<span class="badge bg-secondary-subtle text-body"><i class="bi bi-alarm"></i></span>': ''), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
 }}
 
-function dates_holders_callback($vals) {
+/**
+ * Hidden inputs that hold raw dates for client-side sorting
+ * @subpackage core/functions
+ * @param array $vals arrival date and sent date
+ * @param string $style message list style
+ * @param object $output_mod Hm_Output_Module
+ * @return string
+ */
+if (!hm_exists('dates_holders_callback')) {
+function dates_holders_callback($vals, $style, $output_mod) {
     $res = '<td class="dates d-none">';
-    $res .= '<input type="hidden" name="arrival" class="arrival" value="'. $vals[0] .'" arial-label="Arrival date" />';
-    $res .= '<input type="hidden" name="date" class="date" value="'. $vals[1] .'" arial-label="Sent date" />';
+    $res .= '<input type="hidden" name="arrival" class="arrival" value="'.$output_mod->html_safe($vals[0]).'" arial-label="Arrival date" />';
+    $res .= '<input type="hidden" name="date" class="date" value="'.$output_mod->html_safe($vals[1]).'" arial-label="Sent date" />';
     $res .= '</td>';
     return $res;
-}
+}}
 
 /**
  * Callback for an icon in a message list row

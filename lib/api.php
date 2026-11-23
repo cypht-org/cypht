@@ -14,6 +14,9 @@ class Hm_API_Curl {
     public $last_status;
     public $format = '';
 
+    public $connect_timeout = 0;
+    public $timeout = 0;
+
     /**
      * Init
      * @param string $format format of the result
@@ -27,14 +30,15 @@ class Hm_API_Curl {
      * @param string $url url to fetch content from
      * @param array $headers HTTP header array
      * @param array $post post fields
+     * @param bool $follow_location follow HTTP redirects; JMAP passes false and checks each host first
      * @return array
      */
-    public function command($url, $headers = [], $post = [], $body = '', $method = false) {
+    public function command($url, $headers = [], $post = [], $body = '', $method = false, $follow_location = true) {
         $ch = Hm_Functions::c_init();
         if (!$ch) {
             return [];
         }
-        $this->curl_setopt($ch, $url, $headers);
+        $this->curl_setopt($ch, $url, $headers, $follow_location);
         $this->curl_setopt_post($ch, $post);
         if ($method) {
             Hm_Functions::c_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
@@ -55,12 +59,18 @@ class Hm_API_Curl {
      * @param array $headers HTTP headers
      * @return void
      */
-    private function curl_setopt($ch, $url, $headers) {
+    private function curl_setopt($ch, $url, $headers, $follow_location = true) {
         Hm_Functions::c_setopt($ch, CURLOPT_URL, $url);
         Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, 'hm3');
         Hm_Functions::c_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        Hm_Functions::c_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        Hm_Functions::c_setopt($ch, CURLOPT_FOLLOWLOCATION, (bool) $follow_location);
+        if ($this->connect_timeout > 0) {
+            Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->connect_timeout);
+        }
+        if ($this->timeout > 0) {
+            Hm_Functions::c_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
+        }
     }
 
     /**
