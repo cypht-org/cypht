@@ -373,6 +373,8 @@ return array(
         'srv_setup_stepper_imap_address' => FILTER_UNSAFE_RAW,
         'srv_setup_stepper_imap_port' => FILTER_UNSAFE_RAW,
         'srv_setup_stepper_imap_tls' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_imap_allow_insecure' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_smtp_allow_insecure' => FILTER_VALIDATE_BOOLEAN,
         'srv_setup_stepper_enable_sieve' => FILTER_VALIDATE_BOOLEAN,
         'srv_setup_stepper_create_profile' => FILTER_VALIDATE_BOOLEAN,
         'srv_setup_stepper_profile_is_default' => FILTER_VALIDATE_BOOLEAN,

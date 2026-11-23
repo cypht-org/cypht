@@ -397,6 +397,7 @@ return array(
         'sieve_config_host' => FILTER_UNSAFE_RAW,
         'imap_sieve_host' => FILTER_UNSAFE_RAW,
         'tls' => FILTER_VALIDATE_BOOLEAN,
+        'new_imap_allow_insecure' => FILTER_VALIDATE_BOOLEAN,
         'folder' => FILTER_UNSAFE_RAW,
         'force_update' => FILTER_VALIDATE_BOOLEAN,
         'imap_folder_state' => FILTER_UNSAFE_RAW,

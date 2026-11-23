@@ -1,9 +1,14 @@
 #!/bin/bash
 
+
 sudo systemctl stop dovecot.service
-echo "disable_plaintext_auth = no" | sudo tee -a /etc/dovecot/conf.d/10-auth.conf
-sudo sed -i "s/auth_mechanisms = plain/auth_mechanisms = plain login/g" /etc/dovecot/conf.d/10-auth.conf
-sudo sed -i "s/ssl = yes/ssl = no/g" /etc/dovecot/conf.d/10-ssl.conf
-# Strip domain from username so testuser@localhost authenticates as testuser in PAM
-echo "auth_username_format = %n" | sudo tee -a /etc/dovecot/conf.d/10-auth.conf
+sudo tee /etc/dovecot/conf.d/99-ci.conf > /dev/null << 'EOF'
+auth_allow_cleartext = yes
+auth_mechanisms = plain login
+auth_username_format = %{user | username}
+ssl = no
+EOF
+
+# Validate config before starting so CI prints exact errors if anything is wrong
+sudo doveconf -n > /dev/null
 sudo systemctl start dovecot.service

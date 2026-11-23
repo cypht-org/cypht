@@ -141,6 +141,7 @@
       <file>./lib/installer.php</file>
       <file>./lib/web_installer.php</file>
       <file>./lib/logging.php</file>
+      <file>./lib/tls.php</file>
       <file>./lib/output_debug.php</file>
     </testsuite>
     <!--<testsuite name="modules_imap">
@@ -152,6 +153,7 @@
     <testsuite name="modules_core">
       <file>./modules/core/modules.php</file>
       <file>./modules/core/functions.php</file>
+      <file>./modules/core/server_target.php</file>
       <file>./modules/core/message_functions.php</file>
       <file>./modules/core/message_list_functions.php</file>
       <file>./modules/core/handler_modules.php</file>
