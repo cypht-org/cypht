@@ -142,6 +142,20 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_generate_main_script_skips_disabled_scripts() {
+        $result = generate_main_script(array(
+            'sdisabled_from_message-20-cyphtfilter',
+            'archive_now-5-cypht',
+            'sdisabled_not-managed-script',
+        ));
+
+        $this->assertEquals("require [\"include\"];\n\ninclude :personal \"archive_now-5-cypht\";\n", $result);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_format_main_script_merges_requirements_and_strips_comments() {
         $script = implode("\n", array(
             '# CYPHT CONFIG HEADER - DON\'T REMOVE',
@@ -672,5 +686,36 @@ class Hm_Test_Sievefilters_Functions extends TestCase {
         $this->assertStringContainsString('from message', $result['list']);
         $this->assertStringContainsString('project archive', $result['list']);
         $this->assertStringContainsString('external-script', $result['list']);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_mailbox_filters_shows_disabled_cypht_filter_unchecked_with_its_name() {
+        MockSieveClientStorage::setScripts(array(
+            'main_script' => 'require ["include"];',
+            'sdisabled_from_message-10-cyphtfilter' => 'require ["fileinto"];',
+        ));
+        Hm_Test_Mock_Sieve_Client_Factory::setMockCreator(function() {
+            $client = $this->createMock(PhpSieveManager\ManageSieve\Client::class);
+            $client->method('listScripts')->willReturnCallback(function() {
+                return array_keys(MockSieveClientStorage::getScripts());
+            });
+            return $client;
+        });
+        $mailbox = array(
+            'name' => 'Primary Account',
+            'sieve_config_host' => 'tls://sieve.example.com:4190',
+            'sieve_extensions' => array('fileinto'),
+        );
+
+        $result = get_mailbox_filters($mailbox, new Hm_Test_Mock_Sieve_Site_Config(), new Hm_Mock_Config());
+
+        $this->assertStringContainsString('<td>from message</td>', $result['list']);
+        $this->assertStringContainsString('script_name_parsed="from message"', $result['list']);
+        $this->assertStringContainsString('script_name="sdisabled_from_message-10-cyphtfilter"', $result['list']);
+        $this->assertStringNotContainsString(' checked', $result['list']);
+        $this->assertStringNotContainsString('sdisabled from', $result['list']);
     }
 }
