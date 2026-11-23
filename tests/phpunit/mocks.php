@@ -348,8 +348,9 @@ class Hm_Functions {
         }
         return false;
     }
+    public static $crypto_enabled = true;
     public static function stream_socket_enable_crypto($socket, $type) {
-        return true;
+        return self::$crypto_enabled;
     }
 }
 function setup_db($config) {

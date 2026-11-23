@@ -30,6 +30,7 @@ function applyServersPageHandlers() {
 }
 
 function applySettingsPageHandlers(routeParams, hash) {
+    setupSettingsForm(document.getElementById('site_settings_form'));
     if (hash) {
         Hm_Utils.toggle_page_section(`.${hash}`);
     }
