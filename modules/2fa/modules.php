@@ -75,40 +75,76 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
             Hm_Msgs::add('2FA disabled because of a security issue. Go to "Settings" -> "Site" to re-enable', 'warning');
         }
         $passed = false;
+        $locked_status = false;
+        $store_failed = false;
         $backup_codes = $this->user_config->get('2fa_backup_codes_setting', array());
-        if (array_key_exists('2fa_code', $this->request->post)) {
-            if ($simple) {
-                $len = 15;
+        $username = $this->session->get('username', false);
+        $status = tfa_lock_status($this->config, $username);
+        if (is_array($status) && !empty($status['locked'])) {
+            $locked_status = $status;
+        }
+        elseif (array_key_exists('2fa_code', $this->request->post)) {
+            if ($status === false) {
+                $store_failed = true;
             }
             else {
-                $len = 64;
-            }
-            $username = $this->session->get('username', false);
-            $secret = create_secret($secret, $username, $len);
-            if (check_2fa_pin($this->request->post['2fa_code'], $secret)) {
-                $passed = true;
-            }
-            elseif (in_array(intval($this->request->post['2fa_code']), $backup_codes, true)) {
-                $passed = true;
-            }
-            else {
-                $this->out('2fa_error', '2 factor authentication code does not match');
+                if ($simple) {
+                    $len = 15;
+                }
+                else {
+                    $len = 64;
+                }
+                $user_secret = create_secret($secret, $username, $len);
+                if (check_2fa_pin($this->request->post['2fa_code'], $user_secret)) {
+                    $passed = true;
+                }
+                elseif (in_array(intval($this->request->post['2fa_code']), $backup_codes, true)) {
+                    $passed = true;
+                }
+                else {
+                    $failure = tfa_record_failure($this->config, $username);
+                    if ($failure === false) {
+                        $store_failed = true;
+                    }
+                    elseif (!empty($failure['locked'])) {
+                        $locked_status = $failure;
+                    }
+                    else {
+                        $this->out('2fa_error', '2 factor authentication code does not match');
+                    }
+                }
             }
         }
 
-        if (!$passed) {
-            $this->out('no_redirect', true);
-            Hm_Request_Key::load($this->session, $this->request, false);
-            $this->out('2fa_key', Hm_Request_Key::generate());
-            $this->out('2fa_required', true);
-            if ($this->request->type == 'AJAX') {
-                $this->out('ajax_halt_status', '2fa required');
-            }
-            $this->halt();
-        }
-        else {
+        if ($passed) {
+            tfa_clear_attempts($this->config, $this->session->get('username', false));
             $this->session->set('2fa_confirmed', true);
+            return;
         }
+
+        if ($locked_status) {
+            $minutes = (int) ceil($locked_status['remaining'] / 60);
+            Hm_Msgs::add(
+                sprintf('ERR: Too many failed authentication attempts. Please try again in %d minute(s).', max(1, $minutes)),
+                'danger'
+            );
+            Hm_Debug::add('2FA: login code locked');
+            $this->session->destroy($this->request);
+            $this->halt();
+            return;
+        }
+        if ($store_failed) {
+            $this->out('2fa_error', 'Unable to verify the authentication code. Please try again.');
+        }
+
+        $this->out('no_redirect', true);
+        Hm_Request_Key::load($this->session, $this->request, false);
+        $this->out('2fa_key', Hm_Request_Key::generate());
+        $this->out('2fa_required', true);
+        if ($this->request->type == 'AJAX') {
+            $this->out('ajax_halt_status', '2fa required');
+        }
+        $this->halt();
     }
 }
 
@@ -312,6 +348,176 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
         }
     }
 }
+
+/**
+ * Storage key for one account's second-factor failures.
+ * @param string $username account name
+ * @return string
+ * @subpackage 2fa/functions
+ */
+if (!hm_exists('tfa_attempt_key')) {
+function tfa_attempt_key($username) {
+    return '2fa:'.hash('sha256', (string) $username);
+}}
+
+/**
+ * @param object $config site config
+ * @return array max attempts and lockout duration in seconds
+ * @subpackage 2fa/functions
+ */
+if (!hm_exists('tfa_attempt_limits')) {
+function tfa_attempt_limits($config) {
+    return array(
+        (int) $config->get('2fa_max_attempts', 5),
+        (int) $config->get('2fa_lockout_duration', 900),
+    );
+}}
+
+/**
+ * @param array $row attempt_count and locked_until
+ * @param object $config site config
+ * @return array locked, remaining seconds, and count
+ * @subpackage 2fa/functions
+ */
+if (!hm_exists('tfa_status_from_row')) {
+function tfa_status_from_row($row, $config) {
+    list($max, ) = tfa_attempt_limits($config);
+    $count = (int) $row['attempt_count'];
+    $locked_until = (int) $row['locked_until'];
+    $now = time();
+    $locked = $count >= $max && $now < $locked_until;
+    return array(
+        'locked' => $locked,
+        'remaining' => $locked ? ($locked_until - $now) : 0,
+        'count' => $count,
+    );
+}}
+
+/**
+ * Read the account lockout. False when the counter cannot be read.
+ * @param object $config site config
+ * @param string $username account name
+ * @return array|false
+ * @subpackage 2fa/functions
+ */
+if (!hm_exists('tfa_lock_status')) {
+function tfa_lock_status($config, $username) {
+    $dbh = Hm_DB::connect($config);
+    if (!$dbh) {
+        return false;
+    }
+    $rows = Hm_DB::execute(
+        $dbh,
+        'select attempt_count, locked_until from hm_login_attempts where attempt_key=?',
+        array(tfa_attempt_key($username)),
+        false,
+        true
+    );
+    if ($rows === false) {
+        return false;
+    }
+    if (!$rows) {
+        return tfa_status_from_row(array('attempt_count' => 0, 'locked_until' => 0), $config);
+    }
+    return tfa_status_from_row($rows[0], $config);
+}}
+
+/**
+ * Insert one new failure row. A duplicate key returns false so the caller can retry.
+ * @param object $dbh database connection
+ * @param string $key attempt key
+ * @param int $count failure count
+ * @param int $locked_until lock expiry timestamp
+ * @param int $now current timestamp
+ * @return bool
+ * @subpackage 2fa/functions
+ */
+if (!hm_exists('tfa_insert_attempt')) {
+function tfa_insert_attempt($dbh, $key, $count, $locked_until, $now) {
+    try {
+        $stmt = $dbh->prepare('insert into hm_login_attempts (attempt_key, attempt_count, locked_until, last_attempt) values (?, ?, ?, ?)');
+        if (!$stmt) {
+            return false;
+        }
+        return $stmt->execute(array($key, $count, $locked_until, $now));
+    } catch (Exception $e) {
+        Hm_Debug::add($e->getMessage());
+        return false;
+    }
+}}
+
+/**
+ * Count one failed code. False when the failure cannot be stored.
+ * @param object $config site config
+ * @param string $username account name
+ * @return array|false
+ * @subpackage 2fa/functions
+ */
+if (!hm_exists('tfa_record_failure')) {
+function tfa_record_failure($config, $username) {
+    $dbh = Hm_DB::connect($config);
+    if (!$dbh) {
+        return false;
+    }
+    list($max, $duration) = tfa_attempt_limits($config);
+    $key = tfa_attempt_key($username);
+    for ($try = 0; $try < 3; $try++) {
+        $rows = Hm_DB::execute(
+            $dbh,
+            'select attempt_count, locked_until from hm_login_attempts where attempt_key=?',
+            array($key),
+            false,
+            true
+        );
+        if ($rows === false) {
+            return false;
+        }
+        $now = time();
+        if (!$rows) {
+            $count = 1;
+            $locked_until = ($count >= $max) ? ($now + $duration) : 0;
+            if (!tfa_insert_attempt($dbh, $key, $count, $locked_until, $now)) {
+                continue;
+            }
+            return tfa_status_from_row(array('attempt_count' => $count, 'locked_until' => $locked_until), $config);
+        }
+        $old_count = (int) $rows[0]['attempt_count'];
+        $old_locked = (int) $rows[0]['locked_until'];
+        if ($old_locked > $now) {
+            return tfa_status_from_row($rows[0], $config);
+        }
+        $count = ($old_locked > 0) ? 1 : ($old_count + 1);
+        $locked_until = ($count >= $max) ? ($now + $duration) : 0;
+        $updated = Hm_DB::execute(
+            $dbh,
+            'update hm_login_attempts set attempt_count=?, locked_until=?, last_attempt=? where attempt_key=? and attempt_count=? and locked_until=?',
+            array($count, $locked_until, $now, $key, $old_count, $old_locked)
+        );
+        if ($updated === false) {
+            return false;
+        }
+        if ($updated > 0) {
+            return tfa_status_from_row(array('attempt_count' => $count, 'locked_until' => $locked_until), $config);
+        }
+    }
+    return false;
+}}
+
+/**
+ * Forget the account's second-factor failures after a correct code.
+ * @param object $config site config
+ * @param string $username account name
+ * @return bool
+ * @subpackage 2fa/functions
+ */
+if (!hm_exists('tfa_clear_attempts')) {
+function tfa_clear_attempts($config, $username) {
+    $dbh = Hm_DB::connect($config);
+    if (!$dbh) {
+        return false;
+    }
+    return Hm_DB::execute($dbh, 'delete from hm_login_attempts where attempt_key=?', array(tfa_attempt_key($username))) !== false;
+}}
 
 /**
  * @subpackage 2fa/functions
