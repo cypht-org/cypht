@@ -17,6 +17,13 @@ class Hm_Test_Server_Target_Config {
     }
 }
 
+/**
+ * These tests load the real IMAP and SMTP list classes. Other suites define
+ * mocks of those classes in helpers.php, so this class must run isolated.
+ *
+ * @runClassInSeparateProcess
+ * @preserveGlobalState disabled
+ */
 class Hm_Test_Core_Server_Target extends TestCase {
     /**
      * @dataProvider user_added_server_host_cases
