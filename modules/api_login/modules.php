@@ -38,6 +38,13 @@ class Hm_Handler_process_api_login extends Hm_Handler_login {
         parent::process();
         if (!$this->validate_request && $this->session->is_active()) {
             $this->user_config->load(rtrim($this->request->post['username']), $this->request->post['password']);
+
+            if (!$this->user_config->decrypt_failed) {
+                $this->session->open_shared_state($this->user_config, $this->request->post['password']);
+            } else {
+                $this->session->set('skip_shared_state_load', true);
+            }
+
             $user_data = $this->user_config->dump();
             $this->session->set('user_data', $user_data);
             header('Content-Type: application/json');

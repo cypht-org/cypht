@@ -46,16 +46,6 @@ class Hm_User_Config_Shared_Session {
     }
 
     /**
-     * Determine whether the configured backends support shared state.
-     * @param Hm_Site_Config_File $site_config site configuration
-     * @return bool whether shared state is supported
-     */
-    public static function supports($site_config) {
-        return in_array($site_config->get('user_config_type', 'file'), ['file', 'DB'], true) &&
-            $site_config->get('session_type', 'PHP') !== 'custom';
-    }
-
-    /**
      * Return the session identity and configured idle timeout for lease tracking.
      * @return array{0:string,1:int} session identifier and idle timeout in seconds
      * @throws RuntimeException if the session has no identifier

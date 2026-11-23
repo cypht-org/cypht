@@ -308,7 +308,7 @@ class Hm_Test_User_Config_Shared_Session extends TestCase {
         $handler->process();
 
         $this->assertTrue($parent->user_config->decrypt_failed);
-        $this->assertTrue($session->get('shared_state_recovery'));
+        $this->assertTrue($session->get('skip_shared_state_load'));
         $this->assertSame($before, $store->read('alice'));
     }
 
