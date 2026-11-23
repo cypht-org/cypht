@@ -175,6 +175,7 @@ return array(
         'reload_page' => array(FILTER_VALIDATE_BOOL, false),
         'new_filter' => array(FILTER_UNSAFE_RAW, false),
         'mailbox_name' => array(FILTER_UNSAFE_RAW, false),
+        'new_script_name' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
@@ -186,7 +187,9 @@ return array(
         'sieve_filter_priority' => FILTER_VALIDATE_INT,
         'script' => FILTER_UNSAFE_RAW,
         'current_editing_script' => FILTER_UNSAFE_RAW,
+        'is_editing_script' => FILTER_UNSAFE_RAW,
         'current_editing_filter_name' => FILTER_UNSAFE_RAW,
+        'is_editing_filter' => FILTER_UNSAFE_RAW,
         'conditions_json' => FILTER_UNSAFE_RAW,
         'actions_json' => FILTER_UNSAFE_RAW,
         'filter_test_type' => FILTER_UNSAFE_RAW,

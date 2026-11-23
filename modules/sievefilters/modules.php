@@ -245,6 +245,7 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
                     'blocked_senders',
                     ''
                 );
+                $scripts[] = 'blocked_senders';
             }
 
             // Create Block List Filter
@@ -372,6 +373,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
                     'blocked_senders',
                     ''
                 );
+                $scripts[] = 'blocked_senders';
             }
 
             $blocked_senders = [];
@@ -482,8 +484,12 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             }
             $msg_header = $mailbox->get_message_headers(hex2bin($this->request->post['folder']), $form['imap_msg_uid']);
             $test_pattern = "/(?:[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/";
-            preg_match_all($test_pattern, $msg_header['From'], $email_sender);
-            $email_sender = $email_sender[0][0];
+            preg_match_all($test_pattern, $msg_header['From'] ?? '', $email_sender);
+            $email_sender = $email_sender[0][0] ?? null;
+            if (!$email_sender) {
+                Hm_Msgs::add('Sender not found', 'warning');
+                return;
+            }
         } elseif (!empty($this->request->post['sender'])) {
             $email_sender = $this->request->post['sender'];
             if (isset($this->request->post['is_screened'])) {
@@ -512,6 +518,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
                     'blocked_senders',
                     ''
                 );
+                $scripts[] = 'blocked_senders';
             }
 
             $blocked_senders = [];
@@ -665,6 +672,9 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
             }
         }
         $script_name = generate_filter_name($this->request->post['sieve_filter_name'], $priority);
+        if (($this->request->post['is_editing_filter'] ?? '') === 'true' && strpos($this->request->post['current_editing_filter_name'] ?? '', 'sdisabled_') === 0) {
+            $script_name = 'sdisabled_' . $script_name;
+        }
         $conditions = json_decode($this->request->post['conditions_json']);
         $actions = json_decode($this->request->post['actions_json']);
         $test_type = mb_strtolower($this->request->post['filter_test_type']);
@@ -1057,6 +1067,8 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
         if ($editing !== '' && ($this->request->post['is_editing_script'] ?? '') === 'true' && !mb_strstr($editing, 'cypht')) {
             // Keep the original name of scripts created outside Cypht
             $script_name = $editing;
+        } elseif ($editing !== '' && ($this->request->post['is_editing_script'] ?? '') === 'true' && strpos($editing, 'sdisabled_') === 0) {
+            $script_name = 'sdisabled_' . $script_name;
         }
         foreach ($this->user_config->get('imap_servers') as $mailbox) {
             if ($mailbox['name'] == $this->request->post['imap_account']) {
@@ -1537,25 +1549,20 @@ class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
         $success = false;
         try {
             $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
-            $state = $form['script_state'] ? 'enabled': 'disabled';
+            $enabled = in_array($form['script_state'], [true, 'true', '1', 1], true);
+            $state = $enabled ? 'enabled' : 'disabled';
             $scripts = $client->listScripts();
             $new_name = null;
-            foreach ($scripts as $key => $script) {
+            foreach ($scripts as $script) {
                 if ($script == 'main_script') {
                     $client->removeScripts('main_script');
                 }
-                if ($script == $form['sieve_script_name'] && !mb_strstr($script, 'cypht')) {
+                if ($script == $form['sieve_script_name']) {
                     $base = strpos($script, 'sdisabled_') === 0 ? substr($script, strlen('sdisabled_')) : $script;
-                    $new_name = in_array($form['script_state'], [true, 'true', '1', 1], true) ? $base : 'sdisabled_' . $base;
+                    $new_name = $enabled ? $base : 'sdisabled_' . $base;
                     if ($new_name !== $script) {
                         $client->renameScript($script, $new_name);
                     }
-                    $success = true;
-                } elseif ($script == $form['sieve_script_name']) {
-                    if (! $form['script_state']) {
-                        unset($scripts[$key]);
-                    }
-                    $client->renameScript($script, "s{$state}_");
                     $success = true;
                 }
             }
