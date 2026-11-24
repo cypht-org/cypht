@@ -1164,16 +1164,7 @@ function createEditFilterModal(save_filter, current_account, options = {}) {
         modalId: 'myEditFilterModal',
     });
 
-    // Store template content on first use, then reuse it
-    if (!edit_filter_template_content) {
-        const templateEl = document.querySelector('#edit_filter_modal');
-        if (templateEl) {
-            edit_filter_template_content = templateEl.innerHTML;
-            $('#edit_filter_modal').remove();
-        }
-    }
-
-    edit_filter_modal.setContent(edit_filter_template_content);
+    edit_filter_modal.setContent(takeSieveModalTemplate('#edit_filter_modal'));
 
     edit_filter_modal.addFooterBtn(
         hm_trans('Save'),
@@ -1237,9 +1228,7 @@ function sieveFiltersPageHandler() {
         modalId: 'myEditScript'
     });
 
-    // set content
-    edit_script_modal.setContent(document.querySelector('#edit_script_modal').innerHTML);
-    $('#edit_script_modal').remove();
+    edit_script_modal.setContent(takeSieveModalTemplate('#edit_script_modal'));
 
     // add a button
     edit_script_modal.addFooterBtn('Save', 'btn-primary', async function () {
@@ -1332,7 +1321,16 @@ function collectChips(container) {
 
 let current_mailbox_for_filter;
 let edit_filter_modal_for_custom_actions;
-let edit_filter_template_content;
+const sieve_modal_templates = {};
+
+function takeSieveModalTemplate(selector) {
+    const templateEl = document.querySelector(selector);
+    if (templateEl) {
+        sieve_modal_templates[selector] = templateEl.innerHTML;
+        templateEl.remove();
+    }
+    return sieve_modal_templates[selector] ?? '';
+}
 
 function createFilterFromList(launcherModal) {
     const froms = collectChips('#filter-from-list');
