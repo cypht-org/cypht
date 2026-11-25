@@ -123,6 +123,52 @@ class Hm_Test_User_Config_Shared_Session extends TestCase {
     }
 
     /** @return void */
+    public function test_resume_without_credentials_requires_reauthentication() {
+        $session = new Hm_PHP_Session($this->site, 'Hm_Auth_DB');
+        $session->session_key = bin2hex(random_bytes(16));
+        $session->set('username', 'alice');
+        $config = new Hm_User_Config_File($this->site);
+        $config->load('alice', 'password');
+
+        $this->expectException(Hm_Shared_State_Reauthentication_Required::class);
+        $session->open_shared_state($config);
+    }
+
+    /** @return void */
+    public function test_save_persists_settings_and_clears_dirty_changes() {
+        list($session, $config) = $this->session_and_config('password');
+        $config->set('theme_setting', 'dark');
+        $session->record_unsaved('Theme changed');
+
+        $session->save_shared_state('password');
+
+        $permanent = new Hm_User_Config_File($this->site);
+        $permanent->load('alice', 'password');
+        $this->assertSame('dark', $permanent->get('theme_setting'));
+        $this->assertSame('dark', $config->get('theme_setting'));
+        $this->assertSame([], $session->get('changed_settings'));
+    }
+
+    /** @return void */
+    public function test_released_session_flushes_its_changes_first() {
+        list($first, $first_config) = $this->session_and_config('password');
+        list($second, $second_config) = $this->session_and_config('password');
+
+        $first_config->set('theme_setting', 'dark');
+        $first->record_unsaved('Theme changed');
+        $first->release_shared_state();
+
+        $this->assertFalse($first->has_shared_state());
+
+        list($next, $next_config) = $this->session_and_config(
+            'password',
+            $second->get('shared_state_credentials'),
+            $second->session_key
+        );
+        $this->assertSame('dark', $next_config->get('theme_setting'));
+    }
+
+    /** @return void */
     public function test_old_session_is_rejected_after_replacement() {
         list($old, $config) = $this->session_and_config('old');
         $credentials = $old->get('shared_state_credentials');

@@ -117,6 +117,111 @@ class Hm_Test_User_Config_Shared_State extends TestCase {
     }
 
     /** @return void */
+    public function test_releasing_one_session_keeps_the_state_for_the_others() {
+        $first = new Hm_User_Config_Shared_State($this->store, 'alice');
+        $first->open('password', ['theme' => 'saved'], 'first-session');
+        $first->update(['config' => ['theme' => 'unsaved'], 'changed_settings' => ['Changed theme']]);
+
+        $second = new Hm_User_Config_Shared_State($this->store, 'alice');
+        $second->open('password', [], 'second-session');
+        $credentials = $second->credentials();
+
+        $first->release_session('first-session');
+
+        $resumed = new Hm_User_Config_Shared_State($this->store, 'alice');
+        $this->assertSame(
+            ['config' => ['theme' => 'unsaved'], 'changed_settings' => ['Changed theme']],
+            $resumed->resume($credentials, 'second-session')
+        );
+    }
+
+    /** @return void */
+    public function test_released_session_cannot_resume() {
+        $first = new Hm_User_Config_Shared_State($this->store, 'alice');
+        $first->open('password', ['theme' => 'saved'], 'first-session');
+        $credentials = $first->credentials();
+        $second = new Hm_User_Config_Shared_State($this->store, 'alice');
+        $second->open('password', [], 'second-session');
+
+        $first->release_session('first-session');
+
+        $this->expectException(Hm_Shared_State_Reauthentication_Required::class);
+        (new Hm_User_Config_Shared_State($this->store, 'alice'))->resume($credentials, 'first-session');
+    }
+
+    /** @return void */
+    public function test_releasing_the_last_session_deletes_the_state() {
+        $state = new Hm_User_Config_Shared_State($this->store, 'alice');
+        $state->open('password', ['theme' => 'saved'], 'only-session');
+
+        $state->release_session('only-session');
+
+        $this->assertNull($this->store->read('alice'));
+    }
+
+    /** @return void */
+    public function test_release_from_a_replaced_generation_keeps_the_new_state() {
+        $old = new Hm_User_Config_Shared_State($this->store, 'alice');
+        $old->open('old-password', ['theme' => 'saved'], 'old-session', 1);
+        sleep(2);
+
+        $new = new Hm_User_Config_Shared_State($this->store, 'alice');
+        $new->open('password', ['theme' => 'saved'], 'new-session');
+
+        $old->release_session('old-session');
+
+        $this->assertNotNull($this->store->read('alice'));
+    }
+
+    /** @return void */
+    public function test_resume_rejects_invalid_credentials() {
+        $state = new Hm_User_Config_Shared_State($this->store, 'alice');
+        $state->open('password', []);
+
+        $this->expectException(RuntimeException::class);
+        $state->resume(['key' => 'not-a-key', 'generation' => 'x']);
+    }
+
+    /** @return void */
+    public function test_resume_reports_a_missing_record() {
+        $state = new Hm_User_Config_Shared_State($this->store, 'alice');
+        $state->open('password', []);
+        $credentials = $state->credentials();
+        $this->store->delete_if_revision('alice', $this->store->read('alice')['revision']);
+
+        $this->expectException(Hm_Shared_State_Reauthentication_Required::class);
+        $state->resume($credentials);
+    }
+
+    /** @return void */
+    public function test_operations_require_an_opened_state() {
+        $state = new Hm_User_Config_Shared_State($this->store, 'alice');
+        $data = ['config' => [], 'changed_settings' => []];
+
+        try {
+            $state->update($data);
+            $this->fail('Updating before opening must fail');
+        } catch (LogicException $exception) {
+            $this->assertSame('Shared state has not been opened', $exception->getMessage());
+        }
+
+        $this->expectException(LogicException::class);
+        $state->rebase_local($data);
+    }
+
+    /** @return void */
+    public function test_password_change_is_rejected_for_a_replaced_generation() {
+        $old = new Hm_User_Config_Shared_State($this->store, 'alice');
+        $old->open('old', ['saved' => 1], 'old-session', 1);
+        sleep(2);
+        $new = new Hm_User_Config_Shared_State($this->store, 'alice');
+        $new->open('new', ['saved' => 1], 'new-session');
+
+        $this->expectException(Hm_Shared_State_Reauthentication_Required::class);
+        $old->change_password('other');
+    }
+
+    /** @return void */
     public function test_password_rewrap_keeps_shared_state() {
         $state = new Hm_User_Config_Shared_State($this->store, 'alice');
         $state->open('old', ['saved' => 1]);

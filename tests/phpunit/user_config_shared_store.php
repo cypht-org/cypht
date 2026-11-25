@@ -93,4 +93,89 @@ class Hm_Test_User_Config_Shared_Store extends TestCase {
         $this->expectException(InvalidArgumentException::class);
         $store->compare_and_swap('alice', 0, 'ciphertext');
     }
+
+    /** @return void */
+    public function test_synchronized_returns_the_result_and_allows_nested_operations() {
+        foreach ($this->stores() as $store) {
+            $result = $store->synchronized('alice', function () use ($store) {
+                $this->assertTrue($store->compare_and_swap('alice', null, 'ciphertext'));
+                return $store->read('alice')['revision'];
+            });
+
+            $this->assertSame(1, $result);
+        }
+    }
+
+    /** @return void */
+    public function test_failed_synchronized_operation_releases_the_lock() {
+        foreach ($this->stores() as $store) {
+            try {
+                $store->synchronized('alice', function () {
+                    throw new RuntimeException('Operation failed');
+                });
+                $this->fail('The exception must propagate');
+            } catch (RuntimeException $exception) {
+                $this->assertSame('Operation failed', $exception->getMessage());
+            }
+
+            $this->assertTrue($store->compare_and_swap('alice', null, 'ciphertext'));
+        }
+    }
+
+    /** @return void */
+    public function test_failed_synchronized_operation_does_not_keep_database_writes() {
+        $store = $this->stores()[1];
+        $store->compare_and_swap('alice', null, 'ciphertext one');
+
+        try {
+            $store->synchronized('alice', function () use ($store) {
+                $store->compare_and_swap('alice', 1, 'ciphertext two');
+                throw new RuntimeException('Operation failed');
+            });
+        } catch (RuntimeException $exception) {
+        }
+
+        $this->assertSame(['revision' => 1, 'payload' => 'ciphertext one'], $store->read('alice'));
+    }
+
+    /** @return void */
+    public function test_deleting_a_missing_record_does_nothing() {
+        foreach ($this->stores() as $store) {
+            $this->assertFalse($store->delete_if_revision('alice', 1));
+        }
+    }
+
+    /** @return void */
+    public function test_delete_requires_a_revision() {
+        foreach ($this->stores() as $store) {
+            try {
+                $store->delete_if_revision('alice', null);
+                $this->fail('A revision is required');
+            } catch (InvalidArgumentException $exception) {
+                $this->assertSame('A revision is required to delete shared state', $exception->getMessage());
+            }
+        }
+    }
+
+    /** @return void */
+    public function test_empty_username_is_rejected() {
+        foreach ($this->stores() as $store) {
+            try {
+                $store->read('');
+                $this->fail('A username is required');
+            } catch (InvalidArgumentException $exception) {
+                $this->assertSame('A username is required', $exception->getMessage());
+            }
+        }
+    }
+
+    /** @return void */
+    public function test_file_store_leaves_no_temporary_files() {
+        $store = new Hm_User_Config_Shared_File_Store($this->directory);
+        $store->compare_and_swap('alice', null, 'ciphertext one');
+        $store->compare_and_swap('alice', 1, 'ciphertext two');
+
+        $this->assertSame([], glob($this->directory . '/*.tmp'));
+        $this->assertSame([], glob($this->directory . '/.*.tmp'));
+    }
 }
