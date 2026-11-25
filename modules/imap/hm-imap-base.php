@@ -73,7 +73,7 @@ class Hm_IMAP_Base {
         $literal_data = $this->fgets($line_length);
         $lit_size = strlen($literal_data);
         $current += $lit_size;
-        while ($lit_size < $size) {
+        while ($lit_size < $size && !Hm_Functions::stream_ended($this->handle)) {
             $chunk = $this->fgets($line_length);
             $chunk_size = strlen($chunk);
             $lit_size += $chunk_size;
@@ -85,7 +85,7 @@ class Hm_IMAP_Base {
             }
         }
         if ($this->max_read) {
-            while ($lit_size < $size) {
+            while ($lit_size < $size && !Hm_Functions::stream_ended($this->handle)) {
                 $temp = $this->fgets($line_length);
                 $lit_size += strlen($temp);
             }
