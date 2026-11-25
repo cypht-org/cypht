@@ -829,6 +829,8 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
         $('.modal_sieve_filter_priority').val('');
         $('.modal_sieve_filter_test').val('ALLOF');
         $('#stop_filtering').prop('checked', false);
+        is_editing_filter = false;
+        current_editing_filter_name = '';
         current_account = $(this).attr('account');
         current_account_element = $(this);
         edit_filter_modal.open();
