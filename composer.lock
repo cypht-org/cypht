@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6660e7ef59b3d1bee1e4efdddbe20b71",
+    "content-hash": "42927a1fee7b9e8266e39d93547c9278",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1954,6 +1954,50 @@
             },
             "time": "2019-03-08T08:55:37+00:00",
             "published-time": "2019-03-08T09:01:32+00:00"
+        },
+        {
+            "name": "rambomst/php-bounce-handler",
+            "version": "1.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Rambomst/PHP-Bounce-Handler.git",
+                "reference": "82bbe0607f17a851cd93a26d5700ff40c17a9665"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Rambomst/PHP-Bounce-Handler/zipball/82bbe0607f17a851cd93a26d5700ff40c17a9665",
+                "reference": "82bbe0607f17a851cd93a26d5700ff40c17a9665",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "rambomst\\PHPBounceHandler\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Patrick O'Connell",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Parses email bounce notifications and turns them into associative arrays and returns header information with bounce statuses",
+            "homepage": "https://github.com/rambomst/PHP-Bounce-Handler/",
+            "keywords": [
+                "bounce",
+                "email",
+                "mail",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/Rambomst/PHP-Bounce-Handler/issues",
+                "source": "https://github.com/Rambomst/PHP-Bounce-Handler/tree/master"
+            },
+            "time": "2018-02-11T21:04:04+00:00"
         },
         {
             "name": "sentry/sdk",
