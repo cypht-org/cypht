@@ -45,7 +45,6 @@ require APP_PATH.'lib/version.php';
 require APP_PATH.'lib/tls.php';
 
 require_once APP_PATH.'modules/core/functions.php';
-require_once APP_PATH.'modules/core/hm-server-target.php';
 
 /* check for and load the correct libsodium interface */
 if (!defined('LIBSODIUM')) {

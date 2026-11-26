@@ -475,10 +475,6 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
 class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
     public function process() {
         if (isset($this->request->post['submit_smtp_server'])) {
-            if ($this->config->get('single_server_mode', false)) {
-                Hm_Msgs::add('Additional servers cannot be added in single server mode', 'warning');
-            }
-            else {
             list($success, $form) = $this->process_form(array('new_smtp_name', 'new_smtp_address', 'new_smtp_port'));
             if (!$success) {
                 Hm_Msgs::add('You must supply a name, a server and a port', 'warning');
@@ -488,18 +484,10 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                 if (array_key_exists('tls', $this->request->post) && $this->request->post['tls']) {
                     $tls = true;
                 }
-                $target = hm_server_connect_target($form['new_smtp_address'], $this->config);
-                $errno = 0;
-                $errstr = '';
-                $con = false;
-                if ($target && hm_server_port_is_valid($form['new_smtp_port'])) {
-                    $con = @fsockopen($target['dial'], (int) $form['new_smtp_port'], $errno, $errstr, 2);
-                }
-                if ($con) {
-                    fclose($con);
+                if ($con = @fsockopen($form['new_smtp_address'], $form['new_smtp_port'], $errno, $errstr, 2)) {
                     Hm_SMTP_List::add(array(
                         'name' => $form['new_smtp_name'],
-                        'server' => $target['host'],
+                        'server' => $form['new_smtp_address'],
                         'port' => $form['new_smtp_port'],
                         'tls' => $tls,
                         'tls_verify' => empty($this->request->post['new_smtp_allow_insecure'])));
@@ -508,13 +496,9 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                     $this->session->record_unsaved('SMTP server added');
                 }
                 else {
-                    if ($errstr !== '') {
-                        Hm_Debug::add(sprintf('Could not add SMTP server: %s', $errstr));
-                    }
                     $this->session->set('add_form_vals', $form);
-                    Hm_Msgs::add('Could not add server', 'danger');
+                    Hm_Msgs::add(sprintf('Could not add server: %s', $errstr), 'danger');
                 }
-            }
             }
         }
         else {
