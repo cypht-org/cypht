@@ -15,7 +15,11 @@ class Hm_Sieve_Client_Factory {
             } else {
                 list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_account);
             }
-            $client = new PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
+            $target = hm_server_connect_target($sieve_host, null);
+            if ($target === false || !hm_server_port_is_valid($sieve_port)) {
+                throw new Exception('Invalid config host');
+            }
+            $client = new PhpSieveManager\ManageSieve\Client($target['host'], $sieve_port);
             $client->connect($imap_account['user'], $imap_account['pass'], $sieve_tls, "", "PLAIN");
             return $client;
         } else {

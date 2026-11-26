@@ -1152,6 +1152,10 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
             'srv_setup_stepper_smtp_server_id',
         ));
         if ($success) {
+            if ($this->config->get('single_server_mode', false)) {
+                Hm_Msgs::add('Additional servers cannot be added in single server mode', 'warning');
+                return;
+            }
             // Destructure form array into variables
             [
                 'srv_setup_stepper_profile_name' => $profileName,
