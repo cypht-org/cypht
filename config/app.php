@@ -219,6 +219,20 @@ return [
     'user_config_type' => env('USER_CONFIG_TYPE', 'file'),
 
     /*
+    | ---------------------
+    | Shared State Bridge
+    | ---------------------
+    |
+    | Shared-state integrations may use a different store than permanent
+    | settings and can provide a server-managed wrapping secret and namespaced
+    | user identity when account-password authentication is external.
+    |
+    */
+    'shared_state_store_type' => env('SHARED_STATE_STORE_TYPE'),
+    'shared_state_secret' => env('SHARED_STATE_SECRET'),
+    'shared_state_user' => env('SHARED_STATE_USER'),
+
+    /*
     | -----------------
     | Settings Location
     | -----------------

@@ -787,21 +787,22 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
             } elseif (!$this->session->get('skip_shared_state_load', false)) {
                 try {
                     $password = $this->session->loaded && $success ? $form['password'] : null;
+
                     $this->session->open_shared_state($this->user_config, $password);
+                    $this->out('shared_state_enabled', true);
+
+                    // Any change originating from the shared state should be synchronized with the UI
+                    $this->out('changed_settings', $this->session->get('changed_settings', []), false);
+                    $pages = $this->user_config->get('saved_pages', []);
+                    $this->session->set('saved_pages', $pages);
                 } catch (Hm_Shared_State_Reauthentication_Required $exception) {
                     $this->session->destroy($this->request);
+
                     Hm_Msgs::add($exception->getMessage(), 'warning');
                     $this->out('redirect_url', '?home');
                     $this->halt();
                     return;
                 }
-
-                $this->out('shared_state_enabled', true);
-
-                // Any change originating from the shared state should be synchronized with the UI
-                $this->out('changed_settings', $this->session->get('changed_settings', []), false);
-                $pages = $this->user_config->get('saved_pages', []);
-                $this->session->set('saved_pages', $pages);
             }
 
             $this->out('disable_delete_prompt', $this->user_config->get('disable_delete_prompt_setting', DEFAULT_DISABLE_DELETE_PROMPT));

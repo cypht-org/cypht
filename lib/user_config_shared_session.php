@@ -14,7 +14,7 @@ class Hm_User_Config_Shared_Session {
      * @param Hm_User_Config_Shared_State $state shared-state manager
      * @param Hm_Session $session authenticated session
      * @param Hm_Config $config user configuration
-     * @param string $username account name
+     * @param string $username authenticated account name
      * @return void
      */
     public function __construct(Hm_User_Config_Shared_State $state, $session, $config, $username) {
@@ -31,10 +31,15 @@ class Hm_User_Config_Shared_Session {
      * @throws Exception if the configured store cannot be created
      */
     public static function create_store($site_config) {
-        $type = $site_config->get('user_config_type', 'file');
+        $type = $site_config->get(
+            'shared_state_store_type',
+            $site_config->get('user_config_type', 'file')
+        );
+
         if ($type === 'file') {
             return new Hm_User_Config_Shared_File_Store($site_config->get('user_settings_dir', false));
         }
+
         if ($type === 'DB') {
             $dbh = Hm_DB::connect($site_config);
             if (!$dbh) {
@@ -42,6 +47,7 @@ class Hm_User_Config_Shared_Session {
             }
             return new Hm_User_Config_Shared_DB_Store($dbh);
         }
+
         throw new RuntimeException('The configured user settings backend does not support shared state');
     }
 

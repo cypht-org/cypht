@@ -271,6 +271,37 @@ class Hm_Test_User_Config_Shared_Session extends TestCase {
     }
 
     /** @return void */
+    public function test_integration_can_open_shared_state_without_user_password() {
+        $this->site->set('user_config_type', 'custom:Tiki_Hm_User_Config');
+        $this->site->set('shared_state_store_type', 'file');
+        $this->site->set('shared_state_secret', 'server-managed-secret');
+        $this->site->set('shared_state_user', 'alice:cypht_user_config_page');
+
+        $session = new Hm_PHP_Session($this->site, 'Hm_Auth_DB');
+        $session->session_key = bin2hex(random_bytes(16));
+        $session->set('username', 'alice');
+
+        $config = new Hm_User_Config_File($this->site);
+        $config->load('alice', 'password');
+
+        $session->open_shared_state($config);
+        $this->assertTrue($session->has_shared_state());
+        $this->assertIsArray($session->get('shared_state_credentials'));
+
+        $config->set('theme_setting', 'dark');
+        $session->flush_shared_state();
+
+        $other_session = new Hm_PHP_Session($this->site, 'Hm_Auth_DB');
+        $other_session->session_key = bin2hex(random_bytes(16));
+        $other_session->set('username', 'bob');
+        $other_config = new Hm_User_Config_File($this->site);
+        $other_config->load('bob', 'password');
+
+        $other_session->open_shared_state($other_config);
+        $this->assertSame('dark', $other_config->get('theme_setting'));
+    }
+
+    /** @return void */
     public function test_shared_draft_remains_until_the_last_active_session_releases_it() {
         list($first, $first_config) = $this->session_and_config('password');
         list($second, $second_config) = $this->session_and_config('password');

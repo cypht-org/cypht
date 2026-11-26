@@ -147,15 +147,28 @@ abstract class Hm_Session {
      * @throws Exception if the store or shared state cannot be opened or the session must sign in again
      */
     public function open_shared_state($config, $password = null) {
-        $username = $this->get('username');
+        $username = $this->site_config->get('shared_state_user', $this->get('username'));
         $store = Hm_User_Config_Shared_Session::create_store($this->site_config);
         $state = new Hm_User_Config_Shared_State($store, $username);
-        $shared_session = new Hm_User_Config_Shared_Session($state, $this, $config, $username);
-        if ($password === null) {
+        $shared_session = new Hm_User_Config_Shared_Session(
+            $state,
+            $this,
+            $config,
+            $this->get('username')
+        );
+
+        $credentials = $this->get('shared_state_credentials');
+        if ($password === null &&
+            is_string($this->site_config->get('shared_state_secret')) &&
+            $this->site_config->get('shared_state_secret') !== '' &&
+            !is_array($credentials)) {
+            $shared_session->login($this->site_config->get('shared_state_secret'));
+        } elseif ($password === null) {
             $shared_session->resume();
         } else {
             $shared_session->login($password);
         }
+
         $this->shared_state = $shared_session;
         Hm_Dispatch::set_shared_session($this);
     }
