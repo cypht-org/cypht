@@ -9,6 +9,13 @@
 trait Hm_Dispatch_Redirect {
 
     /**
+     * Flush shared state before redirecting.
+     * @return void
+     * @throws Throwable if flushing the shared state fails
+     */
+    abstract public static function flush_shared_session();
+
+    /**
      * Redirect after an HTTP POST form
      * @param Hm_Request $request request object
      * @param object $session session object
@@ -129,6 +136,7 @@ trait Hm_Dispatch_Redirect {
      * @return void
      */
     static public function page_redirect($url, $status = false) {
+        self::flush_shared_session();
         if (DEBUG_MODE) {
             Hm_Debug::add(sprintf('Redirecting to %s', $url), 'info');
             Hm_Debug::load_page_stats();
@@ -161,6 +169,27 @@ class Hm_Dispatch {
     public $module_exec;
     public $page;
     public $output;
+    private static $shared_session;
+
+    /**
+     * Register the session whose shared settings need redirect-time flushing.
+     * @param Hm_Session|null $session session to register, or null to clear
+     * @return void
+     */
+    public static function set_shared_session($session) {
+        self::$shared_session = $session;
+    }
+
+    /**
+     * Flush the registered session's shared state before a direct redirect.
+     * @return void
+     * @throws Throwable if flushing the shared state fails
+     */
+    public static function flush_shared_session() {
+        if (self::$shared_session) {
+            self::$shared_session->flush_shared_state();
+        }
+    }
 
     /**
      * Setup object needed to process a request

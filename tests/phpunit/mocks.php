@@ -32,6 +32,12 @@ class Hm_Mock_Session {
     public function record_unsaved() {
         return true;
     }
+    public function open_shared_state($config, $password = null) {
+        return true;
+    }
+    public function save_shared_state($password) {
+        return false;
+    }
     public function is_active() {
         return $this->loaded;
     }

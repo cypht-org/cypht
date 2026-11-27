@@ -118,6 +118,7 @@ abstract class Hm_PHP_Session_Data extends Hm_Session {
     public function set($name, $value, $user = false) {
         if ($user) {
             $this->data['user_data'][$name] = $value;
+            $this->set_shared_user_value($name, $value);
         } else {
             $this->data[$name] = $value;
         }
@@ -317,6 +318,7 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
      * @return void
      */
     public function close_early() {
+        $this->flush_shared_state();
         $this->session_closed = true;
         $this->save_data();
     }
@@ -327,6 +329,7 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
      * @return void
      */
     public function destroy($request) {
+        $this->release_shared_state();
         if (function_exists('delete_uploaded_files')) {
             delete_uploaded_files($this);
         }
@@ -346,6 +349,8 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
      * @return void
      */
     public function end() {
+        $this->flush_shared_state();
+        $this->detach_shared_state();
         if ($this->active) {
             if (!$this->session_closed) {
                 $this->save_data();

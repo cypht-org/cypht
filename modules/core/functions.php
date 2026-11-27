@@ -488,7 +488,10 @@ function save_user_settings($handler, $form, $logout) {
     }
     if ($user && $path && $pass) {
         try {
-            $handler->user_config->save($user, $pass);
+            if (!$handler->session->save_shared_state($pass)) {
+                $handler->user_config->save($user, $pass);
+            }
+            
             $handler->session->set('changed_settings', array());
             if ($logout) {
                 $handler->session->destroy($handler->request);

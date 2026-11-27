@@ -35,6 +35,7 @@ class Hm_Handler_process_change_password extends Hm_Handler_Module {
             $user_config->load($user, $form['old_pass']);
             try {
                 $user_config->save($user, $form['new_pass1']);
+                $this->session->rewrap_shared_state($form['new_pass1']);
             } catch (Exception $e) {
                 Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
             }

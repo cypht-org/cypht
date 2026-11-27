@@ -38,10 +38,18 @@ function cypht_login($user, $pass, $url, $lifetime=0) {
         $config = new Hm_Site_Config_File();
         $user_config = load_user_config_object($config);
         $user_config->load($user, $pass);
+
+        $session->set('username', rtrim($user));
+        
+        if (!$user_config->decrypt_failed) {
+            $session->open_shared_state($user_config, $pass);
+        } else {
+            $session->set('skip_shared_state_load', true);
+        }
+
         module_init_functions($user_config, $session, $request, $config, $user, $pass);
         $user_data = $user_config->dump();
         $session->set('user_data', $user_data);
-        $session->set('username', rtrim($user));
         Hm_Functions::setcookie('hm_id', stripslashes($session->enc_key), $lifetime, $path, $domain, $secure, true);
         Hm_Functions::setcookie('hm_session', stripslashes($session->session_key), $lifetime, $path, $domain, $secure, true);
         $session->end();
