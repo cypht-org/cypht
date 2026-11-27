@@ -14,7 +14,7 @@ var is_editing_filter = false;
 var current_editing_filter_name = '';
 
 var hm_sieve_condition_fields = function() {
-    return {
+    const fields = {
         'Message': [
             {
                 name: 'subject',
@@ -82,6 +82,16 @@ var hm_sieve_condition_fields = function() {
             },
         ],
     };
+    if (hm_module_is_supported('bounces')) {
+        // evaluated by host-side filter runners, see modules/bounces/README.md
+        fields.Message.push({
+            name: 'bounce',
+            description: 'Is bounce',
+            type: 'none',
+            options: ['Soft', 'Hard'],
+        });
+    }
+    return fields;
 };
 
   /**************************************************************************************
@@ -175,7 +185,7 @@ function showErrorMsg(msg, parentClass, fadeTime = null) {
  * @type {[{name: string, description: string, placeholder: string, type: string, selected: boolean},{name: string, description: string, placeholder: string, type: string},{name: string, description: string, type: string},{name: string, description: string, type: string},{name: string, description: string, placeholder: string, type: string}]}
  */
 var hm_sieve_possible_actions = function() {
-    return [
+    const actions = [
         {
             name: 'keep',
             description: 'Deliver (Keep)',
@@ -264,6 +274,16 @@ var hm_sieve_possible_actions = function() {
             require: 'vacation'
         }
     ];
+    if (hm_module_is_supported('bounces')) {
+        actions.push({
+            name: 'bounce',
+            description: 'Add to bounce list',
+            type: 'none',
+            extra_field: false,
+            require: 'bounce'
+        });
+    }
+    return actions;
 };
 
 var find_account_element = function(account_name) {
@@ -829,6 +849,8 @@ const registerSievePageEvents = (edit_filter_modal, edit_script_modal) => {
         $('.modal_sieve_filter_priority').val('');
         $('.modal_sieve_filter_test').val('ALLOF');
         $('#stop_filtering').prop('checked', false);
+        is_editing_filter = false;
+        current_editing_filter_name = '';
         current_account = $(this).attr('account');
         current_account_element = $(this);
         edit_filter_modal.open();
@@ -1164,16 +1186,7 @@ function createEditFilterModal(save_filter, current_account, options = {}) {
         modalId: 'myEditFilterModal',
     });
 
-    // Store template content on first use, then reuse it
-    if (!edit_filter_template_content) {
-        const templateEl = document.querySelector('#edit_filter_modal');
-        if (templateEl) {
-            edit_filter_template_content = templateEl.innerHTML;
-            $('#edit_filter_modal').remove();
-        }
-    }
-
-    edit_filter_modal.setContent(edit_filter_template_content);
+    edit_filter_modal.setContent(takeSieveModalTemplate('#edit_filter_modal'));
 
     edit_filter_modal.addFooterBtn(
         hm_trans('Save'),
@@ -1237,9 +1250,7 @@ function sieveFiltersPageHandler() {
         modalId: 'myEditScript'
     });
 
-    // set content
-    edit_script_modal.setContent(document.querySelector('#edit_script_modal').innerHTML);
-    $('#edit_script_modal').remove();
+    edit_script_modal.setContent(takeSieveModalTemplate('#edit_script_modal'));
 
     // add a button
     edit_script_modal.addFooterBtn('Save', 'btn-primary', async function () {
@@ -1332,7 +1343,16 @@ function collectChips(container) {
 
 let current_mailbox_for_filter;
 let edit_filter_modal_for_custom_actions;
-let edit_filter_template_content;
+const sieve_modal_templates = {};
+
+function takeSieveModalTemplate(selector) {
+    const templateEl = document.querySelector(selector);
+    if (templateEl) {
+        sieve_modal_templates[selector] = templateEl.innerHTML;
+        templateEl.remove();
+    }
+    return sieve_modal_templates[selector] ?? '';
+}
 
 function createFilterFromList(launcherModal) {
     const froms = collectChips('#filter-from-list');

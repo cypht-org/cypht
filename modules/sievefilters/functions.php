@@ -164,6 +164,10 @@ if (!hm_exists('get_mailbox_filters')) {
             ';
                 continue;
             }
+            $is_disabled = strpos($script_name, 'sdisabled_') === 0;
+            if ($is_disabled) {
+                $exp_name = explode('-', substr($script_name, strlen('sdisabled_')));
+            }
             $parsed_name = str_replace('_', ' ', $exp_name[0]);
 
             if (count($exp_name) > 3) {
@@ -172,17 +176,11 @@ if (!hm_exists('get_mailbox_filters')) {
             }
 
             $display_name = str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2)));
-            $checked = ' checked';
-            if (preg_match('/^s(en|dis)abled/', $display_name)) {
-                $display_name = str_replace(['senabled ', 'sdisabled '], '', $display_name);
-                if (strpos($display_name, 'sdisabled') === 0) {
-                    $checked = '';
-                }
-            }
+            $checked = $is_disabled ? '' : ' checked';
             $script_list .= '
             <tr>
                 <td>'. $exp_name[sizeof($exp_name) - 2] .'</td>
-                <td>' . str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2))) . '</td>
+                <td>' . $display_name . '</td>
                 <td>
                     <span class="form-switch">
                         <input script_name_parsed="'.$parsed_name.'" priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'" class="toggle_filter form-check-input" type="checkbox" role="switch" id="Check" name="script_state"'.$checked.'>
@@ -215,10 +213,14 @@ if (!hm_exists('generate_main_script')) {
                 $has_blocked_senders = true;
             }
 
+            if (strpos($script_name, 'sdisabled_') === 0) {
+                continue;
+            }
+
             if (mb_strstr($script_name, 'cypht')) {
                 $ex_name = explode('-', $script_name);
                 $sorted_list[$script_name] = $ex_name[1];
-            } elseif ($script_name != 'blocked_senders' && strpos($script_name, 'sdisabled_') !== 0) {
+            } elseif ($script_name != 'blocked_senders') {
                 // Scripts created outside Cypht run first, with priority 0
                 $sorted_list[$script_name] = 0;
             }

@@ -51,6 +51,7 @@
         "league/commonmark": "^2.8",
         "monolog/monolog": "^3.0",
         "php": ">=8.1",
+        "rambomst/php-bounce-handler": "^1.6",
         "sentry/sdk": "^4.0",
         "symfony/dotenv": "^6.4",
         "symfony/yaml": "^6.4.40",
