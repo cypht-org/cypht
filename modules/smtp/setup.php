@@ -182,7 +182,7 @@ return array(
         'smtp_compose_type' => FILTER_VALIDATE_INT,
         'new_smtp_name' => FILTER_UNSAFE_RAW,
         'new_smtp_address' => FILTER_UNSAFE_RAW,
-        'new_smtp_port' => FILTER_VALIDATE_INT,
+        'new_smtp_port' => FILTER_UNSAFE_RAW,
         'smtp_connect' => FILTER_VALIDATE_INT,
         'smtp_delete' => FILTER_VALIDATE_INT,
         'smtp_send' => FILTER_VALIDATE_INT,
