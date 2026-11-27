@@ -35,6 +35,11 @@ class Hm_IMAP_List {
     }
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
+        if (!hm_mailbox_server_is_allowed($server)) {
+            Hm_Debug::add('Blocked mailbox connection to a disallowed host');
+            self::$server_list[$id]['object'] = false;
+            return false;
+        }
         $config = array(
             'server'    => $server['server'],
             'port'      => $server['port'],

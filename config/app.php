@@ -595,6 +595,22 @@ return [
     'allow_external_image_sources' => env('ALLOW_EXTERNAL_IMAGE_SOURCES', false),
 
     /*
+    | --------------------------
+    | User-added server networks
+    | --------------------------
+    |
+    | Applies when a logged-in user adds an IMAP, SMTP, JMAP, EWS, or Sieve
+    | server (not IMAP_AUTH_SERVER, Redis, or Memcached). Public hosts are
+    | always allowed. Internal hosts (RFC1918, IPv6 unique-local, loopback,
+    | localhost, and other non-public addresses that are not link-local) are
+    | allowed only when allow_internal_servers is true. Link-local addresses
+    | (169.254.0.0/16 and fe80::/10), including cloud instance metadata, are
+    | always denied. Set allow_internal_servers to true for private-network
+    | or localhost mail. Ports are not restricted.
+    */
+    'allow_internal_servers' => env('ALLOW_INTERNAL_SERVERS', false),
+
+    /*
     | ------------------
     | Enable AMP email
     | ------------------
