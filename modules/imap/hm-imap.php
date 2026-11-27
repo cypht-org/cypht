@@ -1692,16 +1692,16 @@ if (!class_exists('Hm_IMAP')) {
         public function read_stream_line($size=1024) {
             if ($this->stream_size) {
                 $res = $this->fgets(1024);
-                while(mb_substr($res, -2) != "\r\n") {
+                while(mb_substr($res, -2) != "\r\n" && !Hm_Functions::stream_ended($this->handle)) {
                     $res .= $this->fgets($size);
                 }
-                if ($res && $this->check_response(array($res), false, false)) {
+                if ($res === '' || ($res && $this->check_response(array($res), false, false))) {
                     $res = false;
                 }
                 if ($res) {
                     $this->current_stream_size += mb_strlen($res);
                 }
-                if ($this->current_stream_size >= $this->stream_size) {
+                if ($this->current_stream_size >= $this->stream_size || Hm_Functions::stream_ended($this->handle)) {
                     $this->stream_size = 0;
                 }
             }
@@ -2269,7 +2269,7 @@ if (!class_exists('Hm_IMAP')) {
          * @return array array of all matching parts from the message
          */
         public function search_bodystructure($struct, $search_flds, $all=true, $res=array()) {
-            return $this->struct_object->recursive_search($struct, $search_flds, $all, $res);
+            return ($this->struct_object ?: new Hm_IMAP_Struct(array(), $this))->recursive_search($struct, $search_flds, $all, $res);
         }
 
         /* ------------------ EXTENSIONS --------------------------------------- */
