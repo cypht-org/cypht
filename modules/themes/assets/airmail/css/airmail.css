@@ -1,0 +1,784 @@
+/*
+ * Airmail light theme for Cypht.
+ *
+ * A light, spacious mail UI: pale blue selection, rounded rows and a flat
+ * white surface. CSS-only: it changes colors, typography and density, and
+ * does not move any element of the layout.
+ *
+ * Palette is defined once as --am-* variables and mapped onto the Bootstrap
+ * custom properties, so components that are not explicitly overridden below
+ * (popovers, tabs, focus rings, etc.) still follow the theme instead of
+ * falling back to Bootstrap's default blue.
+ */
+
+@import url('../../../../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css');
+
+/* ------------------------------------------------------------------ */
+/* Palette, typography and Bootstrap mapping                          */
+/* ------------------------------------------------------------------ */
+html:root {
+	--am-primary: #0b57d0;
+	--am-primary-rgb: 11, 87, 208;
+	--am-primary-hover: #0842a0;
+	--am-primary-soft: rgba(11, 87, 208, .08);
+	--am-on-primary: #ffffff;
+
+	--am-surface: #ffffff;
+	--am-surface-2: #f2f6fc;
+	--am-hover: #f2f6fc;
+	--am-selected: #d3e3fd;
+	--am-selected-text: #001d35;
+
+	--am-text: #202124;
+	--am-text-2: #5f6368;
+	--am-border: #f1f3f4;
+	--am-border-strong: #dadce0;
+	--am-focus: rgba(11, 87, 208, .25);
+
+	/* Bootstrap custom properties: keep unthemed components in sync */
+	--bs-primary: var(--am-primary);
+	--bs-primary-rgb: var(--am-primary-rgb);
+	--bs-link-color: var(--am-primary);
+	--bs-link-color-rgb: var(--am-primary-rgb);
+	--bs-link-hover-color: var(--am-primary-hover);
+	--bs-body-color: var(--am-text);
+	--bs-body-bg: var(--am-surface);
+	--bs-emphasis-color: var(--am-text);
+	--bs-secondary-color: var(--am-text-2);
+	--bs-secondary-bg: var(--am-surface-2);
+	--bs-tertiary-bg: var(--am-surface-2);
+	--bs-border-color: var(--am-border-strong);
+	--bs-border-radius: 8px;
+	/* Core paints the active sidebar row with these two (core/site.css) */
+	--bs-primary-bg-subtle: var(--am-selected);
+	--bs-primary-border-subtle: #c2d7f7;
+	--bs-primary-text-emphasis: var(--am-selected-text);
+	--bs-focus-ring-color: var(--am-focus);
+	--bs-focus-ring-width: 2px;
+	--bs-focus-ring-opacity: 1;
+	--bs-form-valid-border-color: #188038;
+	--bs-form-invalid-border-color: #d93025;
+}
+
+html body,
+body.ltr_page {
+	background-color: var(--am-surface) !important;
+	color: var(--am-text);
+	font-family: "Roboto", "Segoe UI", Arial, sans-serif;
+	font-size: 14px;
+	-webkit-font-smoothing: antialiased;
+}
+
+a {
+	color: var(--am-primary);
+}
+
+/* ------------------------------------------------------------------ */
+/* Sidebar                                                            */
+/* ------------------------------------------------------------------ */
+.folder_cell,
+.folder_list {
+	background-color: var(--am-surface);
+}
+
+/*
+ * Sidebar rows.
+ *
+ * Core pads the <li> (0.3rem) and gives it a radius, while a theme that
+ * paints the inner <a> leaves the highlight floating inside the row. Two row
+ * shapes have to be handled:
+ *   - top-level rows (Unread, Compose, Folders, account headers): the anchor
+ *     holds icon + label, so the anchor is the pill;
+ *   - folder rows, which live in ul.inner_list and keep the folder icon as a
+ *     sibling of the anchor: there the <li> itself is the pill.
+ */
+.folder_list ul.folders > li {
+	padding: 0;
+}
+
+.folder_list ul.folders > li > a {
+	border-radius: 0 16px 16px 0;
+	color: var(--am-text);
+	display: block;
+	flex: 1 1 auto;
+	font-size: 14px;
+	height: 32px;
+	line-height: 32px;
+	min-width: 0;
+	overflow: hidden;
+	padding: 0 16px;
+	text-decoration: none;
+	text-overflow: ellipsis;
+	transition: background-color .15s ease, color .15s ease;
+	white-space: nowrap;
+}
+
+.folder_list .inner_list > li {
+	border-radius: 0 16px 16px 0;
+	line-height: 32px;
+	margin: 0;
+	padding: 0 16px;
+	transition: background-color .15s ease;
+}
+
+.folder_list .inner_list > li:hover {
+	background-color: var(--am-hover);
+}
+
+.folder_list .inner_list > li > a {
+	color: var(--am-text);
+	line-height: 32px;
+	text-decoration: none;
+	vertical-align: middle;
+}
+
+.folder_list .inner_list > li > i {
+	vertical-align: middle;
+}
+
+/* The "+" toggle of a folder with children must stay a small inline icon */
+.folder_list .inner_list .expand_link {
+	background: transparent;
+	color: var(--am-text-2);
+	padding: 0;
+}
+
+/*
+ * Active row: core adds .selected_menu to the <li> itself
+ * (site.js hl_selected_menu) and forces the text color with !important,
+ * which is why --bs-primary-text-emphasis is mapped to the palette above.
+ */
+.folder_list ul.folders > li.selected_menu > a {
+	background-color: var(--am-selected);
+	color: var(--am-selected-text);
+	font-weight: 500;
+}
+
+.folder_list .inner_list > li.selected_menu {
+	background-color: var(--am-selected);
+}
+
+.folder_list .inner_list > li.selected_menu > a {
+	color: var(--am-selected-text);
+}
+
+/* Core underlines links on hover; the pill replaces that affordance. */
+.folder_list a:hover,
+.folder_list a:focus {
+	text-decoration: none;
+}
+
+/* Never stack a second background on the active row. */
+.folder_list ul.folders > li:not(.selected_menu) > a:hover,
+.folder_list ul.folders > li:not(.selected_menu) > a:focus {
+	background-color: var(--am-hover);
+}
+
+.folder_list ul.folders > li.selected_menu > a:hover,
+.folder_list ul.folders > li.selected_menu > a:focus {
+	color: var(--am-selected-text);
+}
+
+.menu-icon {
+	color: #444746;
+	display: inline-block;
+	font-size: 20px;
+	line-height: 1;
+	margin-right: 20px;
+	text-align: center;
+	vertical-align: middle;
+	width: 20px;
+}
+
+.nav-label {
+	font-size: 14px;
+}
+
+/*
+ * Compose is a plain row like the others (review A1): no fill, so the icon
+ * alone marks it. The generic row rules above already give it the same
+ * radius, height and hover as every other entry.
+ */
+.folder_list ul.folders > li.menu_compose > a {
+	background-color: transparent;
+	color: var(--am-text);
+}
+
+.folder_list ul.folders > li.menu_compose > a:hover,
+.folder_list ul.folders > li.menu_compose > a:focus {
+	background-color: var(--am-hover);
+	color: var(--am-text);
+}
+
+/* Collapsed sidebar: no horizontal padding, icons centred. Some rows are
+ * flex containers (the Unread item carries d-flex), so text-align alone does
+ * not centre the icon: justify-content is needed there. */
+nav.collapsed .folder_list ul.folders > li > a {
+	border-radius: 16px;
+	justify-content: center;
+	padding: 0;
+	text-align: center;
+}
+
+/* Core keeps a 15-20px indent for the folder lists, which pushes the icons
+ * off centre once the labels are hidden. */
+nav.collapsed .folder_list {
+	padding-right: 0;
+}
+
+nav.collapsed .folder_list ul.folders,
+nav.collapsed .folder_list .inner_list {
+	margin-left: 0 !important;
+}
+
+/* The footer is a column in collapsed mode, so centre it as a whole: the
+ * menu-toggle is a plain 20px div, not a link. The theme sheet is loaded
+ * before core's site.css, so a same-specificity rule would lose: one extra
+ * class keeps the indent off. */
+nav.collapsed .folder_list .sidebar-footer {
+	align-items: center;
+	padding-left: 0 !important;
+	padding-right: 0;
+}
+
+/*
+ * Icons only: core already hides .nav-label and .collapse, so what is left
+ * over is the unread counters (which floated over the icons) and, when the
+ * install runs in single_server_mode, the account rows and their folder
+ * trees, because those are not wrapped in a .collapse for core to hide.
+ */
+nav.collapsed .folder_list .unread_count,
+nav.collapsed .folder_list .total_unread_count,
+nav.collapsed .folder_list .unread_mail_count,
+nav.collapsed .folder_list .combined_inbox_count {
+	display: none !important;
+}
+
+nav.collapsed .folder_list [data-server-id],
+nav.collapsed .folder_list .inner_list {
+	display: none !important;
+}
+
+/* The section initial is the popover trigger for the folder list, so it has
+ * to stay: render it as a round avatar instead of a full-width block. */
+nav.collapsed .folder_list .src_name_initial {
+	border-radius: 50%;
+	font-size: 13px;
+	height: 32px;
+	line-height: 32px;
+	margin: 4px auto 6px;
+	padding: 0;
+	width: 32px;
+}
+
+/* Search: rounded pill, no layout change */
+.menu_search .input-group {
+	background-color: var(--am-border);
+	border-radius: 24px;
+	overflow: hidden;
+}
+
+.menu_search .input-group:focus-within {
+	background-color: var(--am-surface);
+	box-shadow: 0 1px 1px 0 rgba(65, 69, 73, .3), 0 1px 3px 1px rgba(65, 69, 73, .15);
+}
+
+.menu_search .input-group-text {
+	background: transparent;
+	border: none;
+	color: var(--am-text-2);
+}
+
+.menu_search .search_terms,
+.search_terms {
+	background: transparent;
+	border: none;
+	color: var(--am-text);
+	font-size: 14px;
+}
+
+/* The generic .form-control:focus rule must not draw a border inside the pill */
+.menu_search .search_terms:focus {
+	border: 0;
+	box-shadow: none;
+	outline: none;
+}
+
+.search_terms::placeholder {
+	color: var(--am-text-2);
+}
+
+/* Account rows: name on the left, unread count on the right */
+.folder_list li[data-server-id] {
+	position: relative;
+}
+
+/* core caps this link so the account name does not overflow the sidebar */
+.folder_list li[data-server-id] > a.imap_folder_link {
+	max-width: none;
+	padding-right: 56px;
+}
+
+/* The header row is the first 32px of the <li>, which also holds the folder
+ * list, so centre on that row instead of on the whole group. */
+.folder_list li[data-server-id] > .unread_count {
+	position: absolute;
+	right: 16px;
+	top: 16px;
+	margin: 0;
+	transform: translateY(-50%);
+}
+
+/* Core pins the badge colors with !important (core/site.css), so must we. */
+li[data-server-id] .unread_count {
+	background-color: var(--am-primary) !important;
+	color: var(--am-on-primary) !important;
+	border: none;
+	border-radius: 10px !important;
+	padding: 1px 8px;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+/* Same !important tie-break as above for the global unread counter. */
+li.menu_unread .total_unread_count,
+li.menu_unread .badge {
+	background-color: var(--am-primary) !important;
+	color: var(--am-on-primary) !important;
+	border: none;
+	border-radius: 10px !important;
+	padding: 1px 8px;
+	font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ */
+/* Content bars                                                       */
+/* ------------------------------------------------------------------ */
+.content_title,
+.bar {
+	background-color: var(--am-surface);
+	border-bottom: 1px solid var(--am-border);
+	box-shadow: none;
+	color: var(--am-text);
+}
+
+.content_title h2,
+.content_title .card_title {
+	font-size: 18px;
+	font-weight: 400;
+	color: var(--am-text);
+}
+
+.list_controls,
+.list_sources,
+.mailbox_list_title {
+	background-color: var(--am-surface);
+	border-bottom: 1px solid var(--am-border);
+	color: var(--am-text);
+}
+
+/* ------------------------------------------------------------------ */
+/* Message list: read rows tinted, unread rows white and bold         */
+/* ------------------------------------------------------------------ */
+/* Core builds rows as tr.<id> [email|feeds] [unseen] <source> [flags].
+ * IMAP rows get an explicit `seen` class, but feed and history rows never
+ * get one: only `unseen` is added, and site.js also only toggles that class.
+ * So "read" is the default state and `unseen` carves the white row out
+ * instead of matching `seen`.
+ *
+ * Bootstrap paints every <td> with --bs-table-bg (#fff), which sits on top
+ * of the row background: without the rules below the tint is invisible and
+ * read and unread rows look identical. */
+.message_table > tbody > tr:not([class~="unseen"]):not(.prev):not(.next) {
+	background-color: var(--am-surface-2);
+}
+
+.message_table > tbody > tr:not([class~="unseen"]):not(.prev):not(.next) > td {
+	background-color: var(--am-surface-2);
+}
+
+.message_table > tbody > tr[class~="unseen"],
+.message_table > tbody > tr[class~="unseen"] > td {
+	background-color: var(--am-surface);
+}
+
+/* Last, so it beats both rules above (same specificity) */
+.message_table > tbody > tr:hover,
+.message_table > tbody > tr:hover > td {
+	background-color: #e8f0fe;
+}
+
+.message_table > tbody > tr[class~="unseen"] .from,
+.message_table > tbody > tr[class~="unseen"] .subject {
+	color: var(--am-text);
+	font-weight: 700;
+}
+
+.message_table .from,
+.message_table .subject {
+	color: var(--am-text);
+}
+
+.message_table .msg_date {
+	color: var(--am-text-2);
+	font-size: 12px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reading and composing                                              */
+/* ------------------------------------------------------------------ */
+.msg_text {
+	color: var(--am-text);
+	font-size: 14px;
+	line-height: 1.55;
+}
+
+.message_headers {
+	color: var(--am-text-2);
+	font-size: 13px;
+}
+
+.message_headers .header_subject,
+.msg_headers .header_subject {
+	color: var(--am-text);
+	font-size: 22px;
+	font-weight: 400;
+}
+
+.compose_subject {
+	font-size: 16px;
+	font-weight: 500;
+}
+
+.compose_to,
+.compose_subject,
+.compose_body,
+.compose_cc,
+.compose_bcc {
+	color: var(--am-text);
+	font-size: 14px;
+}
+
+.smtp_send {
+	background-color: var(--am-primary);
+	border-radius: 18px;
+	color: var(--am-on-primary);
+	font-weight: 500;
+}
+
+.smtp_send:hover {
+	background-color: var(--am-primary-hover);
+}
+
+/* ------------------------------------------------------------------ */
+/* Buttons                                                            */
+/* ------------------------------------------------------------------ */
+.btn {
+	border-radius: 18px;
+	font-size: 14px;
+	font-weight: 500;
+	box-shadow: none;
+}
+
+.btn:focus-visible {
+	box-shadow: 0 0 0 2px var(--am-focus);
+}
+
+.btn-primary {
+	background-color: var(--am-primary);
+	border-color: var(--am-primary);
+	color: var(--am-on-primary);
+}
+
+/* Lighter on hover, as asked in review: a darker fill reads as "pressed" */
+.btn-primary:hover,
+.btn-primary:focus {
+	background-color: #286bd6;
+	border-color: #286bd6;
+	color: var(--am-on-primary);
+}
+
+.btn-primary:active,
+.btn-primary.active,
+.btn-primary.show {
+	background-color: var(--am-primary-hover);
+	border-color: var(--am-primary-hover);
+	color: var(--am-on-primary);
+}
+
+.btn-secondary,
+.btn-light,
+.btn-outline-secondary {
+	background-color: transparent;
+	border-color: var(--am-border-strong);
+	color: var(--am-primary);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-light:hover,
+.btn-light:focus,
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+	background-color: var(--am-primary-soft);
+	border-color: var(--am-border-strong);
+	color: var(--am-primary);
+}
+
+/* Bootstrap paints the pressed/open state with a dark fill, which reads as
+ * an unrelated color on this palette (review C10). */
+.btn-secondary:active,
+.btn-secondary.active,
+.btn-secondary.show,
+.btn-light:active,
+.btn-light.active,
+.btn-light.show,
+.btn-outline-secondary:active,
+.btn-outline-secondary.active,
+.btn-outline-secondary.show {
+	background-color: var(--am-primary-soft);
+	border-color: var(--am-border-strong);
+	color: var(--am-primary);
+}
+
+/* Status buttons: a red/green/amber ramp that stays readable on white */
+.btn-danger {
+	background-color: #d93025;
+	border-color: #d93025;
+	color: #ffffff;
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+	background-color: #b3261e;
+	border-color: #b3261e;
+	color: #ffffff;
+}
+
+.btn-success {
+	background-color: #188038;
+	border-color: #188038;
+	color: #ffffff;
+}
+
+.btn-success:hover,
+.btn-success:focus {
+	background-color: #146c2e;
+	border-color: #146c2e;
+	color: #ffffff;
+}
+
+.btn-warning {
+	background-color: #f9ab00;
+	border-color: #f9ab00;
+	color: var(--am-text);
+}
+
+.btn-warning:hover,
+.btn-warning:focus {
+	background-color: #e8a300;
+	border-color: #e8a300;
+	color: var(--am-text);
+}
+
+/* ------------------------------------------------------------------ */
+/* Forms                                                              */
+/* ------------------------------------------------------------------ */
+.form-control,
+.form-select {
+	background-color: var(--am-surface);
+	border-color: var(--am-border-strong);
+	border-radius: 4px;
+	color: var(--am-text);
+	font-size: 14px;
+}
+
+.form-control:focus,
+.form-select:focus {
+	border-color: var(--am-primary);
+	box-shadow: 0 0 0 1px var(--am-primary);
+	outline: none;
+}
+
+.form-check-input:focus {
+	border-color: var(--am-primary);
+	box-shadow: 0 0 0 2px var(--am-focus);
+}
+
+.form-check-input:checked {
+	background-color: var(--am-primary);
+	border-color: var(--am-primary);
+}
+
+/* The contacts modal uses .custom-input, whose module rule is loaded after
+ * this sheet, so the plain selectors above would lose: match the other
+ * fields instead of leaving a different focus ring (review B8). */
+input.custom-input,
+select.custom-input {
+	border-color: var(--am-border-strong);
+	border-radius: 4px;
+}
+
+input.custom-input:focus,
+select.custom-input:focus {
+	border-color: var(--am-primary);
+	box-shadow: 0 0 0 1px var(--am-primary);
+	outline: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Cards, tabs, popovers, modals                                      */
+/* ------------------------------------------------------------------ */
+.card {
+	background-color: var(--am-surface);
+	border: 1px solid var(--am-border-strong);
+	border-radius: 8px;
+	box-shadow: none;
+}
+
+.nav-tabs {
+	--bs-nav-tabs-border-color: var(--am-border-strong);
+	--bs-nav-tabs-link-hover-border-color: var(--am-border-strong);
+	--bs-nav-tabs-link-active-color: var(--am-primary);
+	--bs-nav-tabs-link-active-bg: var(--am-surface);
+	--bs-nav-tabs-link-active-border-color: var(--am-border-strong) var(--am-border-strong) var(--am-surface);
+}
+
+/* Core uses the primary color for popover headers, which reads as a block of
+ * brand blue; keep it on the surface color instead. */
+.popover {
+	--bs-popover-border-color: var(--am-border-strong);
+	--bs-popover-header-bg: var(--am-surface-2);
+	--bs-popover-header-color: var(--am-text);
+	--bs-popover-body-color: var(--am-text);
+	--bs-popover-body-padding-y: .75rem;
+	--bs-popover-body-padding-x: .75rem;
+	border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(60, 64, 67, .3), 0 4px 8px 3px rgba(60, 64, 67, .15);
+}
+
+.popover-header {
+	border-bottom: 1px solid var(--am-border);
+	font-weight: 500;
+}
+
+/* Dropdowns (folder and message actions): Bootstrap's defaults do not follow
+ * the palette, so the menus looked unrelated to the theme (review C11). */
+.dropdown-menu {
+	--bs-dropdown-bg: var(--am-surface);
+	--bs-dropdown-border-color: var(--am-border-strong);
+	--bs-dropdown-border-radius: 8px;
+	--bs-dropdown-link-color: var(--am-text);
+	--bs-dropdown-link-hover-bg: var(--am-hover);
+	--bs-dropdown-link-hover-color: var(--am-text);
+	--bs-dropdown-link-active-bg: var(--am-selected);
+	--bs-dropdown-link-active-color: var(--am-selected-text);
+	--bs-dropdown-header-color: var(--am-text-2);
+	padding: 6px 0;
+	box-shadow: 0 1px 3px rgba(60, 64, 67, .3), 0 4px 8px 3px rgba(60, 64, 67, .15);
+}
+
+.dropdown-item {
+	padding: 6px 16px;
+}
+
+.dropdown-divider {
+	border-color: var(--am-border);
+}
+
+/* Local contacts modal: the Manual/CSV toggle and its buttons are custom
+ * components, so they do not follow the palette on their own (B7, B9). The
+ * module sheet is loaded after this one, hence the extra class. */
+.modal .contact-method-toggle {
+	background-color: var(--am-surface);
+	border-color: var(--am-border-strong);
+}
+
+.contact-method-toggle .method-btn {
+	background-color: var(--am-surface);
+	border-right-color: var(--am-border);
+	color: var(--am-text-2);
+}
+
+.contact-method-toggle .method-btn:hover {
+	background-color: var(--am-hover);
+	color: var(--am-text);
+}
+
+.contact-method-toggle .method-btn.active {
+	background-color: var(--am-primary-soft);
+	color: var(--am-primary);
+	font-weight: 600;
+}
+
+/* The module sheet sets a grey hover after this one, so outrank it. */
+.modal-footer .custom-btn-secondary:hover {
+	background-color: var(--am-primary-soft);
+	border-color: var(--am-border-strong);
+	color: var(--am-primary);
+}
+
+.modal .modal-icon-wrapper {
+	color: var(--am-text-2);
+}
+
+.modal-content {
+	border: none;
+	border-radius: 8px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Settings                                                           */
+/* ------------------------------------------------------------------ */
+/* Core pins this color with !important (core/site.css), so must we. Keep the
+ * section headers on the link color, and let the RSS icon inherit it (E13). */
+.settings_subtitle {
+	background-color: var(--am-surface);
+	color: var(--am-primary) !important;
+	font-size: 16px;
+	font-weight: 500;
+}
+
+/* The RSS icon inside a subtitle inherited the pinned link color */
+.settings_subtitle .menu-icon {
+	color: inherit;
+	margin-right: 12px;
+}
+
+.settings .table > tbody > tr > td,
+.settings table td {
+	border-bottom: 1px solid var(--am-border);
+	color: var(--am-text);
+}
+
+.login_form .btn-lg,
+.login_form .btn-primary {
+	border-radius: 20px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Notifications and scrollbars                                       */
+/* ------------------------------------------------------------------ */
+.sys_messages .alert,
+.sys_messages > div {
+	background-color: #323232;
+	border: none;
+	border-radius: 4px;
+	color: #ffffff;
+}
+
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--am-border-strong) transparent;
+}
+
+::-webkit-scrollbar {
+	height: 8px;
+	width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--am-border-strong);
+	border-radius: 8px;
+}
